@@ -3,7 +3,7 @@ name: Build and Release C# Extension (with Roslyn Server)
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'  # 매일 0시에 실행
+    - cron: '0 0 * * *'
   push:
     branches: [main, master]
 
@@ -12,7 +12,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. 업스트림 dotnet/vscode-csharp 최신 코드 checkout
       - name: Checkout this repo
         uses: actions/checkout@v4
 
@@ -20,10 +19,9 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: dotnet/vscode-csharp
-          ref: main         # 필요에 따라 release 브랜치/tag로 변경
+          ref: main         # 필요시 release 브랜치/tag로 변경
           path: upstream
 
-      # 2. Node.js 및 dotnet SDK 설치
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -34,28 +32,19 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      # 3. 의존성 설치 및 Language Server 자동 다운로드
-      - name: Install dependencies and download language server
+      # 핵심 빌드 단계!
+      - name: Install dependencies and build VSIX
         run: |
           cd upstream
-          npm install
-          npm run downloadServer
-          npm install -g vsce ovsx
+          npm ci
+          npm run package   # roslyn 서버 포함 VSIX 자동 생성
 
-      # 4. VSIX 패키지 생성
-      - name: Build VSIX package
-        run: |
-          cd upstream
-          vsce package
-
-      # 5. 결과물 아티팩트로 업로드 (Optional)
       - name: Upload VSIX as artifact
         uses: actions/upload-artifact@v4
         with:
           name: vscode-csharp.vsix
           path: upstream/*.vsix
 
-      # 6. GitHub Release 자동 생성 및 VSIX 업로드
       #- name: Create Release
       #  id: create_release
       #  uses: softprops/action-gh-release@v2
@@ -74,21 +63,20 @@ jobs:
       #  env:
       #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 7. (옵션) Open VSX에 업로드
       #- name: Publish to Open VSX
       #  if: env.OPEN_VSX_TOKEN != ''
       #  run: |
       #    cd upstream
+      #    npm install -g ovsx
       #    ovsx publish *.vsix -p $OPEN_VSX_TOKEN
       #  env:
       #    OPEN_VSX_TOKEN: ${{ secrets.OPEN_VSX_TOKEN }}
 
-      # 8. (Optional) 빌드 결과 검증
-      - name: Verify server inclusion
+      # (Optional) 빌드 검증
+      - name: Verify Roslyn server inclusion
         run: |
           cd upstream
-          if [ ! -d "./dist/roslynLspServer" ] && [ ! -d "./server" ]; then
-            echo "Roslyn LSP server not found in VSIX package! Build failed."
+          if ! ls *.vsix | grep -q .; then
+            echo "VSIX package not found!"
             exit 1
           fi
-
