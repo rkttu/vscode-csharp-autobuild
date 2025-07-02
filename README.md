@@ -1,5 +1,6 @@
 # vscode-csharp-autobuild
 
+![GitHub Release](https://img.shields.io/github/v/release/rkttu/vscode-csharp-autobuild)
 [![Build and Release](https://github.com/rkttu/vscode-csharp-autobuild/actions/workflows/build-and-release.yml/badge.svg)](https://github.com/rkttu/vscode-csharp-autobuild/actions/workflows/build-and-release.yml)
 
 Automatically build and publish upstream builds of the dotnet/vscode-csharp Extension.
