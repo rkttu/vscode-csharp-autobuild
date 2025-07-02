@@ -24,16 +24,6 @@ jobs:
           repository: dotnet/vscode-csharp
           path: upstream
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Set up .NET SDK
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.x
-
       - name: Get latest tag and commit sha from upstream
         id: get_upstream
         run: |
@@ -100,6 +90,7 @@ jobs:
       - name: Checkout latest tag
         run: |
           cd upstream
+          git fetch --tags
           git checkout ${{ needs.check-changes.outputs.latest_tag }}
 
       - name: Change publisher in package.json
