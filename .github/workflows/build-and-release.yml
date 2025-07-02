@@ -52,7 +52,10 @@ jobs:
       - name: Check if new commit exists
         id: check_commit
         run: |
-          if [ "${{ steps.get_upstream.outputs.latest_sha }}" = "${{ steps.readsha.outputs.last_sha }}" ]; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual trigger detected. Forcing build."
+            echo "should_build=true" >> $GITHUB_OUTPUT
+          elif [ "${{ steps.get_upstream.outputs.latest_sha }}" = "${{ steps.readsha.outputs.last_sha }}" ]; then
             echo "No new commit. Skipping build."
             echo "should_build=false" >> $GITHUB_OUTPUT
           else
@@ -123,30 +126,37 @@ jobs:
           name: vscode-csharp-${{ needs.check-changes.outputs.latest_tag }}
           path: upstream/vsix/*
 
-      - name: Create GitHub Release
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Delete existing release if exists
+        run: |
+          if gh release view ${{ needs.check-changes.outputs.latest_tag }} > /dev/null 2>&1; then
+            echo "Deleting existing release ${{ needs.check-changes.outputs.latest_tag }}"
+            gh release delete ${{ needs.check-changes.outputs.latest_tag }} --yes
+          else
+            echo "No existing release found for ${{ needs.check-changes.outputs.latest_tag }}"
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ needs.check-changes.outputs.latest_tag }}
-          release_name: vscode-csharp ${{ needs.check-changes.outputs.latest_tag }}
-          body: |
-            Automated build of vscode-csharp based on upstream tag ${{ needs.check-changes.outputs.latest_tag }}
-            
-            Source: https://github.com/dotnet/vscode-csharp/releases/tag/${{ needs.check-changes.outputs.latest_tag }}
-          draft: false
-          prerelease: false
 
-      - name: Upload VSIX files to release
+      - name: Delete existing tag if exists
         run: |
-          cd upstream/vsix
-          for file in *.vsix; do
-            if [ -f "$file" ]; then
-              echo "Uploading $file to release..."
-              gh release upload ${{ needs.check-changes.outputs.latest_tag }} "$file" --clobber
-            fi
-          done
+          if git rev-parse ${{ needs.check-changes.outputs.latest_tag }} > /dev/null 2>&1; then
+            echo "Deleting existing tag ${{ needs.check-changes.outputs.latest_tag }}"
+            git tag -d ${{ needs.check-changes.outputs.latest_tag }} || true
+            git push origin :refs/tags/${{ needs.check-changes.outputs.latest_tag }} || true
+          else
+            echo "No existing tag found for ${{ needs.check-changes.outputs.latest_tag }}"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create GitHub Release
+        run: |
+          gh release create ${{ needs.check-changes.outputs.latest_tag }} \
+            --title "vscode-csharp ${{ needs.check-changes.outputs.latest_tag }}" \
+            --notes "Automated build of vscode-csharp based on upstream tag ${{ needs.check-changes.outputs.latest_tag }}
+
+          Source: https://github.com/dotnet/vscode-csharp/releases/tag/${{ needs.check-changes.outputs.latest_tag }}" \
+            upstream/vsix/*.vsix
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
