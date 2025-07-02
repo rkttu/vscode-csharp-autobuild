@@ -167,7 +167,11 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "actions@github.com"
           git add .last_built_sha
-          git commit -m "Update last built sha to ${{ needs.check-changes.outputs.latest_sha }}"
-          git push origin main
+          if git diff --staged --quiet; then
+            echo "No changes to .last_built_sha file. Skipping commit."
+          else
+            git commit -m "Update last built sha to ${{ needs.check-changes.outputs.latest_sha }}"
+            git push origin main
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
