@@ -2,10 +2,8 @@ name: vscode-csharp Automated Build
 
 on:
   workflow_dispatch:
-  #schedule:
-  #  - cron: '0 9 * * *'
-  #push:
-  #  branches: [main, master]
+  schedule:
+    - cron: '0 */6 * * *'
 
 jobs:
   check-changes:
