@@ -8,11 +8,12 @@ on:
   #  branches: [main, master]
 
 jobs:
-  build-and-release:
+  check-changes:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
+    outputs:
+      should_build: ${{ steps.check_commit.outputs.should_build }}
+      latest_tag: ${{ steps.get_upstream.outputs.latest_tag }}
+      latest_sha: ${{ steps.get_upstream.outputs.latest_sha }}
     steps:
       - name: Checkout this repo
         uses: actions/checkout@v4
@@ -39,39 +40,73 @@ jobs:
           cd upstream
           git fetch --tags
           LATEST_TAG=$(git for-each-ref --sort=-creatordate --format '%(refname:short)' refs/tags | head -n1)
-          echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
           LATEST_SHA=$(git rev-parse $LATEST_TAG)
-          echo "LATEST_SHA=$LATEST_SHA" >> $GITHUB_ENV
+          echo "latest_sha=$LATEST_SHA" >> $GITHUB_OUTPUT
 
       - name: Checkout latest tag
         run: |
           cd upstream
-          git checkout ${{ env.LATEST_TAG }}
-
-      - name: Change publisher in package.json
-        run: |
-          cd upstream
-          jq '.publisher = "your-namespace"' package.json > package.tmp.json
-          mv package.tmp.json package.json
+          git checkout ${{ steps.get_upstream.outputs.latest_tag }}
 
       - name: Read last built sha
         id: readsha
         run: |
           if [ -f .last_built_sha ]; then
             LAST_SHA=$(cat .last_built_sha)
-            echo "LAST_SHA=$LAST_SHA" >> $GITHUB_ENV
+            echo "last_sha=$LAST_SHA" >> $GITHUB_OUTPUT
           else
-            echo "LAST_SHA=none" >> $GITHUB_ENV
+            echo "last_sha=none" >> $GITHUB_OUTPUT
           fi
 
-      - name: Check if new commit, else exit
+      - name: Check if new commit exists
+        id: check_commit
         run: |
-          if [ "${{ env.LATEST_SHA }}" = "${{ env.LAST_SHA }}" ]; then
+          if [ "${{ steps.get_upstream.outputs.latest_sha }}" = "${{ steps.readsha.outputs.last_sha }}" ]; then
             echo "No new commit. Skipping build."
-            exit 0
+            echo "should_build=false" >> $GITHUB_OUTPUT
           else
-            echo "New commit detected. Proceeding."
+            echo "New commit detected. Proceeding with build."
+            echo "should_build=true" >> $GITHUB_OUTPUT
           fi
+
+  build-and-release:
+    needs: check-changes
+    if: needs.check-changes.outputs.should_build == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+
+      - name: Checkout upstream vscode-csharp
+        uses: actions/checkout@v4
+        with:
+          repository: dotnet/vscode-csharp
+          path: upstream
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Checkout latest tag
+        run: |
+          cd upstream
+          git checkout ${{ needs.check-changes.outputs.latest_tag }}
+
+      - name: Change publisher in package.json
+        run: |
+          cd upstream
+          jq '.publisher = "your-namespace"' package.json > package.tmp.json
+          mv package.tmp.json package.json
 
       - name: Install dependencies
         run: |
@@ -94,19 +129,19 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: vscode-csharp-${{ env.LATEST_TAG }}
+          name: vscode-csharp-${{ needs.check-changes.outputs.latest_tag }}
           path: upstream/vsix/*
 
       - name: Update last built sha file
         run: |
-          echo "${{ env.LATEST_SHA }}" > .last_built_sha
+          echo "${{ needs.check-changes.outputs.latest_sha }}" > .last_built_sha
 
       - name: Commit updated sha file
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "actions@github.com"
           git add .last_built_sha
-          git commit -m "Update last built sha to ${{ env.LATEST_SHA }}"
+          git commit -m "Update last built sha to ${{ needs.check-changes.outputs.latest_sha }}"
           git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
