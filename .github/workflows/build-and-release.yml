@@ -97,7 +97,7 @@ jobs:
       - name: Change publisher in package.json
         run: |
           cd upstream
-          jq '.publisher = "your-namespace"' package.json > package.tmp.json
+          jq '.publisher = "dotnetdev-kr-custom"' package.json > package.tmp.json
           mv package.tmp.json package.json
 
       - name: Install dependencies
