@@ -1,4 +1,4 @@
-name: Build and Release C# Extension (with Roslyn Server)
+name: vscode-csharp Automated Build
 
 on:
   workflow_dispatch:
@@ -122,6 +122,33 @@ jobs:
         with:
           name: vscode-csharp-${{ needs.check-changes.outputs.latest_tag }}
           path: upstream/vsix/*
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.check-changes.outputs.latest_tag }}
+          release_name: vscode-csharp ${{ needs.check-changes.outputs.latest_tag }}
+          body: |
+            Automated build of vscode-csharp based on upstream tag ${{ needs.check-changes.outputs.latest_tag }}
+            
+            Source: https://github.com/dotnet/vscode-csharp/releases/tag/${{ needs.check-changes.outputs.latest_tag }}
+          draft: false
+          prerelease: false
+
+      - name: Upload VSIX files to release
+        run: |
+          cd upstream/vsix
+          for file in *.vsix; do
+            if [ -f "$file" ]; then
+              echo "Uploading $file to release..."
+              gh release upload ${{ needs.check-changes.outputs.latest_tag }} "$file" --clobber
+            fi
+          done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update last built sha file
         run: |
