@@ -154,7 +154,7 @@ jobs:
             --notes "Automated build of vscode-csharp based on upstream tag ${{ needs.check-changes.outputs.latest_tag }}
 
           Source: https://github.com/dotnet/vscode-csharp/releases/tag/${{ needs.check-changes.outputs.latest_tag }}" \
-            --clobber \
+            --latest \
             upstream/vsix/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
