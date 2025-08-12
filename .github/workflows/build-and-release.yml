@@ -176,3 +176,21 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install ovsx CLI
+        run: npm install -g ovsx
+
+      - name: Ensure OpenVSX namespace exists (idempotent)
+        run: |
+          ovsx create-namespace dotnetdev-kr-custom -p "$OPENVSX_ACCESS_TOKEN" || true
+        env:
+          OPENVSX_ACCESS_TOKEN: ${{ secrets.OPENVSX_ACCESS_TOKEN }}
+
+      - name: Publish to OpenVSX
+        run: |
+          for file in upstream/vsix/*.vsix; do
+            echo "Publishing $file..."
+            ovsx publish --packagePath "$file" --skip-duplicate -p "$OPENVSX_ACCESS_TOKEN"
+          done
+        env:
+          OPENVSX_ACCESS_TOKEN: ${{ secrets.OPENVSX_ACCESS_TOKEN }}
