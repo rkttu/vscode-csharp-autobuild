@@ -100,6 +100,28 @@ jobs:
           jq '.publisher = "dotnetdev-kr-custom"' package.json > package.tmp.json
           mv package.tmp.json package.json
 
+      - name: Modify README.md
+        run: |
+          cd upstream
+          cat > README.tmp.md << 'EOF'
+          > **⚠️ CUSTOM BUILD NOTICE**
+          > 
+          > This is a custom build of the official Microsoft C# extension for Visual Studio Code.
+          > 
+          > - **Original Source**: [dotnet/vscode-csharp](https://github.com/dotnet/vscode-csharp)
+          > - **Build Repository**: [rkttu/vscode-csharp-autobuild](https://github.com/rkttu/vscode-csharp-autobuild)
+          > - **Publisher**: dotnetdev-kr-custom
+          > - **Version**: ${{ needs.check-changes.outputs.latest_tag }}
+          > 
+          > This build is automatically generated and published to OpenVSX for use in VS Code forks that don't have access to the Microsoft marketplace.
+          > 
+          > ---
+          EOF
+
+          # 기존 README 내용을 추가
+          cat README.md >> README.tmp.md
+          mv README.tmp.md README.md
+
       - name: Install dependencies
         run: |
           cd upstream
@@ -194,3 +216,4 @@ jobs:
           done
         env:
           OPENVSX_ACCESS_TOKEN: ${{ secrets.OPENVSX_ACCESS_TOKEN }}
+
