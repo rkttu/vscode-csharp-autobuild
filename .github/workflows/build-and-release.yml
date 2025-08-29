@@ -29,7 +29,7 @@ jobs:
           git fetch --tags
           LATEST_TAG=$(git for-each-ref --sort=-creatordate --format '%(refname:short)' refs/tags | head -n1)
           echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
-          LATEST_SHA=$(git rev-parse $LATEST_TAG)
+          LATEST_SHA=$(git rev-list -n 1 "$LATEST_TAG")
           echo "latest_sha=$LATEST_SHA" >> $GITHUB_OUTPUT
 
       - name: Checkout latest tag
@@ -199,6 +199,16 @@ jobs:
         env:
           OPENVSX_ACCESS_TOKEN: ${{ secrets.OPENVSX_ACCESS_TOKEN }}
 
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync to latest main (before making changes)
+        run: |
+          git fetch origin main
+          git rebase origin/main
+
       - name: Update last built sha file
         run: |
           echo "${{ needs.check-changes.outputs.latest_sha }}" > .last_built_sha
@@ -216,4 +226,5 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
