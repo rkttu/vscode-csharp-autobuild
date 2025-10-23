@@ -21,6 +21,7 @@ jobs:
         with:
           repository: dotnet/vscode-csharp
           path: upstream
+          fetch-depth: 0
 
       - name: Get latest tag and commit sha from upstream
         id: get_upstream
@@ -77,6 +78,7 @@ jobs:
         with:
           repository: dotnet/vscode-csharp
           path: upstream
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -226,5 +228,6 @@ jobs:
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
 
