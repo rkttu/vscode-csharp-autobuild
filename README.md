@@ -14,6 +14,8 @@ This project is an automatic build mirroring system for the [dotnet/vscode-cshar
 
 Unlike the C# Dev Kit, this project provides automatic builds that do not fall under Microsoft's commercial licensing restrictions. The builds are made available through GitHub releases to ensure wide accessibility while avoiding potential confusion by not registering on the Open VSX registry.
 
+> **Note on Debugger**: A proposal to replace Microsoft's vsdbg with Samsung's netcoredbg for better VS Code fork compatibility was considered but not implemented due to the lack of official macOS ARM64 support in netcoredbg. See [PR #3](https://github.com/rkttu/vscode-csharp-autobuild/pull/3) for details. This decision may be revisited if Samsung releases official macOS ARM64 builds.
+
 ## Key Features
 
 - 🔄 Automatic builds from upstream dotnet/vscode-csharp repository
@@ -21,7 +23,6 @@ Unlike the C# Dev Kit, this project provides automatic builds that do not fall u
 - 🆓 Free from Microsoft commercial licensing restrictions
 - 🚀 Regular releases available through GitHub
 - ⏰ Automated monitoring every 6 hours for new upstream releases
-- 🔧 Uses [Samsung/netcoredbg](https://github.com/Samsung/netcoredbg) instead of vsdbg for VS Code fork compatibility
 
 ## How It Works
 
@@ -29,15 +30,10 @@ This project automatically monitors the upstream [dotnet/vscode-csharp](https://
 
 1. 🔍 **Scans for new tags** - Checks the upstream repository tag list every 6 hours
 2. 🏗️ **Triggers automatic build** - Initiates build process when new tags are found
-3. 🔄 **Replaces debugger** - Substitutes vsdbg with Samsung/netcoredbg for better compatibility
-4. 📦 **Generates VSIX packages** - Creates both main and platform-specific packages
-5. 🚀 **Publishes releases** - Makes the built packages available through GitHub releases
+3. 📦 **Generates VSIX packages** - Creates both main and platform-specific packages
+4. 🚀 **Publishes releases** - Makes the built packages available through GitHub releases
 
 This ensures that new versions of the C# extension are available shortly after they are released upstream, typically within 6 hours of the original release.
-
-## Debugger Configuration
-
-This build uses [Samsung/netcoredbg](https://github.com/Samsung/netcoredbg) instead of Microsoft's vsdbg. This change ensures compatibility with VS Code forks (like VSCodium, Code - OSS, etc.) that don't have access to Microsoft's proprietary debugger. NetCoreDbg is a fully open-source .NET debugger that supports the same debugging features and protocols.
 
 ## Installation
 
@@ -83,5 +79,4 @@ This project is primarily automated. If you encounter issues with the builds, pl
 ## Related Projects
 
 - [dotnet/vscode-csharp](https://github.com/dotnet/vscode-csharp) - Original upstream repository
-- [Samsung/netcoredbg](https://github.com/Samsung/netcoredbg) - Open-source .NET debugger used in this build
 - [Microsoft C# Dev Kit](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit) - Official Microsoft C# extension (commercial license)
