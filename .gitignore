@@ -1,5 +1,6 @@
 # Upstream repository directory (used only in GitHub Actions)
 upstream/
+temp-upstream/
 
 # Node.js dependencies
 node_modules/

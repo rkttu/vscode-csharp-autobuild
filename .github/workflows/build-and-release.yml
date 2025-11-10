@@ -102,6 +102,10 @@ jobs:
           jq '.publisher = "dotnetdev-kr-custom"' package.json > package.tmp.json
           mv package.tmp.json package.json
 
+      - name: Replace vsdbg with netcoredbg
+        run: |
+          node replace-debugger.js upstream/package.json
+
       - name: Modify README.md
         run: |
           cd upstream
@@ -111,11 +115,13 @@ jobs:
           > This is a custom build of the official Microsoft C# extension for Visual Studio Code.
           > 
           > - **Original Source**: [dotnet/vscode-csharp](https://github.com/dotnet/vscode-csharp)
-          > - **Build Repository**: [rkttu/vscode-csharp-autobuild](https://github.com/rkttu/vscode-csharp-autobuild)
+          > - **Build Repository**: [rkttu/vscode-csharp-autobuild](https://github.com/rktru/vscode-csharp-autobuild)
           > - **Publisher**: dotnetdev-kr-custom
           > - **Version**: ${{ needs.check-changes.outputs.latest_tag }}
+          > - **Debugger**: [Samsung/netcoredbg](https://github.com/Samsung/netcoredbg) (instead of vsdbg)
           > 
           > This build is automatically generated and published to OpenVSX for use in VS Code forks that don't have access to the Microsoft marketplace.
+          > The debugger has been replaced with Samsung's netcoredbg to ensure compatibility with all VS Code forks.
           > 
           > ---
           EOF
