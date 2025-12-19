@@ -16,6 +16,14 @@ Unlike the C# Dev Kit, this project provides automatic builds that do not fall u
 
 > **Note on Debugger**: A proposal to replace Microsoft's vsdbg with Samsung's netcoredbg for better VS Code fork compatibility was considered but not implemented due to the lack of official macOS ARM64 support in netcoredbg. See [PR #3](https://github.com/rkttu/vscode-csharp-autobuild/pull/3) for details. This decision may be revisited if Samsung releases official macOS ARM64 builds.
 
+## Known Limitations
+
+**Debugger Restriction**: Microsoft's vsdbg debugger is licensed to work only with officially signed versions of Visual Studio Code distributed by Microsoft. The debugger functionality will not work with unofficial VS Code distributions or community builds (e.g., Kiro, Cursor, Windsurf, Google Antigravity, VSCodium, Trae, Void, Eclipse Theia, etc.).
+
+If you require debugging capabilities in non-Microsoft VS Code environments, we recommend using the [C# extension by muhammad-sammy](https://open-vsx.org/extension/muhammad-sammy/csharp), which integrates [Samsung's netcoredbg](https://github.com/Samsung/netcoredbg) as an alternative debugger that is not subject to these licensing restrictions.
+
+**Quick Run Alternative**: Since the debugger is not available, if you need a quick way to run your code for productivity purposes, we recommend using the [Code Runner](https://open-vsx.org/extension/formulahendry/code-runner) extension instead of manually opening a terminal and running `dotnet run` commands.
+
 ## Key Features
 
 - 🔄 Automatic builds from upstream dotnet/vscode-csharp repository
