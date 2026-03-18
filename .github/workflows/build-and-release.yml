@@ -80,6 +80,12 @@ jobs:
           path: upstream
           fetch-depth: 0
 
+      - name: Checkout latest tag
+        run: |
+          cd upstream
+          git fetch --tags
+          git checkout ${{ needs.check-changes.outputs.latest_tag }}
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -88,17 +94,7 @@ jobs:
       - name: Set up .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: |
-            8.0.x
-            9.0.x
-            10.0.x
-          global-json-file: upstream/global.json
-
-      - name: Checkout latest tag
-        run: |
-          cd upstream
-          git fetch --tags
-          git checkout ${{ needs.check-changes.outputs.latest_tag }}
+          dotnet-version: 10.0.x
 
       - name: Change publisher in package.json
         run: |
