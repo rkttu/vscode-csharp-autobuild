@@ -30,6 +30,12 @@ If you require debugging capabilities in non-Microsoft VS Code environments, we 
 
 **Quick Run Alternative**: Since the debugger is not available, if you need a quick way to run your code for productivity purposes, we recommend using the [Code Runner](https://open-vsx.org/extension/formulahendry/code-runner) extension instead of manually opening a terminal and running `dotnet run` commands.
 
+## Release Policy
+
+This project only tracks and builds from **stable (official) release tags** of the upstream repository. Prerelease tags (e.g., tags containing `-prerelease`) are excluded from the automated build pipeline.
+
+This decision was made because prerelease versions of the upstream repository frequently have different build structures and scripts, which increases CI/CD maintenance costs and causes unpredictable build failures. By targeting only stable releases, we ensure a more reliable and consistent automated publishing process.
+
 ## Key Features
 
 - 🔄 Automatic builds from upstream dotnet/vscode-csharp repository
