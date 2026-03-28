@@ -32,9 +32,7 @@ If you require debugging capabilities in non-Microsoft VS Code environments, we 
 
 ## Release Policy
 
-This project only tracks and builds from **stable (official) release tags** of the upstream repository. Prerelease tags (e.g., tags containing `-prerelease`) are excluded from the automated build pipeline.
-
-This decision was made because prerelease versions of the upstream repository frequently have different build structures and scripts, which increases CI/CD maintenance costs and causes unpredictable build failures. By targeting only stable releases, we ensure a more reliable and consistent automated publishing process.
+This project tracks and builds from **all release tags** of the upstream repository, including both stable and prerelease versions. This ensures you always have access to the latest features and fixes as soon as they are tagged upstream.
 
 ## Key Features
 

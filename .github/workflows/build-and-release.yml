@@ -28,9 +28,9 @@ jobs:
         run: |
           cd upstream
           git fetch --tags
-          LATEST_TAG=$(git for-each-ref --sort=-creatordate --format '%(refname:short)' refs/tags | grep -v 'prerelease' | head -n1)
+          LATEST_TAG=$(git for-each-ref --sort=-creatordate --format '%(refname:short)' refs/tags | head -n1)
           if [ -z "$LATEST_TAG" ]; then
-            echo "No stable (non-prerelease) tags found in upstream repository."
+            echo "No tags found in upstream repository."
             exit 1
           fi
           echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
@@ -136,7 +136,7 @@ jobs:
       - name: Build and package VSIX
         run: |
           cd upstream
-          npm run vsix:release:package
+          npx gulp vsix:release:package
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
