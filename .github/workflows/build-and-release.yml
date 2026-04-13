@@ -141,12 +141,12 @@ jobs:
         run: |
           cd upstream
           npm install
-          npm install --save-dev gulp
 
       - name: Build and package VSIX
         run: |
           cd upstream
-          npx gulp vsix:release:package
+          git checkout -b release
+          npm run vsix:release:package
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
