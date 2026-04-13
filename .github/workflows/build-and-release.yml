@@ -141,6 +141,7 @@ jobs:
         run: |
           cd upstream
           npm install
+          npm install --save-dev gulp
 
       - name: Build and package VSIX
         run: |
