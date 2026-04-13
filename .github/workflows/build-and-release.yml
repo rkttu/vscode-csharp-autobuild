@@ -136,6 +136,7 @@ jobs:
       - name: Build and package VSIX
         run: |
           cd upstream
+          sed -i 's/always-auth=true/always-auth=false/' .npmrc
           npx gulp vsix:release:package
 
       - name: Upload artifacts
