@@ -5,19 +5,24 @@ on:
   schedule:
     - cron: '0 */6 * * *'
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
   check-changes:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     outputs:
       should_build: ${{ steps.check_commit.outputs.should_build }}
       latest_tag: ${{ steps.get_upstream.outputs.latest_tag }}
       latest_sha: ${{ steps.get_upstream.outputs.latest_sha }}
     steps:
       - name: Checkout this repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Checkout upstream vscode-csharp
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: dotnet/vscode-csharp
           path: upstream
@@ -70,15 +75,16 @@ jobs:
     needs: check-changes
     if: needs.check-changes.outputs.should_build == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     permissions:
       contents: write
 
     steps:
       - name: Checkout this repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Checkout upstream vscode-csharp
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: dotnet/vscode-csharp
           path: upstream
@@ -91,12 +97,12 @@ jobs:
           git checkout ${{ needs.check-changes.outputs.latest_tag }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
 
       - name: Set up .NET SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v6
         with:
           dotnet-version: 10.0.x
 
@@ -149,30 +155,18 @@ jobs:
           npm run vsix:release:package
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: vscode-csharp-${{ needs.check-changes.outputs.latest_tag }}
           path: upstream/vsix/*
 
-      - name: Delete existing release if exists
+      - name: Delete existing release and tag if exists
         run: |
           if gh release view ${{ needs.check-changes.outputs.latest_tag }} > /dev/null 2>&1; then
-            echo "Deleting existing release ${{ needs.check-changes.outputs.latest_tag }}"
-            gh release delete ${{ needs.check-changes.outputs.latest_tag }} --yes
+            echo "Deleting existing release and tag ${{ needs.check-changes.outputs.latest_tag }}"
+            gh release delete ${{ needs.check-changes.outputs.latest_tag }} --yes --cleanup-tag
           else
             echo "No existing release found for ${{ needs.check-changes.outputs.latest_tag }}"
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Delete existing tag if exists
-        run: |
-          if git rev-parse ${{ needs.check-changes.outputs.latest_tag }} > /dev/null 2>&1; then
-            echo "Deleting existing tag ${{ needs.check-changes.outputs.latest_tag }}"
-            git tag -d ${{ needs.check-changes.outputs.latest_tag }} || true
-            git push origin :refs/tags/${{ needs.check-changes.outputs.latest_tag }} || true
-          else
-            echo "No existing tag found for ${{ needs.check-changes.outputs.latest_tag }}"
           fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -208,7 +202,7 @@ jobs:
           OPENVSX_ACCESS_TOKEN: ${{ secrets.OPENVSX_ACCESS_TOKEN }}
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
