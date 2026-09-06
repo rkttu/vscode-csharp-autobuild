@@ -39,6 +39,7 @@ $status = [ordered]@{
     success = $false
     stage = 'environment'
     architecture = $Architecture
+    target = "win32-$Architecture"
     scope = 'Standalone source build and DAP launch; no VSIX, IDE, attach, or publication validation.'
     netcoredbgTag = $env:NETCOREDBG_TAG
     netcoredbgCommit = $env:NETCOREDBG_SHA
@@ -135,6 +136,7 @@ try {
     Copy-Item (Join-Path $source 'third_party/linenoise-ng/LICENSE') (Join-Path $notices 'linenoise-ng-LICENSE')
     Copy-Item (Join-Path $source 'third_party/json/LICENSE.MIT') (Join-Path $notices 'json-LICENSE.MIT')
     Copy-Item (Join-Path $runtime 'LICENSE.TXT') (Join-Path $notices 'dotnet-runtime-LICENSE.TXT')
+    Copy-Item (Join-Path $runtime 'THIRD-PARTY-NOTICES.TXT') (Join-Path $notices 'dotnet-runtime-THIRD-PARTY-NOTICES.TXT')
     Get-ChildItem $env:NUGET_PACKAGES -Recurse -File |
         Where-Object { $_.Name -match '^(LICENSE|COPYING|THIRD-PARTY-NOTICES)' } |
         ForEach-Object {

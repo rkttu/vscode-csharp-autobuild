@@ -1,4 +1,4 @@
-"""Source integrity and PE architecture checks for the validation-only workflow."""
+"""Source integrity and native binary architecture checks."""
 
 import argparse
 import hashlib
@@ -33,6 +33,18 @@ def pe_architecture(path):
     return {0x8664: "x64", 0xAA64: "arm64", 0x14C: "x86"}.get(machine, hex(machine))
 
 
+def native_architecture(path):
+    with path.open("rb") as stream:
+        header = stream.read(64)
+    if header[:2] == b"MZ":
+        return pe_architecture(path)
+    if header[:4] == b"\x7fELF" and header[4:6] == b"\x02\x01":
+        return {62: "x64", 183: "arm64"}.get(struct.unpack_from("<H", header, 18)[0], "unknown")
+    if header[:4] == b"\xcf\xfa\xed\xfe":
+        return {0x1000007: "x64", 0x100000C: "arm64"}.get(struct.unpack_from("<I", header, 4)[0], "unknown")
+    raise ValueError(f"Unsupported native binary format: {path}")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -47,6 +59,10 @@ def main():
     pe.add_argument("--arch", choices=["x64", "arm64"], required=True)
     pe.add_argument("--output", type=Path, required=True)
     pe.add_argument("files", nargs="+", type=Path)
+    native = sub.add_parser("native")
+    native.add_argument("--arch", choices=["x64", "arm64"], required=True)
+    native.add_argument("--output", type=Path, required=True)
+    native.add_argument("files", nargs="+", type=Path)
     args = parser.parse_args()
     success = True
     if args.command == "snapshot":
@@ -59,7 +75,8 @@ def main():
         result = {"success": success, "originalFileCount": len(original), "changedOrMissing": changed,
                   "scope": "Original tracked input files; generated files are excluded."}
     else:
-        records = [{"file": str(path), "architecture": pe_architecture(path), "sha256": sha256(path)}
+        inspect = pe_architecture if args.command == "pe" else native_architecture
+        records = [{"file": str(path), "architecture": inspect(path), "sha256": sha256(path)}
                    for path in args.files]
         success = all(record["architecture"] == args.arch for record in records)
         result = {"success": success, "expectedArchitecture": args.arch, "files": records}

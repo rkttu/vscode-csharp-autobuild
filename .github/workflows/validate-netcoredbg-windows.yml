@@ -1,15 +1,9 @@
 name: Validate netcoredbg on Windows
 
-# Research only. The branch-scoped push trigger permits the first run without
-# putting this workflow on main; workflow_dispatch requires default-branch registration.
+# Retained for manual Windows-only diagnosis. The all-platform workflow now
+# handles branch validation and reusable release gates.
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - research/netcoredbg-windows-validation
-    paths:
-      - .github/workflows/validate-netcoredbg-windows.yml
-      - scripts/validation/**
 
 permissions:
   contents: read
