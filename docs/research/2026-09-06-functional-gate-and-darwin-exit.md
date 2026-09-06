@@ -113,3 +113,19 @@ Attempt 2 passed seven extracted-VSIX targets but failed macOS ARM64's .NET 8 `V
 Samsung's [stack-trace implementation](https://github.com/Samsung/netcoredbg/blob/9744e1f051866215611b8440c638042aa2aa2f72/src/debugger/manageddebugger.cpp) already makes three attempts to reconstruct source frames from exception details when the top physical frame has no source line. Reading `Exception.StackTrace` involves managed evaluation. The roughly 13-second failing scenario is slower than the roughly 2-second passing cases, but the transcript alone does not establish an evaluation timeout or its cause. No assertion or required test was changed.
 
 Ten local repetitions of the same unchanged scenario, .NET 8.0.24, and debugger bytes from the installed candidate all passed. A single maintainer-driven rerun of the failed CI job with diagnostics was requested after this comparison. The [failed VSIX evidence and local repetition results](cross-platform-2026-09-06/candidate-34028072085-vsix-failure/README.md) retain both observations. A successful rerun establishes a passing validation result; it does not establish that the intermittent behavior was corrected.
+
+For a future recurrence, download the failed job's artifact before rerunning it: extracted-VSIX artifacts use a stable name and overwrite earlier attempts. Preserve `vsix-result.json`, the runtime's `upstream-*-result.json`, and the failing scenario transcript. Compare the tested executable hash, SDK/runtime, and source hashes before comparing behavior. Source-build artifacts include the attempt number and remain distinct.
+
+After `upstream_suite.py` has generated and built the external projects, the following invocation isolates this scenario. Replace the four paths with the recorded native SDK, external build directory, original source tree, and extracted debugger. It is the same TestRunner invocation used by the automated gate.
+
+```sh
+"$DOTNET" "$WORK/build/bin/TestRunner/debug/TestRunner.dll" \
+  --local "$DEBUGGER" --proto vscode --test VSCodeTestUnhandledException \
+  --sources "$SOURCE/test-suite/VSCodeTestUnhandledException/Program.cs" \
+  --assembly "$WORK/build/bin/VSCodeTestUnhandledException/debug/VSCodeTestUnhandledException.dll" \
+  --dotnet "$DOTNET"
+```
+
+Use the matching SDK environment from the full-suite invocation. A diagnostic launcher can append `--engineLogging=<path>` and `--log` to the debugger invocation while forwarding TestRunner's arguments. Local reproduction does not replace the complete native and extracted-VSIX release gates.
+
+Attempt 3 passed both runtime gates on macOS ARM64 without modifying the candidate or test assertions. The final publication preflight accepted all eight packages, and [the complete dry run](cross-platform-2026-09-06/candidate-34028072085-final/README.md) finished successfully. This candidate covers 32 target/runtime/phase combinations, with eight fixture checks and 30 upstream scenarios in each. It did not upload to Open VSX. The subsequent main-branch run records actual publication separately.
