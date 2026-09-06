@@ -1,0 +1,15 @@
+{
+  "date": "2026-09-06",
+  "upstreamCommit": "2f5806a9f39575bfaf4ca16445f420440a43e050",
+  "sourcePath": "src/coreclrDebug/activate.ts",
+  "originalTypeScriptModified": false,
+  "sourceClassTranspiledWithoutEdits": true,
+  "descriptorReturnedByIdentity": true,
+  "dynamicSdkLookupCalls": 0,
+  "scope": "Actual upstream factory class invoked with supplied descriptor; SDK and VS Code host services are stubs. This is not an extension-host, VSIX, or DAP integration test.",
+  "implication": "When VS Code supplies a package.json executable descriptor, current factory skips fallback vsdbg path and SDK-derived DOTNET_ROOT injection.",
+  "requirement": "Static executable path, matching debugger package, existing .debugger installation, and suitable inherited runtime environment.",
+  "sourceFileSha256": "10b705563963f33603abd4d9e710d2166b1b51f9e7a313a0398a8ce84dbf0fde",
+  "documentation": "https://code.visualstudio.com/api/references/vscode-api#DebugAdapterDescriptorFactory",
+  "nodeVersion": "26.8.1"
+}

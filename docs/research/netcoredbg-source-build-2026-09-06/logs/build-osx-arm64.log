@@ -1,0 +1,351 @@
+[  2%] Building CXX object third_party/linenoise-ng/CMakeFiles/linenoise.dir/src/ConvertUTF.cpp.o
+[  2%] Building CXX object src/CMakeFiles/corguids.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/pal/prebuilt/idl/clrdata_i.cpp.o
+[  4%] Building CXX object third_party/linenoise-ng/CMakeFiles/linenoise.dir/src/linenoise.cpp.o
+[  4%] Building C object src/CMakeFiles/minipalguid.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/native/minipal/guid.c.o
+[  5%] Compiling ManagedPart.dll
+[  5%] Built target buildinfo
+[  7%] Building CXX object src/CMakeFiles/corguids.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/pal/prebuilt/idl/clrinternal_i.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[  8%] Building C object src/CMakeFiles/minipalguid.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/native/minipal/random.c.o
+[  9%] Building CXX object third_party/linenoise-ng/CMakeFiles/linenoise.dir/src/wcwidth.cpp.o
+[ 10%] Building CXX object src/CMakeFiles/corguids.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/pal/prebuilt/idl/clrprivappxhosting_i.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 11%] Linking C static library libminipalguid.a
+[ 12%] Building CXX object src/CMakeFiles/corguids.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/pal/prebuilt/idl/cordebug_i.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 14%] Building CXX object src/CMakeFiles/corguids.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/pal/prebuilt/idl/corprof_i.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 15%] Building CXX object src/CMakeFiles/corguids.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/pal/prebuilt/idl/corsym_i.cpp.o
+[ 16%] Building CXX object src/CMakeFiles/corguids.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/pal/prebuilt/idl/metahost_i.cpp.o
+
+.NET 10.0을(를) 시작합니다.
+---------------------
+SDK 버전: 10.0.400
+
+----------------
+첫 번째 앱 작성: https://aka.ms/dotnet-hello-world
+새로운 기능 확인: https://aka.ms/dotnet-whats-new
+설명서 살펴보기: https://aka.ms/dotnet-docs
+GitHub에서 문제 보고 및 소스 찾기: https://github.com/dotnet/core
+사용 가능한 명령을 보려면 'dotnet --help'를 사용하거나 https://aka.ms/dotnet-cli를 방문하세요.
+--------------------------------------------------------------------------------------
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+설치된 워크로드의 상태를 확인하는 중...
+[ 17%] Building CXX object src/CMakeFiles/corguids.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/pal/prebuilt/idl/sospriv_i.cpp.o
+Microsoft.iOS.Sdk.net10.0_26.5 팩 버전 26.5.10301이(가) 이미 설치되었습니다.
+Microsoft.iOS.Sdk.net10.0_26.5 버전 26.5.10301에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.iOS.Sdk.net9.0_18.0 팩 버전 18.0.9617이(가) 이미 설치되었습니다.
+Microsoft.iOS.Sdk.net9.0_18.0 버전 18.0.9617에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.iOS.Sdk.net9.0_26.5 팩 버전 26.5.9004이(가) 이미 설치되었습니다.
+Microsoft.iOS.Sdk.net9.0_26.5 버전 26.5.9004에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.iOS.Sdk.net10.0_26.0 팩 버전 26.0.11017이(가) 이미 설치되었습니다.
+Microsoft.iOS.Sdk.net10.0_26.0 버전 26.0.11017에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.iOS.Ref.net10.0_26.5 팩 버전 26.5.10301이(가) 이미 설치되었습니다.
+Microsoft.iOS.Ref.net10.0_26.5 버전 26.5.10301에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.iOS.Runtime.ios.net10.0_26.5 팩 버전 26.5.10301이(가) 이미 설치되었습니다.
+Microsoft.iOS.Runtime.ios.net10.0_26.5 버전 26.5.10301에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.iOS.Runtime.iossimulator-x64.net10.0_26.5 팩 버전 26.5.10301이(가) 이미 설치되었습니다.
+Microsoft.iOS.Runtime.iossimulator-x64.net10.0_26.5 버전 26.5.10301에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.iOS.Runtime.iossimulator-arm64.net10.0_26.5 팩 버전 26.5.10301이(가) 이미 설치되었습니다.
+Microsoft.iOS.Runtime.iossimulator-arm64.net10.0_26.5 버전 26.5.10301에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.iOS.Runtime.ios-arm64.net10.0_26.5 팩 버전 26.5.10301이(가) 이미 설치되었습니다.
+Microsoft.iOS.Runtime.ios-arm64.net10.0_26.5 버전 26.5.10301에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.iOS.Templates 팩 버전 26.5.10301이(가) 이미 설치되었습니다.
+Microsoft.iOS.Templates 버전 26.5.10301에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.ios-arm64 팩 버전 10.0.11이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.ios-arm64 버전 10.0.11에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.iossimulator-arm64 팩 버전 10.0.11이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.iossimulator-arm64 버전 10.0.11에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.iossimulator-x64 팩 버전 10.0.11이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.iossimulator-x64 버전 10.0.11에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.Mono.ios-arm64 팩 버전 10.0.11이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.Mono.ios-arm64 버전 10.0.11에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+Microsoft.NETCore.App.Runtime.Mono.iossimulator-arm64 팩 버전 10.0.11이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.Mono.iossimulator-arm64 버전 10.0.11에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.Mono.iossimulator-x64 팩 버전 10.0.11이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.Mono.iossimulator-x64 버전 10.0.11에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NET.Runtime.MonoAOTCompiler.Task 팩 버전 10.0.11이(가) 이미 설치되었습니다.
+Microsoft.NET.Runtime.MonoAOTCompiler.Task 버전 10.0.11에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NET.Runtime.MonoTargets.Sdk 팩 버전 10.0.11이(가) 이미 설치되었습니다.
+Microsoft.NET.Runtime.MonoTargets.Sdk 버전 10.0.11에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.ios-arm64 팩 버전 9.0.19이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.ios-arm64 버전 9.0.19에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.iossimulator-arm64 팩 버전 9.0.19이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.iossimulator-arm64 버전 9.0.19에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.iossimulator-x64 팩 버전 9.0.19이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.iossimulator-x64 버전 9.0.19에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+[ 18%] Building CXX object src/CMakeFiles/corguids.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/pal/prebuilt/idl/xclrdata_i.cpp.o
+Microsoft.NETCore.App.Runtime.Mono.ios-arm64 팩 버전 9.0.19이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.Mono.ios-arm64 버전 9.0.19에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.Mono.iossimulator-arm64 팩 버전 9.0.19이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.Mono.iossimulator-arm64 버전 9.0.19에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.Mono.iossimulator-x64 팩 버전 9.0.19이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.Mono.iossimulator-x64 버전 9.0.19에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NET.Runtime.MonoAOTCompiler.Task 팩 버전 9.0.19이(가) 이미 설치되었습니다.
+Microsoft.NET.Runtime.MonoAOTCompiler.Task 버전 9.0.19에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NET.Runtime.MonoTargets.Sdk 팩 버전 9.0.19이(가) 이미 설치되었습니다.
+Microsoft.NET.Runtime.MonoTargets.Sdk 버전 9.0.19에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.Android.Sdk.Darwin 팩 버전 36.1.69이(가) 이미 설치되었습니다.
+Microsoft.Android.Sdk.Darwin 버전 36.1.69에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.Android.Sdk.Darwin 팩 버전 35.0.105이(가) 이미 설치되었습니다.
+Microsoft.Android.Sdk.Darwin 버전 35.0.105에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.Android.Ref.36 팩 버전 36.1.69이(가) 이미 설치되었습니다.
+Microsoft.Android.Ref.36 버전 36.1.69에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.Android.Runtime.36.android 팩 버전 36.1.69이(가) 이미 설치되었습니다.
+Microsoft.Android.Runtime.36.android 버전 36.1.69에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.Android.Runtime.Mono.36.android-arm 팩 버전 36.1.69이(가) 이미 설치되었습니다.
+Microsoft.Android.Runtime.Mono.36.android-arm 버전 36.1.69에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.Android.Runtime.Mono.36.android-arm64 팩 버전 36.1.69이(가) 이미 설치되었습니다.
+Microsoft.Android.Runtime.Mono.36.android-arm64 버전 36.1.69에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.Android.Runtime.Mono.36.android-x86 팩 버전 36.1.69이(가) 이미 설치되었습니다.
+Microsoft.Android.Runtime.Mono.36.android-x86 버전 36.1.69에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.Android.Runtime.Mono.36.android-x64 팩 버전 36.1.69이(가) 이미 설치되었습니다.
+Microsoft.Android.Runtime.Mono.36.android-x64 버전 36.1.69에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.Android.Runtime.CoreCLR.36.android-arm64 팩 버전 36.1.69이(가) 이미 설치되었습니다.
+Microsoft.Android.Runtime.CoreCLR.36.android-arm64 버전 36.1.69에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.Android.Runtime.CoreCLR.36.android-x64 팩 버전 36.1.69이(가) 이미 설치되었습니다.
+Microsoft.Android.Runtime.CoreCLR.36.android-x64 버전 36.1.69에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.Android.Runtime.NativeAOT.36.android-arm64 팩 버전 36.1.69이(가) 이미 설치되었습니다.
+Microsoft.Android.Runtime.NativeAOT.36.android-arm64 버전 36.1.69에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.Android.Runtime.NativeAOT.36.android-x64 팩 버전 36.1.69이(가) 이미 설치되었습니다.
+Microsoft.Android.Runtime.NativeAOT.36.android-x64 버전 36.1.69에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.Android.Templates 팩 버전 36.1.69이(가) 이미 설치되었습니다.
+Microsoft.Android.Templates 버전 36.1.69에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.Mono.android-arm 팩 버전 9.0.19이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.Mono.android-arm 버전 9.0.19에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.Mono.android-arm64 팩 버전 9.0.19이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.Mono.android-arm64 버전 9.0.19에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.Mono.android-x64 팩 버전 9.0.19이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.Mono.android-x64 버전 9.0.19에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.Mono.android-x86 팩 버전 9.0.19이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.Mono.android-x86 버전 9.0.19에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.android-x86 팩 버전 9.0.19이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.android-x86 버전 9.0.19에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.android-x64 팩 버전 9.0.19이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.android-x64 버전 9.0.19에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.android-arm 팩 버전 9.0.19이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.android-arm 버전 9.0.19에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.android-arm64 팩 버전 9.0.19이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.android-arm64 버전 9.0.19에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.Mono.android-arm 팩 버전 10.0.11이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.Mono.android-arm 버전 10.0.11에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.Mono.android-arm64 팩 버전 10.0.11이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.Mono.android-arm64 버전 10.0.11에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.Mono.android-x64 팩 버전 10.0.11이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.Mono.android-x64 버전 10.0.11에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.Mono.android-x86 팩 버전 10.0.11이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.Mono.android-x86 버전 10.0.11에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.android-x86 팩 버전 10.0.11이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.android-x86 버전 10.0.11에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.android-x64 팩 버전 10.0.11이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.android-x64 버전 10.0.11에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.android-arm 팩 버전 10.0.11이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.android-arm 버전 10.0.11에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.android-arm64 팩 버전 10.0.11이(가) 이미 설치되었습니다.
+Microsoft.NETCore.App.Runtime.AOT.osx-arm64.Cross.android-arm64 버전 10.0.11에 대한 워크로드 팩 설치 레코드를 작성하는 중...
+----------------
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 20%] Building CXX object src/CMakeFiles/corguids.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/pal/prebuilt/idl/xcordebug_i.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 21%] Linking CXX static library libcorguids.a
+[ 22%] Linking CXX static library liblinenoise.a
+  복원할 프로젝트를 확인하는 중...
+[ 22%] Built target minipalguid
+[ 22%] Built target corguids
+[ 22%] Built target linenoise
+[ 23%] Creating new dotnet project
+[ 24%] Building C object third_party/linenoise-ng/CMakeFiles/example.dir/tst/example.c.o
+[ 25%] Linking CXX executable example
+ld: warning: -force_flat_namespace is no longer supported, using -flat_namespace instead
+[ 25%] Built target example
+"콘솔 앱" 템플릿이 성공적으로 생성되었습니다.
+
+생성 후 작업 처리 중...
+<RESEARCH_TMP>/source-build/build-osx-arm64/src/generrmsg/generrmsg.csproj 복원 중:
+  복원할 프로젝트를 확인하는 중...
+  <RESEARCH_TMP>/source-build/build-osx-arm64/src/generrmsg/generrmsg.csproj을(를) 34밀리초 동안 복원했습니다.
+복원에 성공했습니다.
+
+
+[ 27%] Compiling generrmsg/bin/generrmsg.dll
+  복원할 프로젝트를 확인하는 중...
+  <RESEARCH_TMP>/source-build/build-osx-arm64/src/generrmsg/generrmsg.csproj을(를) 39밀리초 동안 복원했습니다.
+  generrmsg -> <RESEARCH_TMP>/source-build/build-osx-arm64/src/generrmsg/bin/generrmsg.dll
+
+빌드했습니다.
+    경고 0개
+    오류 0개
+
+경과 시간: 00:00:01.61
+[ 28%] Extracting <RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/inc/corerror.xml
+[ 30%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/breakpoint_break.cpp.o
+[ 30%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/breakpoints_exception.cpp.o
+[ 31%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/breakpoint_hotreload.cpp.o
+[ 32%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/breakpoint_entry.cpp.o
+[ 34%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/breakpoints_func.cpp.o
+clang++: clang++clang++warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 36%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/breakpoints.cpp.o
+[ 36%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/breakpoints_line.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 37%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/breakpointutils.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 38%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/callbacksqueue.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 40%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/evalhelpers.cpp.o
+[ 41%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/evalstackmachine.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 42%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/evaluator.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 43%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/evalwaiter.cpp.o
+[ 44%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/evalutils.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 45%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/frames.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 47%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/hotreloadhelpers.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 48%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/managedcallback.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 49%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/manageddebugger.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 50%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/threads.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 51%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/stepper_async.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 52%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/stepper_simple.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 54%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/steppers.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 55%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/valueprint.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 56%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/variables.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 57%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/waitpid.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 58%] Building CXX object src/CMakeFiles/netcoredbg.dir/interfaces/types.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 60%] Building CXX object src/CMakeFiles/netcoredbg.dir/managed/interop.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 61%] Building CXX object src/CMakeFiles/netcoredbg.dir/metadata/attributes.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 62%] Building CXX object src/CMakeFiles/netcoredbg.dir/metadata/async_info.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 63%] Building CXX object src/CMakeFiles/netcoredbg.dir/metadata/jmc.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 64%] Building CXX object src/CMakeFiles/netcoredbg.dir/metadata/modules.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 65%] Building CXX object src/CMakeFiles/netcoredbg.dir/metadata/modules_app_update.cpp.o
+[ 67%] Building CXX object src/CMakeFiles/netcoredbg.dir/metadata/modules_sources.cpp.o
+[ 68%] Building CXX object src/CMakeFiles/netcoredbg.dir/metadata/typeprinter.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+  <RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/managed/ManagedPart.csproj을(를) 10.17초 동안 복원했습니다.
+[ 69%] Building CXX object src/CMakeFiles/netcoredbg.dir/protocols/cliprotocol.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 70%] Building CXX object src/CMakeFiles/netcoredbg.dir/protocols/escaped_string.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+  ManagedPart -> <RESEARCH_TMP>/source-build/build-osx-arm64/src/bin/Release/netstandard2.0/osx-arm64/ManagedPart.dll
+  ManagedPart -> <RESEARCH_TMP>/source-build/build-osx-arm64/src/
+[ 70%] Built target managedpart_dll
+[ 71%] Building CXX object src/CMakeFiles/netcoredbg.dir/protocols/protocol_utils.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 72%] Building CXX object src/CMakeFiles/netcoredbg.dir/protocols/miprotocol.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 74%] Building CXX object src/CMakeFiles/netcoredbg.dir/protocols/tokenizer.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 75%] Building CXX object src/CMakeFiles/netcoredbg.dir/protocols/vscodeprotocol.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 76%] Building CXX object src/CMakeFiles/netcoredbg.dir/protocols/sourcestorage.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+In file included from <RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/protocols/vscodeprotocol.cpp:18:
+In file included from <RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/protocols/vscodeprotocol.h:15:
+<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/third_party/json/json.hpp:25777:35: warning: identifier '_json' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 25777 | inline nlohmann::json operator "" _json(const char* s, std::size_t n)
+       |                       ~~~~~~~~~~~~^~~~~
+       |                       operator""_json
+<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/third_party/json/json.hpp:25796:49: warning: identifier '_json_pointer' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 25796 | inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std::size_t n)
+       |                                     ~~~~~~~~~~~~^~~~~~~~~~~~~
+       |                                     operator""_json_pointer
+[ 77%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/utf.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 78%] Building CXX object src/CMakeFiles/netcoredbg.dir/errormessage.cpp.o
+[ 80%] Building CXX object src/CMakeFiles/netcoredbg.dir/main.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 81%] Building CXX object src/CMakeFiles/netcoredbg.dir/buildinfo.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 82%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/dynlibs_unix.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 83%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/dynlibs_win32.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 84%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/err_utils.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 85%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/filesystem.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 87%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/filesystem_unix.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 88%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/filesystem_win32.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+In file included from <RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/main.cpp:13:
+In file included from <RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/protocols/vscodeprotocol.h:15:
+<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/third_party/json/json.hpp:25777:35: warning: identifier '_json' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 25777 | inline nlohmann::json operator "" _json(const char* s, std::size_t n)
+       |                       ~~~~~~~~~~~~^~~~~
+       |                       operator""_json
+<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/third_party/json/json.hpp:25796:49: warning: identifier '_json_pointer' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 25796 | inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std::size_t n)
+       |                                     ~~~~~~~~~~~~^~~~~~~~~~~~~
+       |                                     operator""_json_pointer
+[ 89%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/ioredirect.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 90%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/iosystem_unix.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 91%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/iosystem_win32.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 92%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/interop_unix.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 94%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/interop_win32.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 95%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/platform_unix.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 96%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/platform_win32.cpp.o
+[ 97%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/streams.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 98%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/logger.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/utils/logger.cpp:63:50: warning: 'syscall' is deprecated: first deprecated in macOS 10.12 - syscall(2) is unsupported; please switch to a supported interface. For SYS_kdebug_trace use kdebug_signpost(). [-Wdeprecated-declarations]
+   63 |         static thread_local unsigned thread_id = syscall(SYS_gettid);
+      |                                                  ^
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/unistd.h:754:6: note: 'syscall' has been explicitly marked deprecated here
+  754 | int      syscall(int, ...);
+      |          ^
+1 warning generated.
+2 warnings generated.
+2 warnings generated.
+[100%] Linking CXX executable netcoredbg
+ld: warning: -force_flat_namespace is no longer supported, using -flat_namespace instead
+[100%] Built target netcoredbg
+Install the project...
+-- Install configuration: "Release"
+-- Installing: <RESEARCH_TMP>/source-build/install-osx-arm64/netcoredbg
+-- Installing: <RESEARCH_TMP>/source-build/install-osx-arm64/ManagedPart.dll
+-- Installing: <RESEARCH_TMP>/source-build/install-osx-arm64/Microsoft.CodeAnalysis.dll
+-- Installing: <RESEARCH_TMP>/source-build/install-osx-arm64/Microsoft.CodeAnalysis.CSharp.dll
+-- Installing: <RESEARCH_TMP>/source-build/install-osx-arm64/Microsoft.CodeAnalysis.Scripting.dll
+-- Installing: <RESEARCH_TMP>/source-build/install-osx-arm64/Microsoft.CodeAnalysis.CSharp.Scripting.dll
+-- Installing: <RESEARCH_TMP>/source-build/install-osx-arm64/libdbgshim.dylib

@@ -1,0 +1,116 @@
+{
+  "date": "2026-09-06",
+  "kind": "Read-only comparison of current upstream-mirror and community-fork publication, manifests, and workflows",
+  "communityHead": {
+    "sha": "d94fae6e1552f1a60eacda933fc76c399b36591f",
+    "committerDate": "2026-06-27T10:23:24Z",
+    "url": "https://github.com/muhammadsammy/free-vscode-csharp/commit/d94fae6e1552f1a60eacda933fc76c399b36591f"
+  },
+  "communityLatestGithubRelease": {
+    "tag_name": "2.140.10",
+    "published_at": "2026-06-27T06:21:18Z",
+    "html_url": "https://github.com/muhammadsammy/free-vscode-csharp/releases/tag/2.140.10"
+  },
+  "communityOpenVsx": {
+    "namespace": "muhammad-sammy",
+    "name": "csharp",
+    "version": "2.145.21-g154a82fd27",
+    "timestamp": "2026-06-27T06:30:09.823831Z",
+    "preRelease": false,
+    "engines": {
+      "vscode": "^1.106.0"
+    },
+    "license": "SEE LICENSE IN RuntimeLicenses/license.txt",
+    "downloads": {
+      "win32-x64": "https://open-vsx.org/api/muhammad-sammy/csharp/win32-x64/2.145.21-g154a82fd27/file/muhammad-sammy.csharp-2.145.21-g154a82fd27@win32-x64.vsix",
+      "linux-x64": "https://open-vsx.org/api/muhammad-sammy/csharp/linux-x64/2.145.21-g154a82fd27/file/muhammad-sammy.csharp-2.145.21-g154a82fd27@linux-x64.vsix",
+      "alpine-arm64": "https://open-vsx.org/api/muhammad-sammy/csharp/alpine-arm64/2.145.21-g154a82fd27/file/muhammad-sammy.csharp-2.145.21-g154a82fd27@alpine-arm64.vsix",
+      "win32-arm64": "https://open-vsx.org/api/muhammad-sammy/csharp/win32-arm64/2.145.21-g154a82fd27/file/muhammad-sammy.csharp-2.145.21-g154a82fd27@win32-arm64.vsix",
+      "darwin-x64": "https://open-vsx.org/api/muhammad-sammy/csharp/darwin-x64/2.145.21-g154a82fd27/file/muhammad-sammy.csharp-2.145.21-g154a82fd27@darwin-x64.vsix",
+      "darwin-arm64": "https://open-vsx.org/api/muhammad-sammy/csharp/darwin-arm64/2.145.21-g154a82fd27/file/muhammad-sammy.csharp-2.145.21-g154a82fd27@darwin-arm64.vsix",
+      "alpine-x64": "https://open-vsx.org/api/muhammad-sammy/csharp/alpine-x64/2.145.21-g154a82fd27/file/muhammad-sammy.csharp-2.145.21-g154a82fd27@alpine-x64.vsix",
+      "linux-arm64": "https://open-vsx.org/api/muhammad-sammy/csharp/linux-arm64/2.145.21-g154a82fd27/file/muhammad-sammy.csharp-2.145.21-g154a82fd27@linux-arm64.vsix"
+    },
+    "dependencies": [
+      {
+        "extension": "vscode-dotnet-runtime",
+        "namespace": "ms-dotnettools",
+        "url": "https://open-vsx.org/api/ms-dotnettools/vscode-dotnet-runtime"
+      }
+    ]
+  },
+  "mirrorOpenVsx": {
+    "namespace": "dotnetdev-kr-custom",
+    "name": "csharp",
+    "version": "2.148.23",
+    "timestamp": "2026-08-07T01:35:19.551911Z",
+    "preRelease": false,
+    "engines": {
+      "vscode": "^1.106.0"
+    },
+    "license": "SEE LICENSE IN RuntimeLicenses/license.txt",
+    "downloads": {
+      "linux-x64": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp/linux-x64/2.148.23/file/dotnetdev-kr-custom.csharp-2.148.23@linux-x64.vsix",
+      "win32-x64": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp/win32-x64/2.148.23/file/dotnetdev-kr-custom.csharp-2.148.23@win32-x64.vsix",
+      "alpine-arm64": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp/alpine-arm64/2.148.23/file/dotnetdev-kr-custom.csharp-2.148.23@alpine-arm64.vsix",
+      "win32-arm64": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp/win32-arm64/2.148.23/file/dotnetdev-kr-custom.csharp-2.148.23@win32-arm64.vsix",
+      "darwin-x64": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp/darwin-x64/2.148.23/file/dotnetdev-kr-custom.csharp-2.148.23@darwin-x64.vsix",
+      "alpine-x64": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp/alpine-x64/2.148.23/file/dotnetdev-kr-custom.csharp-2.148.23@alpine-x64.vsix",
+      "darwin-arm64": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp/darwin-arm64/2.148.23/file/dotnetdev-kr-custom.csharp-2.148.23@darwin-arm64.vsix",
+      "linux-arm64": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp/linux-arm64/2.148.23/file/dotnetdev-kr-custom.csharp-2.148.23@linux-arm64.vsix"
+    },
+    "dependencies": [
+      {
+        "extension": "vscode-dotnet-runtime",
+        "namespace": "ms-dotnettools",
+        "url": "https://open-vsx.org/api/ms-dotnettools/vscode-dotnet-runtime"
+      }
+    ]
+  },
+  "sources": {
+    "communityApi": "https://open-vsx.org/api/muhammad-sammy/csharp/latest",
+    "mirrorApi": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp/latest",
+    "communityHeadApi": "https://api.github.com/repos/muhammadsammy/free-vscode-csharp/commits/master"
+  },
+  "communityWorkflows": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "url": "https://github.com/muhammadsammy/free-vscode-csharp/blob/d94fae6e1552f1a60eacda933fc76c399b36591f/.github/workflows/ci.yml",
+      "sha256": "11ef850f14e955779fb283ac8241e39ae26f78c0b9732ee17756f11ca3e2c08c",
+      "content": "name: OmniSharp-VSCode CI\n\non:\n  push:\n    branches: [master, feature/**]\n\n  pull_request:\n    branches: [master, feature/**]\n\njobs:\n  build:\n    runs-on: ubuntu-latest\n    timeout-minutes: 30\n\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          fetch-depth: 0\n\n      - name: Setup dotnet\n        uses: actions/setup-dotnet@v5\n        with:\n          dotnet-version: latest\n          dotnet-channel: LTS\n\n      - name: Install Node.js LTS\n        uses: actions/setup-node@v6\n        with:\n          node-version: 'lts/*'\n\n      - name: Install dependencies\n        run: |\n          npm ci\n\n      - name: Compile\n        run: npm run compile\n\n      - name: Prepublish VSIXs\n        run: npm run vscode:prepublish\n\n      - name: Build VSIXs\n        run: npm run vsix:release:package\n\n      - name: Upload build artifact (darwin-x64)\n        id: upload-release-asset-darwin-x64\n        uses: actions/upload-artifact@v4\n        with:\n          path: ./vsix/csharp-darwin-x64-*.vsix\n          name: csharp-darwin-x64.vsix\n\n      - name: Upload build artifact (linux-x64)\n        id: upload-release-asset-linux-x64\n        uses: actions/upload-artifact@v4\n        with:\n          path: ./vsix/csharp-linux-x64-*.vsix\n          name: csharp-linux-x64.vsix\n\n      - name: Upload build artifact (win32-x64)\n        id: upload-release-asset-win32-x64\n        uses: actions/upload-artifact@v4\n        with:\n          path: ./vsix/csharp-win32-x64-*.vsix\n          name: csharp-win32-x64.vsix\n"
+    },
+    {
+      "path": ".github/workflows/publish.yml",
+      "url": "https://github.com/muhammadsammy/free-vscode-csharp/blob/d94fae6e1552f1a60eacda933fc76c399b36591f/.github/workflows/publish.yml",
+      "sha256": "56cad17beed9a286d66c03b5a76733b46fe950639c9df3d48decdb6eea9f0fda",
+      "content": "on:\n  release:\n    types:\n      - released\n\nname: Publish the Extension to OpenVSX\n\njobs:\n  deploy:\n    runs-on: ubuntu-latest\n    timeout-minutes: 30\n\n    steps:\n      - uses: actions/checkout@v6\n        with:\n          fetch-depth: 0\n\n      - name: Setup dotnet\n        uses: actions/setup-dotnet@v5\n        with:\n          dotnet-version: latest\n          dotnet-channel: LTS\n\n      - name: Install Node.js LTS\n        uses: actions/setup-node@v6\n        with:\n          node-version: 'lts/*'\n\n      - name: Install dependencies\n        run: |\n          npm ci\n          npm i -g ovsx\n\n      - name: Compile\n        run: npm run compile\n\n      - name: Prepublish VSIX\n        run: npm run vscode:prepublish\n\n      - name: Build VSIX\n        run: npm run vsix:release:package\n\n      - name: Publish to Open-VSX\n        run: ovsx publish --packagePath $(find . -iname *.vsix) -p ${{ secrets.OPEN_VSX_TOKEN }}\n"
+    },
+    {
+      "path": ".github/workflows/create-release.yml",
+      "url": "https://github.com/muhammadsammy/free-vscode-csharp/blob/d94fae6e1552f1a60eacda933fc76c399b36591f/.github/workflows/create-release.yml",
+      "sha256": "32117b51a01a9db7fba54f5efb8a7a0f9080bf1232949f6b6fa2202cfa68833d",
+      "content": "name: Create GitHub Release\non:\n  push:\n    tags:\n      - 'v2.*'\n\npermissions:\n  contents: write\n\njobs:\n  # This job runs against the yaml defined in the tag we were triggered on.\n  # So we can modify the release creation without having to wait for the change to flow into the commit\n  # that we're tagging, we call a reusable workflow from main\n  create-release:\n    uses: dotnet/vscode-csharp/.github/workflows/release-reusable.yml@main\n    with:\n      tag: ${{ github.ref_name }}\n    secrets: inherit\n"
+    },
+    {
+      "path": ".github/workflows/release-reusable.yml",
+      "url": "https://github.com/muhammadsammy/free-vscode-csharp/blob/d94fae6e1552f1a60eacda933fc76c399b36591f/.github/workflows/release-reusable.yml",
+      "sha256": "040fc94ce6283d03287096affd2dd8a87a45b95b7eb8c7ab4b324713e79303e5",
+      "content": "name: Reusable - Create Release from Changelog\n\non:\n  workflow_call:\n    inputs:\n      tag:\n        description: Tag name to create a release for (e.g. v2.88.0 or v2.88.0-prerelease)\n        required: true\n        type: string\n\npermissions:\n  contents: write\n\njobs:\n  create-release:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Checkout tag\n        uses: actions/checkout@v4\n        with:\n          ref: refs/tags/${{ inputs.tag }}\n\n      - name: Create release from CHANGELOG\n        uses: actions/github-script@v7\n        env:\n          TAG: ${{ inputs.tag }}\n        with:\n          github-token: ${{ secrets.GITHUB_TOKEN }}\n          script: |\n            const { readFile } = require('fs/promises');\n\n            const tag = process.env.TAG;\n            core.info(`Creating release for tag: ${tag}`);\n\n            if (!tag || !tag.startsWith('v2.')) {\n              core.setFailed('Invalid tag name. Tag name must start with \"v2.\"');\n              return;\n            }\n\n            // Read CHANGELOG.md and extract the latest section (first single '#' header)\n            const changelog = await readFile('CHANGELOG.md', 'utf8');\n            const headerMatch = changelog.match(/^# .+$/m);\n            if (!headerMatch) {\n              core.setFailed('Could not find a top-level # header in CHANGELOG.md');\n              return;\n            }\n            const startIdx = changelog.indexOf(headerMatch[0]);\n            let endIdx = changelog.indexOf('\\n# ', startIdx + headerMatch[0].length);\n            if (endIdx === -1) {\n              endIdx = changelog.length;\n            }\n            const releaseNotes = changelog.substring(startIdx, endIdx).trim();\n\n            const isPrerelease = tag.includes('-prerelease');\n            core.info(`Prerelease: ${isPrerelease}`);\n\n            try {\n              const response = await github.rest.repos.createRelease({\n                owner: context.repo.owner,\n                repo: context.repo.repo,\n                tag_name: tag,\n                name: tag,\n                body: releaseNotes,\n                prerelease: isPrerelease,\n              });\n              core.info(`Release created: ${response.data.html_url}`);\n            } catch (err) {\n              if (err && err.status === 422 && err.message && String(err.message).includes('already_exists')) {\n                core.warning(`Release for tag '${tag}' already exists.`);\n              } else {\n                core.setFailed(`Error creating release: ${err?.message ?? err}`);\n              }\n            }\n"
+    },
+    {
+      "path": ".github/workflows/branch-snap.yml",
+      "url": "https://github.com/muhammadsammy/free-vscode-csharp/blob/d94fae6e1552f1a60eacda933fc76c399b36591f/.github/workflows/branch-snap.yml",
+      "sha256": "1e45bb30d0e821f27559e820123379fe44371e0d75e787c60f10eadf47efe2fc",
+      "content": "name: Branch snap\non:\n  workflow_dispatch:\n    inputs:\n      releaseCandidate:\n        description: 'Is this a release candidate snap from main? (Will increment main version to be higher than next stable release)'\n        required: false\n        default: 'false'\n        type: boolean\n\npermissions:\n  contents: write\n  pull-requests: write\n\njobs:\n  check-script:\n    uses: dotnet/arcade/.github/workflows/inter-branch-merge-base.yml@main\n    with:\n      configuration_file_path: '.config/snap-flow.json'\n\n  bump-main-version:\n    needs: check-script\n    if: github.ref == 'refs/heads/main'\n    runs-on: ubuntu-latest\n    steps:\n      - name: Check out\n        uses: actions/checkout@v4\n      - name: Install NodeJS\n        uses: actions/setup-node@v4\n        with:\n          node-version: '24.x'\n      - name: Install dependencies\n        run: npm ci\n      - name: Update version.json\n        run: |\n          if [ \"${{ github.event.inputs.releaseCandidate }}\" = \"true\" ]; then\n            npm run incrementVersion -- --releaseCandidate=true\n          else\n            npm run incrementVersion\n          fi\n      - name: Create version update PR\n        uses: peter-evans/create-pull-request@v4\n        with:\n          token: ${{ secrets.GITHUB_TOKEN }}\n          commit-message: Update main version\n          title: '[automated] Update main version'\n          branch: merge/update-main-version\n\n  update-release-version:\n    needs: check-script\n    if: github.ref == 'refs/heads/prerelease'\n    runs-on: ubuntu-latest\n    steps:\n      - name: Check out merge branch\n        uses: actions/checkout@v4\n        with:\n          ref: merge/prerelease-to-release\n          fetch-depth: 0\n      - name: Install NodeJS\n        uses: actions/setup-node@v4\n        with:\n          node-version: '24.x'\n      - name: Install dependencies\n        run: npm ci\n      - name: Update version.json for release\n        run: npm run updateVersionForStableRelease\n      - name: Commit and push version update\n        run: |\n          git config user.name \"github-actions[bot]\"\n          git config user.email \"github-actions[bot]@users.noreply.github.com\"\n          git add .\n          git commit -m \"Update version for stable release\"\n          git push origin merge/prerelease-to-release\n"
+    }
+  ],
+  "publishedManifestComparison": "published-debugger-mapping.json",
+  "limits": [
+    "Eight published manifest files were retrieved. VSIX binary contents and the community extension runtime were not tested.",
+    "The package dependency mappings contain macOS x64 pointing to arm64 and Alpine x64 pointing to a glibc Linux archive; explicit Windows ARM64 and Alpine ARM64 entries are absent. This is a manifest-level finding.",
+    "A release/version snapshot does not establish long-term maintainer responsiveness or project abandonment.",
+    "No complete redistribution-license inventory of the VSIX components was completed.",
+    "No production workflow, extension identity, existing publication, repository, or communication to maintainers was changed.",
+    "The proposed product scope assumes the current eight VSIX targets and core C# language and CoreCLR workflows; full feature parity has not been established."
+  ]
+}

@@ -1,0 +1,578 @@
+[
+  {
+    "target": "win32-x64",
+    "url": "https://open-vsx.org/api/muhammad-sammy/csharp/win32-x64/2.145.21-g154a82fd27/file/package.json",
+    "version": "2.145.21-g154a82fd27",
+    "debuggerDependencies": [
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (Windows / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-win64.zip",
+        "installPath": ".debugger",
+        "platforms": [
+          "win32"
+        ],
+        "architectures": [
+          "x86_64"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg.exe"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (macOS / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-osx-arm64.zip",
+        "installPath": ".debugger",
+        "platforms": [
+          "darwin"
+        ],
+        "architectures": [
+          "x86_64",
+          "arm64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (linux / ARM64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-linux-arm64.tar.gz",
+        "installPath": ".debugger",
+        "platforms": [
+          "linux"
+        ],
+        "architectures": [
+          "arm64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (linux / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-linux-amd64.tar.gz",
+        "installPath": ".debugger",
+        "platforms": [
+          "linux",
+          "linux-musl"
+        ],
+        "architectures": [
+          "x86_64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      }
+    ],
+    "license": "SEE LICENSE IN RuntimeLicenses/license.txt",
+    "manifestSha256": "2873747ff47368feae8014e509825681dec8445c1c99b0255e4c2d26f07291b4"
+  },
+  {
+    "target": "linux-x64",
+    "url": "https://open-vsx.org/api/muhammad-sammy/csharp/linux-x64/2.145.21-g154a82fd27/file/package.json",
+    "version": "2.145.21-g154a82fd27",
+    "debuggerDependencies": [
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (Windows / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-win64.zip",
+        "installPath": ".debugger",
+        "platforms": [
+          "win32"
+        ],
+        "architectures": [
+          "x86_64"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg.exe"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (macOS / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-osx-arm64.zip",
+        "installPath": ".debugger",
+        "platforms": [
+          "darwin"
+        ],
+        "architectures": [
+          "x86_64",
+          "arm64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (linux / ARM64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-linux-arm64.tar.gz",
+        "installPath": ".debugger",
+        "platforms": [
+          "linux"
+        ],
+        "architectures": [
+          "arm64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (linux / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-linux-amd64.tar.gz",
+        "installPath": ".debugger",
+        "platforms": [
+          "linux",
+          "linux-musl"
+        ],
+        "architectures": [
+          "x86_64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      }
+    ],
+    "license": "SEE LICENSE IN RuntimeLicenses/license.txt",
+    "manifestSha256": "2873747ff47368feae8014e509825681dec8445c1c99b0255e4c2d26f07291b4"
+  },
+  {
+    "target": "alpine-arm64",
+    "url": "https://open-vsx.org/api/muhammad-sammy/csharp/alpine-arm64/2.145.21-g154a82fd27/file/package.json",
+    "version": "2.145.21-g154a82fd27",
+    "debuggerDependencies": [
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (Windows / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-win64.zip",
+        "installPath": ".debugger",
+        "platforms": [
+          "win32"
+        ],
+        "architectures": [
+          "x86_64"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg.exe"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (macOS / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-osx-arm64.zip",
+        "installPath": ".debugger",
+        "platforms": [
+          "darwin"
+        ],
+        "architectures": [
+          "x86_64",
+          "arm64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (linux / ARM64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-linux-arm64.tar.gz",
+        "installPath": ".debugger",
+        "platforms": [
+          "linux"
+        ],
+        "architectures": [
+          "arm64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (linux / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-linux-amd64.tar.gz",
+        "installPath": ".debugger",
+        "platforms": [
+          "linux",
+          "linux-musl"
+        ],
+        "architectures": [
+          "x86_64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      }
+    ],
+    "license": "SEE LICENSE IN RuntimeLicenses/license.txt",
+    "manifestSha256": "2873747ff47368feae8014e509825681dec8445c1c99b0255e4c2d26f07291b4"
+  },
+  {
+    "target": "win32-arm64",
+    "url": "https://open-vsx.org/api/muhammad-sammy/csharp/win32-arm64/2.145.21-g154a82fd27/file/package.json",
+    "version": "2.145.21-g154a82fd27",
+    "debuggerDependencies": [
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (Windows / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-win64.zip",
+        "installPath": ".debugger",
+        "platforms": [
+          "win32"
+        ],
+        "architectures": [
+          "x86_64"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg.exe"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (macOS / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-osx-arm64.zip",
+        "installPath": ".debugger",
+        "platforms": [
+          "darwin"
+        ],
+        "architectures": [
+          "x86_64",
+          "arm64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (linux / ARM64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-linux-arm64.tar.gz",
+        "installPath": ".debugger",
+        "platforms": [
+          "linux"
+        ],
+        "architectures": [
+          "arm64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (linux / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-linux-amd64.tar.gz",
+        "installPath": ".debugger",
+        "platforms": [
+          "linux",
+          "linux-musl"
+        ],
+        "architectures": [
+          "x86_64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      }
+    ],
+    "license": "SEE LICENSE IN RuntimeLicenses/license.txt",
+    "manifestSha256": "2873747ff47368feae8014e509825681dec8445c1c99b0255e4c2d26f07291b4"
+  },
+  {
+    "target": "darwin-x64",
+    "url": "https://open-vsx.org/api/muhammad-sammy/csharp/darwin-x64/2.145.21-g154a82fd27/file/package.json",
+    "version": "2.145.21-g154a82fd27",
+    "debuggerDependencies": [
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (Windows / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-win64.zip",
+        "installPath": ".debugger",
+        "platforms": [
+          "win32"
+        ],
+        "architectures": [
+          "x86_64"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg.exe"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (macOS / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-osx-arm64.zip",
+        "installPath": ".debugger",
+        "platforms": [
+          "darwin"
+        ],
+        "architectures": [
+          "x86_64",
+          "arm64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (linux / ARM64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-linux-arm64.tar.gz",
+        "installPath": ".debugger",
+        "platforms": [
+          "linux"
+        ],
+        "architectures": [
+          "arm64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (linux / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-linux-amd64.tar.gz",
+        "installPath": ".debugger",
+        "platforms": [
+          "linux",
+          "linux-musl"
+        ],
+        "architectures": [
+          "x86_64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      }
+    ],
+    "license": "SEE LICENSE IN RuntimeLicenses/license.txt",
+    "manifestSha256": "2873747ff47368feae8014e509825681dec8445c1c99b0255e4c2d26f07291b4"
+  },
+  {
+    "target": "darwin-arm64",
+    "url": "https://open-vsx.org/api/muhammad-sammy/csharp/darwin-arm64/2.145.21-g154a82fd27/file/package.json",
+    "version": "2.145.21-g154a82fd27",
+    "debuggerDependencies": [
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (Windows / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-win64.zip",
+        "installPath": ".debugger",
+        "platforms": [
+          "win32"
+        ],
+        "architectures": [
+          "x86_64"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg.exe"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (macOS / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-osx-arm64.zip",
+        "installPath": ".debugger",
+        "platforms": [
+          "darwin"
+        ],
+        "architectures": [
+          "x86_64",
+          "arm64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (linux / ARM64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-linux-arm64.tar.gz",
+        "installPath": ".debugger",
+        "platforms": [
+          "linux"
+        ],
+        "architectures": [
+          "arm64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (linux / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-linux-amd64.tar.gz",
+        "installPath": ".debugger",
+        "platforms": [
+          "linux",
+          "linux-musl"
+        ],
+        "architectures": [
+          "x86_64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      }
+    ],
+    "license": "SEE LICENSE IN RuntimeLicenses/license.txt",
+    "manifestSha256": "2873747ff47368feae8014e509825681dec8445c1c99b0255e4c2d26f07291b4"
+  },
+  {
+    "target": "alpine-x64",
+    "url": "https://open-vsx.org/api/muhammad-sammy/csharp/alpine-x64/2.145.21-g154a82fd27/file/package.json",
+    "version": "2.145.21-g154a82fd27",
+    "debuggerDependencies": [
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (Windows / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-win64.zip",
+        "installPath": ".debugger",
+        "platforms": [
+          "win32"
+        ],
+        "architectures": [
+          "x86_64"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg.exe"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (macOS / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-osx-arm64.zip",
+        "installPath": ".debugger",
+        "platforms": [
+          "darwin"
+        ],
+        "architectures": [
+          "x86_64",
+          "arm64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (linux / ARM64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-linux-arm64.tar.gz",
+        "installPath": ".debugger",
+        "platforms": [
+          "linux"
+        ],
+        "architectures": [
+          "arm64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (linux / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-linux-amd64.tar.gz",
+        "installPath": ".debugger",
+        "platforms": [
+          "linux",
+          "linux-musl"
+        ],
+        "architectures": [
+          "x86_64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      }
+    ],
+    "license": "SEE LICENSE IN RuntimeLicenses/license.txt",
+    "manifestSha256": "2873747ff47368feae8014e509825681dec8445c1c99b0255e4c2d26f07291b4"
+  },
+  {
+    "target": "linux-arm64",
+    "url": "https://open-vsx.org/api/muhammad-sammy/csharp/linux-arm64/2.145.21-g154a82fd27/file/package.json",
+    "version": "2.145.21-g154a82fd27",
+    "debuggerDependencies": [
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (Windows / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-win64.zip",
+        "installPath": ".debugger",
+        "platforms": [
+          "win32"
+        ],
+        "architectures": [
+          "x86_64"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg.exe"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (macOS / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-osx-arm64.zip",
+        "installPath": ".debugger",
+        "platforms": [
+          "darwin"
+        ],
+        "architectures": [
+          "x86_64",
+          "arm64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (linux / ARM64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-linux-arm64.tar.gz",
+        "installPath": ".debugger",
+        "platforms": [
+          "linux"
+        ],
+        "architectures": [
+          "arm64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      },
+      {
+        "id": "Debugger",
+        "description": ".NET Core Debugger (linux / x64)",
+        "url": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-linux-amd64.tar.gz",
+        "installPath": ".debugger",
+        "platforms": [
+          "linux",
+          "linux-musl"
+        ],
+        "architectures": [
+          "x86_64"
+        ],
+        "binaries": [
+          "./netcoredbg"
+        ],
+        "installTestPath": ".debugger/netcoredbg/netcoredbg"
+      }
+    ],
+    "license": "SEE LICENSE IN RuntimeLicenses/license.txt",
+    "manifestSha256": "2873747ff47368feae8014e509825681dec8445c1c99b0255e4c2d26f07291b4"
+  }
+]

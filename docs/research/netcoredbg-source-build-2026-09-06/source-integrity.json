@@ -1,0 +1,8 @@
+{
+  "checkedOriginalFiles": 498,
+  "changedOriginalFiles": [],
+  "afterBuildTargets": [
+    "osx-arm64",
+    "osx-x64"
+  ]
+}

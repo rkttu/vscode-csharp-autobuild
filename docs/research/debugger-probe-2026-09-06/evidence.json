@@ -1,0 +1,173 @@
+{
+  "date": "2026-09-06",
+  "kind": "Independent DAP launch probe; not an extension integration test",
+  "host": {
+    "os": "macOS",
+    "version": "26.6.2",
+    "build": "25G83",
+    "architecture": "arm64"
+  },
+  "extension": {
+    "repository": "https://github.com/rkttu/vscode-csharp-autobuild",
+    "localCommit": "5cab182e77a8001f35d868c6c96a54a5cb52b45b",
+    "openVsxVersion": "2.148.23",
+    "upstreamCommit": "2f5806a9f39575bfaf4ca16445f420440a43e050"
+  },
+  "notes": [
+    "Only generated fixture processes were debugged.",
+    "Binaries were downloaded from official project release assets and were not rebuilt.",
+    "Archive SHA-256 values matched the GitHub release asset digest.",
+    "Runtime versions were observed in debuggee stdout; they are not claims about the latest public .NET servicing release.",
+    "Trace files preserve DAP messages; local temporary root and DOTNET_ROOT paths are replaced with placeholders.",
+    "The fixture defaults to net10.0; the net8.0 run used a separate project targeting net8.0 and global.json pinned to SDK 8.0.418.",
+    "An initial SDK 10 multitarget restore failed because local net8.0 targeting packs did not match the SDK expectation. The net8.0 fixture was subsequently built successfully with installed SDK 8.0.418 and cleared NuGet sources."
+  ],
+  "fixtures": {
+    "Probe.csproj": {
+      "sha256": "852f7773f63d648dc0b9e34e2e22031a4ef4d80467eab8b27c8b5d0ca3270dc7"
+    },
+    "NuGet.Config": {
+      "sha256": "9508cae5f76364f56e80eb97cb16493977243cf38e5cca6284e3d74f83b20a2c"
+    },
+    "Program.cs": {
+      "sha256": "5147b718cb60b75a4965c678ff490a4d9a346e11e48a5c1fc64cbc32886fc6ea"
+    }
+  },
+  "engines": {
+    "netcoredbg": {
+      "tag": "3.2.0-1092",
+      "commit": "9744e1f051866215611b8440c638042aa2aa2f72",
+      "publishedAt": "2026-06-25T14:40:46Z",
+      "releaseUrl": "https://github.com/Samsung/netcoredbg/releases/tag/3.2.0-1092",
+      "testedAsset": "https://github.com/Samsung/netcoredbg/releases/download/3.2.0-1092/netcoredbg-osx-arm64.zip",
+      "sha256": "f4fa33b3ff874910cc184b4bb3b9c56d0abdf5c6521cee0b144d7c6e4a6e59ea",
+      "architecture": "Mach-O 64-bit executable arm64",
+      "allReleaseAssets": [
+        "netcoredbg-linux-amd64.tar.gz",
+        "netcoredbg-linux-arm64.tar.gz",
+        "netcoredbg-osx-arm64.zip",
+        "netcoredbg-win64.zip"
+      ]
+    },
+    "dncdbg": {
+      "tag": "v1.2.0",
+      "commit": "7ce59f7cca0a110764c41baa6cc2312bd8c23f73",
+      "publishedAt": "2026-08-28T08:04:28Z",
+      "releaseUrl": "https://github.com/viewizard/dncdbg/releases/tag/v1.2.0",
+      "testedAsset": "https://github.com/viewizard/dncdbg/releases/download/v1.2.0/dncdbg-1.2.0-macos-arm64.zip",
+      "sha256": "b999408b747d0427b655bb8d69d562df98aad6c4827b053dd719167222e312c9",
+      "architecture": "Mach-O 64-bit executable arm64",
+      "allReleaseAssets": [
+        "dncdbg-1.2.0-linux-arm32.tar.gz",
+        "dncdbg-1.2.0-linux-arm64.tar.gz",
+        "dncdbg-1.2.0-linux-musl-arm32.tar.gz",
+        "dncdbg-1.2.0-linux-musl-arm64.tar.gz",
+        "dncdbg-1.2.0-linux-musl-x64.tar.gz",
+        "dncdbg-1.2.0-linux-x64.tar.gz",
+        "dncdbg-1.2.0-macos-arm64.zip",
+        "dncdbg-1.2.0-macos-x64.zip",
+        "dncdbg-1.2.0-windows-arm64.zip",
+        "dncdbg-1.2.0-windows-x64.zip",
+        "dncdbg-1.2.0-windows-x86.zip"
+      ]
+    }
+  },
+  "runs": [
+    {
+      "engine": "netcoredbg",
+      "sdk": "8.0.418",
+      "runtime": "8.0.24",
+      "targetFramework": "net8.0",
+      "success": true,
+      "checks": [
+        "conditional breakpoint with a true condition",
+        "stackTrace source line",
+        "scopes and variables answer=40",
+        "evaluate answer+2=42",
+        "step over stopped event",
+        "breakpoint after await",
+        "InvalidOperationException breakpoint and exceptionInfo",
+        "stdout and exitCode=0"
+      ],
+      "stdout": "RUNTIME=.NET 8.0.24;ARCH=Arm64\nANSWER=42\nAFTER_AWAIT=43\nCAUGHT\nDONE\n",
+      "trace": "traces/netcoredbg-net8.jsonl",
+      "traceSha256": "2c93c905c9529ff9b7f1984a19f9d315ac7521cde85aa5b00a9d894926876942"
+    },
+    {
+      "engine": "netcoredbg",
+      "sdk": "10.0.400",
+      "runtime": "10.0.11",
+      "targetFramework": "net10.0",
+      "success": true,
+      "checks": [
+        "conditional breakpoint with a true condition",
+        "stackTrace source line",
+        "scopes and variables answer=40",
+        "evaluate answer+2=42",
+        "step over stopped event",
+        "breakpoint after await",
+        "InvalidOperationException breakpoint and exceptionInfo",
+        "stdout and exitCode=0"
+      ],
+      "stdout": "RUNTIME=.NET 10.0.11;ARCH=Arm64\nANSWER=42\nAFTER_AWAIT=43\nCAUGHT\nDONE\n",
+      "trace": "traces/netcoredbg-net10.jsonl",
+      "traceSha256": "917ff212ca7b4c0a6e03869f04c63b720a8503f607914ece88698c6cf50298d7"
+    },
+    {
+      "engine": "dncdbg",
+      "sdk": "8.0.418",
+      "runtime": "8.0.24",
+      "targetFramework": "net8.0",
+      "success": true,
+      "checks": [
+        "conditional breakpoint with a true condition",
+        "stackTrace source line",
+        "scopes and variables answer=40",
+        "evaluate answer+2=42",
+        "step over stopped event",
+        "breakpoint after await",
+        "InvalidOperationException breakpoint and exceptionInfo",
+        "stdout and exitCode=0"
+      ],
+      "stdout": "RUNTIME=.NET 8.0.24;ARCH=Arm64\nANSWER=42\nAFTER_AWAIT=43\nCAUGHT\nDONE\n",
+      "trace": "traces/dncdbg-net8.jsonl",
+      "traceSha256": "fc332df4f1a9289d0d0c8ca2ee8e0f0fb2e0330413f481200fa3317fc58c0981"
+    },
+    {
+      "engine": "dncdbg",
+      "sdk": "10.0.400",
+      "runtime": "10.0.11",
+      "targetFramework": "net10.0",
+      "success": true,
+      "checks": [
+        "conditional breakpoint with a true condition",
+        "stackTrace source line",
+        "scopes and variables answer=40",
+        "evaluate answer+2=42",
+        "step over stopped event",
+        "breakpoint after await",
+        "InvalidOperationException breakpoint and exceptionInfo",
+        "stdout and exitCode=0"
+      ],
+      "stdout": "RUNTIME=.NET 10.0.11;ARCH=Arm64\nANSWER=42\nAFTER_AWAIT=43\nCAUGHT\nDONE\n",
+      "trace": "traces/dncdbg-net10.jsonl",
+      "traceSha256": "5f899b2c27971fb11ca71aeff3ef009db9afddabad17c7879efd50bf9e862713"
+    }
+  ],
+  "notTested": [
+    "VSIX packaging",
+    "VSCodium or other IDE UI",
+    "Linux",
+    "Windows",
+    "macOS x64",
+    "attach",
+    "remote debugging",
+    "integrated terminal",
+    "ASP.NET Core",
+    "Hot Reload",
+    "complex expression evaluation",
+    "false conditional breakpoint",
+    "dotnet 9",
+    "dotnet 11 preview"
+  ]
+}
