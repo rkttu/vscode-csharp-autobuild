@@ -1,0 +1,34 @@
+{
+  "engine": "netcoredbg",
+  "program": "<runner-temp>/netcoredbg-validation/fixture-net8/output/Probe.dll",
+  "expectedArchitecture": "x64",
+  "expectedRuntime": "8",
+  "checks": [],
+  "capabilities": {
+    "exceptionBreakpointFilters": [
+      {
+        "filter": "user-unhandled",
+        "label": "user-unhandled"
+      },
+      {
+        "filter": "all",
+        "label": "all"
+      }
+    ],
+    "supportTerminateDebuggee": true,
+    "supportsCancelRequest": true,
+    "supportsConditionalBreakpoints": true,
+    "supportsConfigurationDoneRequest": true,
+    "supportsExceptionFilterOptions": true,
+    "supportsExceptionInfoRequest": true,
+    "supportsExceptionOptions": false,
+    "supportsFunctionBreakpoints": true,
+    "supportsSetExpression": true,
+    "supportsSetVariable": true,
+    "supportsTerminateRequest": true
+  },
+  "success": false,
+  "error": "{\"command\": \"configurationDone\", \"message\": \"Failed command 'configurationDone' : 0x80004005\", \"request_seq\": 5, \"seq\": 7, \"success\": false, \"type\": \"response\"}",
+  "adapterExitCodeAtFailure": null,
+  "stderr": ""
+}

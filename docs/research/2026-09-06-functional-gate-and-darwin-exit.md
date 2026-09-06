@@ -93,3 +93,23 @@ The maintainer policy remains: fail the Actions run, preserve evidence, and let
 the maintainer respond through their GitHub notification settings. No automatic
 rollback, quarantine state machine, or custom notification server was added.
 See the [operating policy review](2026-09-06-publication-recovery-and-rollback.md).
+
+## 5. First native matrix and startup failure
+
+[Candidate run 34028072085](https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34028072085), attempt 1, used recipe `ee1443d0d2bc0a76dfbd129e574126d6badfeaa9a55bf7aed861750df4f085f5` and candidate version `2.148.23001`. Seven native targets passed both runtime gates. macOS Intel passed all 30 upstream scenarios on .NET 10, but its earlier .NET 8 repository fixture failed before any checks completed. DAP `configurationDone` returned `0x80004005` after approximately five seconds. No .NET 8 upstream-suite result existed for that target because its prerequisite fixture failed.
+
+Samsung's startup path uses `startupWaitTimeout = 5000 ms` and returns `E_FAIL` if the process-attached condition is not observed by the deadline. The timing is consistent with that path, but the first log alone does not establish why attachment was late or absent. The failure was not converted to a pass or excluded. Aggregation failed and packaging/publication were skipped. A maintainer-driven rerun of failed jobs with runner diagnostics was requested to investigate reproducibility; its outcome is recorded separately.
+
+Attempt 2 reran the failed macOS Intel job without changing the workflow recipe or Samsung source. It passed all eight repository fixture checks and all 30 upstream scenarios on each of .NET 8 and .NET 10. The original 498 Samsung files remained unchanged. The aggregate then accepted the latest evidence for every target and packaging started. This establishes a successful rerun, not the root cause of the first startup failure. The [failed-attempt archive](cross-platform-2026-09-06/candidate-34028072085-attempt1/README.md) remains separate.
+
+## 6. Installed-editor check of the new package
+
+The macOS ARM64 VSIX from run 34028072085 passed an actual installed-extension check in VS Code 1.135.0. Extension activation and seven checks per runtime passed on .NET 8.0.24 and .NET 10.0.11. The installed package's source/run provenance matched the candidate, and every installed debugger file matched the VSIX bytes, including the new Darwin library. The VSIX SHA-256 was `fe196696f3866af53654b76f97d132ba5d5718bf2909ac3c8962e45381b45b4e`. [Editor evidence](cross-platform-2026-09-06/candidate-34028072085-editor/README.md) records the result and test harness separately from the eight-platform extracted-adapter gate.
+
+## 7. Intermittent extracted-VSIX exception stack failure
+
+Attempt 2 passed seven extracted-VSIX targets but failed macOS ARM64's .NET 8 `VSCodeTestUnhandledException` scenario. The other 29 upstream cases and all eight repository fixture checks passed on that target. The debugger stopped on the expected unhandled exception, but returned only runtime and synthetic `Main` frames with line zero and no source. The original test dereferenced the absent source field and failed with `NullReferenceException`. .NET 10 did not run on that target because the preceding runtime gate failed. Publication remained blocked.
+
+Samsung's [stack-trace implementation](https://github.com/Samsung/netcoredbg/blob/9744e1f051866215611b8440c638042aa2aa2f72/src/debugger/manageddebugger.cpp) already makes three attempts to reconstruct source frames from exception details when the top physical frame has no source line. Reading `Exception.StackTrace` involves managed evaluation. The roughly 13-second failing scenario is slower than the roughly 2-second passing cases, but the transcript alone does not establish an evaluation timeout or its cause. No assertion or required test was changed.
+
+Ten local repetitions of the same unchanged scenario, .NET 8.0.24, and debugger bytes from the installed candidate all passed. A single maintainer-driven rerun of the failed CI job with diagnostics was requested after this comparison. The [failed VSIX evidence and local repetition results](cross-platform-2026-09-06/candidate-34028072085-vsix-failure/README.md) retain both observations. A successful rerun establishes a passing validation result; it does not establish that the intermittent behavior was corrected.

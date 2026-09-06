@@ -1,0 +1,218 @@
+{
+  "schemaVersion": 1,
+  "success": false,
+  "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+  "workflowCommit": "b919f8e16f492a5dd1d560c750d90ddc3111003c",
+  "runId": "34028072085",
+  "config": {
+    "schemaVersion": 1,
+    "baselineTag": "3.2.0-1092",
+    "baselineCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+    "coreclrCommit": "60629d14374c56f1cb51819049ad1fa529307f8d",
+    "sdk8": "8.0.418",
+    "sdk10": "10.0.400",
+    "dbgshimVersion": "10.0.731102",
+    "alpineImage": "alpine:3.22.1@sha256:4bcff63911fcb4448bd4fdacec207030997caf25e9bea4045fa6c8c44de311d1",
+    "targets": [
+      "win32-x64",
+      "win32-arm64",
+      "linux-x64",
+      "linux-arm64",
+      "alpine-x64",
+      "alpine-arm64",
+      "darwin-x64",
+      "darwin-arm64"
+    ],
+    "runtimes": [
+      "8",
+      "10"
+    ]
+  },
+  "targets": [
+    {
+      "target": "win32-x64",
+      "success": true,
+      "archive": "netcoredbg-win32-x64.zip",
+      "sha256": "5ad4fc0333921c3d5a992d5dcdb1b86c0dc6bf198e94eb443c045a4a5cb2f99b",
+      "files": {
+        "Microsoft.CodeAnalysis.dll": "97553a05b1f8aad2f29349f0fc7893ceb6dd199bd769d3e1092839957c7c0cdb",
+        "Microsoft.CodeAnalysis.CSharp.dll": "e9cc57c55a95146f98b55dd46fdd881b4be48925e3773ef4aa5ac622b76903a6",
+        "netcoredbg.exe": "f789f117302f9e7cb774f521b5ad47e54515e217051dc1fbfe996107f8688a10",
+        "ManagedPart.dll": "7e7b8f6761f710cbd3ab083feeb147c9b09ed2ad4c7708323f5beeff106c2144",
+        "Microsoft.CodeAnalysis.CSharp.Scripting.dll": "64050c89e7bf7905f6c7ec9eb1594dcea5fbbd2868341f9ef99b58e9dea01605",
+        "dbgshim.dll": "973ee80765d6451b3596910a0300ccab1cca18df2bb3d1ff3d7fa8e17e345cc7",
+        "Microsoft.CodeAnalysis.Scripting.dll": "066f1d39b5e211e343c8c79f374438884b1684fa27dc8c29a9000f88615bf764",
+        "notices/Samsung-netcoredbg-LICENSE": "6cd03b0de8299b0800f22b35ae842c931ded7684a2d1ba4f1d4188bab9b09a11",
+        "notices/dotnet-runtime-THIRD-PARTY-NOTICES.TXT": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21",
+        "notices/dotnet-runtime-LICENSE.TXT": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b",
+        "notices/json-LICENSE.MIT": "7b875bb7a4e28abb7956ea821b4b7d88ff6a2a4fabf261c3993730a365ec56dd",
+        "notices/linenoise-ng-LICENSE": "c676d229c8807fa8701cf5cd9d59788d41de2b4803803a34d35570e700a18363",
+        "notices/nuget/netstandard.library/2.0.3/THIRD-PARTY-NOTICES.TXT": "0684b2349427ee28e392ae8914645832e59731dba8a38a984f72b3fb8769c76b",
+        "notices/nuget/netstandard.library/2.0.3/LICENSE.TXT": "fc95de1436a321aadbfafd21f8a8506a2f4678bfc003bd806d6b59d3088efadc",
+        "notices/nuget/microsoft.csharp/4.4.0/THIRD-PARTY-NOTICES.TXT": "0ef4dce1f4e8965f19a3b8b2f984f337d5c35e5aaf7f8a36b95aec66c301963a",
+        "notices/nuget/microsoft.csharp/4.4.0/LICENSE.TXT": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+      }
+    },
+    {
+      "target": "win32-arm64",
+      "success": true,
+      "archive": "netcoredbg-win32-arm64.zip",
+      "sha256": "281cd763b77407aed5ceda40c7dd58d80bc72ecd710da64a5668de81a9ac1624",
+      "files": {
+        "Microsoft.CodeAnalysis.dll": "97553a05b1f8aad2f29349f0fc7893ceb6dd199bd769d3e1092839957c7c0cdb",
+        "Microsoft.CodeAnalysis.CSharp.dll": "e9cc57c55a95146f98b55dd46fdd881b4be48925e3773ef4aa5ac622b76903a6",
+        "netcoredbg.exe": "a3214cf5d70e7ed955fd14ef03b7b2d902b924b0bfff2d61eff01844f9918daa",
+        "ManagedPart.dll": "de8d46ba81ea4cd6e7c54a08b5f0c09212f48b38ade0253a027c915a0b15c6a0",
+        "Microsoft.CodeAnalysis.CSharp.Scripting.dll": "64050c89e7bf7905f6c7ec9eb1594dcea5fbbd2868341f9ef99b58e9dea01605",
+        "dbgshim.dll": "a9c116424acd30298b3e30e622f1afde1a951d3055cf7aa1985fd429c9842e1e",
+        "Microsoft.CodeAnalysis.Scripting.dll": "066f1d39b5e211e343c8c79f374438884b1684fa27dc8c29a9000f88615bf764",
+        "notices/Samsung-netcoredbg-LICENSE": "6cd03b0de8299b0800f22b35ae842c931ded7684a2d1ba4f1d4188bab9b09a11",
+        "notices/dotnet-runtime-THIRD-PARTY-NOTICES.TXT": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21",
+        "notices/dotnet-runtime-LICENSE.TXT": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b",
+        "notices/json-LICENSE.MIT": "7b875bb7a4e28abb7956ea821b4b7d88ff6a2a4fabf261c3993730a365ec56dd",
+        "notices/linenoise-ng-LICENSE": "c676d229c8807fa8701cf5cd9d59788d41de2b4803803a34d35570e700a18363",
+        "notices/nuget/netstandard.library/2.0.3/THIRD-PARTY-NOTICES.TXT": "0684b2349427ee28e392ae8914645832e59731dba8a38a984f72b3fb8769c76b",
+        "notices/nuget/netstandard.library/2.0.3/LICENSE.TXT": "fc95de1436a321aadbfafd21f8a8506a2f4678bfc003bd806d6b59d3088efadc",
+        "notices/nuget/microsoft.csharp/4.4.0/THIRD-PARTY-NOTICES.TXT": "0ef4dce1f4e8965f19a3b8b2f984f337d5c35e5aaf7f8a36b95aec66c301963a",
+        "notices/nuget/microsoft.csharp/4.4.0/LICENSE.TXT": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+      }
+    },
+    {
+      "target": "linux-x64",
+      "success": true,
+      "archive": "netcoredbg-linux-x64.zip",
+      "sha256": "c337797754c400541b69650145345cf3d6726b4a47b0b851a6d07db3081eddf9",
+      "files": {
+        "Microsoft.CodeAnalysis.dll": "97553a05b1f8aad2f29349f0fc7893ceb6dd199bd769d3e1092839957c7c0cdb",
+        "libdbgshim.so": "ac79da6ec930fa17cd6c1f243e8a48d9a3aa4642c0ec6145260a82245467ecba",
+        "Microsoft.CodeAnalysis.CSharp.dll": "e9cc57c55a95146f98b55dd46fdd881b4be48925e3773ef4aa5ac622b76903a6",
+        "ManagedPart.dll": "361b0b09d460c93ad05a1120e1efbb38106694e36892d57ad76606d4404ad866",
+        "netcoredbg": "cc5e8828e46901b7635d158db1303fb57a7af5278cb8c4b8a0f2ddbd662a2e6e",
+        "Microsoft.CodeAnalysis.CSharp.Scripting.dll": "64050c89e7bf7905f6c7ec9eb1594dcea5fbbd2868341f9ef99b58e9dea01605",
+        "Microsoft.CodeAnalysis.Scripting.dll": "066f1d39b5e211e343c8c79f374438884b1684fa27dc8c29a9000f88615bf764",
+        "notices/Samsung-netcoredbg-LICENSE": "6cd03b0de8299b0800f22b35ae842c931ded7684a2d1ba4f1d4188bab9b09a11",
+        "notices/dotnet-runtime-THIRD-PARTY-NOTICES.TXT": "66f1d4e44973185519bb4aa8a9718eb22fc7af2cc532e3ae9cfc4c127ee7fc54",
+        "notices/dotnet-runtime-LICENSE.TXT": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310",
+        "notices/json-LICENSE.MIT": "7b875bb7a4e28abb7956ea821b4b7d88ff6a2a4fabf261c3993730a365ec56dd",
+        "notices/linenoise-ng-LICENSE": "c676d229c8807fa8701cf5cd9d59788d41de2b4803803a34d35570e700a18363",
+        "notices/nuget/netstandard.library/2.0.3/THIRD-PARTY-NOTICES.TXT": "0684b2349427ee28e392ae8914645832e59731dba8a38a984f72b3fb8769c76b",
+        "notices/nuget/netstandard.library/2.0.3/LICENSE.TXT": "fc95de1436a321aadbfafd21f8a8506a2f4678bfc003bd806d6b59d3088efadc",
+        "notices/nuget/microsoft.csharp/4.4.0/THIRD-PARTY-NOTICES.TXT": "0ef4dce1f4e8965f19a3b8b2f984f337d5c35e5aaf7f8a36b95aec66c301963a",
+        "notices/nuget/microsoft.csharp/4.4.0/LICENSE.TXT": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+      }
+    },
+    {
+      "target": "linux-arm64",
+      "success": true,
+      "archive": "netcoredbg-linux-arm64.zip",
+      "sha256": "bab9e2279e75e0d9958087ef0b326e5997e4436d77c1915c08f36d416170ec6f",
+      "files": {
+        "Microsoft.CodeAnalysis.dll": "97553a05b1f8aad2f29349f0fc7893ceb6dd199bd769d3e1092839957c7c0cdb",
+        "libdbgshim.so": "afabe34cafb0b1ec6ac7f084b9e9f2c2e642ec921a56d0bf1f9b03d3e9ccbae4",
+        "Microsoft.CodeAnalysis.CSharp.dll": "e9cc57c55a95146f98b55dd46fdd881b4be48925e3773ef4aa5ac622b76903a6",
+        "ManagedPart.dll": "98ccfb2c220c62bb32056fa0d2c129062fdd050988b6ee9634ff467dedf35878",
+        "netcoredbg": "97530fff98ea2aeba8f42dbeeeb7d10db6ab56274e7d69d513e8460fd85dc7d6",
+        "Microsoft.CodeAnalysis.CSharp.Scripting.dll": "64050c89e7bf7905f6c7ec9eb1594dcea5fbbd2868341f9ef99b58e9dea01605",
+        "Microsoft.CodeAnalysis.Scripting.dll": "066f1d39b5e211e343c8c79f374438884b1684fa27dc8c29a9000f88615bf764",
+        "notices/Samsung-netcoredbg-LICENSE": "6cd03b0de8299b0800f22b35ae842c931ded7684a2d1ba4f1d4188bab9b09a11",
+        "notices/dotnet-runtime-THIRD-PARTY-NOTICES.TXT": "66f1d4e44973185519bb4aa8a9718eb22fc7af2cc532e3ae9cfc4c127ee7fc54",
+        "notices/dotnet-runtime-LICENSE.TXT": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310",
+        "notices/json-LICENSE.MIT": "7b875bb7a4e28abb7956ea821b4b7d88ff6a2a4fabf261c3993730a365ec56dd",
+        "notices/linenoise-ng-LICENSE": "c676d229c8807fa8701cf5cd9d59788d41de2b4803803a34d35570e700a18363",
+        "notices/nuget/netstandard.library/2.0.3/THIRD-PARTY-NOTICES.TXT": "0684b2349427ee28e392ae8914645832e59731dba8a38a984f72b3fb8769c76b",
+        "notices/nuget/netstandard.library/2.0.3/LICENSE.TXT": "fc95de1436a321aadbfafd21f8a8506a2f4678bfc003bd806d6b59d3088efadc",
+        "notices/nuget/microsoft.csharp/4.4.0/THIRD-PARTY-NOTICES.TXT": "0ef4dce1f4e8965f19a3b8b2f984f337d5c35e5aaf7f8a36b95aec66c301963a",
+        "notices/nuget/microsoft.csharp/4.4.0/LICENSE.TXT": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+      }
+    },
+    {
+      "target": "alpine-x64",
+      "success": true,
+      "archive": "netcoredbg-alpine-x64.zip",
+      "sha256": "3b68c55a35f33df1ac5fd0f2a90bdca4ff1a32ec99898f892577b09fc2b33501",
+      "files": {
+        "Microsoft.CodeAnalysis.dll": "97553a05b1f8aad2f29349f0fc7893ceb6dd199bd769d3e1092839957c7c0cdb",
+        "libdbgshim.so": "c8413c4e928cd5a3e6a76764cd58acaba01ba51466371cc43d6f774307629fe3",
+        "Microsoft.CodeAnalysis.CSharp.dll": "e9cc57c55a95146f98b55dd46fdd881b4be48925e3773ef4aa5ac622b76903a6",
+        "ManagedPart.dll": "5925fbdf71a30bba694e904c4d8c7924b5bbc85fa056d68b89bb65abaf944817",
+        "netcoredbg": "6c056d7031228b9578f8405ba00dabf999895a85c38feeba99f066e713372427",
+        "Microsoft.CodeAnalysis.CSharp.Scripting.dll": "64050c89e7bf7905f6c7ec9eb1594dcea5fbbd2868341f9ef99b58e9dea01605",
+        "Microsoft.CodeAnalysis.Scripting.dll": "066f1d39b5e211e343c8c79f374438884b1684fa27dc8c29a9000f88615bf764",
+        "notices/musl-coreclr-host.cpp": "d26a2aea4293037bd45246f79b85ddb5dfc0bfd72ad0050053d6fbb422ca7e68",
+        "notices/Samsung-netcoredbg-LICENSE": "6cd03b0de8299b0800f22b35ae842c931ded7684a2d1ba4f1d4188bab9b09a11",
+        "notices/dotnet-runtime-THIRD-PARTY-NOTICES.TXT": "66f1d4e44973185519bb4aa8a9718eb22fc7af2cc532e3ae9cfc4c127ee7fc54",
+        "notices/dotnet-runtime-LICENSE.TXT": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310",
+        "notices/json-LICENSE.MIT": "7b875bb7a4e28abb7956ea821b4b7d88ff6a2a4fabf261c3993730a365ec56dd",
+        "notices/vscode-csharp-autobuild-LICENSE": "7c419230c16a1ec87a56cb1f7d067924d747ac240cafeaa7c7366784f5d91544",
+        "notices/linenoise-ng-LICENSE": "c676d229c8807fa8701cf5cd9d59788d41de2b4803803a34d35570e700a18363",
+        "notices/nuget/netstandard.library/2.0.3/THIRD-PARTY-NOTICES.TXT": "0684b2349427ee28e392ae8914645832e59731dba8a38a984f72b3fb8769c76b",
+        "notices/nuget/netstandard.library/2.0.3/LICENSE.TXT": "fc95de1436a321aadbfafd21f8a8506a2f4678bfc003bd806d6b59d3088efadc",
+        "notices/nuget/microsoft.csharp/4.4.0/THIRD-PARTY-NOTICES.TXT": "0ef4dce1f4e8965f19a3b8b2f984f337d5c35e5aaf7f8a36b95aec66c301963a",
+        "notices/nuget/microsoft.csharp/4.4.0/LICENSE.TXT": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+      }
+    },
+    {
+      "target": "alpine-arm64",
+      "success": true,
+      "archive": "netcoredbg-alpine-arm64.zip",
+      "sha256": "eaf56a2bf3fa8e5f99843050df1ff6bef6113ec87d2e8098bf93b1dccaabcebd",
+      "files": {
+        "Microsoft.CodeAnalysis.dll": "97553a05b1f8aad2f29349f0fc7893ceb6dd199bd769d3e1092839957c7c0cdb",
+        "libdbgshim.so": "2f617f411ddaebead23786c15ac55407300150fb33470cdad2eb0cb9db0744ef",
+        "Microsoft.CodeAnalysis.CSharp.dll": "e9cc57c55a95146f98b55dd46fdd881b4be48925e3773ef4aa5ac622b76903a6",
+        "ManagedPart.dll": "29aaa5a68cd60bc7f6b0a55177048d793b8529c3cad7c7ce5b3326f81f98ccaf",
+        "netcoredbg": "8edec59a4017a17dcd4b12dd7f430f0c21115172789bbbca41f039bb3a911b7c",
+        "Microsoft.CodeAnalysis.CSharp.Scripting.dll": "64050c89e7bf7905f6c7ec9eb1594dcea5fbbd2868341f9ef99b58e9dea01605",
+        "Microsoft.CodeAnalysis.Scripting.dll": "066f1d39b5e211e343c8c79f374438884b1684fa27dc8c29a9000f88615bf764",
+        "notices/musl-coreclr-host.cpp": "d26a2aea4293037bd45246f79b85ddb5dfc0bfd72ad0050053d6fbb422ca7e68",
+        "notices/Samsung-netcoredbg-LICENSE": "6cd03b0de8299b0800f22b35ae842c931ded7684a2d1ba4f1d4188bab9b09a11",
+        "notices/dotnet-runtime-THIRD-PARTY-NOTICES.TXT": "66f1d4e44973185519bb4aa8a9718eb22fc7af2cc532e3ae9cfc4c127ee7fc54",
+        "notices/dotnet-runtime-LICENSE.TXT": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310",
+        "notices/json-LICENSE.MIT": "7b875bb7a4e28abb7956ea821b4b7d88ff6a2a4fabf261c3993730a365ec56dd",
+        "notices/vscode-csharp-autobuild-LICENSE": "7c419230c16a1ec87a56cb1f7d067924d747ac240cafeaa7c7366784f5d91544",
+        "notices/linenoise-ng-LICENSE": "c676d229c8807fa8701cf5cd9d59788d41de2b4803803a34d35570e700a18363",
+        "notices/nuget/netstandard.library/2.0.3/THIRD-PARTY-NOTICES.TXT": "0684b2349427ee28e392ae8914645832e59731dba8a38a984f72b3fb8769c76b",
+        "notices/nuget/netstandard.library/2.0.3/LICENSE.TXT": "fc95de1436a321aadbfafd21f8a8506a2f4678bfc003bd806d6b59d3088efadc",
+        "notices/nuget/microsoft.csharp/4.4.0/THIRD-PARTY-NOTICES.TXT": "0ef4dce1f4e8965f19a3b8b2f984f337d5c35e5aaf7f8a36b95aec66c301963a",
+        "notices/nuget/microsoft.csharp/4.4.0/LICENSE.TXT": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+      }
+    },
+    {
+      "target": "darwin-x64",
+      "success": false,
+      "error": "Runtime validation failed"
+    },
+    {
+      "target": "darwin-arm64",
+      "success": true,
+      "archive": "netcoredbg-darwin-arm64.zip",
+      "sha256": "2b41d212950775a95da145c86683dfce11d8d220b71691a893e8b2f343cf2bb2",
+      "files": {
+        "Microsoft.CodeAnalysis.dll": "97553a05b1f8aad2f29349f0fc7893ceb6dd199bd769d3e1092839957c7c0cdb",
+        "libdbgshim.dylib": "b61d20d321c26c71ce5864c8193ec6d8101af0482d66969cf1af42513bf4a4c3",
+        "libnetcoredbg-darwin-compat.dylib": "e6993968e2ae2978d8fb11b5eeb95953a29555ba41b2772b68f9ec1b64abfd4d",
+        "Microsoft.CodeAnalysis.CSharp.dll": "e9cc57c55a95146f98b55dd46fdd881b4be48925e3773ef4aa5ac622b76903a6",
+        "ManagedPart.dll": "2268f10bc59eff7d1e7b9927da45f4911a461e02d58defb93c998584713cfd6b",
+        "netcoredbg": "9c61620dd7ccccd93126bddfbfab2f87e9d7ad73f8858dc323ce641f796c911b",
+        "Microsoft.CodeAnalysis.CSharp.Scripting.dll": "64050c89e7bf7905f6c7ec9eb1594dcea5fbbd2868341f9ef99b58e9dea01605",
+        "Microsoft.CodeAnalysis.Scripting.dll": "066f1d39b5e211e343c8c79f374438884b1684fa27dc8c29a9000f88615bf764",
+        "notices/Samsung-netcoredbg-LICENSE": "6cd03b0de8299b0800f22b35ae842c931ded7684a2d1ba4f1d4188bab9b09a11",
+        "notices/dotnet-runtime-THIRD-PARTY-NOTICES.TXT": "66f1d4e44973185519bb4aa8a9718eb22fc7af2cc532e3ae9cfc4c127ee7fc54",
+        "notices/dotnet-runtime-LICENSE.TXT": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310",
+        "notices/json-LICENSE.MIT": "7b875bb7a4e28abb7956ea821b4b7d88ff6a2a4fabf261c3993730a365ec56dd",
+        "notices/darwin-waitpid.cpp": "f72febab79d89a166e4120466d25b61e8d86e28f40ac481387a1dfdc01fa0c31",
+        "notices/vscode-csharp-autobuild-LICENSE": "7c419230c16a1ec87a56cb1f7d067924d747ac240cafeaa7c7366784f5d91544",
+        "notices/darwin-compat.cmake": "0d38c5764329743920560aa7f0f336c726fffded4fa239e8403b04423488aff2",
+        "notices/darwin-exit-observer.cpp": "299e54eb3fa2d23964f4f2dad9b88052629f32c01ad781ca6f5fdf19bd257155",
+        "notices/linenoise-ng-LICENSE": "c676d229c8807fa8701cf5cd9d59788d41de2b4803803a34d35570e700a18363",
+        "notices/nuget/netstandard.library/2.0.3/THIRD-PARTY-NOTICES.TXT": "0684b2349427ee28e392ae8914645832e59731dba8a38a984f72b3fb8769c76b",
+        "notices/nuget/netstandard.library/2.0.3/LICENSE.TXT": "fc95de1436a321aadbfafd21f8a8506a2f4678bfc003bd806d6b59d3088efadc",
+        "notices/nuget/microsoft.csharp/4.4.0/THIRD-PARTY-NOTICES.TXT": "0ef4dce1f4e8965f19a3b8b2f984f337d5c35e5aaf7f8a36b95aec66c301963a",
+        "notices/nuget/microsoft.csharp/4.4.0/LICENSE.TXT": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+      }
+    }
+  ],
+  "errors": [
+    "darwin-x64: Runtime validation failed"
+  ]
+}

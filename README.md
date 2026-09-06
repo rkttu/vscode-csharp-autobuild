@@ -20,7 +20,7 @@ The upstream-preserving build changes publication metadata, the package notice, 
 
 The netcoredbg variant applies a small, checked overlay in a disposable C# checkout. The overlay changes extension identity, package branding, debugger acquisition, adapter selection, and SDK environment forwarding. An unexpected upstream integration change fails the build instead of silently applying an incomplete overlay. Original Samsung source files remain unchanged; this repository owns the external build and runtime compatibility code.
 
-This differs from the community-maintained [muhammad-sammy C# extension](https://github.com/muhammad-sammy/vscode-csharp) by keeping a separate upstream-preserving distribution and automating native debugger builds, checked integration, and gated releases. It does not claim broader feature support than that project.
+This differs from the community-maintained [muhammadsammy C# extension](https://github.com/muhammadsammy/free-vscode-csharp) by keeping a separate upstream-preserving distribution and automating native debugger builds, checked integration, and gated releases. It does not claim broader feature support than that project.
 
 ## 2. Installation and a first debugging session
 
@@ -84,6 +84,8 @@ Current build inputs are pinned in [`config/netcoredbg.json`](config/netcoredbg.
 Alpine builds include an external CoreCLR initialization wrapper using an owned 8 MiB thread stack. macOS builds include a linked `waitpid` observer for correct process exit reporting, including the non-cancelable Darwin entry point used by .NET 10. These components ship with source and license notices. [Research and troubleshooting records](docs/research/README.md) explain the underlying failures and verification evidence.
 
 The automated matrix checks debugger protocol behavior and packaged bytes. It does not certify every editor or all language-service features. A separate installed-extension smoke test has exercised activation and .NET 8/10 launch in VS Code 1.135.0 on macOS ARM64. That result does not establish an eight-platform editor UI matrix or compatibility with every VS Code fork.
+
+Release preparation also encountered intermittent macOS startup and exception-stack failures. The gate rejected those attempts, and the [functional-gate research note](docs/research/2026-09-06-functional-gate-and-darwin-exit.md) retains the failures and subsequent diagnostic results. Their root causes remain unconfirmed; a passing rerun does not establish that the intermittent behavior was corrected.
 
 Only `coreclr` is advertised by the variant. Desktop .NET Framework, Unity, mobile, WebAssembly, remote debugging, Hot Reload, and full C# Dev Kit parity remain outside the release gate. Passing attach scenarios establish the tested local DAP behavior, not every IDE-specific attach workflow.
 
