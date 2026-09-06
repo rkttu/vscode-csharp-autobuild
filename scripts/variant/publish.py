@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import time
 import urllib.error
 import urllib.request
 import zipfile
@@ -25,6 +26,29 @@ def save_status(args, **values):
     status = json.loads(file.read_text()) if file.exists() else dict(verifiedTargets=[])
     status.update(values)
     file.write_text(json.dumps(status, indent=2) + "\n")
+
+
+def registry_metadata(url):
+    try:
+        with urllib.request.urlopen(url, timeout=60) as response:
+            return json.load(response)
+    except urllib.error.HTTPError as error:
+        error.close()
+        if error.code != 404:
+            raise
+        return None
+
+
+def wait_for_metadata(url, deadline):
+    while True:
+        published = registry_metadata(url)
+        if published is not None:
+            return published
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError("Open VSX publication is not publicly available: " + url)
+        print("Waiting for Open VSX asynchronous publication: " + url, flush=True)
+        time.sleep(min(15, remaining))
 
 
 def execute(args):
@@ -93,21 +117,11 @@ def execute(args):
         assert json.loads((preserved / "release-manifest.json").read_text()) == release_manifest, "Existing release inputs differ; use its saved artifacts"
         for package in outputs:
             assert sha256(preserved / package["file"].name) == package["sha256"], "Existing release asset differs"
-    save_status(args, stage="publish-targets", verifiedTargets=[])
+    save_status(args, stage="publish-targets", verifiedTargets=[], submittedTargets=[])
     verified_targets = []
-    for package in outputs:
-        save_status(args, target=package["target"])
-        url = f"https://open-vsx.org/api/{variant['publisher']}/{variant['name']}/{package['target']}/{candidate['version']}"
-        try:
-            with urllib.request.urlopen(url, timeout=60) as response:
-                published = json.load(response)
-        except urllib.error.HTTPError as error:
-            error.close()
-            if error.code != 404:
-                raise
-            subprocess.run(["ovsx", "publish", "--packagePath", str(package["file"])], check=True)
-            with urllib.request.urlopen(url, timeout=60) as response:
-                published = json.load(response)
+    pending = []
+
+    def verify_public_bytes(package, published):
         assert published["version"] == candidate["version"] and published["targetPlatform"] == package["target"]
         with urllib.request.urlopen(published["files"]["download"], timeout=120) as response:
             digest = hashlib.sha256(response.read()).hexdigest()
@@ -115,6 +129,24 @@ def execute(args):
         verified_targets.append(package["target"])
         save_status(args, verifiedTargets=verified_targets)
         print(f"Verified Open VSX publication: {package['target']}")
+
+    for package in outputs:
+        save_status(args, target=package["target"])
+        url = f"https://open-vsx.org/api/{variant['publisher']}/{variant['name']}/{package['target']}/{candidate['version']}"
+        published = registry_metadata(url)
+        if published is not None:
+            verify_public_bytes(package, published)
+            continue
+        subprocess.run(["ovsx", "publish", "--packagePath", str(package["file"])], check=True)
+        pending.append((package, url))
+        save_status(args, submittedTargets=[p["target"] for p, _ in pending])
+
+    # The server acknowledges uploads before asynchronous scans activate them.
+    # Submit each missing target once, then use one bounded visibility deadline.
+    deadline = time.monotonic() + 15 * 60
+    for package, url in pending:
+        save_status(args, stage="wait-for-publication", target=package["target"])
+        verify_public_bytes(package, wait_for_metadata(url, deadline))
     save_status(args, stage="finalize-github-release")
     meta["published"] = True
     notes.write_text(notes.read_text().replace('"published":false', '"published":true'))

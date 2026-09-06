@@ -100,11 +100,22 @@ class DiscoveryTests(unittest.TestCase):
         latest = self.run_discovery()[-1]
         self.assertEqual(self.run_discovery([self.release(latest, True)]), [])
 
-    def test_draft_reserves_revision_for_other_candidates(self):
+    def test_draft_finishes_before_other_candidates_are_built(self):
         first = self.run_discovery()[0]
         self.debuggers["3.3.0-1100"] = "d" * 40
         candidates = self.run_discovery([self.release(first, False)])
-        self.assertEqual([c["revision"] for c in candidates], [1, 2])
+        self.assertEqual([c["revision"] for c in candidates], [1])
+        self.assertEqual(candidates[0]['resumeRelease'], first['releaseTag'])
+        completed = self.run_discovery([self.release(first, True)])
+        self.assertEqual([c["revision"] for c in completed], [2])
+
+    def test_publisher_recipe_change_still_resumes_saved_candidate_first(self):
+        first = self.run_discovery()[0]
+        first.update(recipe='previous-recipe', fingerprint='f' * 64)
+        candidates = self.run_discovery([self.release(first, False)])
+        self.assertEqual(len(candidates), 1)
+        self.assertEqual(candidates[0].pop('resumeRelease'), first['releaseTag'])
+        self.assertEqual(candidates[0], first)
 
 
 if __name__ == "__main__":

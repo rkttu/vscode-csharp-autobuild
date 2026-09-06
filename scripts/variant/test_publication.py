@@ -183,5 +183,54 @@ class PublicationTests(unittest.TestCase):
         self.assertFalse(self.draft)
         self.assertEqual(self.uploads, [])
 
+
+    def test_all_missing_targets_are_submitted_before_visibility_wait(self):
+        original = self.urlopen
+
+        def registry(url, **kwargs):
+            target = url.split('/')[-2]
+            if target in self.registry:
+                self.assertEqual(self.uploads, self.targets)
+            return original(url, **kwargs)
+
+        with patch('urllib.request.urlopen', side_effect=registry):
+            self.publish()
+        self.assertTrue(self.finalized)
+
+    def test_visibility_timeout_resumes_without_reupload(self):
+        with patch.object(publish, 'wait_for_metadata', side_effect=TimeoutError('Still processing')):
+            with self.assertRaises(TimeoutError):
+                self.publish()
+        self.assertEqual(self.uploads, self.targets)
+        self.assertFalse(self.finalized)
+        self.restore()
+        self.publish()
+        self.assertEqual(self.uploads, self.targets)
+        self.assertTrue(self.finalized)
+
+
+class VisibilityTests(unittest.TestCase):
+    def test_waits_for_metadata_after_accepted_upload(self):
+        expected = {'version': '2.148.23001'}
+        with patch.object(publish, 'registry_metadata', side_effect=[None, None, expected]), \
+             patch('time.monotonic', side_effect=[0, 15]), patch('time.sleep') as sleep, \
+             contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(publish.wait_for_metadata('https://test.invalid/metadata', 60), expected)
+        self.assertEqual(sleep.call_count, 2)
+
+    def test_inactive_version_reaches_bounded_failure(self):
+        with patch.object(publish, 'registry_metadata', return_value=None), \
+             patch('time.monotonic', return_value=60), patch('time.sleep') as sleep:
+            with self.assertRaisesRegex(TimeoutError, 'not publicly available'):
+                publish.wait_for_metadata('https://test.invalid/metadata', 60)
+        sleep.assert_not_called()
+
+    def test_authentication_error_is_not_retried_as_pending(self):
+        error = urllib.error.HTTPError('https://test.invalid', 403, 'Forbidden', {}, None)
+        with patch('urllib.request.urlopen', side_effect=error), patch('time.sleep') as sleep:
+            with self.assertRaises(urllib.error.HTTPError):
+                publish.wait_for_metadata('https://test.invalid/metadata', 60)
+        sleep.assert_not_called()
+
 if __name__ == '__main__':
     unittest.main()

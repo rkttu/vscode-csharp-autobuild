@@ -24,7 +24,7 @@ for name in ('result.json', 'vsix-result.json', 'publication-status.json', 'vali
         continue
     found = True
     data = json.loads(file.read_text(encoding='utf-8-sig'))
-    for key in ('success', 'stage', 'error', 'errors', 'sourceUnchanged', 'verifiedTargets', 'netcoredbgTag', 'netcoredbgCommit'):
+    for key in ('success', 'stage', 'error', 'errors', 'sourceUnchanged', 'submittedTargets', 'verifiedTargets', 'netcoredbgTag', 'netcoredbgCommit'):
         if key in data:
             lines.append(f'- {key}: `{data[key]}`')
 for file in sorted(args.evidence.glob('upstream-net*-result.json')):

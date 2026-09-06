@@ -89,7 +89,8 @@ def discover():
         candidates.extend(resumable.values())
     # Bound the matrix using the newest tags, then publish in ascending order.
     # The newest successful engine receives the highest numeric package revision.
-    selected = sorted(eligible, key=version_key, reverse=True)[:max(0, 16 - len(candidates))]
+    # Finish preserved uploads before introducing a new source/recipe candidate.
+    selected = [] if candidates else sorted(eligible, key=version_key, reverse=True)[:16]
     for tag in sorted(selected, key=version_key):
         fingerprint = hashlib.sha256((samsung[tag] + csharp[csharp_tag] + recipe).encode()).hexdigest()
         if fingerprint in shipped:

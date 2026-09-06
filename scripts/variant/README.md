@@ -45,6 +45,17 @@ C#-only changes currently rebuild and retest the full matrix.
 
 ## Publication and retry
 
+Automatic discovery completes preserved drafts before selecting new source/recipe
+candidates. An operator fix can therefore resume tested bytes without rebuilding
+the extension or consuming another version in that recovery run.
+
+Open VSX acknowledges an upload before asynchronous processing and scanning make
+it public. The publisher submits each missing target once, then waits against one
+15-minute visibility deadline. Only HTTP 404 is treated as pending; authentication
+and other HTTP errors fail immediately. Timeout fails the run without reuploading
+the same files. Existing public bytes and every newly visible target must match
+the preserved VSIX hashes before GitHub finalization.
+
 Only scheduled `main` runs or explicitly selected manual `main` runs publish.
 Other branches can run complete dry runs. Only the final upload step receives
 `OPENVSX_ACCESS_TOKEN` as `OVSX_PAT`.
