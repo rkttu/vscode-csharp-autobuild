@@ -20,7 +20,7 @@ The upstream-preserving build changes publication metadata, the package notice, 
 
 The netcoredbg variant applies a small, checked overlay in a disposable C# checkout. The overlay changes extension identity, package branding, debugger acquisition, adapter selection, and SDK environment forwarding. An unexpected upstream integration change fails the build instead of silently applying an incomplete overlay. Original Samsung source files remain unchanged; this repository owns the external build and runtime compatibility code.
 
-This differs from the community-maintained [muhammad-sammy C# extension](https://github.com/muhammad-sammy/vscode-csharp) by keeping a separate upstream-preserving distribution and treating the alternative debugger as a reproducible build, integration, and release pipeline. It does not claim broader feature support than that project.
+This differs from the community-maintained [muhammad-sammy C# extension](https://github.com/muhammad-sammy/vscode-csharp) by keeping a separate upstream-preserving distribution and automating native debugger builds, checked integration, and gated releases. It does not claim broader feature support than that project.
 
 ## 2. Installation and a first debugging session
 

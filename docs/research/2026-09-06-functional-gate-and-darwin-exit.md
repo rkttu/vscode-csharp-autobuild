@@ -20,7 +20,8 @@ adds absolute references to the original `.cs` files. Project references preserv
 their relative layout in the generated project tree. Samsung project files,
 C# sources, and assertions remain unchanged. SHA-256 records cover the inputs.
 Artifacts, SDK selection, intermediate output, and logs live outside the original
-source tree.
+source tree. Test-list and transcript decoding use explicit UTF-8, including on
+Windows, so the Chinese-path scenario remains intact.
 
 The upstream shell script ends with a summary rather than a failing aggregate
 exit code. Its Linux-oriented process cleanup also does not cover every native
@@ -71,7 +72,7 @@ inspection showed that .NET 10.0.11's `libmscordaccore.dylib` imports
 the .NET 10 result. Targeted runs against the installed companion-library build
 then passed `VSCodeTestExitCode` on .NET 8.0.24 and .NET 10.0.11, both returning 3
 through DAP without environment injection. Full candidate validation remains
-separate from these targeted experiments.
+separate from these targeted experiments. The [local evidence archive](cross-platform-2026-09-06/upstream-suite-local/README.md) retains the failed suite result and corrected exit-code transcripts with provenance hashes.
 
 ## 4. Release boundary and fault tests
 

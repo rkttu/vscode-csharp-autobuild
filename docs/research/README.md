@@ -12,10 +12,10 @@ These reports record the investigation completed on September 6, 2026. They dist
 8. [Upstream version mapping and merge readiness](2026-09-06-versioning-and-merge-readiness.md): the accepted numeric revision policy, paired release tags, warm brown staff icon, revised candidate checks and default-branch publication boundary.
 9. [Publication recovery and rollback boundaries](2026-09-06-publication-recovery-and-rollback.md): partial-upload resumption, public registry withdrawal, installed-user recovery and missing quarantine/recovery-release controls.
 
+10. [Upstream functional gate and Darwin exit-code compatibility](2026-09-06-functional-gate-and-darwin-exit.md): external test projects, the newly detected nonzero-exit defect, runtime ABI correction, and publication fault tests.
+
 The first four reports retain their original investigation scope. The Windows report updates their outstanding Windows build and basic-debugging checks with actual GitHub runner evidence.
 
 The adjacent dated evidence directories contain source hashes, API snapshots, build logs, and DAP traces. Personal paths in archived evidence were replaced. The original DAP fixture and probe are preserved with their macOS ARM64 experiment; those historical results do not establish execution on other platforms.
 
 The existing production workflow and `dotnetdev-kr-custom.csharp` publication policy remain unchanged.
-
-- [Upstream functional gate and Darwin exit-code compatibility](2026-09-06-functional-gate-and-darwin-exit.md): external test projects, the newly detected nonzero-exit defect, runtime ABI correction, and publication fault tests.
