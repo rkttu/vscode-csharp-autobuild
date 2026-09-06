@@ -40,10 +40,28 @@ The user installs a native SDK matching the selected platform package.
 
 ## Release and retry behavior
 
-The detector uses all eligible Samsung tags from the baseline and the highest
-version C# tag. Successful source/recipe fingerprints prevent repeated shipping.
-The version is independent: `versionPrefix` plus `run_number * 1000 + tag_index`.
-The numeric range keeps multiple candidates and scheduler runs distinct.
+The detector considers Samsung tags from the baseline and the highest version
+C# tag. Successful source/recipe fingerprints prevent repeated shipping.
+The VSIX keeps the upstream major and minor, and encodes its patch as
+`upstream_patch * 1000 + packaging_revision`. For C# 2.148.23, revisions 1 and 2
+become `2.148.23001` and `2.148.23002`. C# 2.148.24 starts at `2.148.24001`.
+Revisions range from 1 through 999; exhaustion fails instead of overflowing
+into the next upstream patch. Draft and completed releases reserve revisions;
+dry runs do not consume one. A retry restores its original bytes and revision.
+
+Git tags contain both sources, for example
+`csharp-v2.148.23-netcoredbg-v3.2.0-1092-g9744e1f05186-r1`.
+`package.json` records both complete source commits, upstream C# version/tag,
+netcoredbg tag, packaging revision and release tag under `netcoredbgBuild`.
+`versioning.py` validates this relationship during discovery, packaging,
+VSIX verification and publication. The earlier `0.1.4000` candidate remains
+historical evidence and was never published.
+
+Automatic candidates exclude debugger tags older than the latest successfully
+published engine. Within the bounded newest-tag window, processing runs from
+older to newer tags so the newest success receives the highest package revision.
+A failed candidate does not stop the following candidates. Manual tag selection
+can deliberately choose an older engine while still assigning a new revision.
 
 An ordinary candidate rebuilds and retests all eight debugger targets, including
 on C#-only updates. Reusing old validated engines is not implemented yet.

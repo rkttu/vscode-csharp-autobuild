@@ -8,6 +8,8 @@ import shutil
 import subprocess
 import zipfile
 
+import versioning
+
 
 def replace_once(path, before, after):
     content = path.read_text()
@@ -16,7 +18,9 @@ def replace_once(path, before, after):
     path.write_text(content.replace(before, after))
 
 
-def apply(source, validated, target, version, repo):
+def apply(source, validated, target, version, repo, candidate):
+    versioning.validate(candidate)
+    assert candidate["version"] == version
     config = json.loads((repo / "config/variant.json").read_text())
     manifest = json.loads((validated / "validation-manifest.json").read_text())
     expected_targets = json.loads((repo / "config/netcoredbg.json").read_text())["targets"]
@@ -42,6 +46,8 @@ def apply(source, validated, target, version, repo):
     pkg_path = source / "package.json"
     pkg = json.loads(pkg_path.read_text())
     upstream_sha = subprocess.check_output(["git", "-C", str(source), "rev-parse", "HEAD"], text=True).strip()
+    assert upstream_sha == candidate["csharpSha"]
+    assert manifest["netcoredbgCommit"] == candidate["debuggerSha"]
     upstream_version = pkg["version"]
     pkg.update({key: config[key] for key in ("publisher", "name", "displayName")})
     pkg.update(version=version, icon="images/netcoredbgIcon.png",
@@ -55,7 +61,11 @@ def apply(source, validated, target, version, repo):
                     label="C# (netcoredbg)")
     # These debug types require other runtimes or Microsoft's adapter-specific protocols.
     pkg["contributes"]["debuggers"] = [debugger]
-    pkg["netcoredbgBuild"] = dict(target=target, upstreamCsharpCommit=upstream_sha, upstreamCsharpVersion=upstream_version,
+    pkg["netcoredbgBuild"] = dict(target=target, upstreamCsharpCommit=upstream_sha,
+                                  upstreamCsharpVersion=candidate["csharpVersion"], upstreamCsharpTag=candidate["csharpTag"],
+                                  upstreamPackageVersion=upstream_version, netcoredbgTag=candidate["debuggerTag"],
+                                  packagingRevision=candidate["revision"], releaseTag=candidate["releaseTag"],
+                                  versionPolicy=candidate["versionPolicy"],
                                   netcoredbgCommit=manifest["netcoredbgCommit"], debuggerArchiveSha256=record["sha256"],
                                   validationRunId=manifest["runId"], validationWorkflowCommit=manifest["workflowCommit"])
     pkg_path.write_text(json.dumps(pkg, indent=2) + "\n")
@@ -153,6 +163,11 @@ release validation manifest.
 ---
 
 """ + readme.read_text())
+    replace_once(readme, "Build provenance is available in package.json under netcoredbgBuild and in the\nrelease validation manifest.",
+                 f"This package follows C# {candidate['csharpVersion']} ({candidate['csharpTag']}) and includes "
+                 f"netcoredbg {candidate['debuggerTag']} at commit {candidate['debuggerSha']}. "
+                 f"Packaging revision: {candidate['revision']}. VSIX version: {version}.\n\n"
+                 "Build provenance is available in package.json under netcoredbgBuild and in the\nrelease validation manifest.")
     # Use the public registry for this community build, matching the existing autobuild.
     (source / ".npmrc").write_text("registry=https://registry.npmjs.org/\n")
     print(json.dumps(dict(version=version, target=target, debuggerDirectory=str(extracted / "netcoredbg"))))
@@ -160,9 +175,10 @@ release validation manifest.
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ("source", "validated"):
+    for name in ("source", "validated", "candidate"):
         parser.add_argument("--" + name, type=Path, required=True)
     for name in ("target", "version"):
         parser.add_argument("--" + name, required=True)
     args = parser.parse_args()
-    apply(args.source.resolve(), args.validated.resolve(), args.target, args.version, Path(__file__).resolve().parents[2])
+    apply(args.source.resolve(), args.validated.resolve(), args.target, args.version, Path(__file__).resolve().parents[2],
+          json.loads(args.candidate.read_text()))

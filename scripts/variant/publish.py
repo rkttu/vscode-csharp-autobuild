@@ -9,6 +9,8 @@ import urllib.error
 import urllib.request
 import zipfile
 
+import versioning
+
 
 def sha256(file):
     return hashlib.sha256(file.read_bytes()).hexdigest()
@@ -25,6 +27,7 @@ def main():
     variant = json.loads((repo / "config/variant.json").read_text())
     candidate = json.loads(args.candidate.read_text())
     candidate.pop("resumeRelease", None)
+    versioning.validate(candidate)
     outputs = []
     for target in settings["targets"]:
         files = list(args.artifacts.rglob(f"{variant['name']}-{target}-{candidate['version']}.vsix"))
@@ -37,6 +40,9 @@ def main():
         assert record["sha256"] == sha256(files[0]), f"Untested or changed VSIX: {target}"
         assert record["netcoredbgBuild"]["netcoredbgCommit"] == candidate["debuggerSha"]
         assert record["netcoredbgBuild"]["upstreamCsharpCommit"] == candidate["csharpSha"]
+        for field, key in (("upstreamCsharpVersion", "csharpVersion"), ("netcoredbgTag", "debuggerTag"),
+                           ("packagingRevision", "revision"), ("releaseTag", "releaseTag")):
+            assert record["netcoredbgBuild"][field] == candidate[key], "VSIX version provenance mismatch: " + field
         outputs.append(dict(target=target, file=files[0], sha256=record["sha256"]))
     release_manifest = dict(candidate=candidate, targets=[dict(target=p["target"], file=p["file"].name, sha256=p["sha256"]) for p in outputs])
     manifest_file = args.artifacts / "release-manifest.json"
@@ -46,7 +52,7 @@ def main():
         return
     assert os.environ.get("OVSX_PAT"), "Open VSX token is missing"
     assert os.environ.get("GITHUB_REF") == "refs/heads/main", "Publication is restricted to main"
-    release_tag = "csharp-netcoredbg-v" + candidate["version"]
+    release_tag = candidate["releaseTag"]
     repository = variant["repository"]
     validated = args.artifacts / (candidate["artifactPrefix"] + "-validated")
     evidence_zip = args.artifacts / "native-validation-evidence.zip"

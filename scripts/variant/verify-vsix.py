@@ -11,6 +11,8 @@ import sys
 import xml.etree.ElementTree as ET
 import zipfile
 
+import versioning
+
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "scripts/validation"))
 from audit import native_architecture
@@ -34,6 +36,12 @@ def verify(vsix, validated, target, version, root, run_dap):
             for key in ("publisher", "name", "displayName"):
                 assert pkg[key] == config[key], f"Wrong extension {key}"
             assert pkg["version"] == version
+            build = pkg["netcoredbgBuild"]
+            versioning.validate(dict(version=pkg["version"], csharpTag=build["upstreamCsharpTag"],
+                                     csharpSha=build["upstreamCsharpCommit"], csharpVersion=build["upstreamCsharpVersion"],
+                                     debuggerTag=build["netcoredbgTag"], debuggerSha=build["netcoredbgCommit"],
+                                     revision=build["packagingRevision"], releaseTag=build["releaseTag"],
+                                     versionPolicy=build["versionPolicy"]))
             identity = next(e for e in ET.fromstring(zip_in.read("extension.vsixmanifest")).iter()
                             if e.tag.endswith("}Identity") or e.tag == "Identity")
             assert identity.attrib["TargetPlatform"] == target

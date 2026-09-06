@@ -9,6 +9,7 @@ import unittest
 from unittest.mock import patch
 
 import discover
+import versioning
 
 
 class DiscoveryTests(unittest.TestCase):
@@ -36,7 +37,7 @@ class DiscoveryTests(unittest.TestCase):
             os.chdir(old)
 
     def release(self, candidate, published):
-        return dict(draft=not published, tag_name="csharp-netcoredbg-v" + candidate["version"],
+        return dict(draft=not published, tag_name=candidate["releaseTag"],
                     body="<!-- netcoredbg-variant: " + json.dumps(dict(candidate, published=published)) + " -->")
 
     def test_detects_tag_without_release(self):
@@ -63,16 +64,47 @@ class DiscoveryTests(unittest.TestCase):
         self.debuggers["3.3.0-1100"] = "d" * 40
         self.debuggers["3.4.0-1200"] = "e" * 40
         candidates = self.run_discovery()
-        self.assertEqual(candidates[0]["debuggerTag"], "3.4.0-1200")
+        self.assertEqual(candidates[-1]["debuggerTag"], "3.4.0-1200")
+        self.assertEqual([c["revision"] for c in candidates], [1, 2, 3])
         self.assertEqual(len(candidates), 3)
 
     def test_interrupted_upload_reuses_original_version(self):
         candidate = self.run_discovery()[0]
-        candidate["version"] = "0.1.2"
+        candidate.update(versioning.identity(candidate["csharpTag"], candidate["debuggerTag"], candidate["debuggerSha"], 7))
         candidates = self.run_discovery([self.release(candidate, False)])
         self.assertEqual(len(candidates), 1)
-        self.assertEqual(candidates[0].pop("resumeRelease"), "csharp-netcoredbg-v0.1.2")
+        self.assertEqual(candidates[0].pop("resumeRelease"), candidate["releaseTag"])
         self.assertEqual(candidates[0], candidate)
+
+    def test_first_version_follows_csharp(self):
+        self.assertEqual(self.run_discovery()[0]["version"], "2.148.23001")
+
+    def test_debugger_update_increments_same_csharp_revision(self):
+        first = self.run_discovery()[0]
+        self.debuggers["3.3.0-1100"] = "d" * 40
+        found = self.run_discovery([self.release(first, True)])
+        self.assertEqual(len(found), 1)
+        self.assertEqual(found[0]["version"], "2.148.23002")
+
+    def test_new_csharp_patch_resets_revision(self):
+        first = self.run_discovery()[0]
+        self.csharp["v2.148.24-prerelease"] = "d" * 40
+        found = self.run_discovery([self.release(first, True)])
+        self.assertEqual(found[0]["version"], "2.148.24001")
+
+    def test_dry_runs_do_not_consume_revisions(self):
+        self.assertEqual(self.run_discovery()[0]["version"], self.run_discovery()[0]["version"])
+
+    def test_old_failed_tag_cannot_downgrade_published_engine(self):
+        self.debuggers["3.3.0-1100"] = "d" * 40
+        latest = self.run_discovery()[-1]
+        self.assertEqual(self.run_discovery([self.release(latest, True)]), [])
+
+    def test_draft_reserves_revision_for_other_candidates(self):
+        first = self.run_discovery()[0]
+        self.debuggers["3.3.0-1100"] = "d" * 40
+        candidates = self.run_discovery([self.release(first, False)])
+        self.assertEqual([c["revision"] for c in candidates], [1, 2])
 
 
 if __name__ == "__main__":

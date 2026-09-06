@@ -60,8 +60,11 @@ jobs:
         with:
           dotnet-version: 10.0.400
       - name: Apply independent identity and debugger integration
+        env:
+          CANDIDATE_JSON: ${{ inputs.candidate }}
         run: |
-          python3 scripts/variant/overlay.py --source upstream --validated validated-debugger --target "$VSIX_TARGET" --version "$VARIANT_VERSION"
+          python3 -c 'import json, os; json.dump(json.loads(os.environ["CANDIDATE_JSON"]), open("candidate.json", "w"), indent=2)'
+          python3 scripts/variant/overlay.py --source upstream --validated validated-debugger --target "$VSIX_TARGET" --version "$VARIANT_VERSION" --candidate candidate.json
           echo "VALIDATED_DEBUGGER_DIRECTORY=$GITHUB_WORKSPACE/validated-debugger/$VSIX_TARGET/netcoredbg" >> "$GITHUB_ENV"
       - name: Install public build dependencies
         working-directory: upstream

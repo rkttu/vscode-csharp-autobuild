@@ -7,18 +7,20 @@ import subprocess
 import zipfile
 
 from discover import metadata
+import versioning
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--candidate", type=Path, required=True)
 parser.add_argument("--artifacts", type=Path, required=True)
 args = parser.parse_args()
 candidate = json.loads(args.candidate.read_text())
+versioning.validate(candidate)
 repo = json.loads((Path(__file__).resolve().parents[2] / "config/variant.json").read_text())["repository"]
 tag = candidate["resumeRelease"]
-assert tag == "csharp-netcoredbg-v" + candidate["version"]
+assert tag == candidate["releaseTag"]
 release = json.loads(subprocess.check_output(["gh", "release", "view", tag, "--repo", repo, "--json", "body"], text=True))
 recorded = metadata(release["body"])
-for key in ("fingerprint", "debuggerSha", "csharpSha", "version", "artifactPrefix"):
+for key in ("fingerprint", "debuggerSha", "csharpSha", "version", "artifactPrefix", "revision", "releaseTag", "csharpVersion", "versionPolicy"):
     assert recorded[key] == candidate[key], "Preserved release identity mismatch"
 subprocess.run(["gh", "release", "download", tag, "--repo", repo, "--dir", str(args.artifacts)], check=True)
 with zipfile.ZipFile(args.artifacts / "native-validation-evidence.zip") as archive:

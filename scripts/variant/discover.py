@@ -6,6 +6,8 @@ from pathlib import Path
 import re
 import subprocess
 
+import versioning
+
 ROOT = Path(__file__).resolve().parents[2]
 
 
@@ -47,6 +49,7 @@ def metadata(body):
 def discover():
     config = json.loads((ROOT / "config/netcoredbg.json").read_text())
     variant = json.loads((ROOT / "config/variant.json").read_text())
+    assert variant["versionPolicy"] == versioning.POLICY
     samsung = tags("Samsung/netcoredbg")
     csharp = tags("dotnet/vscode-csharp")
     version_key = lambda name: tuple(map(int, re.findall(r"\d+", name)))
@@ -54,6 +57,7 @@ def discover():
     csharp_tag = os.environ.get("INPUT_CSHARP_TAG") or max(
         (tag for tag in csharp if re.fullmatch(r"v\d+\.\d+\.\d+(?:-prerelease)?", tag)), key=version_key)
     assert csharp_tag in csharp
+    upstream_version = versioning.csharp_version(csharp_tag)
     selected_tag = os.environ.get("INPUT_DEBUGGER_TAG")
     eligible = [selected_tag] if selected_tag else [tag for tag in samsung
                  if re.fullmatch(r"\d+\.\d+\.\d+-\d+", tag) and version_key(tag) >= version_key(config["baselineTag"])]
@@ -70,12 +74,23 @@ def discover():
     if not selected_tag:
         eligible = [tag for tag in eligible if samsung[tag] not in shipped_debuggers
                     or (latest_validated and tag == latest_validated["debuggerTag"])]
+        # A late success for an older failed tag must not downgrade a newer engine.
+        if latest_validated:
+            eligible = [tag for tag in eligible if version_key(tag) >= version_key(latest_validated["debuggerTag"])]
+    reserved = [data for release in releases if (data := metadata(release["body"]))
+                and data.get("versionPolicy") == versioning.POLICY and data.get("csharpVersion") == upstream_version]
+    for data in reserved:
+        versioning.validate(data)
+    revision = max((data["revision"] for data in reserved), default=0)
     recipe = recipe_fingerprint()
     candidates = []
     if not selected_tag:
         # Complete an interrupted multi-platform upload from its preserved bytes.
         candidates.extend(resumable.values())
-    for index, tag in enumerate(sorted(eligible, key=version_key, reverse=True)):
+    # Bound the matrix using the newest tags, then publish in ascending order.
+    # The newest successful engine receives the highest numeric package revision.
+    selected = sorted(eligible, key=version_key, reverse=True)[:max(0, 16 - len(candidates))]
+    for tag in sorted(selected, key=version_key):
         fingerprint = hashlib.sha256((samsung[tag] + csharp[csharp_tag] + recipe).encode()).hexdigest()
         if fingerprint in shipped:
             continue
@@ -83,18 +98,19 @@ def discover():
             if selected_tag:
                 candidates.append(resumable[fingerprint])
             continue
-        # Each scheduling run reserves a disjoint numeric range, including dry runs.
-        patch = int(os.environ.get("GITHUB_RUN_NUMBER", "1")) * 1000 + index
+        # Draft and completed releases reserve revisions. Dry runs do not consume one.
+        revision += 1
         candidates.append(dict(debuggerTag=tag, debuggerSha=samsung[tag], csharpTag=csharp_tag,
                                csharpSha=csharp[csharp_tag], recipe=recipe, fingerprint=fingerprint,
-                               artifactPrefix=fingerprint[:16], version=variant["versionPrefix"] + "." + str(patch)))
+                               artifactPrefix=fingerprint[:16],
+                               **versioning.identity(csharp_tag, tag, samsung[tag], revision)))
     # Keep matrices within GitHub limits; remaining tags are reconsidered next poll.
     result = dict(include=candidates[:16])
     Path("candidate-matrix.json").write_text(json.dumps(result, indent=2) + "\n")
     with open(os.environ["GITHUB_OUTPUT"], "a") as out:
         out.write("matrix=" + json.dumps(result, separators=(",", ":")) + "\n")
         out.write("has-candidates=" + str(bool(candidates)).lower() + "\n")
-    print(json.dumps(dict(selected=len(result["include"]), backlog=max(0, len(candidates) - 16), candidates=result), indent=2))
+    print(json.dumps(dict(selected=len(result["include"]), backlog=max(0, len(candidates) - 16) + max(0, len(eligible) - len(selected)), candidates=result), indent=2))
 
 
 if __name__ == "__main__":

@@ -2,6 +2,6 @@
   "publisher": "dotnetdev-kr-custom",
   "name": "csharp-with-netcoredbg",
   "displayName": "C# (with netcoredbg)",
-  "versionPrefix": "0.1",
+  "versionPolicy": "upstream-patch-revision-v1",
   "repository": "rkttu/vscode-csharp-autobuild"
 }
