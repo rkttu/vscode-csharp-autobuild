@@ -1,0 +1,46 @@
+# Windows source-build and DAP validation
+
+This experiment builds Samsung netcoredbg on native Windows x64 and ARM64 runners and runs the same basic DAP fixture on .NET 8 and .NET 10. It supports the investigation in [issue #2](https://github.com/rkttu/vscode-csharp-autobuild/issues/2). It does not build VSIX packages, create releases, publish to Open VSX, or update `.last_built_sha`.
+
+The [workflow](../../.github/workflows/validate-netcoredbg-windows.yml) runs on changes to itself or `scripts/validation/**` on the dedicated `research/netcoredbg-windows-validation` branch. This allows verification without changing `main`. It also declares `workflow_dispatch`, which GitHub exposes after a workflow is registered on the default branch. There are no schedule, release, or main-branch push triggers. [GitHub dispatch requirements](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_dispatch)
+
+## Pinned inputs and native execution
+
+| Input | Selection |
+| --- | --- |
+| Samsung tag | `3.2.0-1092` |
+| Samsung source | `9744e1f051866215611b8440c638042aa2aa2f72` |
+| CoreCLR source | `60629d14374c56f1cb51819049ad1fa529307f8d` (`v10.0.0`) |
+| Build and test SDKs | `10.0.400` and `8.0.418` |
+| dbgshim | `10.0.731102` |
+| x64 runner | `windows-2022` |
+| ARM64 runner | `windows-11-arm` |
+
+The workflow installs isolated SDKs with an explicit architecture and verifies the OS, `dotnet.exe`, `netcoredbg.exe`, `dbgshim.dll`, and debuggee architecture. It uses MSVC's Visual Studio 2022 generator with explicit target and CoreCLR architecture options. Native Windows ARM64 runner availability is documented by [GitHub](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).
+
+`ManagedDependencies.targets` overrides the floating dbgshim version through the external `DirectoryBuildTargetsPath` MSBuild input. No Samsung project file is edited. Original tracked files are hashed before the build and checked again even if a later build or runtime test fails. Generated files are outside that integrity comparison.
+
+This experiment pins source commits, SDK versions, action commits, and dbgshim. It records other restored package versions and hashes from `project.assets.json`. It does not yet provide a fully locked offline NuGet restore or a frozen runner/compiler image. These limits are separate from preserving Samsung's original files.
+
+## Checks and recorded results
+
+`validate-windows.ps1` performs the following work:
+
+1. Verify source SHAs and native OS/SDK architecture; record SDK, CMake, and Visual Studio details.
+2. Configure, compile, and install netcoredbg without changing Samsung input files.
+3. Check required installed files, collect notices, and inspect native PE architecture and hashes.
+4. Copy the installed debugger to a fresh directory and run its version command there.
+5. Build the fixture with each selected SDK, run it directly, and debug it over DAP.
+6. Record source integrity, package hashes, per-runtime results, and an overall verdict.
+
+The DAP checks require a conditional breakpoint, stack and variables, expression evaluation, step-over, a breakpoint after `await`, exception information, expected runtime and CPU output, and clean termination. Absence of a supported exception filter fails the probe instead of silently reducing coverage. Both runtimes are attempted even if one fails, and the architecture matrix uses `fail-fast: false`.
+
+Artifacts named `netcoredbg-validation-windows-<arch>-<attempt>` retain `evidence/` and the experimental `package/` for 14 days. `evidence/result.json` identifies the last stage and overall result; `dap-net8-result.json` and `dap-net10-result.json` record individual runtime checks. Build and DAP logs, source hashes, restored libraries, and PE inspection results accompany them. Setup failures before the script starts may have only the GitHub job log.
+
+The original [macOS probe and evidence](../../docs/research/debugger-probe-2026-09-06/) remain unchanged. The validation probe derives from that experiment and adds explicit expected runtime and architecture, result files, and bounded cleanup. The new probe passed eight checks each on local macOS ARM64 with .NET 8 and .NET 10; a deliberately wrong x64 expectation failed. Local helper checks also rejected modified or deleted source files and mismatched CPU headers in actual Windows dbgshim libraries. These checks validate the test tools, not Windows execution.
+
+## Scope of a successful run
+
+A green result establishes the recorded Samsung source build and basic standalone launch debugging on the selected Windows runner and runtimes. It does not establish process attach, VSIX installation, IDE interactions, remote sessions, integrated terminals, all vsdbg features, or other OS targets. Experimental artifacts are not production debugger releases.
+
+The workflow uses read-only repository permissions and checkout without persisted credentials. All build outputs and SDK installations use temporary runner directories. Production publication remains in the existing, unchanged workflow.

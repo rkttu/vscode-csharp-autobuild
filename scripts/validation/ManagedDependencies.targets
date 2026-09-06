@@ -1,0 +1,9 @@
+<Project>
+  <!-- External build input: the Samsung project file remains unchanged. -->
+  <PropertyGroup>
+    <UseSharedCompilation>false</UseSharedCompilation>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Update="Microsoft.Diagnostics.DbgShim" Version="$(DBGSHIM_VERSION)" />
+  </ItemGroup>
+</Project>
