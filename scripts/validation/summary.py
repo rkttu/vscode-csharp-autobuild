@@ -2,8 +2,10 @@
 import argparse
 import json
 import os
+import sys
 from pathlib import Path
 
+sys.stdout.reconfigure(encoding='utf-8')
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--evidence', type=Path, required=True)
 parser.add_argument('--stage', required=True)

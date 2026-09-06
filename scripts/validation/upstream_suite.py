@@ -75,7 +75,7 @@ def run(source, debugger, dotnet, runtime, sdk, arch, work, evidence):
         assert subprocess.check_output([str(dotnet), '--version'], cwd=work, env=env, text=True).strip() == sdk
         suite = source / 'test-suite'
         script = suite / 'run_tests.sh'
-        names = re.findall(r'"(VSCode[^"]+)"', script.read_text().split('# Skipped tests:')[0])
+        names = re.findall(r'"(VSCode[^"]+)"', script.read_text(encoding='utf-8').split('# Skipped tests:')[0])
         assert names == rules['tests'], 'Upstream default DAP test list changed; review and update the required suite'
         files[script] = sha256(script)
         test_sources = {}
@@ -122,7 +122,7 @@ def run(source, debugger, dotnet, runtime, sdk, arch, work, evidence):
                     '--dotnet', dotnet], work, env, log, rules['testTimeoutSeconds'])
                 record.update(executed)
                 marker = f'Success: Test case "{name}" is passed!!!'
-                record['success'] = executed['exitCode'] == 0 and not executed['timedOut'] and marker in log.read_text(errors='replace')
+                record['success'] = executed['exitCode'] == 0 and not executed['timedOut'] and marker in log.read_text(encoding='utf-8', errors='replace')
             print(f'Upstream .NET {runtime}: {name}: {"PASS" if record["success"] else "FAIL"}', flush=True)
         failures = [test['name'] for test in result['tests'] if not test['success']]
         assert not failures, 'Upstream DAP failures: ' + ', '.join(failures)
@@ -140,6 +140,7 @@ def run(source, debugger, dotnet, runtime, sdk, arch, work, evidence):
 
 
 if __name__ == '__main__':
+    sys.stdout.reconfigure(encoding='utf-8')
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('source', 'debugger', 'dotnet', 'work', 'evidence'):
         parser.add_argument('--' + name, type=Path, required=True)
