@@ -38,3 +38,14 @@ pids
 # Temporary files
 *.tmp
 *.temp
+
+# Independent debugger build workspaces
+validation-inputs/
+validation-artifacts/
+validated-debugger/
+candidate-vsix/
+release-artifacts/
+package-check/
+candidate-matrix.json
+candidate.json
+__pycache__/

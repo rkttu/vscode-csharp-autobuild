@@ -10,6 +10,9 @@ on:
       debugger-sha:
         type: string
         required: true
+      artifact-prefix:
+        type: string
+        default: netcoredbg
   push:
     branches: [research/netcoredbg-windows-validation]
     paths:
@@ -21,7 +24,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: netcoredbg-all-${{ github.workflow }}-${{ github.ref }}
+  group: netcoredbg-all-${{ github.workflow }}-${{ github.ref }}-${{ inputs.artifact-prefix || 'netcoredbg' }}
   cancel-in-progress: false
 
 jobs:
@@ -154,7 +157,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
-          name: netcoredbg-${{ matrix.target }}-${{ github.run_attempt }}
+          name: ${{ inputs.artifact-prefix || 'netcoredbg' }}-${{ matrix.target }}-${{ github.run_attempt }}
           path: |
             ${{ env.VALIDATION_ROOT }}/evidence/
             ${{ env.VALIDATION_ROOT }}/package/
@@ -171,14 +174,15 @@ jobs:
           persist-credentials: false
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
-          pattern: netcoredbg-*
+          pattern: ${{ inputs.artifact-prefix || 'netcoredbg' }}-*-*
           path: validation-artifacts
       - name: Require all target evidence and package hashes
         env:
           EXPECTED_SHA: ${{ needs.inputs.outputs.debugger-sha }}
+          ARTIFACT_PREFIX: ${{ inputs.artifact-prefix || 'netcoredbg' }}
         run: |
           python3 scripts/validation/aggregate.py --inputs validation-artifacts --config config/netcoredbg.json \
-            --sha "$EXPECTED_SHA" --workflow-sha "$GITHUB_SHA" --run-id "$GITHUB_RUN_ID" --output validated-debugger
+            --sha "$EXPECTED_SHA" --workflow-sha "$GITHUB_SHA" --run-id "$GITHUB_RUN_ID" --output validated-debugger --prefix "$ARTIFACT_PREFIX"
       - name: Reject failed, canceled, or skipped matrix jobs
         if: always()
         env:
@@ -188,7 +192,8 @@ jobs:
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: always()
         with:
-          name: validated-debugger
+          name: ${{ inputs.artifact-prefix || 'netcoredbg' }}-validated
           path: validated-debugger/
+          overwrite: true
           if-no-files-found: warn
           retention-days: 30

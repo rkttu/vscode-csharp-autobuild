@@ -8,14 +8,14 @@ import zipfile
 from audit import sha256
 
 
-def aggregate(inputs, config, expected_sha, workflow_sha, run_id, output):
+def aggregate(inputs, config, expected_sha, workflow_sha, run_id, output, prefix="netcoredbg"):
     output.mkdir(parents=True, exist_ok=True)
     rows, errors = [], []
     for target in config["targets"]:
         try:
-            roots = list(inputs.glob(f"netcoredbg-{target}-*"))
-            assert len(roots) == 1, f"Expected exactly one artifact; found {len(roots)}"
-            root = roots[0]
+            roots = list(inputs.glob(f"{prefix}-{target}-*"))
+            assert roots, "Missing target artifact"
+            root = max(roots, key=lambda p: int(p.name.rsplit("-", 1)[1]))
             evidence, package = root / "evidence", root / "package/netcoredbg"
             result = json.loads((evidence / "result.json").read_text(encoding="utf-8-sig"))
             assert result["success"] is True and result["sourceUnchanged"] is True, result.get("error")
@@ -64,6 +64,7 @@ if __name__ == "__main__":
         parser.add_argument("--" + name, type=Path, required=True)
     for name in ("sha", "workflow-sha", "run-id"):
         parser.add_argument("--" + name, required=True)
+    parser.add_argument("--prefix", default="netcoredbg")
     args = parser.parse_args()
-    result = aggregate(args.inputs, json.loads(args.config.read_text()), args.sha, args.workflow_sha, args.run_id, args.output)
+    result = aggregate(args.inputs, json.loads(args.config.read_text()), args.sha, args.workflow_sha, args.run_id, args.output, args.prefix)
     sys.exit(0 if result["success"] else 1)
