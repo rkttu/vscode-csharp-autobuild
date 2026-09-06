@@ -25,17 +25,27 @@ def aggregate(inputs, config, expected_sha, workflow_sha, run_id, output, prefix
                 assert str(result[key]) == str(expected), f"{key} mismatch"
             assert result["architecture"] == target.split("-")[1]
             assert result["target"] == target
+            integrity = json.loads((evidence / "source-integrity.json").read_text(encoding="utf-8-sig"))
+            assert integrity["success"] is True and integrity["originalFileCount"] > 0 and integrity["changedOrMissing"] == []
             assert sorted(t["runtime"] for t in result["runtimeTests"]) == sorted(config["runtimes"])
             assert all(t["success"] is True for t in result["runtimeTests"])
             for runtime in config["runtimes"]:
                 dap = json.loads((evidence / f"dap-net{runtime}-result.json").read_text(encoding="utf-8-sig"))
                 assert dap["success"] is True and len(dap["checks"]) == 8, f"Incomplete DAP checks: .NET {runtime}"
+                assert dap["expectedArchitecture"] == target.split("-")[1] and dap["expectedRuntime"] == runtime
             files = json.loads((evidence / "package-sha256.json").read_text(encoding="utf-8-sig"))
             expected_files = {item["file"].replace("\\", "/"): item["sha256"] for item in files}
             actual_files = {p.relative_to(package).as_posix(): sha256(p) for p in package.rglob("*") if p.is_file()}
             assert actual_files and expected_files == actual_files, "Package file set/hash mismatch"
             native = json.loads((evidence / "debugger-architectures.json").read_text(encoding="utf-8-sig"))
             assert native["success"] is True and native["expectedArchitecture"] == target.split("-")[1]
+            exe = "netcoredbg.exe" if target.startswith("win32") else "netcoredbg"
+            shim = "dbgshim.dll" if target.startswith("win32") else ("libdbgshim.dylib" if target.startswith("darwin") else "libdbgshim.so")
+            assert {p["file"].replace("\\", "/").split("/")[-1] for p in native["files"]} == {exe, shim}
+            required = {exe, shim, "ManagedPart.dll", "Microsoft.CodeAnalysis.dll", "Microsoft.CodeAnalysis.CSharp.dll",
+                        "Microsoft.CodeAnalysis.Scripting.dll", "Microsoft.CodeAnalysis.CSharp.Scripting.dll",
+                        "notices/Samsung-netcoredbg-LICENSE", "notices/dotnet-runtime-LICENSE.TXT"}
+            assert required <= set(actual_files), "Required runtime files or notices missing"
             for item in native["files"]:
                 # Windows paths remain Windows paths when aggregation runs on Linux.
                 name = item["file"].replace("\\", "/").split("/")[-1]

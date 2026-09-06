@@ -96,9 +96,16 @@ def main():
              "-c", "Release", "-o", managed / "publish", f"-p:BaseIntermediateOutputPath={managed}/obj/",
              f"-p:BaseOutputPath={managed}/bin/", "-p:UseDbgShimDependency=true"], "managed-build.log")
         shim = "libdbgshim.dylib" if family == "darwin" else "libdbgshim.so"
-        for name in [shim, "ManagedPart.dll", "Microsoft.CodeAnalysis.dll", "Microsoft.CodeAnalysis.CSharp.dll",
+        for name in ["ManagedPart.dll", "Microsoft.CodeAnalysis.dll", "Microsoft.CodeAnalysis.CSharp.dll",
                      "Microsoft.CodeAnalysis.Scripting.dll", "Microsoft.CodeAnalysis.CSharp.Scripting.dll"]:
             shutil.copy2(managed / "publish" / name, package / name)
+        # A netstandard2.0 restore can fall back to linux-arm64 even for a musl
+        # runtime ID. Select the exact native asset from its pinned RID package.
+        shim_package = Path(env["NUGET_PACKAGES"]) / f"microsoft.diagnostics.dbgshim.{rid}-{arch}" / status["dbgshimVersion"]
+        selected_shim = shim_package / "runtimes" / f"{rid}-{arch}" / "native" / shim
+        shutil.copy2(selected_shim, package / shim)
+        write(evidence / "dbgshim-selection.json", dict(rid=f"{rid}-{arch}", version=status["dbgshimVersion"],
+              nativeSha256=sha256(selected_shim), nugetPackageSha256=sha256(next(shim_package.glob("*.nupkg")))))
         libraries = json.loads((managed / "obj/project.assets.json").read_text())["libraries"]
         assert "Microsoft.Diagnostics.DbgShim/" + status["dbgshimVersion"] in libraries
         write(evidence / "resolved-libraries.json", libraries)
@@ -122,6 +129,10 @@ def main():
         assert all(p["architecture"] == arch for p in files)
         write(evidence / "debugger-architectures.json", dict(success=True, expectedArchitecture=arch, files=files))
         run([debugger, "--version"], "debugger-version.log")
+        if family == "alpine":
+            run(["ldd", debugger], "debugger-libraries.log")
+            run(["ldd", relocated / shim], "dbgshim-libraries.log")
+            env["LOG_OUTPUT"] = "stderr"
         status["stage"] = "runtime-tests"
         for version in ("8", "10"):
             test = dict(runtime=version, sdk=status["sdk" + version], success=False, error=None)
