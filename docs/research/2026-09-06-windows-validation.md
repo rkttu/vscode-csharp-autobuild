@@ -1,6 +1,6 @@
 # Windows x64 and ARM64 source-build and debugging results
 
-On September 6, 2026, a validation-only GitHub Actions workflow built Samsung netcoredbg from unchanged source and passed basic DAP checks on native Windows x64 and ARM64 runners with .NET 8 and .NET 10. Both jobs checked all 498 original Samsung input files and found no changes. [Passing workflow run](https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34017007698), [archived run metadata](windows-validation-2026-09-06/passing-run/run.json)
+On September 6, 2026, a validation-only GitHub Actions workflow built Samsung netcoredbg from unchanged source and passed basic DAP checks on native Windows x64 and ARM64 runners with .NET 8 and .NET 10. Both jobs checked all 498 original Samsung input files and found no changes. [archived run metadata](windows-validation-2026-09-06/passing-run/run.json)
 
 The work also translated the four preceding research reports into English, reopened [issue #2](https://github.com/rkttu/vscode-csharp-autobuild/issues/2), and continued on `research/netcoredbg-windows-validation`. The existing production workflow, extension ID, build state, and Open VSX publication path remain unchanged.
 
@@ -10,7 +10,7 @@ The results below cover the pinned inputs, an initial build failure and its exte
 
 ## 1. Pinned source and native target selection
 
-The workflow checks out Samsung tag `3.2.0-1092` at commit `9744e1f051866215611b8440c638042aa2aa2f72` and uses .NET runtime `v10.0.0` commit `60629d14374c56f1cb51819049ad1fa529307f8d` for CoreCLR headers and helper sources. The full CoreCLR runtime is not rebuilt. SDKs `8.0.418` and `10.0.400` and dbgshim `10.0.731102` are selected explicitly. [Workflow source](../../.github/workflows/validate-netcoredbg-windows.yml), [build script](../../scripts/validation/validate-windows.ps1)
+The workflow checks out Samsung tag `3.2.0-1092` at commit `9744e1f051866215611b8440c638042aa2aa2f72` and uses .NET runtime `v10.0.0` commit `60629d14374c56f1cb51819049ad1fa529307f8d` for CoreCLR headers and helper sources. The full CoreCLR runtime is not rebuilt. SDKs `8.0.418` and `10.0.400` and dbgshim `10.0.731102` are selected explicitly. [Workflow source](https://github.com/rkttu/vscode-csharp-autobuild/blob/62117f140ed351739889b4f783fe59f42e74c13d/.github/workflows/validate-netcoredbg-windows.yml), [build script](../../scripts/validation/validate-windows.ps1)
 
 | Target | Runner | Native compiler path | Observed source integrity |
 | --- | --- | --- | --- |
@@ -23,7 +23,7 @@ The shallow checkouts produce the version string `3.2.0-1 (9744e1f, Release)`, r
 
 ## 2. An external build recipe change for MSVC and NuGet
 
-The [first run](https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34016701849) configured both native compilers and built ManagedPart, then failed in the native `corguids.vcxproj` NuGet resolution step with `Sequence contains no elements`. The logs point to the shared native and managed output directory: the managed `obj/project.assets.json` was available beside the native project. Neither job reached DAP tests, and both still passed source-integrity checks. [First-run evidence](windows-validation-2026-09-06/first-run/run.json)
+The [first run](windows-validation-2026-09-06/first-run/run.json) configured both native compilers and built ManagedPart, then failed in the native `corguids.vcxproj` NuGet resolution step with `Sequence contains no elements`. The logs point to the shared native and managed output directory: the managed `obj/project.assets.json` was available beside the native project. Neither job reached DAP tests, and both still passed source-integrity checks. [First-run evidence](windows-validation-2026-09-06/first-run/run.json)
 
 The corrected recipe builds the native `netcoredbg` target with `BUILD_MANAGED=OFF`, then publishes the original `ManagedPart.csproj` into separate intermediate and output directories. It collects the same managed DLLs and dbgshim that upstream's installation rules select. The separate `ManagedDependencies.targets` file pins dbgshim through MSBuild's external `DirectoryBuildTargetsPath`; Samsung source files remain untouched. [Recipe fix](https://github.com/rkttu/vscode-csharp-autobuild/commit/4b769fd23afcbf867d538ca0c9ace0ed824f6494), [external dependency input](../../scripts/validation/ManagedDependencies.targets)
 
@@ -60,6 +60,6 @@ The next integration experiment can consume these Windows build outputs while pr
 
 ## 6. Completed Windows verification and remaining release work
 
-Both Windows architectures passed unchanged Samsung source builds and all four .NET/runtime DAP combinations after one external build-layout correction. The workflow and evidence remain on the dedicated research branch, and issue #2 stays open for the remaining product work. [Passing run](https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34017007698)
+Both Windows architectures passed unchanged Samsung source builds and all four .NET/runtime DAP combinations after one external build-layout correction. The workflow source and evidence remain in Git history and the research archive. After release adoption, the maintainer requested removal of the temporary workflow, its two Actions runs, and the research branch. Issue #2 stays open for follow-up coverage. [Passing run](windows-validation-2026-09-06/passing-run/run.json)
 
 The immediate Windows build uncertainty is reduced for the pinned inputs. Longer-term operation still depends on repeating checks across new upstream tags, dependency and compiler changes, and the remaining targets. No production release or Open VSX publication was performed as part of this verification.

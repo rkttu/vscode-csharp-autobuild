@@ -19,20 +19,18 @@ records the complete matrix, crash evidence and source-preservation boundary.
 The independent [variant workflow](../variant/README.md) cannot package or publish
 a candidate until the full native gate passes.
 
-`diagnose-netcoredbg-alpine.yml` reuses the pinned failing-run artifacts and
-collects debugger exit codes and stacks on disposable runners. Its successful
-job status describes collection only; its DAP result files remain authoritative.
-The diagnostic workflow never promotes artifacts or publishes an extension.
-
-Manual `validate-netcoredbg.yml` dispatch accepts `platform-scope=alpine` for
-isolated experiments. This mode skips the aggregate and cannot promote a
-debugger. Normal release candidates use the default `all` scope.
+The release workflow calls this validation gate internally and always includes
+all eight targets. For a manual validation run, dispatch
+`release-netcoredbg.yml` on `main` with `publish` disabled. The former Windows-only
+and Alpine diagnostic workflows, independent native-validation dispatch, and
+Alpine-only experimental scope were retired after the first release. Their
+source and results remain in Git history and the research archive.
 
 ## Windows-specific recipe and historical experiment
 
 This experiment builds Samsung netcoredbg on native Windows x64 and ARM64 runners and runs the same basic DAP fixture on .NET 8 and .NET 10. It supports the investigation in [issue #2](https://github.com/rkttu/vscode-csharp-autobuild/issues/2). It does not build VSIX packages, create releases, publish to Open VSX, or update `.last_built_sha`.
 
-The original [Windows workflow](../../.github/workflows/validate-netcoredbg-windows.yml) is retained for manual Windows-only diagnosis. Its initial branch-scoped push trigger enabled the first research run and has since been removed in favor of the reusable all-platform workflow. GitHub exposes `workflow_dispatch` after default-branch registration. [GitHub dispatch requirements](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_dispatch)
+The original [Windows workflow](https://github.com/rkttu/vscode-csharp-autobuild/blob/62117f140ed351739889b4f783fe59f42e74c13d/.github/workflows/validate-netcoredbg-windows.yml) ran the first branch-scoped experiment. It was removed during workflow cleanup after the release pipeline adopted the reusable all-platform gate. The following sections retain that original experiment's scope and evidence.
 
 ## Pinned inputs and native execution
 

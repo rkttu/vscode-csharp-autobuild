@@ -1,13 +1,6 @@
 name: Validate netcoredbg on all platforms
 
 on:
-  workflow_dispatch:
-    inputs:
-      platform-scope:
-        description: Alpine-only is experimental and cannot produce a release gate
-        type: choice
-        default: all
-        options: [all, alpine]
   workflow_call:
     inputs:
       debugger-tag:
@@ -19,9 +12,6 @@ on:
       artifact-prefix:
         type: string
         default: netcoredbg
-      platform-scope:
-        type: string
-        default: all
 
 permissions:
   contents: read
@@ -45,7 +35,6 @@ jobs:
         env:
           INPUT_SHA: ${{ inputs.debugger-sha }}
           INPUT_TAG: ${{ inputs.debugger-tag }}
-          PLATFORM_SCOPE: ${{ inputs.platform-scope || 'all' }}
         run: |
           python3 - <<'PY'
           import json, os, re
@@ -54,8 +43,6 @@ jobs:
           tag = os.environ['INPUT_TAG'] or config['baselineTag']
           assert re.fullmatch(r'[0-9a-f]{40}', sha)
           assert re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+-[0-9]+', tag)
-          scope = os.environ['PLATFORM_SCOPE']
-          assert scope in ('all', 'alpine')
           runners = {'win32-x64': 'windows-2022', 'win32-arm64': 'windows-11-arm',
                      'linux-x64': 'ubuntu-22.04', 'linux-arm64': 'ubuntu-22.04-arm',
                      'alpine-x64': 'ubuntu-22.04', 'alpine-arm64': 'ubuntu-22.04-arm',
@@ -63,9 +50,8 @@ jobs:
           matrix = []
           for target in config['targets']:
               family, arch = target.split('-')
-              if scope == 'all' or family == 'alpine':
-                  matrix.append(dict(target=target, arch=arch, runner=runners[target],
-                                     family='windows' if family == 'win32' else family))
+              matrix.append(dict(target=target, arch=arch, runner=runners[target],
+                                 family='windows' if family == 'win32' else family))
           with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
               out.write(f'sha={sha}\ntag={tag}\n')
               out.write('matrix=' + json.dumps({'include': matrix}) + '\n')
@@ -182,7 +168,7 @@ jobs:
           retention-days: 14
 
   aggregate:
-    if: always() && inputs.platform-scope != 'alpine'
+    if: always()
     needs: [inputs, validate]
     runs-on: ubuntu-22.04
     steps:
