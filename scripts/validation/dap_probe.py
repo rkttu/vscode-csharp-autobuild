@@ -177,6 +177,7 @@ def run(args):
     except Exception as error:
         result['success'] = False
         result['error'] = str(error) or type(error).__name__
+        result['adapterExitCodeAtFailure'] = d.proc.poll()
         if getattr(args, 'diagnose_hang', False) and d.proc.poll() is None:
             stacks = Path(args.log).with_suffix('.stacks.log')
             try:

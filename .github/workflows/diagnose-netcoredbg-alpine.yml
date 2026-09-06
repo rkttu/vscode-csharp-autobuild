@@ -50,7 +50,8 @@ jobs:
           PY
       - name: Capture failed adapter stacks in musl
         run: |
-          docker run --rm --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
+          sudo sysctl -w kernel.core_pattern=core.%p
+          docker run --rm --ulimit core=1073741824 --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
             -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v "$RUNNER_TEMP:$RUNNER_TEMP" -w "$GITHUB_WORKSPACE" \
             -e VALIDATION_ROOT -e DOTNET_INSTALL_DIR -e VALIDATION_ARCH -e SDK8_VERSION -e SDK10_VERSION \
             -e DOTNET_CLI_TELEMETRY_OPTOUT -e DOTNET_NOLOGO "$ALPINE_IMAGE" sh -ec '

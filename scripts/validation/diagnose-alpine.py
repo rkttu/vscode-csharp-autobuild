@@ -28,4 +28,10 @@ for version in settings["runtimes"]:
                     "--expected-arch", env["VALIDATION_ARCH"], "--expected-runtime", version,
                     "--log", str(root / f"dap-net{version}.jsonl"), "--result", str(root / f"dap-net{version}-result.json"),
                     "--diagnose-hang"], cwd=fixture, env=env, check=False)
+    for index, core in enumerate(sorted(fixture.glob('core.*'))):
+        with (root / f'net{version}-core-{index + 1}.stacks.log').open('w') as output:
+            subprocess.run(['gdb', '-nx', '-batch', str(adapter), str(core), '-ex', 'set pagination off',
+                            '-ex', 'set debuginfod enabled off', '-ex', 'thread apply all bt'],
+                           stdout=output, stderr=subprocess.STDOUT, timeout=30)
+        core.unlink()
 print('Diagnostic collection finished. This workflow cannot promote a debugger or publish VSIX packages.')
