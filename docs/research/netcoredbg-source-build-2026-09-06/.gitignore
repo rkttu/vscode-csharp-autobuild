@@ -1,0 +1,2 @@
+# Keep the sanitized build logs referenced by the research report.
+!logs/*.log

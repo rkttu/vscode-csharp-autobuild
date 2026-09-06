@@ -1,0 +1,20 @@
+{
+  "artifacts": [
+    {
+      "digest": "sha256:552943d1cc9a98712cc9d6c2732054516e584d1b2331348ffd90a7cdf9c92804",
+      "expired": false,
+      "expires_at": "2026-09-20T06:42:05Z",
+      "id": 9984260507,
+      "name": "netcoredbg-validation-windows-arm64-1",
+      "size_in_bytes": 3595616
+    },
+    {
+      "digest": "sha256:44743cd45b96ab55cddc581aceb24d2900b601ffd9c33d513e87700760ef5546",
+      "expired": false,
+      "expires_at": "2026-09-20T06:40:47Z",
+      "id": 9984242754,
+      "name": "netcoredbg-validation-windows-x64-1",
+      "size_in_bytes": 3627386
+    }
+  ]
+}

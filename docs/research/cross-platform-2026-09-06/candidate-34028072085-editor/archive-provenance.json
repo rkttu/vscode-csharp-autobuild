@@ -1,0 +1,21 @@
+{
+  "runId": "34028072085",
+  "vsixSha256": "fe196696f3866af53654b76f97d132ba5d5718bf2909ac3c8962e45381b45b4e",
+  "records": [
+    {
+      "file": "ide-net10.json",
+      "rawSha256": "24b8c20cae65ff33e36d827227f45eca33cf85809e6cf02ca6c1b61a266affb2",
+      "archivedSha256": "5d1261690f573fca5ec31e12d16ad2bcd49c34b05e36d8c794529324acc169d5"
+    },
+    {
+      "file": "ide-net8.json",
+      "rawSha256": "c4cd2acb96fdcad9c13a47314b154af72ac0e2538300688dc812d233f63e04a1",
+      "archivedSha256": "3d64fc4ea01291c7b3f3e87b0b0a0249a250ef6ec057a0d3ffbb1ea759c2a67f"
+    },
+    {
+      "file": "ide-result.json",
+      "rawSha256": "a8bfcb53a6671149369980b4c3bf52a420abe17b0042dfae8cb5dc06a4d4d47e",
+      "archivedSha256": "240c998b6e5592a0f9fbfed0f60617709b0b10cc00b484c092be0c69883ae77d"
+    }
+  ]
+}

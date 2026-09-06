@@ -1,0 +1,37 @@
+{
+  "runId": "34028072085",
+  "attempt": 1,
+  "workflowCommit": "b919f8e16f492a5dd1d560c750d90ddc3111003c",
+  "records": [
+    {
+      "file": "validation-manifest.json",
+      "rawSha256": "d4d0226449f12ce62aa8c9a07b0bc6f5228a5e83bb7699535643ec5836da7426",
+      "archivedSha256": "d4d0226449f12ce62aa8c9a07b0bc6f5228a5e83bb7699535643ec5836da7426"
+    },
+    {
+      "file": "result.json",
+      "rawSha256": "50395286c5b3894f6a8557b17362d16a7809464a22b1d329fc75530ade6d3a5d",
+      "archivedSha256": "50395286c5b3894f6a8557b17362d16a7809464a22b1d329fc75530ade6d3a5d"
+    },
+    {
+      "file": "dap-net8-result.json",
+      "rawSha256": "b8e88536bcfd477211a800b8e0d76ffe93590a83338bc9af17c721e90c68801a",
+      "archivedSha256": "7102b4cc33b42953ef511bd0f31a7bde3ba81948a24ec231948e52a1448c09de"
+    },
+    {
+      "file": "dap-net8.jsonl",
+      "rawSha256": "cee95f4fd51e18f3a369ec69f9898ab295a165cb525199c3f6b75f268fedfb3d",
+      "archivedSha256": "d6e99d5ae3595386fec898b661ba84c66aac8a43ec53a1a7691622715f8fb620"
+    },
+    {
+      "file": "source-integrity.json",
+      "rawSha256": "d0e89b4f2be72b07c63724b630e73933b6414f8c8ea1a7b049d9df8fcbcb83ad",
+      "archivedSha256": "d0e89b4f2be72b07c63724b630e73933b6414f8c8ea1a7b049d9df8fcbcb83ad"
+    },
+    {
+      "file": "upstream-net10-result.json",
+      "rawSha256": "d0a692f591af6399b8999f26838cde263e6769cae9b8289a77fc91b07901b45c",
+      "archivedSha256": "d0a692f591af6399b8999f26838cde263e6769cae9b8289a77fc91b07901b45c"
+    }
+  ]
+}

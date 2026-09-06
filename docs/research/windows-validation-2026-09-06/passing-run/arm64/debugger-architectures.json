@@ -1,0 +1,16 @@
+{
+  "success": true,
+  "expectedArchitecture": "arm64",
+  "files": [
+    {
+      "file": "C:\\a\\_temp\\netcoredbg-validation-arm64\\relocated\\netcoredbg\\netcoredbg.exe",
+      "architecture": "arm64",
+      "sha256": "a0855a31945adc4359f7e70a334c0c8f806774f30b09387611e150ce1455af5e"
+    },
+    {
+      "file": "C:\\a\\_temp\\netcoredbg-validation-arm64\\relocated\\netcoredbg\\dbgshim.dll",
+      "architecture": "arm64",
+      "sha256": "a9c116424acd30298b3e30e622f1afde1a951d3055cf7aa1985fd429c9842e1e"
+    }
+  ]
+}

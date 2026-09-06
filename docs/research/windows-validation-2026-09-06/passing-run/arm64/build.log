@@ -1,0 +1,106 @@
+MSBuild version 17.14.51+25f168cee for .NET Framework
+
+  1>Checking Build System
+  Building Custom Rule C:/a/vscode-csharp-autobuild/vscode-csharp-autobuild/validation-inputs/netcoredbg/src/CMakeLists.txt
+  clrdata_i.cpp
+  clrinternal_i.cpp
+  clrprivappxhosting_i.cpp
+  cordebug_i.cpp
+  Building Custom Rule C:/a/vscode-csharp-autobuild/vscode-csharp-autobuild/validation-inputs/netcoredbg/third_party/linenoise-ng/CMakeLists.txt
+  ConvertUTF.cpp
+  linenoise.cpp
+  wcwidth.cpp
+  corprof_i.cpp
+  corsym_i.cpp
+  metahost_i.cpp
+  sospriv_i.cpp
+  xclrdata_i.cpp
+  xcordebug_i.cpp
+  corguids.vcxproj -> C:\a\_temp\netcoredbg-validation-arm64\build\src\Release\corguids.lib
+  linenoise.vcxproj -> C:\a\_temp\netcoredbg-validation-arm64\build\third_party\linenoise-ng\Release\linenoise.lib
+  Creating new dotnet project
+  The template "Console App" was created successfully.
+
+  Processing post-creation actions...
+  Restoring C:\a\_temp\netcoredbg-validation-arm64\build\src\generrmsg\generrmsg.csproj:
+    Determining projects to restore...
+    Restored C:\a\_temp\netcoredbg-validation-arm64\build\src\generrmsg\generrmsg.csproj (in 87 ms).
+  Restore succeeded.
+
+
+  Building Custom Rule C:/a/vscode-csharp-autobuild/vscode-csharp-autobuild/validation-inputs/netcoredbg/src/CMakeLists.txt
+  Compiling generrmsg/bin/generrmsg.dll
+    Determining projects to restore...
+    Restored C:\a\_temp\netcoredbg-validation-arm64\build\src\generrmsg\generrmsg.csproj (in 100 ms).
+    generrmsg -> C:\a\_temp\netcoredbg-validation-arm64\build\src\generrmsg\bin\generrmsg.dll
+
+  Build succeeded.
+      0 Warning(s)
+      0 Error(s)
+
+  Time Elapsed 00:00:03.04
+  Extracting C:/a/vscode-csharp-autobuild/vscode-csharp-autobuild/validation-inputs/runtime/src/coreclr/inc/corerror.xml
+  breakpoint_break.cpp
+  breakpoint_entry.cpp
+  breakpoint_hotreload.cpp
+  breakpoints_exception.cpp
+  breakpoints_func.cpp
+  breakpoints_line.cpp
+  breakpoints.cpp
+  breakpointutils.cpp
+  callbacksqueue.cpp
+  evalhelpers.cpp
+  evalstackmachine.cpp
+  evaluator.cpp
+  evalwaiter.cpp
+  evalutils.cpp
+  frames.cpp
+  hotreloadhelpers.cpp
+  managedcallback.cpp
+  manageddebugger.cpp
+  threads.cpp
+  stepper_async.cpp
+  stepper_simple.cpp
+  steppers.cpp
+  valueprint.cpp
+  variables.cpp
+  waitpid.cpp
+  types.cpp
+  interop.cpp
+  attributes.cpp
+  async_info.cpp
+  jmc.cpp
+  modules.cpp
+  modules_app_update.cpp
+  modules_sources.cpp
+  typeprinter.cpp
+  cliprotocol.cpp
+  escaped_string.cpp
+  protocol_utils.cpp
+  miprotocol.cpp
+  tokenizer.cpp
+  vscodeprotocol.cpp
+  sourcestorage.cpp
+  utf.cpp
+  errormessage.cpp
+  main.cpp
+  dynlibs_unix.cpp
+  dynlibs_win32.cpp
+  err_utils.cpp
+  filesystem.cpp
+  filesystem_unix.cpp
+  filesystem_win32.cpp
+  ioredirect.cpp
+  iosystem_unix.cpp
+  iosystem_win32.cpp
+  interop_unix.cpp
+  interop_win32.cpp
+  platform_unix.cpp
+  platform_win32.cpp
+  streams.cpp
+  logger.cpp
+  buildinfo.cpp
+  breakpoint_break.obj : MSIL .netmodule or module compiled with /GL found; restarting link with /LTCG; add /LTCG to the link command line to improve linker performance
+  Generating code
+  Finished generating code
+  netcoredbg.vcxproj -> C:\a\_temp\netcoredbg-validation-arm64\build\src\Release\netcoredbg.exe

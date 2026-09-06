@@ -1,0 +1,106 @@
+[
+  {
+    "rid": "win-arm64",
+    "assets": [
+      "runtimes/win-arm64/native/dbgshim.dll"
+    ],
+    "version": "10.0.731102",
+    "packageUrl": "https://api.nuget.org/v3-flatcontainer/microsoft.diagnostics.dbgshim.win-arm64/10.0.731102/microsoft.diagnostics.dbgshim.win-arm64.10.0.731102.nupkg",
+    "packageSha256": "3bc58ed2ff3701fe50624f10ae33e89db7f07169422f27c5b3706f71889c0977",
+    "nativeSha256": "a9c116424acd30298b3e30e622f1afde1a951d3055cf7aa1985fd429c9842e1e",
+    "nativeFormat": "PE",
+    "nativeArchitecture": "arm64",
+    "runtimeExecutionTested": false
+  },
+  {
+    "rid": "win-x64",
+    "assets": [
+      "runtimes/win-x64/native/dbgshim.dll"
+    ],
+    "version": "10.0.731102",
+    "packageUrl": "https://api.nuget.org/v3-flatcontainer/microsoft.diagnostics.dbgshim.win-x64/10.0.731102/microsoft.diagnostics.dbgshim.win-x64.10.0.731102.nupkg",
+    "packageSha256": "af1f487a0106230b8478eeb7171d83f84618000408b932141912cf27865f7bc4",
+    "nativeSha256": "973ee80765d6451b3596910a0300ccab1cca18df2bb3d1ff3d7fa8e17e345cc7",
+    "nativeFormat": "PE",
+    "nativeArchitecture": "x64",
+    "runtimeExecutionTested": false
+  },
+  {
+    "rid": "linux-x64",
+    "assets": [
+      "runtimes/linux-x64/native/libdbgshim.so"
+    ],
+    "version": "10.0.731102",
+    "packageUrl": "https://api.nuget.org/v3-flatcontainer/microsoft.diagnostics.dbgshim.linux-x64/10.0.731102/microsoft.diagnostics.dbgshim.linux-x64.10.0.731102.nupkg",
+    "packageSha256": "e6754b5dcec1d4621ef444d4d21db7187df98db402d1f29ffb2f4a40c6e82283",
+    "nativeSha256": "ac79da6ec930fa17cd6c1f243e8a48d9a3aa4642c0ec6145260a82245467ecba",
+    "nativeFormat": "ELF",
+    "nativeArchitecture": "x64",
+    "runtimeExecutionTested": false
+  },
+  {
+    "rid": "linux-arm64",
+    "assets": [
+      "runtimes/linux-arm64/native/libdbgshim.so"
+    ],
+    "version": "10.0.731102",
+    "packageUrl": "https://api.nuget.org/v3-flatcontainer/microsoft.diagnostics.dbgshim.linux-arm64/10.0.731102/microsoft.diagnostics.dbgshim.linux-arm64.10.0.731102.nupkg",
+    "packageSha256": "199e59055ac85fce55251a1ace5968af93b4f44a9ef947642960ba91c7ad0cb5",
+    "nativeSha256": "afabe34cafb0b1ec6ac7f084b9e9f2c2e642ec921a56d0bf1f9b03d3e9ccbae4",
+    "nativeFormat": "ELF",
+    "nativeArchitecture": "arm64",
+    "runtimeExecutionTested": false
+  },
+  {
+    "rid": "linux-musl-x64",
+    "assets": [
+      "runtimes/linux-musl-x64/native/libdbgshim.so"
+    ],
+    "version": "10.0.731102",
+    "packageUrl": "https://api.nuget.org/v3-flatcontainer/microsoft.diagnostics.dbgshim.linux-musl-x64/10.0.731102/microsoft.diagnostics.dbgshim.linux-musl-x64.10.0.731102.nupkg",
+    "packageSha256": "8fee0f2c5f88e969f6daaae1f01d441782edac0fedf44692fe76bc301fe961b4",
+    "nativeSha256": "c8413c4e928cd5a3e6a76764cd58acaba01ba51466371cc43d6f774307629fe3",
+    "nativeFormat": "ELF",
+    "nativeArchitecture": "x64",
+    "runtimeExecutionTested": false
+  },
+  {
+    "rid": "linux-musl-arm64",
+    "assets": [
+      "runtimes/linux-musl-arm64/native/libdbgshim.so"
+    ],
+    "version": "10.0.731102",
+    "packageUrl": "https://api.nuget.org/v3-flatcontainer/microsoft.diagnostics.dbgshim.linux-musl-arm64/10.0.731102/microsoft.diagnostics.dbgshim.linux-musl-arm64.10.0.731102.nupkg",
+    "packageSha256": "29d1cd0c404884fb295d5103645b873dd2b1a9991bc4be5735785324048ea2db",
+    "nativeSha256": "2f617f411ddaebead23786c15ac55407300150fb33470cdad2eb0cb9db0744ef",
+    "nativeFormat": "ELF",
+    "nativeArchitecture": "arm64",
+    "runtimeExecutionTested": false
+  },
+  {
+    "rid": "osx-arm64",
+    "assets": [
+      "runtimes/osx-arm64/native/libdbgshim.dylib"
+    ],
+    "version": "10.0.731102",
+    "packageUrl": "https://api.nuget.org/v3-flatcontainer/microsoft.diagnostics.dbgshim.osx-arm64/10.0.731102/microsoft.diagnostics.dbgshim.osx-arm64.10.0.731102.nupkg",
+    "packageSha256": "2d0e73223d0e02e53a3c0343009d508bbf350c575859954ab7a627354bb0023a",
+    "nativeSha256": "b61d20d321c26c71ce5864c8193ec6d8101af0482d66969cf1af42513bf4a4c3",
+    "nativeFormat": "Mach-O",
+    "nativeArchitecture": "arm64",
+    "runtimeExecutionTested": true
+  },
+  {
+    "rid": "osx-x64",
+    "assets": [
+      "runtimes/osx-x64/native/libdbgshim.dylib"
+    ],
+    "version": "10.0.731102",
+    "packageUrl": "https://api.nuget.org/v3-flatcontainer/microsoft.diagnostics.dbgshim.osx-x64/10.0.731102/microsoft.diagnostics.dbgshim.osx-x64.10.0.731102.nupkg",
+    "packageSha256": "c62bec337d9e93d2b4f3600bdb8b7615a733a08b67491b0bad7c36c046f9ada8",
+    "nativeSha256": "87caa9326348ca9b7bc8ab8174c04a411aba2998f8bc122de86a254a15af1e6c",
+    "nativeFormat": "Mach-O",
+    "nativeArchitecture": "x64",
+    "runtimeExecutionTested": false
+  }
+]

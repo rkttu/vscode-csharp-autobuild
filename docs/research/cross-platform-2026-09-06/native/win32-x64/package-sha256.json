@@ -1,0 +1,66 @@
+[
+  {
+    "file": "dbgshim.dll",
+    "sha256": "973ee80765d6451b3596910a0300ccab1cca18df2bb3d1ff3d7fa8e17e345cc7"
+  },
+  {
+    "file": "ManagedPart.dll",
+    "sha256": "7e7b8f6761f710cbd3ab083feeb147c9b09ed2ad4c7708323f5beeff106c2144"
+  },
+  {
+    "file": "Microsoft.CodeAnalysis.CSharp.dll",
+    "sha256": "e9cc57c55a95146f98b55dd46fdd881b4be48925e3773ef4aa5ac622b76903a6"
+  },
+  {
+    "file": "Microsoft.CodeAnalysis.CSharp.Scripting.dll",
+    "sha256": "64050c89e7bf7905f6c7ec9eb1594dcea5fbbd2868341f9ef99b58e9dea01605"
+  },
+  {
+    "file": "Microsoft.CodeAnalysis.dll",
+    "sha256": "97553a05b1f8aad2f29349f0fc7893ceb6dd199bd769d3e1092839957c7c0cdb"
+  },
+  {
+    "file": "Microsoft.CodeAnalysis.Scripting.dll",
+    "sha256": "066f1d39b5e211e343c8c79f374438884b1684fa27dc8c29a9000f88615bf764"
+  },
+  {
+    "file": "netcoredbg.exe",
+    "sha256": "119d114b4aed346d8e866fb65fe9cda91b868a9df1c7d8313d68a9b977144d54"
+  },
+  {
+    "file": "notices\\dotnet-runtime-LICENSE.TXT",
+    "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+  },
+  {
+    "file": "notices\\dotnet-runtime-THIRD-PARTY-NOTICES.TXT",
+    "sha256": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21"
+  },
+  {
+    "file": "notices\\json-LICENSE.MIT",
+    "sha256": "7b875bb7a4e28abb7956ea821b4b7d88ff6a2a4fabf261c3993730a365ec56dd"
+  },
+  {
+    "file": "notices\\linenoise-ng-LICENSE",
+    "sha256": "c676d229c8807fa8701cf5cd9d59788d41de2b4803803a34d35570e700a18363"
+  },
+  {
+    "file": "notices\\Samsung-netcoredbg-LICENSE",
+    "sha256": "6cd03b0de8299b0800f22b35ae842c931ded7684a2d1ba4f1d4188bab9b09a11"
+  },
+  {
+    "file": "notices\\nuget\\microsoft.csharp\\4.4.0\\LICENSE.TXT",
+    "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+  },
+  {
+    "file": "notices\\nuget\\microsoft.csharp\\4.4.0\\THIRD-PARTY-NOTICES.TXT",
+    "sha256": "0ef4dce1f4e8965f19a3b8b2f984f337d5c35e5aaf7f8a36b95aec66c301963a"
+  },
+  {
+    "file": "notices\\nuget\\netstandard.library\\2.0.3\\LICENSE.TXT",
+    "sha256": "fc95de1436a321aadbfafd21f8a8506a2f4678bfc003bd806d6b59d3088efadc"
+  },
+  {
+    "file": "notices\\nuget\\netstandard.library\\2.0.3\\THIRD-PARTY-NOTICES.TXT",
+    "sha256": "0684b2349427ee28e392ae8914645832e59731dba8a38a984f72b3fb8769c76b"
+  }
+]

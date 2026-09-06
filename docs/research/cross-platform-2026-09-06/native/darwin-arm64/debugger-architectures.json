@@ -1,0 +1,16 @@
+{
+  "success": true,
+  "expectedArchitecture": "arm64",
+  "files": [
+    {
+      "file": "netcoredbg",
+      "architecture": "arm64",
+      "sha256": "e816dfc309a082193b0cc8914c845c9f4619eb19a3706dc27ae9fe363d76440f"
+    },
+    {
+      "file": "libdbgshim.dylib",
+      "architecture": "arm64",
+      "sha256": "b61d20d321c26c71ce5864c8193ec6d8101af0482d66969cf1af42513bf4a4c3"
+    }
+  ]
+}

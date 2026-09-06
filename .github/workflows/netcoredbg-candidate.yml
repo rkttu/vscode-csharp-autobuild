@@ -1,0 +1,251 @@
+name: Build and verify a netcoredbg VSIX candidate
+
+on:
+  workflow_call:
+    inputs:
+      candidate:
+        type: string
+        required: true
+      publish:
+        type: boolean
+        default: false
+    secrets:
+      OPENVSX_ACCESS_TOKEN:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  debugger:
+    if: ${{ !fromJSON(inputs.candidate).resumeRelease }}
+    uses: ./.github/workflows/validate-netcoredbg.yml
+    with:
+      debugger-tag: ${{ fromJSON(inputs.candidate).debuggerTag }}
+      debugger-sha: ${{ fromJSON(inputs.candidate).debuggerSha }}
+      artifact-prefix: ${{ fromJSON(inputs.candidate).artifactPrefix }}
+
+  package:
+    needs: debugger
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [win32-x64, win32-arm64, linux-x64, linux-arm64, alpine-x64, alpine-arm64, darwin-x64, darwin-arm64]
+    env:
+      VARIANT_VERSION: ${{ fromJSON(inputs.candidate).version }}
+      VSIX_TARGET: ${{ matrix.target }}
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_GENERATE_ASPNET_CERTIFICATE: 'false'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: dotnet/vscode-csharp
+          ref: ${{ fromJSON(inputs.candidate).csharpSha }}
+          fetch-depth: 0
+          path: upstream
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: ${{ fromJSON(inputs.candidate).artifactPrefix }}-validated
+          path: validated-debugger
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '22'
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6
+        with:
+          dotnet-version: 10.0.400
+      - name: Apply independent identity and debugger integration
+        env:
+          CANDIDATE_JSON: ${{ inputs.candidate }}
+        run: |
+          python3 -c 'import json, os; json.dump(json.loads(os.environ["CANDIDATE_JSON"]), open("candidate.json", "w"), indent=2)'
+          python3 scripts/variant/overlay.py --source upstream --validated validated-debugger --target "$VSIX_TARGET" --version "$VARIANT_VERSION" --candidate candidate.json
+          echo "VALIDATED_DEBUGGER_DIRECTORY=$GITHUB_WORKSPACE/validated-debugger/$VSIX_TARGET/netcoredbg" >> "$GITHUB_ENV"
+      - name: Install public build dependencies
+        working-directory: upstream
+        run: npm install
+      - name: Format changed TypeScript with upstream rules
+        working-directory: upstream
+        run: npx prettier --write tasks/packaging/offlinePackagingTasks.ts src/coreclrDebug/activate.ts src/constants/csharpExtensionId.ts src/razor/src/razorExtensionId.ts src/lsptoolshost/logging/loggingUtils.ts
+      - name: Build the platform VSIX
+        working-directory: upstream
+        run: npm run vsix:release:package
+      - name: Verify adapter selection and SDK environment
+        run: node scripts/variant/test-factory.cjs upstream
+      - name: Verify identity, permissions and exact debugger payload
+        run: |
+          python3 scripts/variant/verify-vsix.py --vsix "upstream/vsix/csharp-with-netcoredbg-$VSIX_TARGET-$VARIANT_VERSION.vsix" \
+            --validated validated-debugger --target "$VSIX_TARGET" --version "$VARIANT_VERSION" --output package-check
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: ${{ fromJSON(inputs.candidate).artifactPrefix }}-vsix-${{ matrix.target }}
+          path: upstream/vsix/*.vsix
+          if-no-files-found: error
+          overwrite: true
+          retention-days: 30
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: ${{ fromJSON(inputs.candidate).artifactPrefix }}-package-evidence-${{ matrix.target }}
+          path: package-check/evidence/
+          if-no-files-found: warn
+          overwrite: true
+
+  test-vsix:
+    needs: package
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {target: win32-x64, arch: x64, runner: windows-2022, family: windows}
+          - {target: win32-arm64, arch: arm64, runner: windows-11-arm, family: windows}
+          - {target: linux-x64, arch: x64, runner: ubuntu-22.04, family: linux}
+          - {target: linux-arm64, arch: arm64, runner: ubuntu-22.04-arm, family: linux}
+          - {target: alpine-x64, arch: x64, runner: ubuntu-22.04, family: alpine}
+          - {target: alpine-arm64, arch: arm64, runner: ubuntu-22.04-arm, family: alpine}
+          - {target: darwin-x64, arch: x64, runner: macos-15-intel, family: darwin}
+          - {target: darwin-arm64, arch: arm64, runner: macos-15, family: darwin}
+    env:
+      VARIANT_VERSION: ${{ fromJSON(inputs.candidate).version }}
+      VALIDATION_TARGET: ${{ matrix.target }}
+      VALIDATION_ARCH: ${{ matrix.arch }}
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: Samsung/netcoredbg
+          ref: ${{ fromJSON(inputs.candidate).debuggerSha }}
+          path: validation-inputs/netcoredbg
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: ${{ fromJSON(inputs.candidate).artifactPrefix }}-vsix-${{ matrix.target }}
+          path: candidate-vsix
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: ${{ fromJSON(inputs.candidate).artifactPrefix }}-validated
+          path: validated-debugger
+      - name: Load runtime and container inputs
+        shell: python
+        run: |
+          import json, os
+          from pathlib import Path
+          config = json.load(open('config/netcoredbg.json'))
+          values = {'SDK8_VERSION': config['sdk8'], 'SDK10_VERSION': config['sdk10'], 'ALPINE_IMAGE': config['alpineImage'],
+                    'VALIDATION_ROOT': str(Path(os.environ['RUNNER_TEMP']) / 'vsix-test'),
+                    'DOTNET_INSTALL_DIR': str(Path(os.environ['RUNNER_TEMP']) / 'vsix-dotnet')}
+          with open(os.environ['GITHUB_ENV'], 'a') as out:
+              for key, value in values.items():
+                  out.write(f'{key}={value}\n')
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6
+        if: matrix.family != 'alpine'
+        with:
+          architecture: ${{ matrix.arch }}
+          dotnet-version: |
+            ${{ env.SDK8_VERSION }}
+            ${{ env.SDK10_VERSION }}
+      - name: Execute the adapter extracted from the VSIX
+        if: matrix.family != 'alpine'
+        shell: python
+        run: |
+          import os, subprocess, sys
+          from pathlib import Path
+          subprocess.run([sys.executable, 'scripts/variant/verify-vsix.py', '--vsix', str(next(Path('candidate-vsix').glob('*.vsix'))),
+                          '--validated', 'validated-debugger', '--target', os.environ['VALIDATION_TARGET'], '--version', os.environ['VARIANT_VERSION'],
+                          '--output', os.environ['VALIDATION_ROOT'], '--run-dap'], check=True)
+      - name: Execute the VSIX adapter in native musl
+        if: matrix.family == 'alpine'
+        run: |
+          docker run --rm --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
+            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v "$RUNNER_TEMP:$RUNNER_TEMP" -w "$GITHUB_WORKSPACE" \
+            -e VALIDATION_ROOT -e DOTNET_INSTALL_DIR -e VALIDATION_TARGET -e VALIDATION_ARCH -e VARIANT_VERSION \
+            -e SDK8_VERSION -e SDK10_VERSION -e DOTNET_CLI_TELEMETRY_OPTOUT -e DOTNET_NOLOGO \
+            "$ALPINE_IMAGE" sh -ec '
+              apk add --no-cache python3 icu-libs icu-data-full libstdc++ libgcc libunwind openssl krb5-libs zlib
+              python3 scripts/validation/install-musl-sdk.py
+              python3 scripts/variant/verify-vsix.py --vsix "candidate-vsix/csharp-with-netcoredbg-$VALIDATION_TARGET-$VARIANT_VERSION.vsix" \
+                --validated validated-debugger --target "$VALIDATION_TARGET" --version "$VARIANT_VERSION" --output "$VALIDATION_ROOT" --run-dap
+            '
+      - name: Summarize extracted VSIX validation
+        if: always()
+        shell: python
+        env:
+          CANDIDATE_JSON: ${{ inputs.candidate }}
+        run: |
+          import os, subprocess, sys
+          from pathlib import Path
+          subprocess.run([sys.executable, 'scripts/validation/summary.py', '--evidence',
+                          str(Path(os.environ['VALIDATION_ROOT']) / 'evidence'), '--stage', 'extracted VSIX'], check=True)
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: ${{ fromJSON(inputs.candidate).artifactPrefix }}-tested-${{ matrix.target }}
+          path: ${{ env.VALIDATION_ROOT }}/evidence/
+          if-no-files-found: error
+          overwrite: true
+          retention-days: 30
+
+  publish:
+    needs: [debugger, package, test-vsix]
+    if: ${{ always() && !cancelled() && (fromJSON(inputs.candidate).resumeRelease || (needs.debugger.result == 'success' && needs.package.result == 'success' && needs.test-vsix.result == 'success')) }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        if: ${{ !fromJSON(inputs.candidate).resumeRelease }}
+        with:
+          pattern: ${{ fromJSON(inputs.candidate).artifactPrefix }}-*
+          path: release-artifacts
+      - name: Preserve candidate inputs
+        env:
+          CANDIDATE_JSON: ${{ inputs.candidate }}
+        run: python3 -c 'import json, os; json.dump(json.loads(os.environ["CANDIDATE_JSON"]), open("candidate.json", "w"), indent=2)'
+      - name: Restore an interrupted upload without rebuilding
+        if: fromJSON(inputs.candidate).resumeRelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/variant/resume.py --candidate candidate.json --artifacts release-artifacts
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        if: inputs.publish
+        with:
+          node-version: '22'
+      - name: Install pinned publisher
+        if: inputs.publish
+        run: npm install -g ovsx@1.1.1
+      - name: Verify the complete release set
+        run: python3 scripts/variant/publish.py --artifacts release-artifacts --candidate candidate.json
+      - name: Publish and read back every platform
+        if: inputs.publish && github.ref == 'refs/heads/main'
+        env:
+          OVSX_PAT: ${{ secrets.OPENVSX_ACCESS_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/variant/publish.py --artifacts release-artifacts --candidate candidate.json --publish
+      - name: Summarize publication state
+        if: always()
+        env:
+          CANDIDATE_JSON: ${{ inputs.candidate }}
+        run: python3 scripts/validation/summary.py --evidence release-artifacts --stage publication
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: ${{ fromJSON(inputs.candidate).artifactPrefix }}-release-manifest
+          path: |
+            release-artifacts/release-manifest.json
+            release-artifacts/publication-status.json
+          overwrite: true

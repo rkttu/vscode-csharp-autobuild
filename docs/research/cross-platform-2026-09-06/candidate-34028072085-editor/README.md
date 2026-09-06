@@ -1,0 +1,3 @@
+# Installed VS Code validation of the expanded-gate candidate
+
+The macOS ARM64 VSIX from run 34028072085 passed activation and real .NET 8/10 debug sessions inside VS Code 1.135.0, using isolated user-data and extension directories. The installer used the new candidate despite its unchanged numeric version. Installed provenance matched the candidate and every installed debugger file matched the VSIX bytes. The test covers launch, conditional breakpoints, stack and variables, expression evaluation, stepping, an async breakpoint, runtime/architecture output, and clean exit. It does not certify every editor or platform. Personal paths are normalized; original and archived evidence hashes are recorded separately.

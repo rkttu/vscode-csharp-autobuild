@@ -1,0 +1,322 @@
+CMake Warning (deprecated) at CMakeLists.txt:1 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- The C compiler identification is AppleClang 21.0.0.21000101
+-- The CXX compiler identification is AppleClang 21.0.0.21000101
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/clang - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/clang++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+Detected OSX x86_64
+Building with 10.0.0 CoreCLR
+CMake Warning (deprecated) at third_party/linenoise-ng/CMakeLists.txt:3 (cmake_minimum_required):
+  Compatibility with CMake < 3.10 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
+  to tell CMake that the project requires at least <min> but has been updated
+  to work with policies introduced by <max> or earlier.
+This warning is for project developers.  Use -Wno-author or -Wno-deprecated
+to suppress it.
+
+-- Build mode: Release
+-- Compiler type CLANG: /usr/bin/clang++
+-- Looking for include files windows.h, bcrypt.h
+-- Looking for include files windows.h, bcrypt.h - not found
+-- Looking for include files sys/auxv.h, asm/hwcap.h
+-- Looking for include files sys/auxv.h, asm/hwcap.h - not found
+-- Looking for include file asm/hwprobe.h
+-- Looking for include file asm/hwprobe.h - not found
+-- Looking for sysctlbyname
+-- Looking for sysctlbyname - found
+-- Looking for fsync
+-- Looking for fsync - found
+-- Looking for arc4random_buf
+-- Looking for arc4random_buf - found
+-- Looking for O_CLOEXEC
+-- Looking for O_CLOEXEC - found
+-- Looking for CLOCK_MONOTONIC
+-- Looking for CLOCK_MONOTONIC - found
+-- Looking for CLOCK_MONOTONIC_COARSE
+-- Looking for CLOCK_MONOTONIC_COARSE - not found
+-- Looking for clock_gettime_nsec_np
+-- Looking for clock_gettime_nsec_np - found
+-- Configuring done (1.6s)
+-- Generating done (0.0s)
+-- Build files have been written to: <RESEARCH_TMP>/source-build/build-osx-x64
+[  2%] Building CXX object third_party/linenoise-ng/CMakeFiles/linenoise.dir/src/ConvertUTF.cpp.o
+[  2%] Building CXX object src/CMakeFiles/corguids.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/pal/prebuilt/idl/clrdata_i.cpp.o
+[  3%] Building CXX object third_party/linenoise-ng/CMakeFiles/linenoise.dir/src/linenoise.cpp.o
+[  4%] Building C object src/CMakeFiles/minipalguid.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/native/minipal/guid.c.o
+[  5%] Compiling ManagedPart.dll
+[  5%] Built target buildinfo
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[  7%] Building CXX object src/CMakeFiles/corguids.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/pal/prebuilt/idl/clrinternal_i.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[  8%] Building C object src/CMakeFiles/minipalguid.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/native/minipal/random.c.o
+[  9%] Building CXX object third_party/linenoise-ng/CMakeFiles/linenoise.dir/src/wcwidth.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 10%] Linking C static library libminipalguid.a
+[ 11%] Building CXX object src/CMakeFiles/corguids.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/pal/prebuilt/idl/clrprivappxhosting_i.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 11%] Built target minipalguid
+[ 12%] Building CXX object src/CMakeFiles/corguids.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/pal/prebuilt/idl/cordebug_i.cpp.o
+[ 14%] Building CXX object src/CMakeFiles/corguids.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/pal/prebuilt/idl/corprof_i.cpp.o
+[ 15%] Building CXX object src/CMakeFiles/corguids.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/pal/prebuilt/idl/corsym_i.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 16%] Building CXX object src/CMakeFiles/corguids.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/pal/prebuilt/idl/metahost_i.cpp.o
+[ 17%] Building CXX object src/CMakeFiles/corguids.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/pal/prebuilt/idl/xclrdata_i.cpp.o
+[ 18%] Building CXX object src/CMakeFiles/corguids.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/pal/prebuilt/idl/sospriv_i.cpp.o
+[ 20%] Building CXX object src/CMakeFiles/corguids.dir<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/pal/prebuilt/idl/xcordebug_i.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 21%] Linking CXX static library libcorguids.a
+[ 21%] Built target corguids
+  복원할 프로젝트를 확인하는 중...
+[ 22%] Linking CXX static library liblinenoise.a
+[ 22%] Built target linenoise
+[ 23%] Creating new dotnet project
+[ 24%] Building C object third_party/linenoise-ng/CMakeFiles/example.dir/tst/example.c.o
+[ 25%] Linking CXX executable example
+ld: warning: -force_flat_namespace is no longer supported, using -flat_namespace instead
+[ 25%] Built target example
+  <RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/managed/ManagedPart.csproj을(를) 273밀리초 동안 복원했습니다.
+"콘솔 앱" 템플릿이 성공적으로 생성되었습니다.
+
+생성 후 작업 처리 중...
+<RESEARCH_TMP>/source-build/build-osx-x64/src/generrmsg/generrmsg.csproj 복원 중:
+  복원할 프로젝트를 확인하는 중...
+  <RESEARCH_TMP>/source-build/build-osx-x64/src/generrmsg/generrmsg.csproj을(를) 34밀리초 동안 복원했습니다.
+복원에 성공했습니다.
+
+
+[ 27%] Compiling generrmsg/bin/generrmsg.dll
+  ManagedPart -> <RESEARCH_TMP>/source-build/build-osx-x64/src/bin/Release/netstandard2.0/osx-x64/ManagedPart.dll
+  ManagedPart -> <RESEARCH_TMP>/source-build/build-osx-x64/src/
+[ 27%] Built target managedpart_dll
+  복원할 프로젝트를 확인하는 중...
+  <RESEARCH_TMP>/source-build/build-osx-x64/src/generrmsg/generrmsg.csproj을(를) 37밀리초 동안 복원했습니다.
+  generrmsg -> <RESEARCH_TMP>/source-build/build-osx-x64/src/generrmsg/bin/generrmsg.dll
+
+빌드했습니다.
+    경고 0개
+    오류 0개
+
+경과 시간: 00:00:01.47
+[ 28%] Extracting <RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr/inc/corerror.xml
+[ 29%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/breakpoints_exception.cpp.o
+[ 30%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/breakpoint_hotreload.cpp.o
+[ 31%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/breakpoints_line.cpp.o
+[ 32%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/breakpoints_func.cpp.o
+[ 34%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/breakpoint_break.cpp.o
+[ 35%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/breakpoint_entry.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 36%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/breakpoints.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 38%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/callbacksqueue.cpp.o
+[ 38%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/breakpointutils.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 40%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/evalhelpers.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 41%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/evalstackmachine.cpp.o
+[ 42%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/evaluator.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 43%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/evalwaiter.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 44%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/evalutils.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 45%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/frames.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/debugger/frames.cpp:249:12: warning: first argument in call to 'memset' is a pointer to non-trivially copyable type 'CONTEXT' (aka '_CONTEXT') [-Wnontrivial-memcall]
+  249 |     memset(&ctxUnmanagedChain, 0, sizeof(CONTEXT));
+      |            ^
+<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/debugger/frames.cpp:249:12: note: explicitly cast the pointer to silence this warning
+  249 |     memset(&ctxUnmanagedChain, 0, sizeof(CONTEXT));
+      |            ^
+      |            (void*)
+<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/debugger/frames.cpp:250:12: warning: first argument in call to 'memset' is a pointer to non-trivially copyable type 'CONTEXT' (aka '_CONTEXT') [-Wnontrivial-memcall]
+  250 |     memset(&currentCtx, 0, sizeof(CONTEXT));
+      |            ^
+<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/debugger/frames.cpp:250:12: note: explicitly cast the pointer to silence this warning
+  250 |     memset(&currentCtx, 0, sizeof(CONTEXT));
+      |            ^
+      |            (void*)
+<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/debugger/frames.cpp:273:20: warning: first argument in call to 'memset' is a pointer to non-trivially copyable type 'CONTEXT' (aka '_CONTEXT') [-Wnontrivial-memcall]
+  273 |             memset(&ctxUnmanagedChain, 0, sizeof(CONTEXT));
+      |                    ^
+<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/debugger/frames.cpp:273:20: note: explicitly cast the pointer to silence this warning
+  273 |             memset(&ctxUnmanagedChain, 0, sizeof(CONTEXT));
+      |                    ^
+      |                    (void*)
+<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/debugger/frames.cpp:295:16: warning: first argument in call to 'memset' is a pointer to non-trivially copyable type 'CONTEXT' (aka '_CONTEXT') [-Wnontrivial-memcall]
+  295 |         memset(&currentCtx, 0, sizeof(CONTEXT));
+      |                ^
+<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/debugger/frames.cpp:295:16: note: explicitly cast the pointer to silence this warning
+  295 |         memset(&currentCtx, 0, sizeof(CONTEXT));
+      |                ^
+      |                (void*)
+<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/debugger/frames.cpp:330:20: warning: first argument in call to 'memset' is a pointer to non-trivially copyable type 'CONTEXT' (aka '_CONTEXT') [-Wnontrivial-memcall]
+  330 |             memset(&ctxUnmanagedChain, 0, sizeof(CONTEXT));
+      |                    ^
+<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/debugger/frames.cpp:330:20: note: explicitly cast the pointer to silence this warning
+  330 |             memset(&ctxUnmanagedChain, 0, sizeof(CONTEXT));
+      |                    ^
+      |                    (void*)
+[ 47%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/hotreloadhelpers.cpp.o
+[ 48%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/managedcallback.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+5 warnings generated.
+[ 49%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/manageddebugger.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 50%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/threads.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 51%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/stepper_async.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 52%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/stepper_simple.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 54%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/steppers.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 55%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/valueprint.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 56%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/variables.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 57%] Building CXX object src/CMakeFiles/netcoredbg.dir/debugger/waitpid.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 58%] Building CXX object src/CMakeFiles/netcoredbg.dir/interfaces/types.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 60%] Building CXX object src/CMakeFiles/netcoredbg.dir/managed/interop.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 61%] Building CXX object src/CMakeFiles/netcoredbg.dir/metadata/attributes.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 62%] Building CXX object src/CMakeFiles/netcoredbg.dir/metadata/async_info.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 63%] Building CXX object src/CMakeFiles/netcoredbg.dir/metadata/jmc.cpp.o
+[ 64%] Building CXX object src/CMakeFiles/netcoredbg.dir/metadata/modules.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 65%] Building CXX object src/CMakeFiles/netcoredbg.dir/metadata/modules_app_update.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 67%] Building CXX object src/CMakeFiles/netcoredbg.dir/metadata/modules_sources.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 68%] Building CXX object src/CMakeFiles/netcoredbg.dir/metadata/typeprinter.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 69%] Building CXX object src/CMakeFiles/netcoredbg.dir/protocols/cliprotocol.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 70%] Building CXX object src/CMakeFiles/netcoredbg.dir/protocols/escaped_string.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 71%] Building CXX object src/CMakeFiles/netcoredbg.dir/protocols/protocol_utils.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 72%] Building CXX object src/CMakeFiles/netcoredbg.dir/protocols/miprotocol.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 74%] Building CXX object src/CMakeFiles/netcoredbg.dir/protocols/tokenizer.cpp.o
+[ 75%] Building CXX object src/CMakeFiles/netcoredbg.dir/protocols/vscodeprotocol.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 76%] Building CXX object src/CMakeFiles/netcoredbg.dir/protocols/sourcestorage.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+In file included from <RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/protocols/vscodeprotocol.cpp:18:
+In file included from <RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/protocols/vscodeprotocol.h:15:
+<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/third_party/json/json.hpp:25777:35: warning: identifier '_json' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 25777 | inline nlohmann::json operator "" _json(const char* s, std::size_t n)
+       |                       ~~~~~~~~~~~~^~~~~
+       |                       operator""_json
+<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/third_party/json/json.hpp:25796:49: warning: identifier '_json_pointer' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 25796 | inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std::size_t n)
+       |                                     ~~~~~~~~~~~~^~~~~~~~~~~~~
+       |                                     operator""_json_pointer
+[ 77%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/utf.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 78%] Building CXX object src/CMakeFiles/netcoredbg.dir/errormessage.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 80%] Building CXX object src/CMakeFiles/netcoredbg.dir/main.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 81%] Building CXX object src/CMakeFiles/netcoredbg.dir/buildinfo.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 82%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/dynlibs_unix.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 83%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/dynlibs_win32.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 84%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/err_utils.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 85%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/filesystem.cpp.o
+[ 87%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/filesystem_unix.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+In file included from <RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/main.cpp:13:
+In file included from <RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/protocols/vscodeprotocol.h:15:
+<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/third_party/json/json.hpp:25777:35: warning: identifier '_json' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 25777 | inline nlohmann::json operator "" _json(const char* s, std::size_t n)
+       |                       ~~~~~~~~~~~~^~~~~
+       |                       operator""_json
+<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/third_party/json/json.hpp:25796:49: warning: identifier '_json_pointer' preceded by whitespace in a literal operator declaration is deprecated [-Wdeprecated-literal-operator]
+ 25796 | inline nlohmann::json::json_pointer operator "" _json_pointer(const char* s, std::size_t n)
+       |                                     ~~~~~~~~~~~~^~~~~~~~~~~~~
+       |                                     operator""_json_pointer
+[ 88%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/filesystem_win32.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 89%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/ioredirect.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 90%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/iosystem_win32.cpp.o
+[ 91%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/iosystem_unix.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 92%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/interop_unix.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 94%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/interop_win32.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 95%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/platform_unix.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 96%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/platform_win32.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 97%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/streams.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+[ 98%] Building CXX object src/CMakeFiles/netcoredbg.dir/utils/logger.cpp.o
+clang++: warning: argument unused during compilation: '-force_flat_namespace' [-Wunused-command-line-argument]
+<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092/src/utils/logger.cpp:63:50: warning: 'syscall' is deprecated: first deprecated in macOS 10.12 - syscall(2) is unsupported; please switch to a supported interface. For SYS_kdebug_trace use kdebug_signpost(). [-Wdeprecated-declarations]
+   63 |         static thread_local unsigned thread_id = syscall(SYS_gettid);
+      |                                                  ^
+/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/unistd.h:754:6: note: 'syscall' has been explicitly marked deprecated here
+  754 | int      syscall(int, ...);
+      |          ^
+1 warning generated.
+2 warnings generated.
+2 warnings generated.
+[100%] Linking CXX executable netcoredbg
+ld: warning: -force_flat_namespace is no longer supported, using -flat_namespace instead
+[100%] Built target netcoredbg
+Install the project...
+-- Install configuration: "Release"
+-- Installing: <RESEARCH_TMP>/source-build/install-osx-x64/netcoredbg
+-- Installing: <RESEARCH_TMP>/source-build/install-osx-x64/ManagedPart.dll
+-- Installing: <RESEARCH_TMP>/source-build/install-osx-x64/Microsoft.CodeAnalysis.dll
+-- Installing: <RESEARCH_TMP>/source-build/install-osx-x64/Microsoft.CodeAnalysis.CSharp.dll
+-- Installing: <RESEARCH_TMP>/source-build/install-osx-x64/Microsoft.CodeAnalysis.Scripting.dll
+-- Installing: <RESEARCH_TMP>/source-build/install-osx-x64/Microsoft.CodeAnalysis.CSharp.Scripting.dll
+-- Installing: <RESEARCH_TMP>/source-build/install-osx-x64/libdbgshim.dylib

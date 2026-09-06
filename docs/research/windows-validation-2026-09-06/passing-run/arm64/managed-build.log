@@ -1,0 +1,4 @@
+  Determining projects to restore...
+  Restored C:\a\vscode-csharp-autobuild\vscode-csharp-autobuild\validation-inputs\netcoredbg\src\managed\ManagedPart.csproj (in 19.46 sec).
+  ManagedPart -> C:\a\_temp\netcoredbg-validation-arm64\managed\bin\Release\netstandard2.0\win-arm64\ManagedPart.dll
+  ManagedPart -> C:\a\_temp\netcoredbg-validation-arm64\managed\publish\

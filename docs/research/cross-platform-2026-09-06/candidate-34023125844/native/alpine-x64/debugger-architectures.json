@@ -1,0 +1,16 @@
+{
+  "success": true,
+  "expectedArchitecture": "x64",
+  "files": [
+    {
+      "file": "netcoredbg",
+      "architecture": "x64",
+      "sha256": "6e0e25c9858e8cd39b51966ddf739e56802a8a2cf598f55c2875caef419f6c7b"
+    },
+    {
+      "file": "libdbgshim.so",
+      "architecture": "x64",
+      "sha256": "c8413c4e928cd5a3e6a76764cd58acaba01ba51466371cc43d6f774307629fe3"
+    }
+  ]
+}

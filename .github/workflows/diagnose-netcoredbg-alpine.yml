@@ -1,0 +1,71 @@
+name: Diagnose Alpine netcoredbg startup
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [research/netcoredbg-windows-validation]
+    paths:
+      - .github/workflows/diagnose-netcoredbg-alpine.yml
+      - scripts/validation/diagnose-alpine.py
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  diagnose:
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {arch: x64, runner: ubuntu-22.04}
+          - {arch: arm64, runner: ubuntu-22.04-arm}
+    env:
+      VALIDATION_ARCH: ${{ matrix.arch }}
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: netcoredbg-alpine-${{ matrix.arch }}-1
+          run-id: 34019887224
+          github-token: ${{ github.token }}
+          path: diagnostic-input
+      - name: Load isolated paths and fixed SDKs
+        run: |
+          python3 - <<'PY'
+          import json, os
+          config = json.load(open('config/netcoredbg.json'))
+          values = {'VALIDATION_ROOT': os.environ['RUNNER_TEMP'] + '/alpine-diagnostic',
+                    'DOTNET_INSTALL_DIR': os.environ['RUNNER_TEMP'] + '/diagnostic-dotnet',
+                    'SDK8_VERSION': config['sdk8'], 'SDK10_VERSION': config['sdk10'], 'ALPINE_IMAGE': config['alpineImage']}
+          with open(os.environ['GITHUB_ENV'], 'a') as out:
+              for key, value in values.items():
+                  out.write(f'{key}={value}\n')
+          PY
+      - name: Capture failed adapter stacks in musl
+        run: |
+          sudo sysctl -w kernel.core_pattern=core.%p
+          docker run --rm --ulimit core=1073741824 --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
+            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v "$RUNNER_TEMP:$RUNNER_TEMP" -w "$GITHUB_WORKSPACE" \
+            -e VALIDATION_ROOT -e DOTNET_INSTALL_DIR -e VALIDATION_ARCH -e SDK8_VERSION -e SDK10_VERSION \
+            -e DOTNET_CLI_TELEMETRY_OPTOUT -e DOTNET_NOLOGO "$ALPINE_IMAGE" sh -ec '
+              apk add --no-cache python3 gdb icu-libs icu-data-full libstdc++ libgcc libunwind openssl krb5-libs zlib
+              python3 scripts/validation/install-musl-sdk.py
+              python3 scripts/validation/diagnose-alpine.py
+            '
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: alpine-startup-diagnostic-${{ matrix.arch }}
+          path: |
+            ${{ env.VALIDATION_ROOT }}/*.json
+            ${{ env.VALIDATION_ROOT }}/*.jsonl
+            ${{ env.VALIDATION_ROOT }}/*.log
+          if-no-files-found: error
+          overwrite: true

@@ -1,0 +1,74 @@
+[
+  {
+    "file": "ManagedPart.dll",
+    "sha256": "5925fbdf71a30bba694e904c4d8c7924b5bbc85fa056d68b89bb65abaf944817"
+  },
+  {
+    "file": "Microsoft.CodeAnalysis.CSharp.Scripting.dll",
+    "sha256": "64050c89e7bf7905f6c7ec9eb1594dcea5fbbd2868341f9ef99b58e9dea01605"
+  },
+  {
+    "file": "Microsoft.CodeAnalysis.CSharp.dll",
+    "sha256": "e9cc57c55a95146f98b55dd46fdd881b4be48925e3773ef4aa5ac622b76903a6"
+  },
+  {
+    "file": "Microsoft.CodeAnalysis.Scripting.dll",
+    "sha256": "066f1d39b5e211e343c8c79f374438884b1684fa27dc8c29a9000f88615bf764"
+  },
+  {
+    "file": "Microsoft.CodeAnalysis.dll",
+    "sha256": "97553a05b1f8aad2f29349f0fc7893ceb6dd199bd769d3e1092839957c7c0cdb"
+  },
+  {
+    "file": "libdbgshim.so",
+    "sha256": "c8413c4e928cd5a3e6a76764cd58acaba01ba51466371cc43d6f774307629fe3"
+  },
+  {
+    "file": "netcoredbg",
+    "sha256": "60a599c2d026aa27cb79abf47ed6c687e8b9fe9e95153e5da25283424819dd6c"
+  },
+  {
+    "file": "notices/Samsung-netcoredbg-LICENSE",
+    "sha256": "6cd03b0de8299b0800f22b35ae842c931ded7684a2d1ba4f1d4188bab9b09a11"
+  },
+  {
+    "file": "notices/dotnet-runtime-LICENSE.TXT",
+    "sha256": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310"
+  },
+  {
+    "file": "notices/dotnet-runtime-THIRD-PARTY-NOTICES.TXT",
+    "sha256": "66f1d4e44973185519bb4aa8a9718eb22fc7af2cc532e3ae9cfc4c127ee7fc54"
+  },
+  {
+    "file": "notices/json-LICENSE.MIT",
+    "sha256": "7b875bb7a4e28abb7956ea821b4b7d88ff6a2a4fabf261c3993730a365ec56dd"
+  },
+  {
+    "file": "notices/linenoise-ng-LICENSE",
+    "sha256": "c676d229c8807fa8701cf5cd9d59788d41de2b4803803a34d35570e700a18363"
+  },
+  {
+    "file": "notices/musl-coreclr-host.cpp",
+    "sha256": "d26a2aea4293037bd45246f79b85ddb5dfc0bfd72ad0050053d6fbb422ca7e68"
+  },
+  {
+    "file": "notices/nuget/microsoft.csharp/4.4.0/LICENSE.TXT",
+    "sha256": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b"
+  },
+  {
+    "file": "notices/nuget/microsoft.csharp/4.4.0/THIRD-PARTY-NOTICES.TXT",
+    "sha256": "0ef4dce1f4e8965f19a3b8b2f984f337d5c35e5aaf7f8a36b95aec66c301963a"
+  },
+  {
+    "file": "notices/nuget/netstandard.library/2.0.3/LICENSE.TXT",
+    "sha256": "fc95de1436a321aadbfafd21f8a8506a2f4678bfc003bd806d6b59d3088efadc"
+  },
+  {
+    "file": "notices/nuget/netstandard.library/2.0.3/THIRD-PARTY-NOTICES.TXT",
+    "sha256": "0684b2349427ee28e392ae8914645832e59731dba8a38a984f72b3fb8769c76b"
+  },
+  {
+    "file": "notices/vscode-csharp-autobuild-LICENSE",
+    "sha256": "7c419230c16a1ec87a56cb1f7d067924d747ac240cafeaa7c7366784f5d91544"
+  }
+]

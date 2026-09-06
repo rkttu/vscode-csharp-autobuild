@@ -1,0 +1,66 @@
+name: Detect and release CSharp with netcoredbg
+
+on:
+  schedule:
+    - cron: '23 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      debugger-tag:
+        description: Optional Samsung tag; empty processes unseen tags from the baseline
+        type: string
+      csharp-tag:
+        description: Optional CSharp tag; empty selects the highest version tag
+        type: string
+      publish:
+        description: Publish verified VSIX packages (main only)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: csharp-netcoredbg-release
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    runs-on: ubuntu-22.04
+    outputs:
+      matrix: ${{ steps.detect.outputs.matrix }}
+      has-candidates: ${{ steps.detect.outputs.has-candidates }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - id: detect
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_DEBUGGER_TAG: ${{ inputs.debugger-tag }}
+          INPUT_CSHARP_TAG: ${{ inputs.csharp-tag }}
+        run: python3 scripts/variant/discover.py
+      - name: Check that incomplete or mismatched evidence blocks release
+        run: |
+          python3 -m unittest discover -s scripts/validation -p test_gate.py -v
+          python3 -m unittest discover -s scripts/variant -p 'test_*.py' -v
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: candidate-matrix
+          path: candidate-matrix.json
+          overwrite: true
+
+  candidate:
+    needs: discover
+    if: needs.discover.outputs.has-candidates == 'true'
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix: ${{ fromJSON(needs.discover.outputs.matrix) }}
+    permissions:
+      contents: write
+    uses: ./.github/workflows/netcoredbg-candidate.yml
+    with:
+      candidate: ${{ toJSON(matrix) }}
+      publish: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'schedule' || inputs.publish == true) }}
+    secrets:
+      OPENVSX_ACCESS_TOKEN: ${{ secrets.OPENVSX_ACCESS_TOKEN }}

@@ -1,0 +1,72 @@
+[
+  {
+    "name": "discover",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887593/job/101450388052"
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger / inputs",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887593/job/101450403050"
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger / linux-x64 source and DAP",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887593/job/101450413254"
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger / linux-arm64 source and DAP",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887593/job/101450413256"
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger / alpine-x64 source and DAP",
+    "conclusion": "failure",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887593/job/101450413267"
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger / alpine-arm64 source and DAP",
+    "conclusion": "failure",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887593/job/101450413283"
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger / win32-x64 source and DAP",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887593/job/101450413289"
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger / darwin-x64 source and DAP",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887593/job/101450413291"
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger / darwin-arm64 source and DAP",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887593/job/101450413304"
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger / win32-arm64 source and DAP",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887593/job/101450413310"
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger / aggregate",
+    "conclusion": "failure",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887593/job/101450913998"
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / package",
+    "conclusion": "skipped",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887593/job/101450939494"
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / test-vsix",
+    "conclusion": "skipped",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887593/job/101450939559"
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / publish",
+    "conclusion": "skipped",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887593/job/101450939772"
+  }
+]

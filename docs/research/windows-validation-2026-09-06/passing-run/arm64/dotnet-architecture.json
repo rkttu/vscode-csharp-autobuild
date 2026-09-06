@@ -1,0 +1,11 @@
+{
+  "success": true,
+  "expectedArchitecture": "arm64",
+  "files": [
+    {
+      "file": "C:\\a\\_temp\\netcoredbg-dotnet-arm64\\dotnet.exe",
+      "architecture": "arm64",
+      "sha256": "4ccfba4cecf59f8ce56bf3d8ec34e72251e687fa8287ea66e6e8bc44fda42253"
+    }
+  ]
+}

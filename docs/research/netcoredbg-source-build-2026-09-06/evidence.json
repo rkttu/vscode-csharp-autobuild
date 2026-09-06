@@ -1,0 +1,234 @@
+{
+  "date": "2026-09-06",
+  "kind": "Source-preserving local build feasibility experiment; not an eight-platform CI or VSIX validation",
+  "host": {
+    "os": "macOS",
+    "version": "26.6.2",
+    "build": "25G83",
+    "architecture": "arm64"
+  },
+  "toolchain": {
+    "cmake": "4.4.3",
+    "compiler": "Apple clang 21.0.0",
+    "sdk": "10.0.400"
+  },
+  "netcoredbg": {
+    "tag": "3.2.0-1092",
+    "commit": "9744e1f051866215611b8440c638042aa2aa2f72",
+    "sourceArchive": "https://codeload.github.com/Samsung/netcoredbg/tar.gz/refs/tags/3.2.0-1092",
+    "sourceArchiveSha256": "18fe4e77e436d9cf98bcf58a949546da1b5278b57c7704a87473509b87585609",
+    "originalFileCount": 498,
+    "originalHashes": "samsung-source-before.json",
+    "integrityAudit": "source-integrity.json",
+    "modifiedOriginalFiles": []
+  },
+  "coreclrBuildInput": {
+    "repository": "https://github.com/dotnet/runtime",
+    "tag": "v10.0.0",
+    "commit": "60629d14374c56f1cb51819049ad1fa529307f8d",
+    "sourceArchive": "https://codeload.github.com/dotnet/runtime/tar.gz/60629d14374c56f1cb51819049ad1fa529307f8d",
+    "sourceArchiveSha256": "4fae24371e108a046d7bfd30785e9a2f4400552b165b70300a72f855370da3de",
+    "extractedParts": [
+      "src/coreclr",
+      "src/native",
+      "eng/Versions.props",
+      "LICENSE.TXT",
+      "THIRD-PARTY-NOTICES.TXT"
+    ],
+    "note": "Only headers and helper libraries consumed by netcoredbg were compiled, not the entire CoreCLR runtime. CMake generates minipalconfig.h in the extracted runtime input tree."
+  },
+  "dbgshim": {
+    "version": "10.0.731102",
+    "licenseExpression": "MIT",
+    "repositoryCommit": "f09edf7ea9a17a86b236b91eb4c458d0469546b6",
+    "platformAssets": "dbgshim-platform-assets.json",
+    "note": "NuGet package native files inspected for all eight targets; only osx-arm64 executed."
+  },
+  "buildRecipe": {
+    "commonConfigure": [
+      "cmake",
+      "-S",
+      "<RESEARCH_TMP>/netcoredbg-src/netcoredbg-3.2.0-1092",
+      "-B",
+      "<BUILD_DIR>",
+      "-DCMAKE_BUILD_TYPE=Release",
+      "-DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>",
+      "-DCORECLR_DIR=<RESEARCH_TMP>/source-build/runtime/runtime-60629d14374c56f1cb51819049ad1fa529307f8d/src/coreclr",
+      "-DDOTNET_DIR=<DOTNET_ROOT>",
+      "-DCMAKE_POLICY_VERSION_MINIMUM=3.5"
+    ],
+    "arm64ExtraConfigure": [
+      "-DCMAKE_OSX_ARCHITECTURES=arm64"
+    ],
+    "x64ExtraConfigure": [
+      "-DCMAKE_SYSTEM_NAME=Darwin",
+      "-DCMAKE_SYSTEM_PROCESSOR=x86_64",
+      "-DCMAKE_OSX_ARCHITECTURES=x86_64"
+    ],
+    "build": [
+      "cmake",
+      "--build",
+      "<BUILD_DIR>",
+      "--target",
+      "install",
+      "--parallel",
+      "6"
+    ],
+    "environment": {
+      "CC": "clang",
+      "CXX": "clang++",
+      "DOTNET_ROOT": "<DOTNET_ROOT>",
+      "DOTNET_CLI_HOME": "<RESEARCH_TMP>/source-build/dotnet-home",
+      "NUGET_PACKAGES": "<RESEARCH_TMP>/source-build/nuget-packages",
+      "NUGET_HTTP_CACHE_PATH": "<RESEARCH_TMP>/source-build/nuget-http-cache",
+      "DOTNET_CLI_TELEMETRY_OPTOUT": "1",
+      "DOTNET_GENERATE_ASPNET_CERTIFICATE": "false",
+      "DOTNET_SKIP_FIRST_TIME_EXPERIENCE": "1",
+      "DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE": "true"
+    },
+    "x64AdditionalEnvironment": {
+      "UseSharedCompilation": "false",
+      "MSBUILDDISABLENODEREUSE": "1",
+      "DOTNET_CLI_USE_MSBUILD_SERVER": "0"
+    }
+  },
+  "outputs": [
+    {
+      "target": "osx-arm64",
+      "configureSucceeded": true,
+      "compileAndInstallSucceeded": true,
+      "buildLog": "logs/build-osx-arm64.log",
+      "runtimeExecutionTested": true,
+      "files": {
+        "ManagedPart.dll": {
+          "sha256": "5bbc8845e8b9dde66339807ee088182e917e96310040a03ee597433bca5472bd",
+          "sizeBytes": 54272
+        },
+        "Microsoft.CodeAnalysis.CSharp.Scripting.dll": {
+          "sha256": "64050c89e7bf7905f6c7ec9eb1594dcea5fbbd2868341f9ef99b58e9dea01605",
+          "sizeBytes": 29728
+        },
+        "Microsoft.CodeAnalysis.CSharp.dll": {
+          "sha256": "e9cc57c55a95146f98b55dd46fdd881b4be48925e3773ef4aa5ac622b76903a6",
+          "sizeBytes": 4357136
+        },
+        "Microsoft.CodeAnalysis.Scripting.dll": {
+          "sha256": "066f1d39b5e211e343c8c79f374438884b1684fa27dc8c29a9000f88615bf764",
+          "sizeBytes": 129552
+        },
+        "Microsoft.CodeAnalysis.dll": {
+          "sha256": "97553a05b1f8aad2f29349f0fc7893ceb6dd199bd769d3e1092839957c7c0cdb",
+          "sizeBytes": 1993728
+        },
+        "libdbgshim.dylib": {
+          "sha256": "b61d20d321c26c71ce5864c8193ec6d8101af0482d66969cf1af42513bf4a4c3",
+          "sizeBytes": 396624,
+          "fileOutput": "<RESEARCH_TMP>/source-build/install-osx-arm64/libdbgshim.dylib: Mach-O 64-bit dynamically linked shared library arm64",
+          "machBuildVersion": "cmd LC_BUILD_VERSION\n  cmdsize 32\n platform 1\n    minos 12.0\n      sdk 15.5\n   ntools 1\n     tool 3"
+        },
+        "netcoredbg": {
+          "sha256": "dbc376c6b1e07187d3706faab597d09fd0962a4cc1fcec3d6c70d7acfa13753f",
+          "sizeBytes": 2625896,
+          "fileOutput": "<RESEARCH_TMP>/source-build/install-osx-arm64/netcoredbg: Mach-O 64-bit executable arm64",
+          "machBuildVersion": "cmd LC_BUILD_VERSION\n  cmdsize 32\n platform 1\n    minos 12.0\n      sdk 26.5\n   ntools 1\n     tool 3"
+        }
+      }
+    },
+    {
+      "target": "osx-x64",
+      "configureSucceeded": true,
+      "compileAndInstallSucceeded": true,
+      "buildLog": "logs/build-osx-x64.log",
+      "runtimeExecutionTested": false,
+      "files": {
+        "ManagedPart.dll": {
+          "sha256": "f1384b82f213db22442910d4a95d97666b5eb4297d563e6d63edc284ea98cdb1",
+          "sizeBytes": 54272
+        },
+        "Microsoft.CodeAnalysis.CSharp.Scripting.dll": {
+          "sha256": "64050c89e7bf7905f6c7ec9eb1594dcea5fbbd2868341f9ef99b58e9dea01605",
+          "sizeBytes": 29728
+        },
+        "Microsoft.CodeAnalysis.CSharp.dll": {
+          "sha256": "e9cc57c55a95146f98b55dd46fdd881b4be48925e3773ef4aa5ac622b76903a6",
+          "sizeBytes": 4357136
+        },
+        "Microsoft.CodeAnalysis.Scripting.dll": {
+          "sha256": "066f1d39b5e211e343c8c79f374438884b1684fa27dc8c29a9000f88615bf764",
+          "sizeBytes": 129552
+        },
+        "Microsoft.CodeAnalysis.dll": {
+          "sha256": "97553a05b1f8aad2f29349f0fc7893ceb6dd199bd769d3e1092839957c7c0cdb",
+          "sizeBytes": 1993728
+        },
+        "libdbgshim.dylib": {
+          "sha256": "87caa9326348ca9b7bc8ab8174c04a411aba2998f8bc122de86a254a15af1e6c",
+          "sizeBytes": 380896,
+          "fileOutput": "<RESEARCH_TMP>/source-build/install-osx-x64/libdbgshim.dylib: Mach-O 64-bit dynamically linked shared library x86_64",
+          "machBuildVersion": "cmd LC_BUILD_VERSION\n  cmdsize 32\n platform 1\n    minos 12.0\n      sdk 15.5\n   ntools 1\n     tool 3"
+        },
+        "netcoredbg": {
+          "sha256": "8fdcfb3c4e22851a3315e0ec70568bcf66df0f6c6292ce78bb5808609fa4a935",
+          "sizeBytes": 2873080,
+          "fileOutput": "<RESEARCH_TMP>/source-build/install-osx-x64/netcoredbg: Mach-O 64-bit executable x86_64",
+          "machBuildVersion": "cmd LC_BUILD_VERSION\n  cmdsize 32\n platform 1\n    minos 12.0\n      sdk 26.5\n   ntools 1\n     tool 3"
+        }
+      }
+    }
+  ],
+  "runs": [
+    {
+      "engine": "netcoredbg",
+      "sdk": "8.0.418",
+      "runtime": "8.0.24",
+      "targetFramework": "net8.0",
+      "success": true,
+      "checks": [
+        "conditional breakpoint with a true condition",
+        "stackTrace source line",
+        "scopes and variables answer=40",
+        "evaluate answer+2=42",
+        "step over stopped event",
+        "breakpoint after await",
+        "InvalidOperationException breakpoint and exceptionInfo",
+        "stdout and exitCode=0"
+      ],
+      "stdout": "RUNTIME=.NET 8.0.24;ARCH=Arm64\nANSWER=42\nAFTER_AWAIT=43\nCAUGHT\nDONE\n",
+      "trace": "traces/selfbuilt-net8.jsonl",
+      "traceSha256": "237b5ebb547668be0f0dd13640612e390fd782ced9fd64de8df03b71b627ec34",
+      "binaryOrigin": "Local unmodified Samsung source build"
+    },
+    {
+      "engine": "netcoredbg",
+      "sdk": "10.0.400",
+      "runtime": "10.0.11",
+      "targetFramework": "net10.0",
+      "success": true,
+      "checks": [
+        "conditional breakpoint with a true condition",
+        "stackTrace source line",
+        "scopes and variables answer=40",
+        "evaluate answer+2=42",
+        "step over stopped event",
+        "breakpoint after await",
+        "InvalidOperationException breakpoint and exceptionInfo",
+        "stdout and exitCode=0"
+      ],
+      "stdout": "RUNTIME=.NET 10.0.11;ARCH=Arm64\nANSWER=42\nAFTER_AWAIT=43\nCAUGHT\nDONE\n",
+      "trace": "traces/selfbuilt-net10.jsonl",
+      "traceSha256": "cf76451e265d01fdcdd6f49481d9b809480d1bfa17efc8b226c7562ed7bab280",
+      "binaryOrigin": "Local unmodified Samsung source build"
+    }
+  ],
+  "limitations": [
+    "Windows, Linux glibc and Alpine source builds were not executed.",
+    "macOS x64 binary and its dbgshim architecture were inspected; x64 runtime execution was not tested.",
+    "The arm64 install completed but the command wrapper waited for a surviving compiler server. That exact build-owned VBCSCompiler process was stopped; the build then exited 0.",
+    "The subsequent x64 build used compiler/server-disabling environment settings and finished without manual process cleanup. A causal diagnosis of the earlier wait was not independently reproduced.",
+    "NuGet restoration used upstream dependency ranges including DbgShim Version=\"*\". Resolved dependencies were recorded but a closed dependency feed or locked restore was not tested.",
+    "Source archives have no git metadata; --version reports 3.2.0-1 (not detected, Release). External commit and hash manifests identify this build.",
+    "Only original Samsung input files were hash-audited. Generated files and the separate runtime input tree are outside that 498-file audit.",
+    "No IDE, VSIX, attach, Hot Reload, .NET 9 or .NET 11 Preview validation.",
+    "Observed installed SDK/runtime versions are not latest-public-release claims."
+  ]
+}

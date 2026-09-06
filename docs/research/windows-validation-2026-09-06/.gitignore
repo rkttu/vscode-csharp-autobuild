@@ -1,0 +1,2 @@
+# Preserve experiment logs referenced by the Windows validation report.
+!**/*.log

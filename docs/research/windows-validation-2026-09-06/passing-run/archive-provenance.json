@@ -1,0 +1,235 @@
+{
+  "normalization": "UTF-8 without BOM, CRLF normalized to LF, ANSI color sequences and trailing horizontal whitespace in logs removed. Binary packages remain GitHub run artifacts and are not committed here.",
+  "files": [
+    {
+      "file": "x64/result.json",
+      "artifactFileSha256": "2a776146568eda79bc061001845af591d1c94568cea89856b04bc05349707c77",
+      "archivedFileSha256": "d6be3fc49a9393ba598750e2ff792e0978597b9db41d8f69f1fbd83571d23696"
+    },
+    {
+      "file": "x64/source-before.json",
+      "artifactFileSha256": "438241ee66082b947b3b28db7242674fad525348cbff70ba08576f1933d1c27b",
+      "archivedFileSha256": "f63243f0d48da29ac7bae3f34488820808fca506e5f01a9c63172421cf2b37d0"
+    },
+    {
+      "file": "x64/source-integrity.json",
+      "artifactFileSha256": "a461faa345bbd9cdee32b6edf90fcdf4ba0a0dff8c35662cd72fef051e7a1ddc",
+      "archivedFileSha256": "74d282da45958d16be403b9a100555f7dc9b303a76ce99bb1d34233c4434def9"
+    },
+    {
+      "file": "x64/dotnet-architecture.json",
+      "artifactFileSha256": "fc6a915b3195889e220c711afbbb510d373a4ec3aee03d1700788cf0f732cec5",
+      "archivedFileSha256": "ca2b7635d44aed55485a1d7feb31032e5371aea9e20bf9ddcc2746cfe5b68611"
+    },
+    {
+      "file": "x64/debugger-architectures.json",
+      "artifactFileSha256": "86ec55f48ee4af36fb05a44b68eae5e3333b2dc14dd89233cc512cc5208d362d",
+      "archivedFileSha256": "6765887a859a2315f708ceb9b6fecf0a126dff806f06dae1ed0ba185127ca544"
+    },
+    {
+      "file": "x64/package-sha256.json",
+      "artifactFileSha256": "a00f422373705f5504892d4c17d08b57cc5626ff01789bce92e7ab97490e390d",
+      "archivedFileSha256": "7397e44f02fdcbd2ac220287a2b5a963e178679c89b82d6fe599412579d756d8"
+    },
+    {
+      "file": "x64/resolved-libraries.json",
+      "artifactFileSha256": "e4992292465f1616c208ed0af7c64c5effa4272f660561ae9e10987806d6b043",
+      "archivedFileSha256": "521f8655e307ce6f6f20a7ec73c525f8ddfe785be61dce4a50c5df98e3fde147"
+    },
+    {
+      "file": "x64/dap-net8-result.json",
+      "artifactFileSha256": "633771db8c8dca58313a9336ca221dfeb8e41725876bd7747305efc730c57e63",
+      "archivedFileSha256": "ac40fcb164b6e76ba645b9874ca75ed9311cfaa6078e923b66d7279d552adfc1"
+    },
+    {
+      "file": "x64/dap-net10-result.json",
+      "artifactFileSha256": "30e0cdf17f8005da1ae456399d64f7d44aff49015c25b0b2776fd72796d48820",
+      "archivedFileSha256": "312109958458f24407fd4e981ba5d0a5560b607201205b7956e53e55d9afe4c6"
+    },
+    {
+      "file": "x64/dap-net8.jsonl",
+      "artifactFileSha256": "0328e64bc918dab03a741dfa196faafb1cf3e599fc924ca63140dac73b140ce6",
+      "archivedFileSha256": "4b756e22901bb04e43016d084955bc0ef066a219c281af011ab72c8a95f97d6a"
+    },
+    {
+      "file": "x64/dap-net10.jsonl",
+      "artifactFileSha256": "4795af336e8ce9d0b56e5919e3e4d6e4e52740d2a4911c2ae79136bcf3361769",
+      "archivedFileSha256": "6f0c2e3ce55ce0ca325d37f3d96fd733af8f0f138a35c6f331aba1a16ba86663"
+    },
+    {
+      "file": "x64/configure.log",
+      "artifactFileSha256": "bf27aa006b59f2fb5669a3d9d34d1ef61088fb14d76fd15badf49ddfdc936b94",
+      "archivedFileSha256": "e0a374541cb679e9fde1778e3a6b0e34727508a2115484851d8052fd48712999"
+    },
+    {
+      "file": "x64/build.log",
+      "artifactFileSha256": "3212fe3f6b767dda0d4b88e5fa6b69c8ae51066d87ab053d489accb39d3cfa05",
+      "archivedFileSha256": "a1ba80b7f10679c289b41fea3ce8d1bc935f2da4966a055045cb3e0cf1c4de98"
+    },
+    {
+      "file": "x64/install.log",
+      "artifactFileSha256": "b4443a0a5ceab4c43bc8e9a4e9bfd4e02232e25b329c387181b7c8242368fe46",
+      "archivedFileSha256": "28dbae8628e25b3e1b00823008304638bfbb033e78da74abc6df03a15f1cb0a4"
+    },
+    {
+      "file": "x64/managed-build.log",
+      "artifactFileSha256": "e76686c1ae4d939df38f13c9075132827ad0b36c44b6312c52c0bc1071b26539",
+      "archivedFileSha256": "f98c4c73f40d4510b9c29078dcffb045c9f53e0d3e423f0419304a40736e46b6"
+    },
+    {
+      "file": "x64/cmake-version.log",
+      "artifactFileSha256": "954b7d134738f0bd4b8a873aa09ca30337f2f42631f4214b74bee2e249c40069",
+      "archivedFileSha256": "f6e81c2559f3ce00c5fdad01d7b226c301f5d6b07ee04f65db6dbfdc1cc5970b"
+    },
+    {
+      "file": "x64/dotnet-info.log",
+      "artifactFileSha256": "56cebffc6dabfc02a6b9d7fb2673f4e30f05b041b10204152d2f666f4c6c199f",
+      "archivedFileSha256": "df97b473a1c82cb5c54937035ba399b3b19f947a23d92ce61234155ad79fd5c0"
+    },
+    {
+      "file": "x64/dotnet-runtimes.log",
+      "artifactFileSha256": "593febe956214d43998dd536cfb1e5868a2dd354e4acba560633b59c4689d64e",
+      "archivedFileSha256": "2ae04ca622ff99d87cdac37a74588875bee4d5b7fb1075935bd3b2c4441901ac"
+    },
+    {
+      "file": "x64/debugger-version.log",
+      "artifactFileSha256": "15efacaf7875ee3eacfcde59273a812ce3474c42a2c03286cf35960551d42474",
+      "archivedFileSha256": "7d6fa3f311477c2842345cb728feabd103e83efef1b8e7ad7cdafc7faaa0add1"
+    },
+    {
+      "file": "x64/fixture-net8-direct.log",
+      "artifactFileSha256": "6cdc11d34e8c6f63014e034c1cc4f5d3303586c6784956100b471fbf6bf770d5",
+      "archivedFileSha256": "1817c2bb97537f97ce9242fa883a061532e8ef2a262e89daf65ad226785ee301"
+    },
+    {
+      "file": "x64/fixture-net10-direct.log",
+      "artifactFileSha256": "ee9ebb1a9c65435f264bad364162887603427601da7d5e310c0b33849276e562",
+      "archivedFileSha256": "5cebf752995f3821e6b6eebe7f3a49e0a846378f3f68f2c9df993508548a4f7f"
+    },
+    {
+      "file": "x64/fixture-net8-build.log",
+      "artifactFileSha256": "d9a75a6ba4e1e622c9e5ef59d216078f2e1038c35a6582f02331f479b425dcb2",
+      "archivedFileSha256": "3772b60736422f10b63ab4b6916edf94dd2afb6a5bf14fdc497be67c8c668d2c"
+    },
+    {
+      "file": "x64/fixture-net10-build.log",
+      "artifactFileSha256": "a9f16b01430d58173d693179e0a5aa1035e5c9430510d91fd88d81fc203f6cf7",
+      "archivedFileSha256": "28ec8bbf374681e8ecdebc266cef11145f41cbf4d3f8d52213b789b86f2bd43c"
+    },
+    {
+      "file": "arm64/result.json",
+      "artifactFileSha256": "6da45477f8f9e0140a00e73f20207c3afbad71f24b40dbbedf4c149aa300586a",
+      "archivedFileSha256": "79c807b4e585166b8bc934c8b538607048150183139e8e429ac3e0c9c7913abf"
+    },
+    {
+      "file": "arm64/source-before.json",
+      "artifactFileSha256": "438241ee66082b947b3b28db7242674fad525348cbff70ba08576f1933d1c27b",
+      "archivedFileSha256": "f63243f0d48da29ac7bae3f34488820808fca506e5f01a9c63172421cf2b37d0"
+    },
+    {
+      "file": "arm64/source-integrity.json",
+      "artifactFileSha256": "a461faa345bbd9cdee32b6edf90fcdf4ba0a0dff8c35662cd72fef051e7a1ddc",
+      "archivedFileSha256": "74d282da45958d16be403b9a100555f7dc9b303a76ce99bb1d34233c4434def9"
+    },
+    {
+      "file": "arm64/dotnet-architecture.json",
+      "artifactFileSha256": "a1f64eb9066d620628a734240552ed216f1682c74ab9a32f6b5f3607d26e80df",
+      "archivedFileSha256": "c8647a9a6608905bf99af216e18bf89a1f1f7d498c53ec98f09141794c4b24a4"
+    },
+    {
+      "file": "arm64/debugger-architectures.json",
+      "artifactFileSha256": "3b6eeda227302f2a7866b5dcd3923a6b1095673a68f2306f25b45f0361e0ab64",
+      "archivedFileSha256": "7664943d75f712a1cf598aeb50732f326bd2e62f241cbd1793a1ba612c244da9"
+    },
+    {
+      "file": "arm64/package-sha256.json",
+      "artifactFileSha256": "6a44223b95b0e49e508520a99a8e4563ac7ea732c3455fe4a37883620a7d50f6",
+      "archivedFileSha256": "88a6711a783c479ca810b63eedbcc9f21e06b6b9a32ccfb7947b9480dd3a88e7"
+    },
+    {
+      "file": "arm64/resolved-libraries.json",
+      "artifactFileSha256": "e4992292465f1616c208ed0af7c64c5effa4272f660561ae9e10987806d6b043",
+      "archivedFileSha256": "521f8655e307ce6f6f20a7ec73c525f8ddfe785be61dce4a50c5df98e3fde147"
+    },
+    {
+      "file": "arm64/dap-net8-result.json",
+      "artifactFileSha256": "e39c17ccc6f6484e93b641912568132a65162dbddb63a0c04157ee30a7df3db6",
+      "archivedFileSha256": "124d9a129ede1b1407f52a23df48ccee14f42cd95daff41579836fd7bd7ce172"
+    },
+    {
+      "file": "arm64/dap-net10-result.json",
+      "artifactFileSha256": "94beda3c5f7e42e58c6abb0efcf16fbd5b8234087af51450a95501b693cae3fd",
+      "archivedFileSha256": "0ab2aecffc04fa05de95501294e65577f18f06d2a14c353623cdaab37d241190"
+    },
+    {
+      "file": "arm64/dap-net8.jsonl",
+      "artifactFileSha256": "1e1e23362b0a79b36538dc9ca64fa18f29376e19caec4310f8661658d8f42485",
+      "archivedFileSha256": "fbd242530271ec583614f831cd977d60ad1c2ef6143c37377148c30857260a7d"
+    },
+    {
+      "file": "arm64/dap-net10.jsonl",
+      "artifactFileSha256": "99777be4ce23e5185545928fb261ebfacfd72fd95f3c454db75a2349fa0e1df1",
+      "archivedFileSha256": "ac72c7292d50881a0aa15271a689658f7d030a02cff438315d7d3b3b6fd213e3"
+    },
+    {
+      "file": "arm64/configure.log",
+      "artifactFileSha256": "ad496b4ded9764f6bc20a1641683d3556dcea4e2c8ab81d983d6b6e40e856bc5",
+      "archivedFileSha256": "fe030819e58f1a5f66098c22d941bb8cdb65f471080357de62b963ef595b7625"
+    },
+    {
+      "file": "arm64/build.log",
+      "artifactFileSha256": "5d73e0e26862b5cf019b53ba51897d83487a3b5d287066b3b85c665e92a7503d",
+      "archivedFileSha256": "3ce7300f3bd9db537dc1fe3b73efdbda831ce686827a26680c5c2bc30f9bcbf0"
+    },
+    {
+      "file": "arm64/install.log",
+      "artifactFileSha256": "6c293e8f664a68ef73189622d3cc43c301c6c68e10442b71b8c285d552c60a5f",
+      "archivedFileSha256": "2780b13ab34845b23cf6b99ef8b279292c8d5e80e9dd729e53c4f5d81d79cff4"
+    },
+    {
+      "file": "arm64/managed-build.log",
+      "artifactFileSha256": "254f0cf7517fcd0af5b5a8b4efae64808e3cc677f1154eb4738f6e50df30d731",
+      "archivedFileSha256": "55b18dd27b0600985de9f945212e498943f5238ecd3e9b943c38b03ef539d356"
+    },
+    {
+      "file": "arm64/cmake-version.log",
+      "artifactFileSha256": "af1b82b57223898998f8c5425148282ef6c86c88d151ffd259e7b2e9fee0247e",
+      "archivedFileSha256": "f46066af33a13476fb604a1a1a24bb8d4dbddb6eb5855e0c24f9f7132784c9f0"
+    },
+    {
+      "file": "arm64/dotnet-info.log",
+      "artifactFileSha256": "126530af9ebff11cb4628004a3e9fba2bee2a96e3cc1a45c87df145f3b040242",
+      "archivedFileSha256": "344f10d2e2435a0f6abd66097167e7443d9728f41c6d1608577b4243c96ec842"
+    },
+    {
+      "file": "arm64/dotnet-runtimes.log",
+      "artifactFileSha256": "d1fef8f06113f8ab0bd7d211cc2586832e92d522ac395de3ef8cabc389a9a8b8",
+      "archivedFileSha256": "97a36f82deb5de454965e2d43c7bc3224b927b31569acd9e9860b15c4d89959e"
+    },
+    {
+      "file": "arm64/debugger-version.log",
+      "artifactFileSha256": "15efacaf7875ee3eacfcde59273a812ce3474c42a2c03286cf35960551d42474",
+      "archivedFileSha256": "7d6fa3f311477c2842345cb728feabd103e83efef1b8e7ad7cdafc7faaa0add1"
+    },
+    {
+      "file": "arm64/fixture-net8-direct.log",
+      "artifactFileSha256": "d1638d34ef8cd2df9d1c79b6624c4f435fac772601473f2a2b961e8db6a74f30",
+      "archivedFileSha256": "32bc5b22b928a5801e7ce4a22b050fdb37c4eaa04e686f7b9bd16e8ed9b8381d"
+    },
+    {
+      "file": "arm64/fixture-net10-direct.log",
+      "artifactFileSha256": "a4dbcbcfaf3f5e0b5918de5cf7a5e6cf332f666bc64cf76d86e556352445f3c7",
+      "archivedFileSha256": "093bb07dff3c48d9623b2507bb125f04195a06cba8fc0b2ab4830974b1570bef"
+    },
+    {
+      "file": "arm64/fixture-net8-build.log",
+      "artifactFileSha256": "73856c4bd8cc803a0f56729a0a9acce248441ef8ea1f1c8c205148487ef7d533",
+      "archivedFileSha256": "74fd339a863a4bd4d7393e51c518ef7fd24fcf6f152b8c7fee09b11c9a2c1ca1"
+    },
+    {
+      "file": "arm64/fixture-net10-build.log",
+      "artifactFileSha256": "e3e7b3722e0d9ec45b99e3145cb360c54355f24661a5515b99c9aa3c381acc48",
+      "archivedFileSha256": "727179ac6dcfac75b48bd935f41ace63b0cf777a5762998b196d766daffc8b0c"
+    }
+  ]
+}

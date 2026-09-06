@@ -1,0 +1,21 @@
+{
+  "runId": 34023125844,
+  "version": "2.148.23001",
+  "workflowCommit": "4b0b41ea198014a6384ff513e4ab660a8125bb8a",
+  "nativeTargetsPassed": 8,
+  "nativeRuntimeCombinationsPassed": 16,
+  "vsixTargetsPassed": 8,
+  "vsixRuntimeCombinationsPassed": 16,
+  "sourceFilesUnchangedPerTarget": 498,
+  "publicationDryRunPassed": true,
+  "openVsxUpload": "skipped",
+  "editor": {
+    "version": "1.135.0",
+    "extensionVersion": "2.148.23001",
+    "target": "darwin-arm64",
+    "vsixSha256": "8d38fa0fe6d2f3789c569944179e434b30a1812942e9c69b7b94ee93437d9596",
+    "activation": true,
+    "runtimeCombinationsPassed": 2,
+    "normalConfigurationChanged": false
+  }
+}

@@ -1,0 +1,28 @@
+MSBuild version 17.14.51+25f168cee for .NET Framework
+
+  1>Checking Build System
+  Building Custom Rule D:/a/vscode-csharp-autobuild/vscode-csharp-autobuild/validation-inputs/netcoredbg/src/CMakeLists.txt
+  Compiling ManagedPart.dll
+    Determining projects to restore...
+    Restored D:\a\vscode-csharp-autobuild\vscode-csharp-autobuild\validation-inputs\netcoredbg\src\managed\ManagedPart.csproj (in 3.94 sec).
+    ManagedPart -> D:\a\_temp\netcoredbg-validation-x64\build\src\bin\Release\netstandard2.0\win-x64\ManagedPart.dll
+    ManagedPart -> D:\a\_temp\netcoredbg-validation-x64\build\src\
+  Building Custom Rule D:/a/vscode-csharp-autobuild/vscode-csharp-autobuild/validation-inputs/netcoredbg/src/CMakeLists.txt
+  Building Custom Rule D:/a/vscode-csharp-autobuild/vscode-csharp-autobuild/validation-inputs/netcoredbg/third_party/linenoise-ng/CMakeLists.txt
+  ConvertUTF.cpp
+  linenoise.cpp
+  wcwidth.cpp
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\NuGet\17.0\Microsoft.NuGet.targets(198,5): error : Sequence contains no elements [D:\a\_temp\netcoredbg-validation-x64\build\src\corguids.vcxproj]
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\NuGet\17.0\Microsoft.NuGet.targets(198,5): error :    at System.Linq.Enumerable.First[TSource](IEnumerable`1 source) [D:\a\_temp\netcoredbg-validation-x64\build\src\corguids.vcxproj]
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\NuGet\17.0\Microsoft.NuGet.targets(198,5): error :    at Microsoft.NuGet.Build.Tasks.ResolveNuGetPackageAssets.GiveErrorForMissingFramework() [D:\a\_temp\netcoredbg-validation-x64\build\src\corguids.vcxproj]
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\NuGet\17.0\Microsoft.NuGet.targets(198,5): error :    at Microsoft.NuGet.Build.Tasks.ResolveNuGetPackageAssets.GetTargetOrAttemptFallback(JObject lockFile, Boolean needsRuntimeIdentifier) [D:\a\_temp\netcoredbg-validation-x64\build\src\corguids.vcxproj]
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\NuGet\17.0\Microsoft.NuGet.targets(198,5): error :    at Microsoft.NuGet.Build.Tasks.ResolveNuGetPackageAssets.GetReferences(JObject lockFile) [D:\a\_temp\netcoredbg-validation-x64\build\src\corguids.vcxproj]
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\NuGet\17.0\Microsoft.NuGet.targets(198,5): error :    at Microsoft.NuGet.Build.Tasks.ResolveNuGetPackageAssets.ExecuteCore() [D:\a\_temp\netcoredbg-validation-x64\build\src\corguids.vcxproj]
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\NuGet\17.0\Microsoft.NuGet.targets(198,5): error :    at Microsoft.NuGet.Build.Tasks.ResolveNuGetPackageAssets.Execute() [D:\a\_temp\netcoredbg-validation-x64\build\src\corguids.vcxproj]
+  linenoise.vcxproj -> D:\a\_temp\netcoredbg-validation-x64\build\third_party\linenoise-ng\Release\linenoise.lib
+  Building Custom Rule D:/a/vscode-csharp-autobuild/vscode-csharp-autobuild/validation-inputs/netcoredbg/third_party/linenoise-ng/CMakeLists.txt
+  example.c
+  example.obj : MSIL .netmodule or module compiled with /GL found; restarting link with /LTCG; add /LTCG to the link command line to improve linker performance
+  Generating code
+  Finished generating code
+  example.vcxproj -> D:\a\_temp\netcoredbg-validation-x64\build\third_party\linenoise-ng\Release\example.exe

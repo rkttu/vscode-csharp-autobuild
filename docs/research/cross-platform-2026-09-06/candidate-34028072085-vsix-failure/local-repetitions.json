@@ -1,0 +1,62 @@
+[
+  {
+    "label": "candidate",
+    "attempt": 1,
+    "exitCode": 0,
+    "durationSeconds": 1.81
+  },
+  {
+    "label": "candidate",
+    "attempt": 2,
+    "exitCode": 0,
+    "durationSeconds": 1.61
+  },
+  {
+    "label": "candidate",
+    "attempt": 3,
+    "exitCode": 0,
+    "durationSeconds": 1.6
+  },
+  {
+    "label": "candidate",
+    "attempt": 4,
+    "exitCode": 0,
+    "durationSeconds": 1.54
+  },
+  {
+    "label": "candidate",
+    "attempt": 5,
+    "exitCode": 0,
+    "durationSeconds": 1.56
+  },
+  {
+    "label": "candidate",
+    "attempt": 6,
+    "exitCode": 0,
+    "durationSeconds": 1.55
+  },
+  {
+    "label": "candidate",
+    "attempt": 7,
+    "exitCode": 0,
+    "durationSeconds": 1.6
+  },
+  {
+    "label": "candidate",
+    "attempt": 8,
+    "exitCode": 0,
+    "durationSeconds": 1.56
+  },
+  {
+    "label": "candidate",
+    "attempt": 9,
+    "exitCode": 0,
+    "durationSeconds": 1.6
+  },
+  {
+    "label": "candidate",
+    "attempt": 10,
+    "exitCode": 0,
+    "durationSeconds": 1.54
+  }
+]

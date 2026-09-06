@@ -1,0 +1,144 @@
+{
+  "date": "2026-09-06",
+  "kind": "Architecture and release-process review; no workflow or extension implemented",
+  "proposedExtension": {
+    "publisher": "dotnetdev-kr-custom",
+    "name": "csharp-with-samsung-debugger",
+    "displayName": "C# (with Samsung Debugger)",
+    "id": "dotnetdev-kr-custom.csharp-with-samsung-debugger",
+    "versionPolicy": "Independent major.minor.patch with upstream C# and netcoredbg versions recorded separately"
+  },
+  "apiChecks": [
+    [
+      "samsung-tags",
+      200,
+      [
+        {
+          "name": "3.2.0-1092",
+          "sha": "9744e1f051866215611b8440c638042aa2aa2f72"
+        },
+        {
+          "name": "3.1.3-1062",
+          "sha": "8b8b22200fecdb1aec5f47af63215462d8c79a4b"
+        },
+        {
+          "name": "3.1.2-1054",
+          "sha": "83214c3993c052a0ccb8854b913e028c5e365bc6"
+        },
+        {
+          "name": "3.1.1-1042",
+          "sha": "227be44beb33d9a7fac236d8147b9e4bdcfa9dcc"
+        },
+        {
+          "name": "3.1.0-1031",
+          "sha": "e4512506fd211493864c4187fb52ff1384af8f5e"
+        },
+        {
+          "name": "3.0.0-1018",
+          "sha": "27606c317017beb81bc1b81846cdc460a7a6aed3"
+        },
+        {
+          "name": "3.0.0-1012",
+          "sha": "aafa6f3b84c2e844d832db40478c50d174340a4e"
+        },
+        {
+          "name": "3.0.0-1006",
+          "sha": "19a1c4c3ef334f30522e5be106e42cf2e246280a"
+        },
+        {
+          "name": "2.2.3-992",
+          "sha": "bac8ea845dc5484218b88ecf015abf81e6ef95d2"
+        },
+        {
+          "name": "2.2.0-974",
+          "sha": "db69338cf1606d8d327de0eaaf1694d8463af135"
+        }
+      ]
+    ],
+    [
+      "community-openvsx",
+      200,
+      {
+        "namespace": "muhammad-sammy",
+        "name": "csharp",
+        "version": "2.145.21-g154a82fd27",
+        "timestamp": "2026-06-27T06:30:09.823831Z",
+        "license": "SEE LICENSE IN RuntimeLicenses/license.txt",
+        "targets": [
+          "win32-x64",
+          "linux-x64",
+          "alpine-arm64",
+          "win32-arm64",
+          "darwin-x64",
+          "darwin-arm64",
+          "alpine-x64",
+          "linux-arm64"
+        ]
+      }
+    ],
+    [
+      "mirror-openvsx",
+      200,
+      {
+        "namespace": "dotnetdev-kr-custom",
+        "name": "csharp",
+        "version": "2.148.23",
+        "timestamp": "2026-08-07T01:35:19.551911Z",
+        "license": "SEE LICENSE IN RuntimeLicenses/license.txt",
+        "targets": [
+          "linux-x64",
+          "win32-x64",
+          "alpine-arm64",
+          "win32-arm64",
+          "darwin-x64",
+          "alpine-x64",
+          "darwin-arm64",
+          "linux-arm64"
+        ]
+      }
+    ],
+    [
+      "candidate-openvsx",
+      404,
+      {
+        "error": "{\"deprecated\":false,\"downloadable\":false,\"error\":\"Extension not found: dotnetdev-kr-custom.csharp-with-samsung-debugger latest\"}"
+      }
+    ]
+  ],
+  "candidateNameCheckLimit": "A public API 404 only means this latest extension endpoint was not found; it does not reserve the name or guarantee publish acceptance.",
+  "upstreamCsharp": {
+    "commit": "2f5806a9f39575bfaf4ca16445f420440a43e050",
+    "sourceFindings": [
+      {
+        "path": "src/coreclrDebug/activate.ts",
+        "finding": "Provided executable descriptor bypasses fallback vsdbg executable construction and its dynamic DOTNET_ROOT logic."
+      },
+      {
+        "path": "tasks/packaging/offlinePackagingTasks.ts",
+        "finding": "doPackageOffline calls cleanAsync, nbgv.getVersion, nbgv.setPackageVersion and eventually nbgv.resetPackageVersionPlaceholder for each VSIX."
+      },
+      {
+        "path": "src/constants/csharpExtensionId.ts",
+        "finding": "CSharpExtensionId is hardcoded as ms-dotnettools.csharp and used by runtime acquisition, settings migration and issue reporting."
+      },
+      {
+        "path": "src/lsptoolshost/logging/loggingUtils.ts",
+        "finding": "gatherCurrentSettings looks up ms-dotnettools.csharp directly."
+      }
+    ]
+  },
+  "currentRepository": {
+    "commit": "5cab182e77a8001f35d868c6c96a54a5cb52b45b",
+    "workflow": ".github/workflows/build-and-release.yml",
+    "stateFile": ".last_built_sha",
+    "existingExtensionId": "dotnetdev-kr-custom.csharp",
+    "releaseBehavior": "Deletes an existing release/tag with the chosen upstream tag name before recreating it and marks the result Latest."
+  },
+  "validationLimits": [
+    "No eight-platform source-build matrix or new VSIX was run in this review.",
+    "Prior source-build experiments passed macOS arm64 build and .NET 8/10 basic DAP; macOS x64 cross-build passed without runtime execution.",
+    "Manifest descriptor check was isolated from the real VS Code extension host.",
+    "Community comparison uses published manifest and workflow inspections recorded in ../libre-csharp-product-2026-09-06/.",
+    "Current mirror workflow, state, extension identity and published releases were not changed."
+  ]
+}

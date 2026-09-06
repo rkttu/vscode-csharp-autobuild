@@ -1,0 +1,185 @@
+{
+  "runId": 34028072085,
+  "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34028072085",
+  "workflowCommit": "b919f8e16f492a5dd1d560c750d90ddc3111003c",
+  "success": true,
+  "published": false,
+  "targets": [
+    {
+      "target": "win32-x64",
+      "vsixSha256": "7b46cfe5def3a1fbdbf5766589b04390a2737fac1538cd3ce6be69876ae73b82",
+      "debuggerSha256": "f789f117302f9e7cb774f521b5ad47e54515e217051dc1fbfe996107f8688a10",
+      "originalSamsungFilesUnchanged": 498,
+      "nativeAttempt": 1,
+      "vsixAttempt": 2,
+      "runtimes": {
+        "8": {
+          "nativeFixtureChecks": 8,
+          "nativeUpstreamScenarios": 30,
+          "vsixFixtureChecks": 8,
+          "vsixUpstreamScenarios": 30
+        },
+        "10": {
+          "nativeFixtureChecks": 8,
+          "nativeUpstreamScenarios": 30,
+          "vsixFixtureChecks": 8,
+          "vsixUpstreamScenarios": 30
+        }
+      }
+    },
+    {
+      "target": "win32-arm64",
+      "vsixSha256": "6bd4bb6d039b67cbc17f7a6127be81a6c26c567fdb1d1efcd1a28ed3baca8c59",
+      "debuggerSha256": "a3214cf5d70e7ed955fd14ef03b7b2d902b924b0bfff2d61eff01844f9918daa",
+      "originalSamsungFilesUnchanged": 498,
+      "nativeAttempt": 1,
+      "vsixAttempt": 2,
+      "runtimes": {
+        "8": {
+          "nativeFixtureChecks": 8,
+          "nativeUpstreamScenarios": 30,
+          "vsixFixtureChecks": 8,
+          "vsixUpstreamScenarios": 30
+        },
+        "10": {
+          "nativeFixtureChecks": 8,
+          "nativeUpstreamScenarios": 30,
+          "vsixFixtureChecks": 8,
+          "vsixUpstreamScenarios": 30
+        }
+      }
+    },
+    {
+      "target": "linux-x64",
+      "vsixSha256": "8d84dfc5a05786cdc28150d065d333b8565eda4fbd36de8d629de3d31f56c943",
+      "debuggerSha256": "cc5e8828e46901b7635d158db1303fb57a7af5278cb8c4b8a0f2ddbd662a2e6e",
+      "originalSamsungFilesUnchanged": 498,
+      "nativeAttempt": 1,
+      "vsixAttempt": 2,
+      "runtimes": {
+        "8": {
+          "nativeFixtureChecks": 8,
+          "nativeUpstreamScenarios": 30,
+          "vsixFixtureChecks": 8,
+          "vsixUpstreamScenarios": 30
+        },
+        "10": {
+          "nativeFixtureChecks": 8,
+          "nativeUpstreamScenarios": 30,
+          "vsixFixtureChecks": 8,
+          "vsixUpstreamScenarios": 30
+        }
+      }
+    },
+    {
+      "target": "linux-arm64",
+      "vsixSha256": "1211456e8ca042c0676aa6c995f510ab4b9c17b95dc31f43ee51d8e8e30cb7d0",
+      "debuggerSha256": "97530fff98ea2aeba8f42dbeeeb7d10db6ab56274e7d69d513e8460fd85dc7d6",
+      "originalSamsungFilesUnchanged": 498,
+      "nativeAttempt": 1,
+      "vsixAttempt": 2,
+      "runtimes": {
+        "8": {
+          "nativeFixtureChecks": 8,
+          "nativeUpstreamScenarios": 30,
+          "vsixFixtureChecks": 8,
+          "vsixUpstreamScenarios": 30
+        },
+        "10": {
+          "nativeFixtureChecks": 8,
+          "nativeUpstreamScenarios": 30,
+          "vsixFixtureChecks": 8,
+          "vsixUpstreamScenarios": 30
+        }
+      }
+    },
+    {
+      "target": "alpine-x64",
+      "vsixSha256": "1978ca0987d81f2bb49901d0a812cadd32c0fa2374fbce4628613610c457985b",
+      "debuggerSha256": "6c056d7031228b9578f8405ba00dabf999895a85c38feeba99f066e713372427",
+      "originalSamsungFilesUnchanged": 498,
+      "nativeAttempt": 1,
+      "vsixAttempt": 2,
+      "runtimes": {
+        "8": {
+          "nativeFixtureChecks": 8,
+          "nativeUpstreamScenarios": 30,
+          "vsixFixtureChecks": 8,
+          "vsixUpstreamScenarios": 30
+        },
+        "10": {
+          "nativeFixtureChecks": 8,
+          "nativeUpstreamScenarios": 30,
+          "vsixFixtureChecks": 8,
+          "vsixUpstreamScenarios": 30
+        }
+      }
+    },
+    {
+      "target": "alpine-arm64",
+      "vsixSha256": "bdc61fab60eb13654f56c7cb1fa81c31c207a747900b4a236a881d25b10e923a",
+      "debuggerSha256": "8edec59a4017a17dcd4b12dd7f430f0c21115172789bbbca41f039bb3a911b7c",
+      "originalSamsungFilesUnchanged": 498,
+      "nativeAttempt": 1,
+      "vsixAttempt": 2,
+      "runtimes": {
+        "8": {
+          "nativeFixtureChecks": 8,
+          "nativeUpstreamScenarios": 30,
+          "vsixFixtureChecks": 8,
+          "vsixUpstreamScenarios": 30
+        },
+        "10": {
+          "nativeFixtureChecks": 8,
+          "nativeUpstreamScenarios": 30,
+          "vsixFixtureChecks": 8,
+          "vsixUpstreamScenarios": 30
+        }
+      }
+    },
+    {
+      "target": "darwin-x64",
+      "vsixSha256": "c6e2be920c64d6ca8b9a0e73343fbdcee7f8bab25a2e672b504685106a199a90",
+      "debuggerSha256": "7c22c7c4b13fc79484481337efc990eb4ec0d8328438cc661ad9471fa15b20b4",
+      "originalSamsungFilesUnchanged": 498,
+      "nativeAttempt": 2,
+      "vsixAttempt": 2,
+      "runtimes": {
+        "8": {
+          "nativeFixtureChecks": 8,
+          "nativeUpstreamScenarios": 30,
+          "vsixFixtureChecks": 8,
+          "vsixUpstreamScenarios": 30
+        },
+        "10": {
+          "nativeFixtureChecks": 8,
+          "nativeUpstreamScenarios": 30,
+          "vsixFixtureChecks": 8,
+          "vsixUpstreamScenarios": 30
+        }
+      }
+    },
+    {
+      "target": "darwin-arm64",
+      "vsixSha256": "fe196696f3866af53654b76f97d132ba5d5718bf2909ac3c8962e45381b45b4e",
+      "debuggerSha256": "9c61620dd7ccccd93126bddfbfab2f87e9d7ad73f8858dc323ce641f796c911b",
+      "originalSamsungFilesUnchanged": 498,
+      "nativeAttempt": 1,
+      "vsixAttempt": 3,
+      "runtimes": {
+        "8": {
+          "nativeFixtureChecks": 8,
+          "nativeUpstreamScenarios": 30,
+          "vsixFixtureChecks": 8,
+          "vsixUpstreamScenarios": 30
+        },
+        "10": {
+          "nativeFixtureChecks": 8,
+          "nativeUpstreamScenarios": 30,
+          "vsixFixtureChecks": 8,
+          "vsixUpstreamScenarios": 30
+        }
+      }
+    }
+  ]
+}

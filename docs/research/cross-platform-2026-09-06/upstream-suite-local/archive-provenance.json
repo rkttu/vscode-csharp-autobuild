@@ -1,0 +1,17 @@
+{
+  "scope": "Local macOS ARM64 experiments; not the complete release gate",
+  "records": [
+    {
+      "file": "corrected-exit-code-net8.txt",
+      "rawSha256": "85481577583aa78aa2fe9470d5b89cf53c9d880167f40342322d0a6cd05d68c3",
+      "archivedSha256": "cc49a35d64648be7f029b90b862d738bcf543a59bddb8fdc2ec821b007ee6142",
+      "success": true
+    },
+    {
+      "file": "corrected-exit-code-net10.txt",
+      "rawSha256": "af8b22a03f14aec88521c7b9143ee72bbf06e9e906be46468a6b2b489fab4135",
+      "archivedSha256": "8bc94ecef75c92e26b4011e5dcfa6d9543b70ceebf2ff6752ae2d8f131ce6cab",
+      "success": true
+    }
+  ]
+}

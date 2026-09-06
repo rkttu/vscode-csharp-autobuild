@@ -1,0 +1,40 @@
+{
+  "success": true,
+  "stage": "complete",
+  "target": "alpine-arm64",
+  "architecture": "arm64",
+  "netcoredbgTag": "3.2.0-1092",
+  "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+  "coreclrCommit": "60629d14374c56f1cb51819049ad1fa529307f8d",
+  "sdk8": "8.0.418",
+  "sdk10": "10.0.400",
+  "dbgshimVersion": "10.0.731102",
+  "workflowCommit": "4b0b41ea198014a6384ff513e4ab660a8125bb8a",
+  "runId": "34023125844",
+  "runnerImage": null,
+  "runnerImageVersion": null,
+  "host": "Linux-6.8.0-1064-azure-aarch64-with",
+  "sourceUnchanged": true,
+  "runtimeTests": [
+    {
+      "runtime": "8",
+      "sdk": "8.0.418",
+      "success": true,
+      "error": null
+    },
+    {
+      "runtime": "10",
+      "sdk": "10.0.400",
+      "success": true,
+      "error": null
+    }
+  ],
+  "error": null,
+  "scope": "Standalone source build and DAP launch; VSIX integration is a separate gate.",
+  "externalCompatibilityHeader": "scripts/validation/musl-null-compat.h",
+  "externalRuntimeCompatibility": {
+    "file": "scripts/validation/musl-coreclr-host.cpp",
+    "sha256": "d26a2aea4293037bd45246f79b85ddb5dfc0bfd72ad0050053d6fbb422ca7e68",
+    "strategy": "CoreCLR initialization on an owned 8 MiB pthread stack"
+  }
+}

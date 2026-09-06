@@ -1,0 +1,39 @@
+{
+  "runId": 34028072085,
+  "attempt": 2,
+  "jobId": 101477067751,
+  "recipe": "ee1443d0d2bc0a76dfbd129e574126d6badfeaa9a55bf7aed861750df4f085f5",
+  "normalization": "Runner/user/temp paths replaced; NUL transcript terminators removed.",
+  "files": [
+    {
+      "file": "vsix-result.json",
+      "originalSha256": "52b95b932325e0fc208f0359dcf8926d6e1d411a9304f94a2703a646c984f5fd",
+      "archivedSha256": "8344599d1f8b0185156819ae0673e094b6438a294a6c70b3261427eda7e1f623"
+    },
+    {
+      "file": "dap-net8-result.json",
+      "originalSha256": "36cae6c0c4cfed8930de605869a2710efcde8573005a3ffc2888eb27ab978a19",
+      "archivedSha256": "4d652bf1b54430784284a5c67f4bd02dac9c14cac1bcd94ac7b1c7cc720a31bb"
+    },
+    {
+      "file": "upstream-net8-result.json",
+      "originalSha256": "ec5d50ab3aace0cac41aa485856a7fa68273a1f2f3aee27dea782b95328d41d5",
+      "archivedSha256": "ec5d50ab3aace0cac41aa485856a7fa68273a1f2f3aee27dea782b95328d41d5"
+    },
+    {
+      "file": "upstream-net8-VSCodeTestUnhandledException.log",
+      "originalSha256": "52613d8ae0b771c0d78e04a6aedd3777dc49ca01515335479b546669a0edf6cf",
+      "archivedSha256": "c45ed57c36de227292e850a166db412ac80cca79a99d4d5de445b299b1950258"
+    },
+    {
+      "file": "local-repetitions.json",
+      "originalSha256": "bb222a5514bd269e339c026c9c51f0b63756d0fe5c48d59c56c4973658b84e43",
+      "archivedSha256": "bb222a5514bd269e339c026c9c51f0b63756d0fe5c48d59c56c4973658b84e43"
+    },
+    {
+      "file": "local-passing-transcript.log",
+      "originalSha256": "05edce593e3327b74417b6fc60ddb0384ee3af2798277acc9eb465073429e389",
+      "archivedSha256": "d51e81661dd522cbbadeb667d9a73962b4c8ae8a1bfdd631fd58d3d70dfe41f5"
+    }
+  ]
+}

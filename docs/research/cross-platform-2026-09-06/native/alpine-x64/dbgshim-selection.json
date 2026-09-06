@@ -1,0 +1,6 @@
+{
+  "rid": "linux-musl-x64",
+  "version": "10.0.731102",
+  "nativeSha256": "c8413c4e928cd5a3e6a76764cd58acaba01ba51466371cc43d6f774307629fe3",
+  "nugetPackageSha256": "8fee0f2c5f88e969f6daaae1f01d441782edac0fedf44692fe76bc301fe961b4"
+}

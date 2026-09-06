@@ -1,0 +1,9 @@
+{
+  "runId": 34016701849,
+  "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34016701849",
+  "workflowCommit": "2b13b613a6e308fd760ea386942b458a971e5089",
+  "conclusion": "failure",
+  "observation": "Both native compiler configurations succeeded. ManagedPart built before corguids.vcxproj read the shared managed NuGet assets and failed with Sequence contains no elements. No DAP test ran. All 498 original Samsung inputs remained unchanged on both runners.",
+  "nextRecipeCommit": "4b769fd23afcbf867d538ca0c9ace0ed824f6494",
+  "nextRecipe": "Build native netcoredbg with BUILD_MANAGED=OFF and publish the unchanged managed project in a separate output/intermediate directory."
+}

@@ -1,0 +1,12 @@
+{
+  "success": false,
+  "target": "darwin-arm64",
+  "version": "2.148.23001",
+  "vsix": "csharp-with-netcoredbg-darwin-arm64-2.148.23001.vsix",
+  "sha256": "fe196696f3866af53654b76f97d132ba5d5718bf2909ac3c8962e45381b45b4e",
+  "runtimeTests": [],
+  "upstreamTests": {},
+  "debuggerSha256": "9c61620dd7ccccd93126bddfbfab2f87e9d7ad73f8858dc323ce641f796c911b",
+  "error": "Command '['/Library/Frameworks/Python.framework/Versions/3.14/bin/python', '<CI_WORKSPACE>/scripts/validation/upstream_suite.py', '--source', '<CI_WORKSPACE>/validation-inputs/netcoredbg', '--debugger', '<CI_TEMP>/vsix-test/unpacked/extension/.debugger/netcoredbg/netcoredbg', '--dotnet', '<CI_TEMP>/vsix-dotnet/dotnet', '--runtime', '8', '--sdk', '8.0.418', '--arch', 'arm64', '--work', '<CI_TEMP>/vsix-test/upstream-net8', '--evidence', '<CI_TEMP>/vsix-test/evidence']' returned non-zero exit status 1.",
+  "scope": "VSIX identity, permissions, exact bundled hashes and extracted-adapter DAP launch; no IDE UI test"
+}

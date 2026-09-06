@@ -1,0 +1,39 @@
+{
+  "success": false,
+  "stage": "runtime-tests",
+  "target": "darwin-x64",
+  "architecture": "x64",
+  "netcoredbgTag": "3.2.0-1092",
+  "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+  "coreclrCommit": "60629d14374c56f1cb51819049ad1fa529307f8d",
+  "sdk8": "8.0.418",
+  "sdk10": "10.0.400",
+  "dbgshimVersion": "10.0.731102",
+  "workflowCommit": "b919f8e16f492a5dd1d560c750d90ddc3111003c",
+  "runId": "34028072085",
+  "runnerImage": "macos15",
+  "runnerImageVersion": "20260824.0482.1",
+  "host": "macOS-15.7.9-x86_64-i386-64bit-Mach-O",
+  "sourceUnchanged": true,
+  "runtimeTests": [
+    {
+      "runtime": "8",
+      "sdk": "8.0.418",
+      "success": false,
+      "error": "dap-net8-console.log: exit 1"
+    },
+    {
+      "runtime": "10",
+      "sdk": "10.0.400",
+      "success": true,
+      "error": null
+    }
+  ],
+  "error": "Runtime validation failed",
+  "scope": "Standalone source build and DAP launch; VSIX integration is a separate gate.",
+  "externalRuntimeCompatibility": {
+    "file": "scripts/validation/darwin-waitpid.cpp",
+    "sha256": "f72febab79d89a166e4120466d25b61e8d86e28f40ac481387a1dfdc01fa0c31",
+    "strategy": "Linked dyld waitpid observer"
+  }
+}

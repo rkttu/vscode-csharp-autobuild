@@ -1,0 +1,219 @@
+name: Validate netcoredbg on all platforms
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform-scope:
+        description: Alpine-only is experimental and cannot produce a release gate
+        type: choice
+        default: all
+        options: [all, alpine]
+  workflow_call:
+    inputs:
+      debugger-tag:
+        type: string
+        required: true
+      debugger-sha:
+        type: string
+        required: true
+      artifact-prefix:
+        type: string
+        default: netcoredbg
+      platform-scope:
+        type: string
+        default: all
+
+permissions:
+  contents: read
+
+concurrency:
+  group: netcoredbg-all-${{ github.workflow }}-${{ github.ref }}-${{ inputs.artifact-prefix || 'netcoredbg' }}
+  cancel-in-progress: false
+
+jobs:
+  inputs:
+    runs-on: ubuntu-22.04
+    outputs:
+      debugger-sha: ${{ steps.config.outputs.sha }}
+      debugger-tag: ${{ steps.config.outputs.tag }}
+      matrix: ${{ steps.config.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - id: config
+        env:
+          INPUT_SHA: ${{ inputs.debugger-sha }}
+          INPUT_TAG: ${{ inputs.debugger-tag }}
+          PLATFORM_SCOPE: ${{ inputs.platform-scope || 'all' }}
+        run: |
+          python3 - <<'PY'
+          import json, os, re
+          config = json.load(open('config/netcoredbg.json'))
+          sha = os.environ['INPUT_SHA'] or config['baselineCommit']
+          tag = os.environ['INPUT_TAG'] or config['baselineTag']
+          assert re.fullmatch(r'[0-9a-f]{40}', sha)
+          assert re.fullmatch(r'[0-9]+\.[0-9]+\.[0-9]+-[0-9]+', tag)
+          scope = os.environ['PLATFORM_SCOPE']
+          assert scope in ('all', 'alpine')
+          runners = {'win32-x64': 'windows-2022', 'win32-arm64': 'windows-11-arm',
+                     'linux-x64': 'ubuntu-22.04', 'linux-arm64': 'ubuntu-22.04-arm',
+                     'alpine-x64': 'ubuntu-22.04', 'alpine-arm64': 'ubuntu-22.04-arm',
+                     'darwin-x64': 'macos-15-intel', 'darwin-arm64': 'macos-15'}
+          matrix = []
+          for target in config['targets']:
+              family, arch = target.split('-')
+              if scope == 'all' or family == 'alpine':
+                  matrix.append(dict(target=target, arch=arch, runner=runners[target],
+                                     family='windows' if family == 'win32' else family))
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              out.write(f'sha={sha}\ntag={tag}\n')
+              out.write('matrix=' + json.dumps({'include': matrix}) + '\n')
+          PY
+
+  validate:
+    needs: inputs
+    name: ${{ matrix.target }} source and DAP
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.inputs.outputs.matrix) }}
+    env:
+      NETCOREDBG_TAG: ${{ needs.inputs.outputs.debugger-tag }}
+      NETCOREDBG_SHA: ${{ needs.inputs.outputs.debugger-sha }}
+      VALIDATION_ARCH: ${{ matrix.arch }}
+      VALIDATION_TARGET: ${{ matrix.target }}
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+      DOTNET_NOLOGO: '1'
+      DOTNET_GENERATE_ASPNET_CERTIFICATE: 'false'
+    steps:
+      - name: Preserve original source line endings on Windows
+        if: runner.os == 'Windows'
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Load fixed dependency inputs and isolated paths
+        shell: python
+        run: |
+          import json, os
+          from pathlib import Path
+          config = json.load(open('config/netcoredbg.json'))
+          values = {'CORECLR_SHA': config['coreclrCommit'], 'SDK8_VERSION': config['sdk8'],
+                    'SDK10_VERSION': config['sdk10'], 'DBGSHIM_VERSION': config['dbgshimVersion'],
+                    'ALPINE_IMAGE': config['alpineImage'],
+                    'VALIDATION_ROOT': str(Path(os.environ['RUNNER_TEMP']) / 'netcoredbg-validation'),
+                    'DOTNET_INSTALL_DIR': str(Path(os.environ['RUNNER_TEMP']) / 'netcoredbg-dotnet')}
+          with open(os.environ['GITHUB_ENV'], 'a') as out:
+              for key, value in values.items():
+                  out.write(f'{key}={value}\n')
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: Samsung/netcoredbg
+          ref: ${{ env.NETCOREDBG_SHA }}
+          path: validation-inputs/netcoredbg
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: dotnet/runtime
+          ref: ${{ env.CORECLR_SHA }}
+          path: validation-inputs/runtime
+          persist-credentials: false
+          sparse-checkout: |
+            src/coreclr
+            src/native
+            eng
+      - name: Install native SDKs
+        if: matrix.family != 'alpine'
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6
+        with:
+          architecture: ${{ matrix.arch }}
+          dotnet-version: |
+            ${{ env.SDK8_VERSION }}
+            ${{ env.SDK10_VERSION }}
+      - name: Install Linux compiler dependencies
+        if: matrix.family == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake zlib1g-dev libunwind-dev libicu-dev libssl-dev
+      - name: Validate Windows
+        if: matrix.family == 'windows'
+        shell: pwsh
+        run: ./scripts/validation/validate-windows.ps1 -Architecture $env:VALIDATION_ARCH
+      - name: Validate Linux or macOS
+        if: matrix.family == 'linux' || matrix.family == 'darwin'
+        run: python3 scripts/validation/validate-unix.py --target "$VALIDATION_TARGET"
+      - name: Build and execute in native musl environment
+        if: matrix.family == 'alpine'
+        run: |
+          docker pull "$ALPINE_IMAGE"
+          mkdir -p "$VALIDATION_ROOT/evidence"
+          docker image inspect "$ALPINE_IMAGE" > "$VALIDATION_ROOT/evidence/container-image.json"
+          docker run --rm --cap-add=SYS_PTRACE --security-opt seccomp=unconfined \
+            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -v "$RUNNER_TEMP:$RUNNER_TEMP" -w "$GITHUB_WORKSPACE" \
+            -e GITHUB_WORKSPACE -e GITHUB_SHA -e GITHUB_RUN_ID -e NETCOREDBG_TAG -e NETCOREDBG_SHA -e CORECLR_SHA \
+            -e VALIDATION_ROOT -e DOTNET_INSTALL_DIR -e VALIDATION_ARCH -e VALIDATION_TARGET \
+            -e SDK8_VERSION -e SDK10_VERSION -e DBGSHIM_VERSION -e DOTNET_CLI_TELEMETRY_OPTOUT -e DOTNET_NOLOGO \
+            "$ALPINE_IMAGE" sh -ec '
+              apk add --no-cache python3 git clang cmake make musl-dev linux-headers zlib-dev libunwind-dev icu-libs icu-data-full libstdc++ libgcc openssl-dev krb5-libs
+              git config --global --add safe.directory "$GITHUB_WORKSPACE/validation-inputs/netcoredbg"
+              git config --global --add safe.directory "$GITHUB_WORKSPACE/validation-inputs/runtime"
+              python3 scripts/validation/install-musl-sdk.py
+              python3 scripts/validation/validate-unix.py --target "$VALIDATION_TARGET"
+            '
+      - name: Summarize native validation and scenario failures
+        if: always()
+        shell: python
+        run: |
+          import os, subprocess, sys
+          from pathlib import Path
+          subprocess.run([sys.executable, 'scripts/validation/summary.py', '--evidence',
+                          str(Path(os.environ['VALIDATION_ROOT']) / 'evidence'), '--stage', 'native validation'], check=True)
+      - name: Preserve evidence and exact packages
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: ${{ inputs.artifact-prefix || 'netcoredbg' }}-${{ matrix.target }}-${{ github.run_attempt }}
+          path: |
+            ${{ env.VALIDATION_ROOT }}/evidence/
+            ${{ env.VALIDATION_ROOT }}/package/
+          if-no-files-found: warn
+          retention-days: 14
+
+  aggregate:
+    if: always() && inputs.platform-scope != 'alpine'
+    needs: [inputs, validate]
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          pattern: ${{ inputs.artifact-prefix || 'netcoredbg' }}-*-*
+          path: validation-artifacts
+      - name: Require all target evidence and package hashes
+        env:
+          EXPECTED_SHA: ${{ needs.inputs.outputs.debugger-sha }}
+          ARTIFACT_PREFIX: ${{ inputs.artifact-prefix || 'netcoredbg' }}
+        run: |
+          python3 scripts/validation/aggregate.py --inputs validation-artifacts --config config/netcoredbg.json \
+            --sha "$EXPECTED_SHA" --workflow-sha "$GITHUB_SHA" --run-id "$GITHUB_RUN_ID" --output validated-debugger --prefix "$ARTIFACT_PREFIX"
+      - name: Summarize the complete platform gate
+        if: always()
+        run: python3 scripts/validation/summary.py --evidence validated-debugger --stage aggregation
+      - name: Reject failed, canceled, or skipped matrix jobs
+        if: always()
+        env:
+          MATRIX_RESULT: ${{ needs.validate.result }}
+          INPUT_RESULT: ${{ needs.inputs.result }}
+        run: test "$MATRIX_RESULT" = success && test "$INPUT_RESULT" = success
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        if: always()
+        with:
+          name: ${{ inputs.artifact-prefix || 'netcoredbg' }}-validated
+          path: validated-debugger/
+          overwrite: true
+          if-no-files-found: warn
+          retention-days: 30

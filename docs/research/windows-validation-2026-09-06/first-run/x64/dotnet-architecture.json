@@ -1,0 +1,11 @@
+{
+  "success": true,
+  "expectedArchitecture": "x64",
+  "files": [
+    {
+      "file": "D:\\a\\_temp\\netcoredbg-dotnet-x64\\dotnet.exe",
+      "architecture": "x64",
+      "sha256": "ab1b71fd3dd71062e074c9fab8312081a81b7f2b3e0327c48c4d249c8d1a3135"
+    }
+  ]
+}
