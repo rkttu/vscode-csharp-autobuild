@@ -14,6 +14,8 @@ These reports record the investigation completed on September 6, 2026. They dist
 10. [Upstream functional gate and Darwin exit-code compatibility](2026-09-06-functional-gate-and-darwin-exit.md): external test projects, the newly detected nonzero-exit defect, runtime ABI correction, publication fault tests, and intermittent CI failures with separate rerun evidence.
 11. [Main adoption and first Open VSX release](2026-09-06-first-release.md): completed merge, eight-platform public release, asynchronous publication and permission recovery, exact public hashes, and scheduled operation.
 
+12. [Production workflow and branch cleanup](2026-09-06-workflow-cleanup.md): retained release dependencies, retired experiment workflows and five run records, temporary branch removal, and preserved research evidence.
+
 The first four reports retain their original investigation scope. The Windows report updates their outstanding Windows build and basic-debugging checks with actual GitHub runner evidence.
 
 The adjacent dated evidence directories contain source hashes, API snapshots, build logs, and DAP traces. Personal paths in archived evidence were replaced. The original DAP fixture and probe are preserved with their macOS ARM64 experiment; those historical results do not establish execution on other platforms.
