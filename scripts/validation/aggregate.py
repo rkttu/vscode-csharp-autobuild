@@ -6,6 +6,7 @@ import sys
 import zipfile
 
 from audit import sha256
+from upstream_suite import validate_result
 
 
 def aggregate(inputs, config, expected_sha, workflow_sha, run_id, output, prefix="netcoredbg"):
@@ -29,10 +30,13 @@ def aggregate(inputs, config, expected_sha, workflow_sha, run_id, output, prefix
             assert integrity["success"] is True and integrity["originalFileCount"] > 0 and integrity["changedOrMissing"] == []
             assert sorted(t["runtime"] for t in result["runtimeTests"]) == sorted(config["runtimes"])
             assert all(t["success"] is True for t in result["runtimeTests"])
+            exe = "netcoredbg.exe" if target.startswith("win32") else "netcoredbg"
             for runtime in config["runtimes"]:
                 dap = json.loads((evidence / f"dap-net{runtime}-result.json").read_text(encoding="utf-8-sig"))
                 assert dap["success"] is True and len(dap["checks"]) == 8, f"Incomplete DAP checks: .NET {runtime}"
                 assert dap["expectedArchitecture"] == target.split("-")[1] and dap["expectedRuntime"] == runtime
+                suite = json.loads((evidence / f"upstream-net{runtime}-result.json").read_text(encoding="utf-8"))
+                validate_result(suite, runtime, target.split("-")[1], sha256(package / exe))
             files = json.loads((evidence / "package-sha256.json").read_text(encoding="utf-8-sig"))
             expected_files = {item["file"].replace("\\", "/"): item["sha256"] for item in files}
             actual_files = {p.relative_to(package).as_posix(): sha256(p) for p in package.rglob("*") if p.is_file()}
@@ -41,11 +45,14 @@ def aggregate(inputs, config, expected_sha, workflow_sha, run_id, output, prefix
             assert native["success"] is True and native["expectedArchitecture"] == target.split("-")[1]
             exe = "netcoredbg.exe" if target.startswith("win32") else "netcoredbg"
             shim = "dbgshim.dll" if target.startswith("win32") else ("libdbgshim.dylib" if target.startswith("darwin") else "libdbgshim.so")
-            assert {p["file"].replace("\\", "/").split("/")[-1] for p in native["files"]} == {exe, shim}
+            native_names = {exe, shim}
+            if target.startswith("darwin"):
+                native_names.add("libnetcoredbg-darwin-compat.dylib")
+            assert {p["file"].replace("\\", "/").split("/")[-1] for p in native["files"]} == native_names
             required = {exe, shim, "ManagedPart.dll", "Microsoft.CodeAnalysis.dll", "Microsoft.CodeAnalysis.CSharp.dll",
                         "Microsoft.CodeAnalysis.Scripting.dll", "Microsoft.CodeAnalysis.CSharp.Scripting.dll",
                         "notices/Samsung-netcoredbg-LICENSE", "notices/dotnet-runtime-LICENSE.TXT"}
-            assert required <= set(actual_files), "Required runtime files or notices missing"
+            assert (required | native_names) <= set(actual_files), "Required runtime files or notices missing"
             for item in native["files"]:
                 # Windows paths remain Windows paths when aggregation runs on Linux.
                 name = item["file"].replace("\\", "/").split("/")[-1]

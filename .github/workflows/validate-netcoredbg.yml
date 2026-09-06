@@ -75,7 +75,7 @@ jobs:
     needs: inputs
     name: ${{ matrix.target }} source and DAP
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 45
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.inputs.outputs.matrix) }}
@@ -162,6 +162,14 @@ jobs:
               python3 scripts/validation/install-musl-sdk.py
               python3 scripts/validation/validate-unix.py --target "$VALIDATION_TARGET"
             '
+      - name: Summarize native validation and scenario failures
+        if: always()
+        shell: python
+        run: |
+          import os, subprocess, sys
+          from pathlib import Path
+          subprocess.run([sys.executable, 'scripts/validation/summary.py', '--evidence',
+                          str(Path(os.environ['VALIDATION_ROOT']) / 'evidence'), '--stage', 'native validation'], check=True)
       - name: Preserve evidence and exact packages
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
@@ -192,6 +200,9 @@ jobs:
         run: |
           python3 scripts/validation/aggregate.py --inputs validation-artifacts --config config/netcoredbg.json \
             --sha "$EXPECTED_SHA" --workflow-sha "$GITHUB_SHA" --run-id "$GITHUB_RUN_ID" --output validated-debugger --prefix "$ARTIFACT_PREFIX"
+      - name: Summarize the complete platform gate
+        if: always()
+        run: python3 scripts/validation/summary.py --evidence validated-debugger --stage aggregation
       - name: Reject failed, canceled, or skipped matrix jobs
         if: always()
         env:

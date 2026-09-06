@@ -9,6 +9,7 @@ import unittest
 
 from aggregate import aggregate
 from audit import sha256
+from upstream_suite import policy
 
 
 class ReleaseGateTests(unittest.TestCase):
@@ -24,7 +25,8 @@ class ReleaseGateTests(unittest.TestCase):
             package.mkdir(parents=True)
             exe = "netcoredbg.exe" if target.startswith("win32") else "netcoredbg"
             shim = "dbgshim.dll" if target.startswith("win32") else ("libdbgshim.dylib" if target.startswith("darwin") else "libdbgshim.so")
-            for name in [exe, shim, "ManagedPart.dll", "Microsoft.CodeAnalysis.dll", "Microsoft.CodeAnalysis.CSharp.dll",
+            extra = ["libnetcoredbg-darwin-compat.dylib"] if target.startswith("darwin") else []
+            for name in extra + [exe, shim, "ManagedPart.dll", "Microsoft.CodeAnalysis.dll", "Microsoft.CodeAnalysis.CSharp.dll",
                          "Microsoft.CodeAnalysis.Scripting.dll", "Microsoft.CodeAnalysis.CSharp.Scripting.dll",
                          "notices/Samsung-netcoredbg-LICENSE", "notices/dotnet-runtime-LICENSE.TXT"]:
                 file = package / name
@@ -33,9 +35,12 @@ class ReleaseGateTests(unittest.TestCase):
             self.write(evidence / "package-sha256.json", [dict(file=p.relative_to(package).as_posix(), sha256=sha256(p)) for p in package.rglob("*") if p.is_file()])
             arch = target.split("-")[1]
             self.write(evidence / "debugger-architectures.json", dict(success=True, expectedArchitecture=arch,
-                       files=[dict(file=name, sha256=sha256(package / name), architecture=arch) for name in (exe, shim)]))
+                       files=[dict(file=name, sha256=sha256(package / name), architecture=arch) for name in [exe, shim] + extra]))
             self.write(evidence / "source-integrity.json", dict(success=True, originalFileCount=498, changedOrMissing=[]))
             for version in self.config["runtimes"]:
+                self.write(evidence / f"upstream-net{version}-result.json", dict(success=True, runtime=version,
+                    architecture=arch, debuggerSha256=sha256(package / exe), sourceUnchanged=True,
+                    tests=[dict(name=name, success=True, exitCode=0, timedOut=False) for name in policy()['tests']]))
                 self.write(evidence / f"dap-net{version}-result.json", dict(success=True, checks=list(range(8)), expectedArchitecture=arch, expectedRuntime=version))
             self.write(evidence / "result.json", dict(success=True, sourceUnchanged=True, target=target, architecture=arch,
                 netcoredbgCommit="a" * 40, workflowCommit="b" * 40, runId="123", coreclrCommit=self.config["coreclrCommit"],
@@ -91,6 +96,22 @@ class ReleaseGateTests(unittest.TestCase):
         self.change("darwin-arm64", "debugger-architectures.json", lambda d: d.update(files=[]))
         self.assertFalse(self.run_gate()["success"])
 
+
+    def test_failed_upstream_scenario_fails(self):
+        self.change("linux-x64", "upstream-net8-result.json", lambda d: d['tests'][3].update(success=False, exitCode=1))
+        self.assertFalse(self.run_gate()["success"])
+
+    def test_missing_upstream_scenario_fails(self):
+        self.change("darwin-arm64", "upstream-net10-result.json", lambda d: d['tests'].pop())
+        self.assertFalse(self.run_gate()["success"])
+
+    def test_upstream_timeout_with_zero_exit_fails(self):
+        self.change("win32-arm64", "upstream-net8-result.json", lambda d: d['tests'][0].update(timedOut=True))
+        self.assertFalse(self.run_gate()["success"])
+
+    def test_suite_for_another_debugger_fails(self):
+        self.change("alpine-x64", "upstream-net10-result.json", lambda d: d.update(debuggerSha256='f' * 64))
+        self.assertFalse(self.run_gate()["success"])
 
 if __name__ == "__main__":
     unittest.main()

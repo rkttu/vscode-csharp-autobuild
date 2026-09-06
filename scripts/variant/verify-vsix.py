@@ -16,6 +16,7 @@ import versioning
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "scripts/validation"))
 from audit import native_architecture
+from upstream_suite import validate_result
 
 
 def verify(vsix, validated, target, version, root, run_dap):
@@ -26,7 +27,7 @@ def verify(vsix, validated, target, version, root, run_dap):
     evidence = root / "evidence"
     evidence.mkdir(parents=True, exist_ok=True)
     result = dict(success=False, target=target, version=version, vsix=vsix.name,
-                  sha256=hashlib.sha256(vsix.read_bytes()).hexdigest(), runtimeTests=[])
+                  sha256=hashlib.sha256(vsix.read_bytes()).hexdigest(), runtimeTests=[], upstreamTests={})
     try:
         with zipfile.ZipFile(vsix) as zip_in:
             names = zip_in.namelist()
@@ -69,6 +70,7 @@ def verify(vsix, validated, target, version, root, run_dap):
                 assert (zip_in.getinfo(prefix + exe_name).external_attr >> 16) & 0o111, "Executable permission missing"
             zip_in.extractall(root / "unpacked")
         adapter = root / "unpacked/extension/.debugger/netcoredbg" / exe_name
+        result["debuggerSha256"] = hashlib.sha256(adapter.read_bytes()).hexdigest()
         assert native_architecture(adapter) == target.split("-")[1]
         if run_dap:
             host_arch = {"amd64": "x64", "x86_64": "x64", "aarch64": "arm64", "arm64": "arm64"}.get(platform.machine().lower())
@@ -99,6 +101,14 @@ def verify(vsix, validated, target, version, root, run_dap):
                                 "--source", str(fixture / "Program.cs"), "--expected-arch", target.split("-")[1],
                                 "--expected-runtime", runtime, "--log", str(evidence / f"dap-net{runtime}.jsonl"),
                                 "--result", str(evidence / f"dap-net{runtime}-result.json")], env=env, check=True)
+                subprocess.run([sys.executable, str(REPO / "scripts/validation/upstream_suite.py"),
+                                "--source", str(REPO / "validation-inputs/netcoredbg"), "--debugger", str(adapter),
+                                "--dotnet", str(dotnet), "--runtime", runtime, "--sdk", settings["sdk" + runtime],
+                                "--arch", target.split("-")[1], "--work", str(root / ("upstream-net" + runtime)),
+                                "--evidence", str(evidence)], env=env, check=True)
+                suite = json.loads((evidence / f"upstream-net{runtime}-result.json").read_text(encoding="utf-8"))
+                validate_result(suite, runtime, target.split("-")[1], result["debuggerSha256"])
+                result["upstreamTests"][runtime] = suite
                 result["runtimeTests"].append(runtime)
         result["success"] = True
         result["netcoredbgBuild"] = pkg["netcoredbgBuild"]

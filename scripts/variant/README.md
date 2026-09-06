@@ -1,92 +1,80 @@
 # Independent C# with netcoredbg release automation
 
-The selected extension ID is `dotnetdev-kr-custom.csharp-with-netcoredbg` and the
-display name is `C# (with netcoredbg)`. Settings live in
-[`config/variant.json`](../../config/variant.json). The existing extension and
-production workflow are independent.
+The extension ID is `dotnetdev-kr-custom.csharp-with-netcoredbg`, with display name
+`C# (with netcoredbg)`. The [root README](../../README.md) covers installation,
+support scope, schedules, versions, and maintainer operations. The original C#
+distribution and its production workflow remain independent.
 
-## Entry points
+## Entry points and gates
 
-- `release-netcoredbg.yml`: scheduled tag discovery and manual selection.
-  Research-branch manual runs cannot publish.
-- `netcoredbg-candidate.yml`: reusable source validation, VSIX packaging,
-  extracted-adapter tests and publication.
-- `validate-netcoredbg.yml`: the eight-target source and DAP gate.
+- `release-netcoredbg.yml`: tag discovery, publication-boundary tests, and serial candidate selection
+- `netcoredbg-candidate.yml`: native source validation, eight VSIX packages, native extracted-adapter validation, and publication
+- `validate-netcoredbg.yml`: eight native targets, .NET 8/10 smoke and upstream DAP suites, source preservation, and aggregation
 
-The detailed observations and current blockers are in the
-[cross-platform report](../../docs/research/2026-09-06-cross-platform-release.md).
-Candidate `0.1.4000` passed the complete native matrix, all eight VSIX builds,
-all sixteen extracted-adapter .NET 8/10 combinations and the final publication
-dry run. Alpine uses repository-owned hosting compatibility code after its
-original hosting path crashed. The original Samsung files remain unchanged.
-The installed macOS ARM64 VSIX also passed activation and two launch sessions
-inside VS Code 1.135.0. Open VSX upload and interrupted-upload recovery remain
-unexecuted.
+Each native phase requires the repository fixture and all 30 scenarios in
+`config/upstream-dap-tests.json`. The external test projects reference original
+Samsung C# files. Missing, failed, timed-out, or mismatched evidence blocks release.
+Alpine uses repository-owned CoreCLR hosting compatibility; macOS uses a linked
+Darwin process-exit observer. Neither implementation edits Samsung source files.
 
-## Identity and source overlay
+`overlay.py` works in a disposable C# checkout, verifies the debugger archive,
+and applies checked integration replacements. The build compiles actual upstream
+TypeScript. `test-factory.cjs` checks registration, adapter selection, and SDK
+forwarding. `verify-vsix.py` validates package identity, permissions, icon, payload
+hashes, provenance, and the extracted adapter. Only `coreclr` is advertised.
 
-`overlay.py` operates on a disposable C# checkout after the complete debugger
-gate passes. It verifies archive hashes, changes the small known integration
-points and fails if those upstream anchors move. Samsung source is not edited.
-`npm run compile` and `test-factory.cjs` passed locally against an actual overlaid
-C# source snapshot with synthetic packaging inputs. That was a compile/factory
-test. The subsequent real VSIX candidate and local editor-host results are
-recorded separately in the report.
+## Versioning and discovery
 
-Only `coreclr` is advertised. The package README identifies unsupported or
-unverified debugger scenarios and preserves upstream component-license terms.
-The runtime acquisition/SDK paths retain their upstream behavior where possible.
-The user installs a native SDK matching the selected platform package.
+`versioning.py` maps C# `major.minor.patch` to
+`major.minor.(patch * 1000 + revision)`. Revisions range from 1 through 999.
+For example, C# 2.148.23 revisions 1 and 2 produce `2.148.23001` and
+`2.148.23002`; C# 2.148.24 starts at `2.148.24001`.
 
-## Release and retry behavior
+GitHub tags contain the upstream C# version, debugger tag and abbreviated SHA,
+and packaging revision. Package metadata and release manifests retain complete
+commits. Draft and completed releases reserve versions; dry runs do not.
+`versioning.validate` rejects inconsistent identities at every boundary.
 
-The detector considers Samsung tags from the baseline and the highest version
-C# tag. Successful source/recipe fingerprints prevent repeated shipping.
-The VSIX keeps the upstream major and minor, and encodes its patch as
-`upstream_patch * 1000 + packaging_revision`. For C# 2.148.23, revisions 1 and 2
-become `2.148.23001` and `2.148.23002`. C# 2.148.24 starts at `2.148.24001`.
-Revisions range from 1 through 999; exhaustion fails instead of overflowing
-into the next upstream patch. Draft and completed releases reserve revisions;
-dry runs do not consume one. A retry restores its original bytes and revision.
+`discover.py` examines upstream tags directly, including tags without GitHub
+releases. It compares source and recipe fingerprints against completed releases,
+restores interrupted drafts, and selects a bounded batch of eligible tags.
+Automatic selection excludes debugger tags older than the latest published
+engine. Within a batch, ascending debugger order gives newer engines higher
+package revisions. A failed candidate does not suppress subsequent candidates.
+C#-only changes currently rebuild and retest the full matrix.
 
-Git tags contain both sources, for example
-`csharp-v2.148.23-netcoredbg-v3.2.0-1092-g9744e1f05186-r1`.
-`package.json` records both complete source commits, upstream C# version/tag,
-netcoredbg tag, packaging revision and release tag under `netcoredbgBuild`.
-`versioning.py` validates this relationship during discovery, packaging,
-VSIX verification and publication. The earlier `0.1.4000` candidate remains
-historical evidence and was never published.
+## Publication and retry
 
-Automatic candidates exclude debugger tags older than the latest successfully
-published engine. Within the bounded newest-tag window, processing runs from
-older to newer tags so the newest success receives the highest package revision.
-A failed candidate does not stop the following candidates. Manual tag selection
-can deliberately choose an older engine while still assigning a new revision.
+Only scheduled `main` runs or explicitly selected manual `main` runs publish.
+Other branches can run complete dry runs. Only the final upload step receives
+`OPENVSX_ACCESS_TOKEN` as `OVSX_PAT`.
 
-An ordinary candidate rebuilds and retests all eight debugger targets, including
-on C#-only updates. Reusing old validated engines is not implemented yet.
-Interrupted Open VSX uploads use the saved draft release's version, VSIX bytes
-and evidence. `resume.py` restores the draft assets; `publish.py` validates the
-complete set again. It refuses a different file behind an existing version.
-If GitHub asset preservation itself was interrupted, missing assets need to be
-recovered from the original Actions artifacts before this retry can complete.
+`publish.py` requires complete native VSIX evidence before preserving a draft
+GitHub release and uploading any target. Every public registry download must
+match the tested VSIX hash. GitHub finalization occurs after all eight readbacks.
+The variant release does not replace the original distribution's Latest release.
 
-Publication uses the existing `OPENVSX_ACCESS_TOKEN` secret through `OVSX_PAT`.
-No per-extension namespace creation command runs. Only the final publication
-step receives this token. The script verifies registry readback hashes for every
-target and marks the variant GitHub release complete only afterward.
+`resume.py` restores the draft release's VSIX files and evidence. Existing matching
+registry bytes are skipped. Different bytes behind an existing version stop the
+release. Missing preserved files also stop the retry. There is no automated
+rollback or quarantine service; maintainers respond to failed Actions runs.
+`publication-status.json` and job summaries expose the last stage and verified
+targets without changing the publication policy.
 
-## Activation and scope
+`test_publication.py` exercises partial-upload recovery, finalization-only retries,
+matching-byte skips, hash mismatch rejection, missing assets, and incomplete
+functional evidence using temporary files and fake remote services. These tests
+do not deliberately interrupt a real public registry upload.
 
-The initial branch push trigger has been removed after successful verification;
-manual dispatch remains available. The research branch runs without publishing.
-A workflow on the default branch
-can accept manual dispatch and scheduled events. A manual run defaults to
-`publish=false`; a scheduled default-branch run publishes only after all gates
-pass. The branch has not been merged and no new extension has been published.
+## Evidence and limitations
 
-Package tests check identity, permissions, absence of vsdbg payload filenames,
-exact bundled hashes and DAP execution of the extracted adapter. They do not
-establish LSP behavior, attach, remote debugging, Hot Reload or all C# Dev Kit
-features. Full editor-host launch was separately checked on one macOS ARM64
-machine; that local result is not an eight-platform IDE test.
+[Research records](../../docs/research/README.md) preserve historical candidate
+runs, actual editor-host checks, build failures, versioning decisions, and the
+publication/recovery review. The earlier `0.1.4000` candidate was never published;
+its evidence is historical. A later `2.148.23001` candidate passed the smaller
+smoke gate before the upstream suite was added. Current recipe validation is
+recorded separately and must not be inferred from either earlier success.
+
+The native DAP matrix does not certify every IDE, language-service feature,
+remote workflow, Hot Reload implementation, or C# Dev Kit feature. Installed-editor
+launch testing has separate evidence for VS Code on macOS ARM64.

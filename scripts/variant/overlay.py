@@ -148,11 +148,13 @@ The bundled debugger is built from [Samsung/netcoredbg](https://github.com/Samsu
 Original Samsung source files remain unchanged; build inputs and compatibility
 code are maintained in the [build repository](https://github.com/rkttu/vscode-csharp-autobuild).
 Alpine packages include repository-owned CoreCLR hosting compatibility code.
+macOS packages include a linked process-exit observer for Darwin runtime compatibility.
 Component licenses accompany the package. This does not classify every component
 of the upstream C# extension as MIT-licensed.
 
 Use a native .NET SDK matching the installed extension target. The release gate
-tests local coreclr launch on .NET 8 and .NET 10. Desktop .NET Framework, Unity,
+tests local coreclr launch and the required upstream DAP scenarios, including
+local attach, on .NET 8 and .NET 10. Desktop .NET Framework, Unity,
 mobile, WebAssembly, Hot Reload, and full C# Dev Kit debugger parity are outside
 this validation scope. Enable only one C# language/debug extension in a workspace
 to avoid competing coreclr registrations and language services.

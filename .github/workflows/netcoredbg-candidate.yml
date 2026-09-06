@@ -99,7 +99,7 @@ jobs:
   test-vsix:
     needs: package
     runs-on: ${{ matrix.runner }}
-    timeout-minutes: 25
+    timeout-minutes: 60
     strategy:
       fail-fast: false
       matrix:
@@ -121,6 +121,12 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: Samsung/netcoredbg
+          ref: ${{ fromJSON(inputs.candidate).debuggerSha }}
+          path: validation-inputs/netcoredbg
           persist-credentials: false
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
         with:
@@ -171,6 +177,16 @@ jobs:
               python3 scripts/variant/verify-vsix.py --vsix "candidate-vsix/csharp-with-netcoredbg-$VALIDATION_TARGET-$VARIANT_VERSION.vsix" \
                 --validated validated-debugger --target "$VALIDATION_TARGET" --version "$VARIANT_VERSION" --output "$VALIDATION_ROOT" --run-dap
             '
+      - name: Summarize extracted VSIX validation
+        if: always()
+        shell: python
+        env:
+          CANDIDATE_JSON: ${{ inputs.candidate }}
+        run: |
+          import os, subprocess, sys
+          from pathlib import Path
+          subprocess.run([sys.executable, 'scripts/validation/summary.py', '--evidence',
+                          str(Path(os.environ['VALIDATION_ROOT']) / 'evidence'), '--stage', 'extracted VSIX'], check=True)
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: always()
         with:
@@ -184,6 +200,7 @@ jobs:
     needs: [debugger, package, test-vsix]
     if: ${{ always() && !cancelled() && (fromJSON(inputs.candidate).resumeRelease || (needs.debugger.result == 'success' && needs.package.result == 'success' && needs.test-vsix.result == 'success')) }}
     runs-on: ubuntu-22.04
+    timeout-minutes: 30
     permissions:
       contents: write
     steps:
@@ -219,9 +236,16 @@ jobs:
           OVSX_PAT: ${{ secrets.OPENVSX_ACCESS_TOKEN }}
           GH_TOKEN: ${{ github.token }}
         run: python3 scripts/variant/publish.py --artifacts release-artifacts --candidate candidate.json --publish
+      - name: Summarize publication state
+        if: always()
+        env:
+          CANDIDATE_JSON: ${{ inputs.candidate }}
+        run: python3 scripts/validation/summary.py --evidence release-artifacts --stage publication
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         if: always()
         with:
           name: ${{ fromJSON(inputs.candidate).artifactPrefix }}-release-manifest
-          path: release-artifacts/release-manifest.json
+          path: |
+            release-artifacts/release-manifest.json
+            release-artifacts/publication-status.json
           overwrite: true

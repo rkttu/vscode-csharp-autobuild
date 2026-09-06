@@ -175,6 +175,10 @@ try {
                 '--source', (Join-Path $fixture 'Program.cs'), '--expected-arch', $Architecture,
                 '--expected-runtime', $version, '--log', (Join-Path $evidence "dap-net$version.jsonl"),
                 '--result', (Join-Path $evidence "dap-net$version-result.json")) "dap-net$version-console.log"
+            Invoke-Logged python @((Join-Path $PSScriptRoot 'upstream_suite.py'), '--source', $source,
+                '--debugger', $debugger, '--dotnet', $dotnet, '--runtime', $version, '--sdk', $sdkVersion,
+                '--arch', $Architecture, '--work', (Join-Path $root "upstream-net$version"),
+                '--evidence', $evidence) "upstream-net$version-console.log"
             $test.success = $true
         } catch {
             $test.error = $_.Exception.Message
@@ -221,7 +225,7 @@ try {
 - Error: $($status.error)
 
 See the artifact's result.json, DAP results, source-integrity.json, and logs.
-Scope: standalone debugger validation; no VSIX, IDE, attach, or publication checks.
+Scope: standalone debugger validation including upstream DAP scenarios; VSIX and publication use separate gates.
 "@ | Add-Content -Encoding utf8 $env:GITHUB_STEP_SUMMARY
     }
 }

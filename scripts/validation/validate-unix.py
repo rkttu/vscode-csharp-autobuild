@@ -89,7 +89,10 @@ def main():
                 sha256=sha256(repo / "scripts/validation/musl-coreclr-host.cpp"),
                 strategy="CoreCLR initialization on an owned 8 MiB pthread stack")
         if family == "darwin":
-            command += [f"-DCMAKE_OSX_ARCHITECTURES={'x86_64' if arch == 'x64' else 'arm64'}", "-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0"]
+            command += [f"-DCMAKE_OSX_ARCHITECTURES={'x86_64' if arch == 'x64' else 'arm64'}", "-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0",
+                        f"-DCMAKE_PROJECT_TOP_LEVEL_INCLUDES={repo}/scripts/validation/darwin-compat.cmake"]
+            status["externalRuntimeCompatibility"] = dict(file="scripts/validation/darwin-waitpid.cpp",
+                sha256=sha256(repo / "scripts/validation/darwin-waitpid.cpp"), strategy="Linked dyld waitpid observer")
         run(command, "configure.log")
         status["stage"] = "native-build"
         run(["cmake", "--build", build, "--target", "netcoredbg", "--parallel", "4"], "build.log")
@@ -115,8 +118,12 @@ def main():
         write(evidence / "resolved-libraries.json", libraries)
         notices = package / "notices"
         notices.mkdir()
-        if family == "alpine":
+        if family in ("alpine", "darwin"):
             shutil.copy2(repo / "LICENSE", notices / "vscode-csharp-autobuild-LICENSE")
+        if family == "darwin":
+            for name in ("darwin-waitpid.cpp", "darwin-exit-observer.cpp", "darwin-compat.cmake"):
+                shutil.copy2(repo / "scripts/validation" / name, notices / name)
+        if family == "alpine":
             shutil.copy2(repo / "scripts/validation/musl-coreclr-host.cpp", notices / "musl-coreclr-host.cpp")
         for file, name in [(source / "LICENSE", "Samsung-netcoredbg-LICENSE"),
                            (source / "third_party/linenoise-ng/LICENSE", "linenoise-ng-LICENSE"),
@@ -132,7 +139,10 @@ def main():
         relocated = root / "relocated/netcoredbg"
         shutil.copytree(package, relocated)
         debugger = relocated / "netcoredbg"
-        files = [dict(file=p.name, architecture=native_architecture(p), sha256=sha256(p)) for p in [debugger, relocated / shim]]
+        native_files = [debugger, relocated / shim]
+        if family == "darwin":
+            native_files.append(relocated / "libnetcoredbg-darwin-compat.dylib")
+        files = [dict(file=p.name, architecture=native_architecture(p), sha256=sha256(p)) for p in native_files]
         assert all(p["architecture"] == arch for p in files)
         write(evidence / "debugger-architectures.json", dict(success=True, expectedArchitecture=arch, files=files))
         run([debugger, "--version"], "debugger-version.log")
@@ -157,6 +167,10 @@ def main():
                      "--program", fixture / "output/Probe.dll", "--source", fixture / "Program.cs", "--expected-arch", arch,
                      "--expected-runtime", version, "--log", evidence / f"dap-net{version}.jsonl",
                      "--result", evidence / f"dap-net{version}-result.json"], f"dap-net{version}-console.log", fixture)
+                run([sys.executable, repo / "scripts/validation/upstream_suite.py", "--source", source,
+                     "--debugger", debugger, "--dotnet", dotnet, "--runtime", version, "--sdk", test["sdk"],
+                     "--arch", arch, "--work", root / ("upstream-net" + version), "--evidence", evidence],
+                    f"upstream-net{version}-console.log")
                 test["success"] = True
             except Exception as error:
                 test["error"] = str(error)

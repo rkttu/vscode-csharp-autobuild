@@ -17,3 +17,5 @@ The first four reports retain their original investigation scope. The Windows re
 The adjacent dated evidence directories contain source hashes, API snapshots, build logs, and DAP traces. Personal paths in archived evidence were replaced. The original DAP fixture and probe are preserved with their macOS ARM64 experiment; those historical results do not establish execution on other platforms.
 
 The existing production workflow and `dotnetdev-kr-custom.csharp` publication policy remain unchanged.
+
+- [Upstream functional gate and Darwin exit-code compatibility](2026-09-06-functional-gate-and-darwin-exit.md): external test projects, the newly detected nonzero-exit defect, runtime ABI correction, and publication fault tests.
