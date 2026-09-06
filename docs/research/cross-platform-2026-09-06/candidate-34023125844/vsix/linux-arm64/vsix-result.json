@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "target": "linux-arm64",
+  "version": "2.148.23001",
+  "vsix": "csharp-with-netcoredbg-linux-arm64-2.148.23001.vsix",
+  "sha256": "9cc0f69142d029e7b9e7e65d51e8463a8667d782b3c8da6c2626b2d39ae21d3e",
+  "runtimeTests": [
+    "8",
+    "10"
+  ],
+  "netcoredbgBuild": {
+    "target": "linux-arm64",
+    "upstreamCsharpCommit": "2f5806a9f39575bfaf4ca16445f420440a43e050",
+    "upstreamCsharpVersion": "2.148.23",
+    "upstreamCsharpTag": "v2.148.23-prerelease",
+    "upstreamPackageVersion": "42.42.42-placeholder",
+    "netcoredbgTag": "3.2.0-1092",
+    "packagingRevision": 1,
+    "releaseTag": "csharp-v2.148.23-netcoredbg-v3.2.0-1092-g9744e1f05186-r1",
+    "versionPolicy": "upstream-patch-revision-v1",
+    "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+    "debuggerArchiveSha256": "4442a945f1f087d7ef630c968c7bc5606e5029aaa67394255c3ac219f599eb9d",
+    "validationRunId": "34023125844",
+    "validationWorkflowCommit": "4b0b41ea198014a6384ff513e4ab660a8125bb8a"
+  },
+  "scope": "VSIX identity, permissions, exact bundled hashes and extracted-adapter DAP launch; no IDE UI test"
+}

@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "target": "alpine-arm64",
+  "version": "2.148.23001",
+  "vsix": "csharp-with-netcoredbg-alpine-arm64-2.148.23001.vsix",
+  "sha256": "e44bdfdc94d3b5a4af2fc16b3c549f7db3827e7c893f5ab3162bfe9236175066",
+  "runtimeTests": [
+    "8",
+    "10"
+  ],
+  "netcoredbgBuild": {
+    "target": "alpine-arm64",
+    "upstreamCsharpCommit": "2f5806a9f39575bfaf4ca16445f420440a43e050",
+    "upstreamCsharpVersion": "2.148.23",
+    "upstreamCsharpTag": "v2.148.23-prerelease",
+    "upstreamPackageVersion": "42.42.42-placeholder",
+    "netcoredbgTag": "3.2.0-1092",
+    "packagingRevision": 1,
+    "releaseTag": "csharp-v2.148.23-netcoredbg-v3.2.0-1092-g9744e1f05186-r1",
+    "versionPolicy": "upstream-patch-revision-v1",
+    "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+    "debuggerArchiveSha256": "6df585ebc3e5703cc66175bde23244e8daf633e0cd60a192136bfca8b1a0a50b",
+    "validationRunId": "34023125844",
+    "validationWorkflowCommit": "4b0b41ea198014a6384ff513e4ab660a8125bb8a"
+  },
+  "scope": "VSIX identity, permissions, exact bundled hashes and extracted-adapter DAP launch; no IDE UI test"
+}

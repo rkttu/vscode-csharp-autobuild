@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "target": "darwin-x64",
+  "version": "2.148.23001",
+  "vsix": "csharp-with-netcoredbg-darwin-x64-2.148.23001.vsix",
+  "sha256": "e929939a45a31c607779ba6a6f305fe6d4f0551718aac197739ac9f5054419ab",
+  "runtimeTests": [
+    "8",
+    "10"
+  ],
+  "netcoredbgBuild": {
+    "target": "darwin-x64",
+    "upstreamCsharpCommit": "2f5806a9f39575bfaf4ca16445f420440a43e050",
+    "upstreamCsharpVersion": "2.148.23",
+    "upstreamCsharpTag": "v2.148.23-prerelease",
+    "upstreamPackageVersion": "42.42.42-placeholder",
+    "netcoredbgTag": "3.2.0-1092",
+    "packagingRevision": 1,
+    "releaseTag": "csharp-v2.148.23-netcoredbg-v3.2.0-1092-g9744e1f05186-r1",
+    "versionPolicy": "upstream-patch-revision-v1",
+    "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+    "debuggerArchiveSha256": "30a921418025a825acbc14dd4f49e1d9bb5a33b35996333fea01d9b2758a6d2c",
+    "validationRunId": "34023125844",
+    "validationWorkflowCommit": "4b0b41ea198014a6384ff513e4ab660a8125bb8a"
+  },
+  "scope": "VSIX identity, permissions, exact bundled hashes and extracted-adapter DAP launch; no IDE UI test"
+}

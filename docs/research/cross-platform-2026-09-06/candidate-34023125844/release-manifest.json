@@ -1,0 +1,58 @@
+{
+  "candidate": {
+    "debuggerTag": "3.2.0-1092",
+    "debuggerSha": "9744e1f051866215611b8440c638042aa2aa2f72",
+    "csharpTag": "v2.148.23-prerelease",
+    "csharpSha": "2f5806a9f39575bfaf4ca16445f420440a43e050",
+    "recipe": "53d923175fe477b7e08d26bf6700ef9cd49ab7c0720b7a84a565707065391a37",
+    "fingerprint": "0d052c9196cfc05b785b61a6f4bc2895748ca855e13674923ce0eeddf1828f36",
+    "artifactPrefix": "0d052c9196cfc05b",
+    "versionPolicy": "upstream-patch-revision-v1",
+    "csharpVersion": "2.148.23",
+    "revision": 1,
+    "version": "2.148.23001",
+    "releaseTag": "csharp-v2.148.23-netcoredbg-v3.2.0-1092-g9744e1f05186-r1"
+  },
+  "targets": [
+    {
+      "target": "win32-x64",
+      "file": "csharp-with-netcoredbg-win32-x64-2.148.23001.vsix",
+      "sha256": "8ff4030fd6339973f2e89d1b6588338220a15c9ef239ce94759d74dee8f61efc"
+    },
+    {
+      "target": "win32-arm64",
+      "file": "csharp-with-netcoredbg-win32-arm64-2.148.23001.vsix",
+      "sha256": "a9bcc0cd2f41d89bd051c9bb2e1fbe7aea15dd91628390379fab2caadc9cbd3d"
+    },
+    {
+      "target": "linux-x64",
+      "file": "csharp-with-netcoredbg-linux-x64-2.148.23001.vsix",
+      "sha256": "dc873b526538dd3d6c808170eb02d7420ab7bd713cf8ae5e6579cbb6b05fb460"
+    },
+    {
+      "target": "linux-arm64",
+      "file": "csharp-with-netcoredbg-linux-arm64-2.148.23001.vsix",
+      "sha256": "9cc0f69142d029e7b9e7e65d51e8463a8667d782b3c8da6c2626b2d39ae21d3e"
+    },
+    {
+      "target": "alpine-x64",
+      "file": "csharp-with-netcoredbg-alpine-x64-2.148.23001.vsix",
+      "sha256": "9c3d7dcedebda8e4a09d13ffa3f7c3f7b0313be8f86e88c69e097f3a6bd416e4"
+    },
+    {
+      "target": "alpine-arm64",
+      "file": "csharp-with-netcoredbg-alpine-arm64-2.148.23001.vsix",
+      "sha256": "e44bdfdc94d3b5a4af2fc16b3c549f7db3827e7c893f5ab3162bfe9236175066"
+    },
+    {
+      "target": "darwin-x64",
+      "file": "csharp-with-netcoredbg-darwin-x64-2.148.23001.vsix",
+      "sha256": "e929939a45a31c607779ba6a6f305fe6d4f0551718aac197739ac9f5054419ab"
+    },
+    {
+      "target": "darwin-arm64",
+      "file": "csharp-with-netcoredbg-darwin-arm64-2.148.23001.vsix",
+      "sha256": "8d38fa0fe6d2f3789c569944179e434b30a1812942e9c69b7b94ee93437d9596"
+    }
+  ]
+}

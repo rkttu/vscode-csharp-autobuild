@@ -1,0 +1,14 @@
+[
+  {
+    "version": "8.0.418",
+    "rid": "linux-musl-x64",
+    "url": "https://builds.dotnet.microsoft.com/dotnet/Sdk/8.0.418/dotnet-sdk-8.0.418-linux-musl-x64.tar.gz",
+    "sha512": "dd0df048412919045561ab0e560d8c575ec2547729db84b0306115d5aaaea355f491d024c9e3f5e7642c6237c4b21439d279dfa7dcbbdc9a39037cf1c5445ab1"
+  },
+  {
+    "version": "10.0.400",
+    "rid": "linux-musl-x64",
+    "url": "https://builds.dotnet.microsoft.com/dotnet/Sdk/10.0.400/dotnet-sdk-10.0.400-linux-musl-x64.tar.gz",
+    "sha512": "afafd95fb98ea5c05beead628da64691b7c999459ecd9aea66e027d51436037db802a81ca17fd7eef691e74498f51929037552b4530eff88911f397a978c37c6"
+  }
+]
