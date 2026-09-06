@@ -1,0 +1,38 @@
+[
+  {
+    "target": "win32-x64",
+    "status": 200,
+    "version": "2.148.23001",
+    "download": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/win32-x64/2.148.23001/file/dotnetdev-kr-custom.csharp-with-netcoredbg-2.148.23001@win32-x64.vsix",
+    "sha256": "8eef6b8cfbaedd17d97f9199a059ffc9b2ba4e113260c67b1c3a99c71a6c1768",
+    "matchesTestedVsix": true
+  },
+  {
+    "target": "win32-arm64",
+    "status": 404
+  },
+  {
+    "target": "linux-x64",
+    "status": 404
+  },
+  {
+    "target": "linux-arm64",
+    "status": 404
+  },
+  {
+    "target": "alpine-x64",
+    "status": 404
+  },
+  {
+    "target": "alpine-arm64",
+    "status": 404
+  },
+  {
+    "target": "darwin-x64",
+    "status": 404
+  },
+  {
+    "target": "darwin-arm64",
+    "status": 404
+  }
+]

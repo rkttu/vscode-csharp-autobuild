@@ -1,5 +1,7 @@
 # Cross-platform validation and the independent netcoredbg release pipeline
 
+> Historical scope: this report records the pre-adoption review and its original test coverage. See [main adoption and first release](2026-09-06-first-release.md) for subsequent merge/publication status, and [the expanded functional gate](2026-09-06-functional-gate-and-darwin-exit.md) for upstream DAP coverage and publication fault tests.
+
 This report preserves the initial `0.1.4000` candidate and its earlier icon/version policy. The subsequent [versioning and merge-readiness report](2026-09-06-versioning-and-merge-readiness.md) supersedes those design choices and records the revised candidate. The historical run results below retain their original scope.
 
 On September 6, 2026, this repository built Samsung netcoredbg 3.2.0-1092 for all eight C# extension targets, generated eight independent VSIX packages, and passed .NET 8/10 DAP checks before and after packaging. The Alpine packages include repository-owned hosting compatibility code while preserving the original Samsung files. The final publication check passed in dry-run mode. No new extension has been published. [Complete candidate run](https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129)

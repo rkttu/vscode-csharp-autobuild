@@ -1,0 +1,49 @@
+2026-09-06T12:21:03.9355633Z ##[group]Run python3 scripts/variant/publish.py --artifacts release-artifacts --candidate candidate.json --publish
+2026-09-06T12:21:03.9356960Z python3 scripts/variant/publish.py --artifacts release-artifacts --candidate candidate.json --publish
+2026-09-06T12:21:03.9407608Z shell: /usr/bin/bash -e {0}
+2026-09-06T12:21:03.9408245Z env:
+2026-09-06T12:21:03.9409076Z   OVSX_PAT: ***
+2026-09-06T12:21:03.9412595Z   GH_TOKEN: ***
+2026-09-06T12:21:03.9413079Z ##[endgroup]
+2026-09-06T12:21:22.4375809Z https://github.com/rkttu/vscode-csharp-autobuild/releases/tag/untagged-47f8577c61d5bc6a0cad
+2026-09-06T12:21:28.9122312Z 🚀  Published dotnetdev-kr-custom.csharp-with-netcoredbg v2.148.23001@win32-x64
+2026-09-06T12:21:29.2184760Z Traceback (most recent call last):
+2026-09-06T12:21:29.2186025Z   File "<CI_WORKSPACE>/scripts/variant/publish.py", line 102, in execute
+2026-09-06T12:21:29.2187523Z     with urllib.request.urlopen(url, timeout=60) as response:
+2026-09-06T12:21:29.2188391Z   File "/usr/lib/python3.10/urllib/request.py", line 216, in urlopen
+2026-09-06T12:21:29.2400627Z     return opener.open(url, data, timeout)
+2026-09-06T12:21:29.2401571Z   File "/usr/lib/python3.10/urllib/request.py", line 525, in open
+2026-09-06T12:21:29.2479505Z     response = meth(req, response)
+2026-09-06T12:21:29.2480379Z   File "/usr/lib/python3.10/urllib/request.py", line 634, in http_response
+2026-09-06T12:21:29.2481203Z     response = self.parent.error(
+2026-09-06T12:21:29.2482028Z   File "/usr/lib/python3.10/urllib/request.py", line 563, in error
+2026-09-06T12:21:29.2486077Z     return self._call_chain(*args)
+2026-09-06T12:21:29.2486946Z   File "/usr/lib/python3.10/urllib/request.py", line 496, in _call_chain
+2026-09-06T12:21:29.2487610Z     result = func(*args)
+2026-09-06T12:21:29.2488366Z   File "/usr/lib/python3.10/urllib/request.py", line 643, in http_error_default
+2026-09-06T12:21:29.2489207Z     raise HTTPError(req.full_url, code, msg, hdrs, fp)
+2026-09-06T12:21:29.2489927Z urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-09-06T12:21:29.2490220Z 
+2026-09-06T12:21:29.2490545Z During handling of the above exception, another exception occurred:
+2026-09-06T12:21:29.2490855Z 
+2026-09-06T12:21:29.2491069Z Traceback (most recent call last):
+2026-09-06T12:21:29.2491790Z   File "<CI_WORKSPACE>/scripts/variant/publish.py", line 141, in <module>
+2026-09-06T12:21:29.2492425Z     main()
+2026-09-06T12:21:29.2493042Z   File "<CI_WORKSPACE>/scripts/variant/publish.py", line 134, in main
+2026-09-06T12:21:29.2493664Z     execute(args)
+2026-09-06T12:21:29.2494331Z   File "<CI_WORKSPACE>/scripts/variant/publish.py", line 109, in execute
+2026-09-06T12:21:29.2495361Z     with urllib.request.urlopen(url, timeout=60) as response:
+2026-09-06T12:21:29.2495985Z   File "/usr/lib/python3.10/urllib/request.py", line 216, in urlopen
+2026-09-06T12:21:29.2496507Z     return opener.open(url, data, timeout)
+2026-09-06T12:21:29.2497057Z   File "/usr/lib/python3.10/urllib/request.py", line 525, in open
+2026-09-06T12:21:29.2497542Z     response = meth(req, response)
+2026-09-06T12:21:29.2498078Z   File "/usr/lib/python3.10/urllib/request.py", line 634, in http_response
+2026-09-06T12:21:29.2498587Z     response = self.parent.error(
+2026-09-06T12:21:29.2499102Z   File "/usr/lib/python3.10/urllib/request.py", line 563, in error
+2026-09-06T12:21:29.2499585Z     return self._call_chain(*args)
+2026-09-06T12:21:29.2500104Z   File "/usr/lib/python3.10/urllib/request.py", line 496, in _call_chain
+2026-09-06T12:21:29.2500575Z     result = func(*args)
+2026-09-06T12:21:29.2501099Z   File "/usr/lib/python3.10/urllib/request.py", line 643, in http_error_default
+2026-09-06T12:21:29.2501679Z     raise HTTPError(req.full_url, code, msg, hdrs, fp)
+2026-09-06T12:21:29.2502212Z urllib.error.HTTPError: HTTP Error 404: Not Found
+2026-09-06T12:21:29.2631371Z ##[error]Process completed with exit code 1.

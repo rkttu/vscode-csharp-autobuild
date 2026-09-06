@@ -1,0 +1,54 @@
+{
+  "success": true,
+  "editor": "1.135.0",
+  "extensionId": "dotnetdev-kr-custom.csharp-with-netcoredbg",
+  "tests": [
+    {
+      "runtime": "8",
+      "success": true,
+      "checks": [
+        "IDE launch",
+        "conditional breakpoint",
+        "stack and variables",
+        "evaluate",
+        "step",
+        "post-await breakpoint",
+        "native runtime output and clean exit"
+      ],
+      "output": "RUNTIME=.NET 8.0.24;ARCH=Arm64\nANSWER=42\nAFTER_AWAIT=43\nCAUGHT\nDONE\n"
+    },
+    {
+      "runtime": "10",
+      "success": true,
+      "checks": [
+        "IDE launch",
+        "conditional breakpoint",
+        "stack and variables",
+        "evaluate",
+        "step",
+        "post-await breakpoint",
+        "native runtime output and clean exit"
+      ],
+      "output": "RUNTIME=.NET 10.0.11;ARCH=Arm64\nANSWER=42\nAFTER_AWAIT=43\nCAUGHT\nDONE\n"
+    }
+  ],
+  "extensionVersion": "2.148.23001",
+  "extensionPath": "<TEMP>/netcoredbg-windows-research/editor-smoke/extensions/dotnetdev-kr-custom.csharp-with-netcoredbg-2.148.23001",
+  "activation": true,
+  "netcoredbgBuild": {
+    "target": "darwin-arm64",
+    "upstreamCsharpCommit": "2f5806a9f39575bfaf4ca16445f420440a43e050",
+    "upstreamCsharpVersion": "2.148.23",
+    "upstreamCsharpTag": "v2.148.23-prerelease",
+    "upstreamPackageVersion": "42.42.42-placeholder",
+    "netcoredbgTag": "3.2.0-1092",
+    "packagingRevision": 1,
+    "releaseTag": "csharp-v2.148.23-netcoredbg-v3.2.0-1092-g9744e1f05186-r1",
+    "versionPolicy": "upstream-patch-revision-v1",
+    "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+    "debuggerArchiveSha256": "5bc2bee9d609968658a88b8392a0aa4dfb9a519cf381b6106384bcd2d569cf35",
+    "validationRunId": "34031151621",
+    "validationWorkflowCommit": "dd526c7b76dcad73f593717a93de67eaf575f55a"
+  },
+  "vsixSha256": "5051f72839d07e518ef60fba6c64add0794a73e242ec92de7eeae97beefb780c"
+}

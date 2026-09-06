@@ -1,0 +1,93 @@
+{
+  "runId": 34031151621,
+  "targets": [
+    {
+      "target": "win32-x64",
+      "vsixSha256": "8eef6b8cfbaedd17d97f9199a059ffc9b2ba4e113260c67b1c3a99c71a6c1768",
+      "debuggerSha256": "65e2302cbb850c2e7667495c8cb850a720c22b1febdc398d06b126c489035e2f",
+      "runtimes": [
+        "8",
+        "10"
+      ],
+      "upstreamScenariosPerRuntime": 30,
+      "resultSha256": "d7b9260ad8e086d57b01f8541dea0920bde91d37ab690e2905a870d5d009406d"
+    },
+    {
+      "target": "win32-arm64",
+      "vsixSha256": "39713504428d45658cb0eb6884bb62f1260e34c0f598eec8bf72618c35801ce8",
+      "debuggerSha256": "2a51a8e165c08999e4cd5e0749de66d21e096715f0f25fb70522030142b795de",
+      "runtimes": [
+        "8",
+        "10"
+      ],
+      "upstreamScenariosPerRuntime": 30,
+      "resultSha256": "b9e05db48871e669009e001da7e9309c56ad9928bc65971b8e3bebf4c842b0ea"
+    },
+    {
+      "target": "linux-x64",
+      "vsixSha256": "9c7934a01b184f298757f51466e7898d5feebf42407fcc72da121ecf765c109e",
+      "debuggerSha256": "ab916ba4299dd991dd0c0c945202d5dd09c38b7331f41a998d410dc98d2f9252",
+      "runtimes": [
+        "8",
+        "10"
+      ],
+      "upstreamScenariosPerRuntime": 30,
+      "resultSha256": "68f94544cb24e4bfca1204c8845505735f0519fc8e75dfb07cf8a5285dffbcb0"
+    },
+    {
+      "target": "linux-arm64",
+      "vsixSha256": "519efa42c2a8eabe08567fc6cf643765e8a09b98396d5fc5ad0f4401e810d880",
+      "debuggerSha256": "a19f04252fb443e47fbef81e229fa4f0729a6a06d71bef30fa7217bd78659350",
+      "runtimes": [
+        "8",
+        "10"
+      ],
+      "upstreamScenariosPerRuntime": 30,
+      "resultSha256": "387dc16655a752a89bea44ffcd48172d6b7f69cd2c9aab982214fdc17bd9e09f"
+    },
+    {
+      "target": "alpine-x64",
+      "vsixSha256": "4abc2d341e5152b106b861cdcef36f6721eed7dd3a8463bd2854c9ce16c3f495",
+      "debuggerSha256": "f3aefdd2866574a8d7017b835594844075b86d3d516c9696977a0fa174a7af9a",
+      "runtimes": [
+        "8",
+        "10"
+      ],
+      "upstreamScenariosPerRuntime": 30,
+      "resultSha256": "928d5a0663d08a8d59231eb3c69a94dc35fab0a4061bd43a9912dd4b0601454b"
+    },
+    {
+      "target": "alpine-arm64",
+      "vsixSha256": "69312c10779314493c7827267334d60be7915c497e35f1c71fe05071e1a18452",
+      "debuggerSha256": "e3a076c3a39ef28bdd49e10fa469152983e9745c94259e30ca81dfb3ebcff6cb",
+      "runtimes": [
+        "8",
+        "10"
+      ],
+      "upstreamScenariosPerRuntime": 30,
+      "resultSha256": "9b4e28767938167f331f71b9aa0813fdd7fd8800990657f1d661a1bd8cff1e0b"
+    },
+    {
+      "target": "darwin-x64",
+      "vsixSha256": "d369dde88ab31eae17e58d03146368d81d1cb81cbd1fe81ff87c94834e4f8e3a",
+      "debuggerSha256": "2e5ac7516dd9ac43b92a996829dcf4cb6587ec5ff006beb7e2f771b8106752c1",
+      "runtimes": [
+        "8",
+        "10"
+      ],
+      "upstreamScenariosPerRuntime": 30,
+      "resultSha256": "95330df26ab901a3d355428f73f6a70ceb3674670ef54dd84edf1fca13742dd9"
+    },
+    {
+      "target": "darwin-arm64",
+      "vsixSha256": "5051f72839d07e518ef60fba6c64add0794a73e242ec92de7eeae97beefb780c",
+      "debuggerSha256": "73e103080e5d4846deb1cf066ac80b88ba66fb4ed241020c51bcf56d1a47d33e",
+      "runtimes": [
+        "8",
+        "10"
+      ],
+      "upstreamScenariosPerRuntime": 30,
+      "resultSha256": "a367c1c7b08820848713f0f77ddf5d6268091cd61230a6c67bf2667f8672fecf"
+    }
+  ]
+}

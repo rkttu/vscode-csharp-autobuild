@@ -1,5 +1,7 @@
 # Publication recovery and rollback boundaries
 
+> Historical scope: this report records the pre-adoption review and its original test coverage. See [main adoption and first release](2026-09-06-first-release.md) for subsequent merge/publication status, and [the expanded functional gate](2026-09-06-functional-gate-and-darwin-exit.md) for upstream DAP coverage and publication fault tests.
+
 On September 6, 2026, the independent netcoredbg variant had completed its eight-platform publication dry run but had not uploaded to Open VSX. This follow-up reviewed interruption recovery and post-publication rollback against the current repository code and the public registry. A read-only request to `https://open-vsx.org/api/version` returned `{"maxExtensionSize":262144000,"version":"v1.1.2"}`. [Successful candidate](https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34023125844), [public version endpoint](https://open-vsx.org/api/version)
 
 The review covers partial uploads, withdrawal of a defective version, recovery for installed users, gaps in the current automation and the effect on operational readiness. It does not execute publication, deletion or rollback.

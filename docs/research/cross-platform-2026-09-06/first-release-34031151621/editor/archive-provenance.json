@@ -1,0 +1,20 @@
+{
+  "runId": 34031151621,
+  "records": [
+    {
+      "file": "ide-net8.json",
+      "rawSha256": "b065972dff653fb7e44221db81d63c4f6f3619fe23f503f4dca4449e3bcb5ff6",
+      "archivedSha256": "912218db450895a9984333ff2e44886a78b4dd11cff603cb5fa608170852a096"
+    },
+    {
+      "file": "ide-net10.json",
+      "rawSha256": "bbdb6e4706d5135e1346af0015e6a1ea5ac21d8085bf6fa8070884174d4e1fc4",
+      "archivedSha256": "7750aacebe61b479bc7bc1f0fece4f337f81f1cfe7f1015dded455ad08c14ac9"
+    },
+    {
+      "file": "ide-result.json",
+      "rawSha256": "43a6235ce30f697c201542d3b7152bf77be5e853b9077fd9c654cc3ce4c5007d",
+      "archivedSha256": "8e92905ea2ffe7d9bda7b17edce6f2b9fce5a603bf6ebf4020ce064a842ed5d5"
+    }
+  ]
+}

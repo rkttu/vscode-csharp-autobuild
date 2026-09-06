@@ -1,0 +1,1558 @@
+[
+  {
+    "direction": "editor",
+    "message": {
+      "command": "initialize",
+      "arguments": {
+        "clientID": "vscode",
+        "clientName": "Visual Studio Code",
+        "adapterID": "coreclr",
+        "pathFormat": "path",
+        "linesStartAt1": true,
+        "columnsStartAt1": true,
+        "supportsVariableType": true,
+        "supportsVariablePaging": true,
+        "supportsRunInTerminalRequest": true,
+        "locale": "en",
+        "supportsProgressReporting": true,
+        "supportsInvalidatedEvent": true,
+        "supportsMemoryReferences": true,
+        "supportsArgsCanBeInterpretedByShell": true,
+        "supportsMemoryEvent": true,
+        "supportsStartDebuggingRequest": true,
+        "supportsANSIStyling": true
+      },
+      "type": "request",
+      "seq": 1
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "capabilities": {
+          "exceptionBreakpointFilters": [
+            {
+              "filter": "user-unhandled",
+              "label": "user-unhandled"
+            },
+            {
+              "filter": "all",
+              "label": "all"
+            }
+          ],
+          "supportTerminateDebuggee": true,
+          "supportsCancelRequest": true,
+          "supportsConditionalBreakpoints": true,
+          "supportsConfigurationDoneRequest": true,
+          "supportsExceptionFilterOptions": true,
+          "supportsExceptionInfoRequest": true,
+          "supportsExceptionOptions": false,
+          "supportsFunctionBreakpoints": true,
+          "supportsSetExpression": true,
+          "supportsSetVariable": true,
+          "supportsTerminateRequest": true
+        }
+      },
+      "event": "capabilities",
+      "seq": 1,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "exceptionBreakpointFilters": [
+          {
+            "filter": "user-unhandled",
+            "label": "user-unhandled"
+          },
+          {
+            "filter": "all",
+            "label": "all"
+          }
+        ],
+        "supportTerminateDebuggee": true,
+        "supportsCancelRequest": true,
+        "supportsConditionalBreakpoints": true,
+        "supportsConfigurationDoneRequest": true,
+        "supportsExceptionFilterOptions": true,
+        "supportsExceptionInfoRequest": true,
+        "supportsExceptionOptions": false,
+        "supportsFunctionBreakpoints": true,
+        "supportsSetExpression": true,
+        "supportsSetVariable": true,
+        "supportsTerminateRequest": true
+      },
+      "command": "initialize",
+      "request_seq": 1,
+      "seq": 2,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {},
+      "event": "initialized",
+      "seq": 3,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "launch",
+      "arguments": {
+        "type": "coreclr",
+        "name": "netcoredbg editor net8",
+        "request": "launch",
+        "program": "<TEMP>/netcoredbg-windows-research/editor-smoke/workspace/net8/output/Probe.dll",
+        "cwd": "<TEMP>/netcoredbg-windows-research/editor-smoke/workspace/net8",
+        "stopAtEntry": false,
+        "justMyCode": true,
+        "console": "internalConsole",
+        "__sessionId": "7f1806d1-eb28-4103-948e-106bb5bd41d2"
+      },
+      "type": "request",
+      "seq": 2
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {},
+      "command": "launch",
+      "request_seq": 2,
+      "seq": 4,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "setBreakpoints",
+      "arguments": {
+        "source": {
+          "name": "Program.cs",
+          "path": "<TEMP>/netcoredbg-windows-research/editor-smoke/workspace/net8/Program.cs"
+        },
+        "lines": [
+          5,
+          9
+        ],
+        "breakpoints": [
+          {
+            "line": 5,
+            "condition": "answer == 40"
+          },
+          {
+            "line": 9
+          }
+        ],
+        "sourceModified": false
+      },
+      "type": "request",
+      "seq": 3
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "setFunctionBreakpoints",
+      "arguments": {
+        "breakpoints": []
+      },
+      "type": "request",
+      "seq": 4
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "setExceptionBreakpoints",
+      "arguments": {
+        "filters": [],
+        "filterOptions": []
+      },
+      "type": "request",
+      "seq": 5
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "breakpoints": [
+          {
+            "id": 1,
+            "line": 5,
+            "message": "The breakpoint is pending and will be resolved when debugging starts.",
+            "verified": false
+          },
+          {
+            "id": 2,
+            "line": 9,
+            "message": "The breakpoint is pending and will be resolved when debugging starts.",
+            "verified": false
+          }
+        ]
+      },
+      "command": "setBreakpoints",
+      "request_seq": 3,
+      "seq": 5,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "breakpoints": []
+      },
+      "command": "setFunctionBreakpoints",
+      "request_seq": 4,
+      "seq": 6,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {},
+      "command": "setExceptionBreakpoints",
+      "request_seq": 5,
+      "seq": 7,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "configurationDone",
+      "type": "request",
+      "seq": 6
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "isLocalProcess": true,
+        "name": "dotnet",
+        "startMethod": "launch",
+        "systemProcessId": 32539
+      },
+      "event": "process",
+      "seq": 8,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {},
+      "command": "configurationDone",
+      "request_seq": 6,
+      "seq": 9,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "threads",
+      "type": "request",
+      "seq": 7
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "threads": []
+      },
+      "command": "threads",
+      "request_seq": 7,
+      "seq": 10,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "module": {
+          "id": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+          "name": "System.Private.CoreLib.dll",
+          "path": "<USER_HOME>/Library/Application Support/dotnetup/dotnet/shared/Microsoft.NETCore.App/8.0.24/System.Private.CoreLib.dll",
+          "symbolStatus": "Symbols not found."
+        },
+        "reason": "new"
+      },
+      "event": "module",
+      "seq": 11,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "reason": "started",
+        "threadId": 2387879
+      },
+      "event": "thread",
+      "seq": 12,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "module": {
+          "id": "92d94b8e-6150-4e1f-8e7c-e216b979681a",
+          "name": "Probe.dll",
+          "path": "<TEMP>/netcoredbg-windows-research/editor-smoke/workspace/net8/output/Probe.dll",
+          "symbolStatus": "Symbols loaded."
+        },
+        "reason": "new"
+      },
+      "event": "module",
+      "seq": 13,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "breakpoint": {
+          "endLine": 5,
+          "id": 1,
+          "line": 5,
+          "source": {
+            "name": "Program.cs",
+            "path": "<TEMP>/netcoredbg-windows-research/editor-smoke/workspace/net8/Program.cs"
+          },
+          "verified": true
+        },
+        "reason": "changed"
+      },
+      "event": "breakpoint",
+      "seq": 14,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "breakpoint": {
+          "endLine": 9,
+          "id": 2,
+          "line": 9,
+          "source": {
+            "name": "Program.cs",
+            "path": "<TEMP>/netcoredbg-windows-research/editor-smoke/workspace/net8/Program.cs"
+          },
+          "verified": true
+        },
+        "reason": "changed"
+      },
+      "event": "breakpoint",
+      "seq": 15,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "module": {
+          "id": "0e18a60a-7b65-4f68-a98e-99d0cee6d958",
+          "name": "System.Runtime.dll",
+          "path": "<USER_HOME>/Library/Application Support/dotnetup/dotnet/shared/Microsoft.NETCore.App/8.0.24/System.Runtime.dll",
+          "symbolStatus": "Symbols not found."
+        },
+        "reason": "new"
+      },
+      "event": "module",
+      "seq": 16,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "module": {
+          "id": "cecdbd7b-bfa7-4b7d-80f1-198fbed8dca7",
+          "name": "System.Console.dll",
+          "path": "<USER_HOME>/Library/Application Support/dotnetup/dotnet/shared/Microsoft.NETCore.App/8.0.24/System.Console.dll",
+          "symbolStatus": "Symbols not found."
+        },
+        "reason": "new"
+      },
+      "event": "module",
+      "seq": 17,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "module": {
+          "id": "2d6dc9d2-afac-42ca-b865-a87a643d122b",
+          "name": "System.Threading.dll",
+          "path": "<USER_HOME>/Library/Application Support/dotnetup/dotnet/shared/Microsoft.NETCore.App/8.0.24/System.Threading.dll",
+          "symbolStatus": "Symbols not found."
+        },
+        "reason": "new"
+      },
+      "event": "module",
+      "seq": 18,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "module": {
+          "id": "10b58443-4c59-4ef4-aa3d-00a915eb41ea",
+          "name": "System.Runtime.InteropServices.dll",
+          "path": "<USER_HOME>/Library/Application Support/dotnetup/dotnet/shared/Microsoft.NETCore.App/8.0.24/System.Runtime.InteropServices.dll",
+          "symbolStatus": "Symbols not found."
+        },
+        "reason": "new"
+      },
+      "event": "module",
+      "seq": 19,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "module": {
+          "id": "cfb50650-b798-461a-b8c2-52be9d972079",
+          "name": "Microsoft.Win32.Primitives.dll",
+          "path": "<USER_HOME>/Library/Application Support/dotnetup/dotnet/shared/Microsoft.NETCore.App/8.0.24/Microsoft.Win32.Primitives.dll",
+          "symbolStatus": "Symbols not found."
+        },
+        "reason": "new"
+      },
+      "event": "module",
+      "seq": 20,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "seq": 21,
+      "event": "output",
+      "type": "event",
+      "body": {
+        "category": "stdout",
+        "output": "RUNTIME=.NET 8.0.24;ARCH=Arm64\n"
+      }
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "threads",
+      "type": "request",
+      "seq": 8
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "threads": [
+          {
+            "id": 2387879,
+            "name": "Main Thread"
+          }
+        ]
+      },
+      "command": "threads",
+      "request_seq": 8,
+      "seq": 22,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "allThreadsStopped": true,
+        "reason": "breakpoint",
+        "threadId": 2387879
+      },
+      "event": "stopped",
+      "seq": 23,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "threads",
+      "type": "request",
+      "seq": 9
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "threads": [
+          {
+            "id": 2387879,
+            "name": "Main Thread"
+          }
+        ]
+      },
+      "command": "threads",
+      "request_seq": 9,
+      "seq": 24,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "stackTrace",
+      "arguments": {
+        "threadId": 2387879,
+        "startFrame": 0,
+        "levels": 20
+      },
+      "type": "request",
+      "seq": 10
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "stackFrames": [
+          {
+            "column": 1,
+            "endColumn": 13,
+            "endLine": 5,
+            "id": 0,
+            "line": 5,
+            "moduleId": "92d94b8e-6150-4e1f-8e7c-e216b979681a",
+            "name": "Program.<<Main>$>d__0.MoveNext()",
+            "source": {
+              "name": "Program.cs",
+              "path": "<TEMP>/netcoredbg-windows-research/editor-smoke/workspace/net8/Program.cs"
+            }
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 1,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start<Program.<<Main>$>d__0>()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 2,
+            "line": 0,
+            "moduleId": "92d94b8e-6150-4e1f-8e7c-e216b979681a",
+            "name": "Program.<Main>$()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 3,
+            "line": 0,
+            "moduleId": "92d94b8e-6150-4e1f-8e7c-e216b979681a",
+            "name": "Program.<Main>()"
+          }
+        ],
+        "totalFrames": 4
+      },
+      "command": "stackTrace",
+      "request_seq": 10,
+      "seq": 25,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "stackTrace",
+      "arguments": {
+        "threadId": 2387879
+      },
+      "type": "request",
+      "seq": 11
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "stackFrames": [
+          {
+            "column": 1,
+            "endColumn": 13,
+            "endLine": 5,
+            "id": 0,
+            "line": 5,
+            "moduleId": "92d94b8e-6150-4e1f-8e7c-e216b979681a",
+            "name": "Program.<<Main>$>d__0.MoveNext()",
+            "source": {
+              "name": "Program.cs",
+              "path": "<TEMP>/netcoredbg-windows-research/editor-smoke/workspace/net8/Program.cs"
+            }
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 1,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start<Program.<<Main>$>d__0>()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 2,
+            "line": 0,
+            "moduleId": "92d94b8e-6150-4e1f-8e7c-e216b979681a",
+            "name": "Program.<Main>$()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 3,
+            "line": 0,
+            "moduleId": "92d94b8e-6150-4e1f-8e7c-e216b979681a",
+            "name": "Program.<Main>()"
+          }
+        ],
+        "totalFrames": 4
+      },
+      "command": "stackTrace",
+      "request_seq": 11,
+      "seq": 26,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "scopes",
+      "arguments": {
+        "frameId": 0
+      },
+      "type": "request",
+      "seq": 12
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "scopes": [
+          {
+            "expensive": false,
+            "name": "Locals",
+            "namedVariables": 3,
+            "variablesReference": 1
+          }
+        ]
+      },
+      "command": "scopes",
+      "request_seq": 12,
+      "seq": 27,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "scopes",
+      "arguments": {
+        "frameId": 0
+      },
+      "type": "request",
+      "seq": 13
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "scopes": [
+          {
+            "expensive": false,
+            "name": "Locals",
+            "namedVariables": 3,
+            "variablesReference": 2
+          }
+        ]
+      },
+      "command": "scopes",
+      "request_seq": 13,
+      "seq": 28,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "variables",
+      "arguments": {
+        "variablesReference": 2
+      },
+      "type": "request",
+      "seq": 14
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "variables": [
+          {
+            "evaluateName": "args",
+            "name": "args",
+            "type": "string[]",
+            "value": "{string[0]}",
+            "variablesReference": 0
+          },
+          {
+            "evaluateName": "answer",
+            "name": "answer",
+            "type": "int",
+            "value": "40",
+            "variablesReference": 0
+          },
+          {
+            "evaluateName": "afterAwait",
+            "name": "afterAwait",
+            "type": "int",
+            "value": "0",
+            "variablesReference": 0
+          }
+        ]
+      },
+      "command": "variables",
+      "request_seq": 14,
+      "seq": 29,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "evaluate",
+      "arguments": {
+        "frameId": 0,
+        "expression": "answer + 2",
+        "context": "watch"
+      },
+      "type": "request",
+      "seq": 15
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "result": "42",
+        "type": "int",
+        "variablesReference": 0
+      },
+      "command": "evaluate",
+      "request_seq": 15,
+      "seq": 30,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "next",
+      "arguments": {
+        "threadId": 2387879
+      },
+      "type": "request",
+      "seq": 16
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "allThreadsContinued": true,
+        "threadId": 2387879
+      },
+      "event": "continued",
+      "seq": 31,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {},
+      "command": "next",
+      "request_seq": 16,
+      "seq": 32,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "allThreadsStopped": true,
+        "reason": "step",
+        "threadId": 2387879
+      },
+      "event": "stopped",
+      "seq": 33,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "threads",
+      "type": "request",
+      "seq": 17
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "threads": [
+          {
+            "id": 2387879,
+            "name": "Main Thread"
+          }
+        ]
+      },
+      "command": "threads",
+      "request_seq": 17,
+      "seq": 34,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "stackTrace",
+      "arguments": {
+        "threadId": 2387879,
+        "startFrame": 0,
+        "levels": 20
+      },
+      "type": "request",
+      "seq": 18
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "continue",
+      "arguments": {
+        "threadId": 2387879
+      },
+      "type": "request",
+      "seq": 19
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "stackFrames": [
+          {
+            "column": 1,
+            "endColumn": 39,
+            "endLine": 6,
+            "id": 4,
+            "line": 6,
+            "moduleId": "92d94b8e-6150-4e1f-8e7c-e216b979681a",
+            "name": "Program.<<Main>$>d__0.MoveNext()",
+            "source": {
+              "name": "Program.cs",
+              "path": "<TEMP>/netcoredbg-windows-research/editor-smoke/workspace/net8/Program.cs"
+            }
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 5,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Runtime.CompilerServices.AsyncMethodBuilderCore.Start<Program.<<Main>$>d__0>()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 6,
+            "line": 0,
+            "moduleId": "92d94b8e-6150-4e1f-8e7c-e216b979681a",
+            "name": "Program.<Main>$()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 7,
+            "line": 0,
+            "moduleId": "92d94b8e-6150-4e1f-8e7c-e216b979681a",
+            "name": "Program.<Main>()"
+          }
+        ],
+        "totalFrames": 4
+      },
+      "command": "stackTrace",
+      "request_seq": 18,
+      "seq": 35,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "allThreadsContinued": true,
+        "threadId": 2387879
+      },
+      "event": "continued",
+      "seq": 36,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "allThreadsContinued": true,
+        "threadId": 2387879
+      },
+      "command": "continue",
+      "request_seq": 19,
+      "seq": 37,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "seq": 38,
+      "event": "output",
+      "type": "event",
+      "body": {
+        "category": "stdout",
+        "output": "ANSWER=42\n"
+      }
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "reason": "started",
+        "threadId": 2388006
+      },
+      "event": "thread",
+      "seq": 39,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "reason": "started",
+        "threadId": 2387949
+      },
+      "event": "thread",
+      "seq": 40,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "reason": "started",
+        "threadId": 2388007
+      },
+      "event": "thread",
+      "seq": 41,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "reason": "started",
+        "threadId": 2388008
+      },
+      "event": "thread",
+      "seq": 42,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "reason": "started",
+        "threadId": 2388009
+      },
+      "event": "thread",
+      "seq": 43,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "threads",
+      "type": "request",
+      "seq": 20
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "allThreadsStopped": true,
+        "reason": "breakpoint",
+        "threadId": 2388007
+      },
+      "event": "stopped",
+      "seq": 44,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "threads": [
+          {
+            "id": 2387879,
+            "name": "Main Thread"
+          },
+          {
+            "id": 2387949,
+            "name": "<No name>"
+          },
+          {
+            "id": 2388006,
+            "name": ".NET Timer"
+          },
+          {
+            "id": 2388007,
+            "name": ".NET TP Worker"
+          },
+          {
+            "id": 2388008,
+            "name": ".NET TP Gate"
+          },
+          {
+            "id": 2388009,
+            "name": ".NET TP Worker"
+          }
+        ]
+      },
+      "command": "threads",
+      "request_seq": 20,
+      "seq": 45,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "threads",
+      "type": "request",
+      "seq": 21
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "threads": [
+          {
+            "id": 2387879,
+            "name": "Main Thread"
+          },
+          {
+            "id": 2387949,
+            "name": "<No name>"
+          },
+          {
+            "id": 2388006,
+            "name": ".NET Timer"
+          },
+          {
+            "id": 2388007,
+            "name": ".NET TP Worker"
+          },
+          {
+            "id": 2388008,
+            "name": ".NET TP Gate"
+          },
+          {
+            "id": 2388009,
+            "name": ".NET TP Worker"
+          }
+        ]
+      },
+      "command": "threads",
+      "request_seq": 21,
+      "seq": 46,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "stackTrace",
+      "arguments": {
+        "threadId": 2388007,
+        "startFrame": 0,
+        "levels": 20
+      },
+      "type": "request",
+      "seq": 22
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "stackTrace",
+      "arguments": {
+        "threadId": 2388007
+      },
+      "type": "request",
+      "seq": 23
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "stackFrames": [
+          {
+            "column": 1,
+            "endColumn": 48,
+            "endLine": 9,
+            "id": 8,
+            "line": 9,
+            "moduleId": "92d94b8e-6150-4e1f-8e7c-e216b979681a",
+            "name": "Program.<<Main>$>d__0.MoveNext()",
+            "source": {
+              "name": "Program.cs",
+              "path": "<TEMP>/netcoredbg-windows-research/editor-smoke/workspace/net8/Program.cs"
+            }
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 9,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Threading.ExecutionContext.RunInternal()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 10,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Runtime.CompilerServices.AsyncTaskMethodBuilder<System.Threading.Tasks.VoidTaskResult>.AsyncStateMachineBox<Program.<<Main>$>d__0>.MoveNext()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 11,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 12,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Threading.Tasks.Task.RunContinuations()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 13,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Threading.Tasks.Task.TrySetResult()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 14,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Threading.Tasks.Task.DelayPromise.CompleteTimedOut()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 15,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Threading.TimerQueueTimer.Fire()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 16,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Threading.TimerQueue.FireNextTimers()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 17,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Threading.ThreadPoolWorkQueue.Dispatch()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 18,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 19,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Threading.Thread.StartCallback()"
+          }
+        ],
+        "totalFrames": 12
+      },
+      "command": "stackTrace",
+      "request_seq": 22,
+      "seq": 47,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "stackFrames": [
+          {
+            "column": 1,
+            "endColumn": 48,
+            "endLine": 9,
+            "id": 8,
+            "line": 9,
+            "moduleId": "92d94b8e-6150-4e1f-8e7c-e216b979681a",
+            "name": "Program.<<Main>$>d__0.MoveNext()",
+            "source": {
+              "name": "Program.cs",
+              "path": "<TEMP>/netcoredbg-windows-research/editor-smoke/workspace/net8/Program.cs"
+            }
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 9,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Threading.ExecutionContext.RunInternal()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 10,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Runtime.CompilerServices.AsyncTaskMethodBuilder<System.Threading.Tasks.VoidTaskResult>.AsyncStateMachineBox<Program.<<Main>$>d__0>.MoveNext()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 11,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Threading.Tasks.AwaitTaskContinuation.RunOrScheduleAction()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 12,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Threading.Tasks.Task.RunContinuations()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 13,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Threading.Tasks.Task.TrySetResult()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 14,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Threading.Tasks.Task.DelayPromise.CompleteTimedOut()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 15,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Threading.TimerQueueTimer.Fire()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 16,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Threading.TimerQueue.FireNextTimers()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 17,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Threading.ThreadPoolWorkQueue.Dispatch()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 18,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Threading.PortableThreadPool.WorkerThread.WorkerThreadStart()"
+          },
+          {
+            "column": 0,
+            "endColumn": 0,
+            "endLine": 0,
+            "id": 19,
+            "line": 0,
+            "moduleId": "f8350a1a-b739-4363-a06b-62d52f873e3c",
+            "name": "System.Threading.Thread.StartCallback()"
+          }
+        ],
+        "totalFrames": 12
+      },
+      "command": "stackTrace",
+      "request_seq": 23,
+      "seq": 48,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "continue",
+      "arguments": {
+        "threadId": 2388007
+      },
+      "type": "request",
+      "seq": 24
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "allThreadsContinued": true,
+        "threadId": 2388007
+      },
+      "event": "continued",
+      "seq": 49,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "allThreadsContinued": true,
+        "threadId": 2388007
+      },
+      "command": "continue",
+      "request_seq": 24,
+      "seq": 50,
+      "success": true,
+      "type": "response"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "seq": 51,
+      "event": "output",
+      "type": "event",
+      "body": {
+        "category": "stdout",
+        "output": "AFTER_AWAIT=43\n"
+      }
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "seq": 52,
+      "event": "output",
+      "type": "event",
+      "body": {
+        "category": "stdout",
+        "output": "CAUGHT\n"
+      }
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "seq": 53,
+      "event": "output",
+      "type": "event",
+      "body": {
+        "category": "stdout",
+        "output": "DONE\n"
+      }
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {
+        "exitCode": 0
+      },
+      "event": "exited",
+      "seq": 54,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {},
+      "event": "terminated",
+      "seq": 55,
+      "type": "event"
+    }
+  },
+  {
+    "direction": "editor",
+    "message": {
+      "command": "disconnect",
+      "arguments": {
+        "restart": false,
+        "terminateDebuggee": false
+      },
+      "type": "request",
+      "seq": 25
+    }
+  },
+  {
+    "direction": "adapter",
+    "message": {
+      "body": {},
+      "command": "disconnect",
+      "request_seq": 25,
+      "seq": 56,
+      "success": true,
+      "type": "response"
+    }
+  }
+]
