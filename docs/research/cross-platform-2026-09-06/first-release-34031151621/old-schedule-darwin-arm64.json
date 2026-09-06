@@ -1,0 +1,261 @@
+{
+  "runId": 34033536801,
+  "jobId": 101487417953,
+  "headSha": "f00801b079f94c3fceb37d91f915a55c880f5025",
+  "runCancelled": true,
+  "results": [
+    {
+      "success": false,
+      "runtime": "10",
+      "sdk": "10.0.400",
+      "architecture": "arm64",
+      "debuggerSha256": "71a9d8654fdd6355ecd8dd231a2b660ee604a440d4174f74fc0ff5883f8323b5",
+      "sourceUnchanged": true,
+      "tests": [
+        {
+          "name": "VSCodeExampleTest",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 1.87
+        },
+        {
+          "name": "VSCodeTestBreakpoint",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 2.16
+        },
+        {
+          "name": "VSCodeTestFuncBreak",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 2.37
+        },
+        {
+          "name": "VSCodeTestAttach",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 3.97
+        },
+        {
+          "name": "VSCodeTestPause",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 4.49
+        },
+        {
+          "name": "VSCodeTestDisconnect",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 2.05
+        },
+        {
+          "name": "VSCodeTestThreads",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 2.3
+        },
+        {
+          "name": "VSCodeTestVariables",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 47.03
+        },
+        {
+          "name": "VSCodeTestEvaluate",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 12.34
+        },
+        {
+          "name": "VSCodeTestStepping",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 1.69
+        },
+        {
+          "name": "VSCodeTestEnv",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 1.63
+        },
+        {
+          "name": "VSCodeTestExitCode",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 1.74
+        },
+        {
+          "name": "VSCodeTestEvalNotEnglish",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 2.15
+        },
+        {
+          "name": "VSCodeTest\u4e2d\u6587\u76ee\u5f55",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 2.03
+        },
+        {
+          "name": "VSCodeTestSrcBreakpointResolve",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 2.16
+        },
+        {
+          "name": "VSCodeTestEnum",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 1.7
+        },
+        {
+          "name": "VSCodeTestAsyncStepping",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 33.5
+        },
+        {
+          "name": "VSCodeTestBreak",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 2.2
+        },
+        {
+          "name": "VSCodeTestNoJMCNoFilterStepping",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 2.45
+        },
+        {
+          "name": "VSCodeTestNoJMCBreakpoint",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 2.09
+        },
+        {
+          "name": "VSCodeTestNoJMCAsyncStepping",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 15.77
+        },
+        {
+          "name": "VSCodeTestExceptionBreakpoint",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 2.42
+        },
+        {
+          "name": "VSCodeTestNoJMCExceptionBreakpoint",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 2.2
+        },
+        {
+          "name": "VSCodeTestSizeof",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 1.89
+        },
+        {
+          "name": "VSCodeTestAsyncLambdaEvaluate",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 5.02
+        },
+        {
+          "name": "VSCodeTestGeneric",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 2.7
+        },
+        {
+          "name": "VSCodeTestEvalArraysIndexers",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 2.6
+        },
+        {
+          "name": "VSCodeTestExtensionMethods",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 1.82
+        },
+        {
+          "name": "VSCodeTestBreakpointWithoutStop",
+          "success": true,
+          "stage": "execute",
+          "exitCode": 0,
+          "timedOut": false,
+          "durationSeconds": 17.2
+        },
+        {
+          "name": "VSCodeTestUnhandledException",
+          "success": false,
+          "stage": "execute",
+          "exitCode": 1,
+          "timedOut": false,
+          "durationSeconds": 12.35
+        }
+      ],
+      "stage": "VSCodeTestUnhandledException",
+      "error": "Upstream DAP failures: VSCodeTestUnhandledException",
+      "changedOrMissing": []
+    }
+  ]
+}

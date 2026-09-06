@@ -1,0 +1,39 @@
+{
+  "verifiedTargets": [
+    "win32-x64",
+    "win32-arm64",
+    "linux-x64",
+    "linux-arm64",
+    "alpine-x64",
+    "alpine-arm64",
+    "darwin-x64",
+    "darwin-arm64"
+  ],
+  "stage": "published",
+  "candidate": {
+    "debuggerTag": "3.2.0-1092",
+    "debuggerSha": "9744e1f051866215611b8440c638042aa2aa2f72",
+    "csharpTag": "v2.148.23-prerelease",
+    "csharpSha": "2f5806a9f39575bfaf4ca16445f420440a43e050",
+    "recipe": "ee1443d0d2bc0a76dfbd129e574126d6badfeaa9a55bf7aed861750df4f085f5",
+    "fingerprint": "46d3aacd73532b6365d62b82f6d4a9e9a40d126236aa9987e2eb8b076fd59346",
+    "artifactPrefix": "46d3aacd73532b63",
+    "versionPolicy": "upstream-patch-revision-v1",
+    "csharpVersion": "2.148.23",
+    "revision": 1,
+    "version": "2.148.23001",
+    "releaseTag": "csharp-v2.148.23-netcoredbg-v3.2.0-1092-g9744e1f05186-r1"
+  },
+  "publicationRequested": true,
+  "success": true,
+  "submittedTargets": [
+    "win32-arm64",
+    "linux-x64",
+    "linux-arm64",
+    "alpine-x64",
+    "alpine-arm64",
+    "darwin-x64",
+    "darwin-arm64"
+  ],
+  "target": "darwin-arm64"
+}

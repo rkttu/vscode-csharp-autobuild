@@ -107,7 +107,7 @@ Variant releases use their own tag prefix and do not replace the repository's Gi
 
 The upstream-preserving workflow runs at `0 */6 * * *` UTC. The independent variant workflow runs at `23 */6 * * *` UTC, corresponding to 03:23, 09:23, 15:23, and 21:23 in Korea. GitHub schedules run from the default branch and can be delayed. Public repository schedules may be disabled after 60 days without repository activity; see [GitHub's schedule documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
 
-The variant release sequence is discovery, native build/tests, complete result aggregation, VSIX packaging, native extracted-VSIX tests, artifact preservation, Open VSX upload/readback, and GitHub release completion. All platform gates must pass before the first upload. The workflow uses one concurrency group without canceling an active release.
+The variant release sequence is discovery, native build/tests, complete result aggregation, VSIX packaging, native extracted-VSIX tests, artifact preservation, Open VSX upload/readback, and GitHub release completion. All platform gates must pass before the first upload. The workflow uses one concurrency group without canceling an active release. GitHub-hosted runners perform the entire sequence; an open terminal, local checkout, or assistant session is not required. The existing repository secret supplies the publication credential. Automatic runs finish preserved draft uploads first and reconsider new source or recipe candidates on the next poll.
 
 To run a candidate manually:
 

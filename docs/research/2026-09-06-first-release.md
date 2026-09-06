@@ -3,10 +3,12 @@
 On September 6, 2026, the maintainer-authorized research branch was merged into
 `main` at `dd526c7b76dcad73f593717a93de67eaf575f55a`. The independent
 **C# (with netcoredbg)** release workflow then started its first publishing run.
-All eight targets passed source-build and extracted-VSIX validation. Windows x64
-is publicly available and its downloaded hash matches the tested VSIX. The other
-seven targets remain unpublished at the recorded check, and the GitHub release
-remains a draft. Publication is not complete.
+All eight targets passed source-build and extracted-VSIX validation.
+[Recovery run 34034255861](https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34034255861)
+then completed publication of version `2.148.23001` on all eight Open VSX targets.
+The workflow and a separate full-download check verified every public VSIX hash.
+The [paired GitHub release](https://github.com/rkttu/vscode-csharp-autobuild/releases/tag/csharp-v2.148.23-netcoredbg-v3.2.0-1092-g9744e1f05186-r1)
+became public at 12:57:19 UTC with all 19 preserved assets.
 
 ## 1. Scope adopted into main
 
@@ -53,9 +55,9 @@ started on the merge commit with publication enabled and explicit source tags:
 - Recipe `ee1443d0d2bc0a76dfbd129e574126d6badfeaa9a55bf7aed861750df4f085f5`
 - Paired tag `csharp-v2.148.23-netcoredbg-v3.2.0-1092-g9744e1f05186-r1`
 
-All eight native source-build jobs and all eight VSIX packaging jobs passed on
-the first attempt. Extracted-VSIX functional validation then began on all eight
-targets. The actual upload remains conditional on that complete result set.
+All eight native source-build jobs, eight VSIX packaging jobs, and eight
+extracted-VSIX functional gates passed on their first attempt. Both runtime
+phases passed all required fixture checks and the 30 upstream DAP scenarios.
 
 The first-release macOS ARM64 VSIX also passed a separate installed-extension
 check in VS Code 1.135.0. Activation and seven checks per runtime passed on
@@ -93,13 +95,37 @@ exposed a separate integration gap: its read-only discovery token could not see
 the draft release. It selected a new candidate instead and was canceled before
 publication. GitHub's [release-list API documentation](https://docs.github.com/en/rest/releases/releases#list-releases)
 limits draft listings to callers with push access. A job-scoped `contents: write`
-permission correction was prepared and passed actionlint. The permission change remains prepared locally pending explicit maintainer
-approval. The preserved version and VSIX files remain unchanged.
+permission correction passed actionlint. After explicit maintainer approval,
+commit `dd115e3` granted that permission to discovery. Native build and packaging
+jobs retain read access. The preserved version and VSIX files remain unchanged.
 
-A later [public readback](cross-platform-2026-09-06/first-release-34031151621/public-state-before-permission.json)
+[Recovery run 34034255861](https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34034255861)
+used empty tag inputs and selected the original revision-1 fingerprint
+`46d3aacd73532b6365d62b82f6d4a9e9a40d126236aa9987e2eb8b076fd59346`.
+It skipped native builds, packaging and extracted-VSIX tests and restored the
+complete tested set from the draft before entering the publisher.
+
+An older [scheduled run 34033536801](https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34033536801)
+started on `f00801b` before the permission correction and was canceled to avoid
+continuing the incorrect new-candidate path. Before cancellation, its macOS
+ARM64 source gate failed `VSCodeTestUnhandledException` on .NET 10 (29/30 passed,
+exit 1, no timeout); .NET 8 passed 30/30. This is another recorded intermittent
+exception-test failure, not evidence that a rerun corrected its cause. No
+artifacts from this failed candidate replace the preserved first-release set.
+
+A pre-correction [public readback](cross-platform-2026-09-06/first-release-34031151621/public-state-before-permission.json)
 confirmed Windows x64's SHA-256
 `8eef6b8cfbaedd17d97f9199a059ffc9b2ba4e113260c67b1c3a99c71a6c1768`, matching the
-tested release manifest. The other seven targets still returned HTTP 404.
+tested release manifest. The other seven targets returned HTTP 404 in that
+historical snapshot.
+
+The successful recovery submitted the seven missing targets between 12:50:39
+and 12:51:04 UTC. It completed all public hash comparisons and release
+finalization at 12:57:19 UTC, without rebuilding or uploading Windows x64 again.
+[The recovery archive](cross-platform-2026-09-06/first-release-34031151621/recovery-34034255861/README.md)
+contains the exact resumed candidate, unchanged release manifest, final
+publication status, public release readback, and independent download hashes
+for every target. The GitHub tag still points to the validated merge commit.
 
 ## 5. Scheduled operation after adoption
 
@@ -107,6 +133,15 @@ The variant workflow is active and scheduled at `23 */6 * * *` UTC. GitHub runs
 the schedule from the default branch. A published source/recipe fingerprint is
 skipped by later discovery; a failed candidate remains eligible for a later run.
 The first release uses the same path that subsequent automatic releases use.
+GitHub-hosted runners execute the entire path without a local terminal or
+assistant session. The workflow was confirmed active after recovery.
+
+Read-only discovery after completion selected `2.148.23002` for the changed
+recipe rather than reusing the published `2.148.23001` reservation. No second
+release was built or published by that check. The next scheduled run will
+reconsider current upstream tags and the recipe, run every gate for a fresh
+candidate, and publish only a complete passing set. Documentation changes
+alone do not change the recipe.
 
 All target gates precede the first upload. The publisher preserves tested files
 in a draft release, reads back each public VSIX hash, and finalizes the GitHub

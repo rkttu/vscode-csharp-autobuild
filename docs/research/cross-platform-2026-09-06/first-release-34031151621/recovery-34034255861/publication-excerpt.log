@@ -1,0 +1,34 @@
+2026-09-06T12:50:16.8649053Z Restored preserved VSIX and native validation evidence. The publication gate will verify every hash again.
+2026-09-06T12:50:39.2988514Z Published dotnetdev-kr-custom.csharp-with-netcoredbg v2.148.23001@win32-arm64
+2026-09-06T12:50:43.7911456Z Published dotnetdev-kr-custom.csharp-with-netcoredbg v2.148.23001@linux-x64
+2026-09-06T12:50:48.0339798Z Published dotnetdev-kr-custom.csharp-with-netcoredbg v2.148.23001@linux-arm64
+2026-09-06T12:50:52.2680798Z Published dotnetdev-kr-custom.csharp-with-netcoredbg v2.148.23001@alpine-x64
+2026-09-06T12:50:56.2995259Z Published dotnetdev-kr-custom.csharp-with-netcoredbg v2.148.23001@alpine-arm64
+2026-09-06T12:51:00.6236229Z Published dotnetdev-kr-custom.csharp-with-netcoredbg v2.148.23001@darwin-x64
+2026-09-06T12:51:04.6669662Z Published dotnetdev-kr-custom.csharp-with-netcoredbg v2.148.23001@darwin-arm64
+2026-09-06T12:51:04.9033175Z Verified Open VSX publication: win32-x64
+2026-09-06T12:51:04.9034440Z Waiting for Open VSX asynchronous publication: https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/win32-arm64/2.148.23001
+2026-09-06T12:51:20.1169837Z Waiting for Open VSX asynchronous publication: https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/win32-arm64/2.148.23001
+2026-09-06T12:51:35.2878632Z Waiting for Open VSX asynchronous publication: https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/win32-arm64/2.148.23001
+2026-09-06T12:51:50.4567694Z Waiting for Open VSX asynchronous publication: https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/win32-arm64/2.148.23001
+2026-09-06T12:52:05.8329227Z Waiting for Open VSX asynchronous publication: https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/win32-arm64/2.148.23001
+2026-09-06T12:52:21.0685147Z Waiting for Open VSX asynchronous publication: https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/win32-arm64/2.148.23001
+2026-09-06T12:52:36.2874144Z Waiting for Open VSX asynchronous publication: https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/win32-arm64/2.148.23001
+2026-09-06T12:52:51.6581454Z Waiting for Open VSX asynchronous publication: https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/win32-arm64/2.148.23001
+2026-09-06T12:53:06.8243670Z Waiting for Open VSX asynchronous publication: https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/win32-arm64/2.148.23001
+2026-09-06T12:53:22.0663697Z Waiting for Open VSX asynchronous publication: https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/win32-arm64/2.148.23001
+2026-09-06T12:53:37.2320364Z Waiting for Open VSX asynchronous publication: https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/win32-arm64/2.148.23001
+2026-09-06T12:53:52.4543075Z Waiting for Open VSX asynchronous publication: https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/win32-arm64/2.148.23001
+2026-09-06T12:54:07.8106741Z Waiting for Open VSX asynchronous publication: https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/win32-arm64/2.148.23001
+2026-09-06T12:54:23.0420483Z Waiting for Open VSX asynchronous publication: https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/win32-arm64/2.148.23001
+2026-09-06T12:54:38.3089822Z Waiting for Open VSX asynchronous publication: https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/win32-arm64/2.148.23001
+2026-09-06T12:55:08.4132061Z Verified Open VSX publication: win32-arm64
+2026-09-06T12:55:08.4133555Z Waiting for Open VSX asynchronous publication: https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/linux-x64/2.148.23001
+2026-09-06T12:56:03.4527687Z Verified Open VSX publication: linux-x64
+2026-09-06T12:56:03.4528466Z Verified Open VSX publication: linux-arm64
+2026-09-06T12:56:03.4529176Z Verified Open VSX publication: alpine-x64
+2026-09-06T12:56:03.4530898Z Waiting for Open VSX asynchronous publication: https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-arm64/2.148.23001
+2026-09-06T12:56:47.9649024Z Verified Open VSX publication: alpine-arm64
+2026-09-06T12:56:47.9649765Z Verified Open VSX publication: darwin-x64
+2026-09-06T12:56:47.9650776Z Waiting for Open VSX asynchronous publication: https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/darwin-arm64/2.148.23001
+2026-09-06T12:57:19.4576718Z Verified Open VSX publication: darwin-arm64

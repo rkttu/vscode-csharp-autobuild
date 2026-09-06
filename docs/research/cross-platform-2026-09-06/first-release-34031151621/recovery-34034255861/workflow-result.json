@@ -1,0 +1,56 @@
+{
+  "conclusion": "success",
+  "createdAt": "2026-09-06T12:49:38Z",
+  "event": "workflow_dispatch",
+  "headSha": "dd115e3eb17e5c0972ccd5956e3a734e58619a40",
+  "jobs": [
+    {
+      "completedAt": "2026-09-06T12:50:07Z",
+      "conclusion": "success",
+      "databaseId": 101489350856,
+      "name": "discover",
+      "startedAt": "2026-09-06T12:49:57Z",
+      "status": "completed",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34034255861/job/101489350856"
+    },
+    {
+      "completedAt": "2026-09-06T12:50:07Z",
+      "conclusion": "skipped",
+      "databaseId": 101489380569,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger",
+      "startedAt": "2026-09-06T12:50:08Z",
+      "status": "completed",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34034255861/job/101489380569"
+    },
+    {
+      "completedAt": "2026-09-06T12:57:21Z",
+      "conclusion": "success",
+      "databaseId": 101489380969,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / publish",
+      "startedAt": "2026-09-06T12:50:10Z",
+      "status": "completed",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34034255861/job/101489380969"
+    },
+    {
+      "completedAt": "2026-09-06T12:50:08Z",
+      "conclusion": "skipped",
+      "databaseId": 101489381109,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / package",
+      "startedAt": "2026-09-06T12:50:08Z",
+      "status": "completed",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34034255861/job/101489381109"
+    },
+    {
+      "completedAt": "2026-09-06T12:50:08Z",
+      "conclusion": "skipped",
+      "databaseId": 101489381377,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / test-vsix",
+      "startedAt": "2026-09-06T12:50:08Z",
+      "status": "completed",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34034255861/job/101489381377"
+    }
+  ],
+  "status": "completed",
+  "updatedAt": "2026-09-06T12:57:22Z",
+  "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34034255861"
+}

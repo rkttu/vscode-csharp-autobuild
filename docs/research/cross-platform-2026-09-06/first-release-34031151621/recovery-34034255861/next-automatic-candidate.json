@@ -1,0 +1,18 @@
+{
+  "include": [
+    {
+      "debuggerTag": "3.2.0-1092",
+      "debuggerSha": "9744e1f051866215611b8440c638042aa2aa2f72",
+      "csharpTag": "v2.148.23-prerelease",
+      "csharpSha": "2f5806a9f39575bfaf4ca16445f420440a43e050",
+      "recipe": "ec25863e095c63df818abf45913734e685f7bf589e00602aa91bf20376f483a7",
+      "fingerprint": "d79953f40b148b95d0a97522a64914b40941958fa6570230fd80250fdfec56d0",
+      "artifactPrefix": "d79953f40b148b95",
+      "versionPolicy": "upstream-patch-revision-v1",
+      "csharpVersion": "2.148.23",
+      "revision": 2,
+      "version": "2.148.23002",
+      "releaseTag": "csharp-v2.148.23-netcoredbg-v3.2.0-1092-g9744e1f05186-r2"
+    }
+  ]
+}

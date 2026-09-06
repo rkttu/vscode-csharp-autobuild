@@ -1,0 +1,87 @@
+{
+  "checkedAt": "2026-09-06T12:58:07.432971+00:00",
+  "version": "2.148.23001",
+  "complete": true,
+  "targets": [
+    {
+      "target": "win32-x64",
+      "metadataUrl": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/win32-x64/2.148.23001",
+      "httpStatus": 200,
+      "version": "2.148.23001",
+      "downloadUrl": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/win32-x64/2.148.23001/file/dotnetdev-kr-custom.csharp-with-netcoredbg-2.148.23001@win32-x64.vsix",
+      "expectedSha256": "8eef6b8cfbaedd17d97f9199a059ffc9b2ba4e113260c67b1c3a99c71a6c1768",
+      "sha256": "8eef6b8cfbaedd17d97f9199a059ffc9b2ba4e113260c67b1c3a99c71a6c1768",
+      "matchesTestedVsix": true
+    },
+    {
+      "target": "win32-arm64",
+      "metadataUrl": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/win32-arm64/2.148.23001",
+      "httpStatus": 200,
+      "version": "2.148.23001",
+      "downloadUrl": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/win32-arm64/2.148.23001/file/dotnetdev-kr-custom.csharp-with-netcoredbg-2.148.23001@win32-arm64.vsix",
+      "expectedSha256": "39713504428d45658cb0eb6884bb62f1260e34c0f598eec8bf72618c35801ce8",
+      "sha256": "39713504428d45658cb0eb6884bb62f1260e34c0f598eec8bf72618c35801ce8",
+      "matchesTestedVsix": true
+    },
+    {
+      "target": "linux-x64",
+      "metadataUrl": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/linux-x64/2.148.23001",
+      "httpStatus": 200,
+      "version": "2.148.23001",
+      "downloadUrl": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/linux-x64/2.148.23001/file/dotnetdev-kr-custom.csharp-with-netcoredbg-2.148.23001@linux-x64.vsix",
+      "expectedSha256": "9c7934a01b184f298757f51466e7898d5feebf42407fcc72da121ecf765c109e",
+      "sha256": "9c7934a01b184f298757f51466e7898d5feebf42407fcc72da121ecf765c109e",
+      "matchesTestedVsix": true
+    },
+    {
+      "target": "linux-arm64",
+      "metadataUrl": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/linux-arm64/2.148.23001",
+      "httpStatus": 200,
+      "version": "2.148.23001",
+      "downloadUrl": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/linux-arm64/2.148.23001/file/dotnetdev-kr-custom.csharp-with-netcoredbg-2.148.23001@linux-arm64.vsix",
+      "expectedSha256": "519efa42c2a8eabe08567fc6cf643765e8a09b98396d5fc5ad0f4401e810d880",
+      "sha256": "519efa42c2a8eabe08567fc6cf643765e8a09b98396d5fc5ad0f4401e810d880",
+      "matchesTestedVsix": true
+    },
+    {
+      "target": "alpine-x64",
+      "metadataUrl": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/2.148.23001",
+      "httpStatus": 200,
+      "version": "2.148.23001",
+      "downloadUrl": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/2.148.23001/file/dotnetdev-kr-custom.csharp-with-netcoredbg-2.148.23001@alpine-x64.vsix",
+      "expectedSha256": "4abc2d341e5152b106b861cdcef36f6721eed7dd3a8463bd2854c9ce16c3f495",
+      "sha256": "4abc2d341e5152b106b861cdcef36f6721eed7dd3a8463bd2854c9ce16c3f495",
+      "matchesTestedVsix": true
+    },
+    {
+      "target": "alpine-arm64",
+      "metadataUrl": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-arm64/2.148.23001",
+      "httpStatus": 200,
+      "version": "2.148.23001",
+      "downloadUrl": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-arm64/2.148.23001/file/dotnetdev-kr-custom.csharp-with-netcoredbg-2.148.23001@alpine-arm64.vsix",
+      "expectedSha256": "69312c10779314493c7827267334d60be7915c497e35f1c71fe05071e1a18452",
+      "sha256": "69312c10779314493c7827267334d60be7915c497e35f1c71fe05071e1a18452",
+      "matchesTestedVsix": true
+    },
+    {
+      "target": "darwin-x64",
+      "metadataUrl": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/darwin-x64/2.148.23001",
+      "httpStatus": 200,
+      "version": "2.148.23001",
+      "downloadUrl": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/darwin-x64/2.148.23001/file/dotnetdev-kr-custom.csharp-with-netcoredbg-2.148.23001@darwin-x64.vsix",
+      "expectedSha256": "d369dde88ab31eae17e58d03146368d81d1cb81cbd1fe81ff87c94834e4f8e3a",
+      "sha256": "d369dde88ab31eae17e58d03146368d81d1cb81cbd1fe81ff87c94834e4f8e3a",
+      "matchesTestedVsix": true
+    },
+    {
+      "target": "darwin-arm64",
+      "metadataUrl": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/darwin-arm64/2.148.23001",
+      "httpStatus": 200,
+      "version": "2.148.23001",
+      "downloadUrl": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/darwin-arm64/2.148.23001/file/dotnetdev-kr-custom.csharp-with-netcoredbg-2.148.23001@darwin-arm64.vsix",
+      "expectedSha256": "5051f72839d07e518ef60fba6c64add0794a73e242ec92de7eeae97beefb780c",
+      "sha256": "5051f72839d07e518ef60fba6c64add0794a73e242ec92de7eeae97beefb780c",
+      "matchesTestedVsix": true
+    }
+  ]
+}
