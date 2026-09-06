@@ -26,6 +26,9 @@ concurrency:
 jobs:
   discover:
     runs-on: ubuntu-22.04
+    permissions:
+      # GitHub lists draft releases only for callers with push access.
+      contents: write
     outputs:
       matrix: ${{ steps.detect.outputs.matrix }}
       has-candidates: ${{ steps.detect.outputs.has-candidates }}

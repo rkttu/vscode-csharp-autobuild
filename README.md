@@ -118,7 +118,7 @@ To run a candidate manually:
 
 Research-branch runs cannot publish. Scheduled `main` runs publish automatically after every gate passes. The reusable [`validate-netcoredbg.yml`](.github/workflows/validate-netcoredbg.yml) can also run standalone validation without packaging or publishing. Its Alpine-only mode is diagnostic and cannot satisfy the complete release gate.
 
-The publisher uses the repository secret `OPENVSX_ACCESS_TOKEN` and exposes it as `OVSX_PAT` only in the final upload step. The token owner needs publication access to the existing `dotnetdev-kr-custom` namespace. A separate extension preregistration step does not run. GitHub release creation uses the workflow's `contents: write` permission.
+The publisher uses the repository secret `OPENVSX_ACCESS_TOKEN` and exposes it as `OVSX_PAT` only in the final upload step. The token owner needs publication access to the existing `dotnetdev-kr-custom` namespace. A separate extension preregistration step does not run. GitHub release creation uses `contents: write`. Discovery also needs that permission because GitHub only lists draft releases for callers with push access; native build and package jobs retain read access.
 
 ## 6. Failures, retries, and published versions
 
