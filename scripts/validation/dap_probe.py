@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 import queue
+import signal
 import subprocess
 import threading
 import time
@@ -13,7 +14,7 @@ class Dap:
     def __init__(self, command, log_path):
         self.log = open(log_path, 'w', encoding='utf-8')
         self.proc = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                                     stderr=subprocess.PIPE)
+                                     stderr=subprocess.PIPE, start_new_session=os.name != 'nt')
         self.messages = queue.Queue()
         self.pending = []
         self.seq = 0
@@ -97,7 +98,7 @@ class Dap:
                     subprocess.run(['taskkill', '/PID', str(self.proc.pid), '/T', '/F'],
                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=5)
                 else:
-                    self.proc.kill()
+                    os.killpg(self.proc.pid, signal.SIGKILL)
                 self.proc.wait(timeout=3)
         self.log.close()
 
@@ -176,6 +177,17 @@ def run(args):
     except Exception as error:
         result['success'] = False
         result['error'] = str(error) or type(error).__name__
+        if getattr(args, 'diagnose_hang', False) and d.proc.poll() is None:
+            stacks = Path(args.log).with_suffix('.stacks.log')
+            try:
+                with stacks.open('w') as output:
+                    subprocess.run(['gdb', '-nx', '-batch', '-ex', 'set pagination off',
+                                    '-ex', 'set debuginfod enabled off', '-ex', f'attach {d.proc.pid}',
+                                    '-ex', 'thread apply all bt', '-ex', 'detach'],
+                                   stdout=output, stderr=subprocess.STDOUT, timeout=15)
+                result['diagnosticStacks'] = stacks.name
+            except Exception as diagnostic_error:
+                result['diagnosticError'] = str(diagnostic_error)
     finally:
         try:
             d.close()
@@ -198,4 +210,5 @@ if __name__ == '__main__':
     p.add_argument('--result', required=True)
     p.add_argument('--expected-arch', choices=['x64', 'arm64'], required=True)
     p.add_argument('--expected-runtime', choices=['8', '10'], required=True)
+    p.add_argument('--diagnose-hang', action='store_true', help='On failure, capture only this adapter process with gdb')
     raise SystemExit(run(p.parse_args()))

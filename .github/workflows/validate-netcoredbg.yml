@@ -13,12 +13,6 @@ on:
       artifact-prefix:
         type: string
         default: netcoredbg
-  push:
-    branches: [research/netcoredbg-windows-validation]
-    paths:
-      - .github/workflows/validate-netcoredbg.yml
-      - scripts/validation/**
-      - config/netcoredbg.json
 
 permissions:
   contents: read
