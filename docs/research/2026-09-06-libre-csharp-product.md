@@ -2,6 +2,8 @@
 
 On September 6, 2026, this review compared the existing unmodified distribution with `muhammad-sammy.csharp` using Open VSX metadata, public workflows, and published platform manifests. The community extension already automates CI builds and publication and provides eight platform VSIX packages. Some published manifests contain platform-to-debugger asset mismatches. [Comparison evidence](libre-csharp-product-2026-09-06/evidence.json)
 
+Subsequent validation: [Windows x64 and ARM64 source builds and .NET 8/10 DAP checks passed](2026-09-06-windows-validation.md). The observations below retain the scope of this earlier research stage.
+
 There are practical grounds to evaluate a separate Libre C# distribution. The relevant criteria are upstream tracking, platform execution tests, redistributable component management, and a limited debugger integration surface. The existing upstream-function-code-preserving distribution should operate independently so failures or delays in the new variant do not block its publication.
 
 The report first compares the roles and current distribution states, then covers support criteria, a companion extension versus an integrated product, component boundaries, and adoption gates. `Libre C#` is a working name in this report; no product or repository was created.

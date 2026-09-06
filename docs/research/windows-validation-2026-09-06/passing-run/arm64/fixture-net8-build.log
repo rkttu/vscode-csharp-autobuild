@@ -1,0 +1,9 @@
+  Determining projects to restore...
+  Restored C:\a\_temp\netcoredbg-validation-arm64\fixture-net8\Probe.csproj (in 80 ms).
+  Probe -> C:\a\_temp\netcoredbg-validation-arm64\fixture-net8\output\Probe.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:02.75

@@ -1,0 +1,42 @@
+{
+  "engine": "netcoredbg",
+  "program": "C:\\a\\_temp\\netcoredbg-validation-arm64\\fixture-net8\\output\\Probe.dll",
+  "expectedArchitecture": "arm64",
+  "expectedRuntime": "8",
+  "checks": [
+    "conditional breakpoint",
+    "stackTrace",
+    "scopes/variables",
+    "evaluate=42",
+    "step over",
+    "breakpoint after await",
+    "exception breakpoint/info",
+    "stdout and clean exit"
+  ],
+  "capabilities": {
+    "exceptionBreakpointFilters": [
+      {
+        "filter": "all",
+        "label": "all"
+      },
+      {
+        "filter": "user-unhandled",
+        "label": "user-unhandled"
+      }
+    ],
+    "supportTerminateDebuggee": true,
+    "supportsCancelRequest": true,
+    "supportsConditionalBreakpoints": true,
+    "supportsConfigurationDoneRequest": true,
+    "supportsExceptionFilterOptions": true,
+    "supportsExceptionInfoRequest": true,
+    "supportsExceptionOptions": false,
+    "supportsFunctionBreakpoints": true,
+    "supportsSetExpression": true,
+    "supportsSetVariable": true,
+    "supportsTerminateRequest": true
+  },
+  "output": "RUNTIME=.NET 8.0.24;ARCH=Arm64\r\nANSWER=42\r\nAFTER_AWAIT=43\r\nCAUGHT\r\nDONE\r\n",
+  "success": true,
+  "stderr": ""
+}

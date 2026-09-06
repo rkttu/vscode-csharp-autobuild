@@ -2,6 +2,8 @@
 
 On September 6, 2026, this review examined the existing `vscode-csharp-autobuild` workflow, Samsung tags, Open VSX identities, and C# packaging code. This repository can preserve its unmodified distribution while producing a separate VSIX containing self-built Samsung netcoredbg and publishing it to Open VSX. Earlier experiments passed macOS ARM64 source builds and basic debugging; the remaining platform validation is distinguished below. [Review evidence](samsung-variant-2026-09-06/review-evidence.json)
 
+Subsequent validation: [Windows x64 and ARM64 source builds and .NET 8/10 DAP checks passed](2026-09-06-windows-validation.md). The observations below retain the scope of this earlier research stage.
+
 The review covers distribution identities, detection of two upstreams, platform builds, VSIX integration, version and publication state, and differences from the community extension. The proposed display name is `C# (with Samsung Debugger)`. It describes the included debugger without claiming full replacement of Microsoft's debugger features or C# Dev Kit.
 
 The report defines the boundary with the current distribution, then describes the tag-to-publication flow, integration points, operational conflicts, and comparison with muhammad-sammy. The identities and file layouts are proposals; no remote repository or publication was created during this review.

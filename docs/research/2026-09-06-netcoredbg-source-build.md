@@ -2,6 +2,8 @@
 
 On September 6, 2026, Samsung netcoredbg 3.2.0-1092 was built from source for macOS ARM64 and x64. SHA-256 checks found all 498 original input files unchanged after both builds. The self-built ARM64 debugger passed basic DAP experiments on .NET 8 and .NET 10. The x64 result covers cross-compilation and binary architecture inspection. [Build and execution evidence](netcoredbg-source-build-2026-09-06/evidence.json)
 
+Subsequent validation: [Windows x64 and ARM64 source builds and .NET 8/10 DAP checks passed](2026-09-06-windows-validation.md). The observations below retain the scope of this earlier research stage.
+
 These results support trying external build scripts that produce platform packages without maintaining patches to Samsung's source. This report covers redistribution conditions, the eight targets, observed results, dependency pinning, and C# integration. Actual Windows ARM64 and Alpine build and debugging success remains unverified in this investigation.
 
 The report defines source preservation first, then presents platform evidence and experiments, followed by a proposed build and publication design. It focuses on Samsung netcoredbg as a single engine and does not assume migration to another debugger.

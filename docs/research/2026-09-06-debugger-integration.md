@@ -2,6 +2,8 @@
 
 On September 6, 2026, this investigation reviewed the `vscode-csharp-autobuild` workflow and the upstream source used for the published C# 2.148.23 extension. Samsung released netcoredbg 3.2.0-1092 with a macOS ARM64 binary on June 25, 2026. That binary passed basic debugging checks against .NET 8 and .NET 10 on a local macOS ARM64 host. [Samsung release](https://github.com/Samsung/netcoredbg/releases/tag/3.2.0-1092)
 
+Subsequent validation: [Windows x64 and ARM64 source builds and .NET 8/10 DAP checks passed](2026-09-06-windows-validation.md). The observations below retain the scope of this earlier research stage.
+
 This report covers the earlier adoption blocker, platform assets, observed debugging behavior, extension integration points, alternative engines, and automated publication. Integrating an open-source debugger into the C# extension is technically plausible. The current netcoredbg release provides a starting point; covering all eight existing extension targets also calls for additional builds or evaluation of an alternative such as DNCDbg.
 
 The report first compares the earlier decision with current releases, then presents local experiments and proposed packaging changes grounded in upstream code. Its scope is the C# extension and CoreCLR debugging, not a replacement for C# Dev Kit.

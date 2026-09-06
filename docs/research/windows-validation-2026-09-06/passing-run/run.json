@@ -1,0 +1,240 @@
+{
+  "conclusion": "success",
+  "headSha": "4b769fd23afcbf867d538ca0c9ace0ed824f6494",
+  "jobs": [
+    {
+      "completedAt": "2026-09-06T06:42:27Z",
+      "conclusion": "success",
+      "databaseId": 101442442909,
+      "name": "Windows arm64 source build and DAP",
+      "startedAt": "2026-09-06T06:38:15Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-09-06T06:38:18Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-09-06T06:38:16Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:38:19Z",
+          "conclusion": "success",
+          "name": "Prepare isolated paths and preserve source line endings",
+          "number": 2,
+          "startedAt": "2026-09-06T06:38:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:38:31Z",
+          "conclusion": "success",
+          "name": "Checkout validation tools",
+          "number": 3,
+          "startedAt": "2026-09-06T06:38:19Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:38:42Z",
+          "conclusion": "success",
+          "name": "Checkout pinned Samsung source",
+          "number": 4,
+          "startedAt": "2026-09-06T06:38:31Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:39:17Z",
+          "conclusion": "success",
+          "name": "Checkout pinned CoreCLR headers and helper sources",
+          "number": 5,
+          "startedAt": "2026-09-06T06:38:42Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:40:20Z",
+          "conclusion": "success",
+          "name": "Install isolated native .NET SDKs and runtimes",
+          "number": 6,
+          "startedAt": "2026-09-06T06:39:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:42:05Z",
+          "conclusion": "success",
+          "name": "Build and validate the pinned debugger",
+          "number": 7,
+          "startedAt": "2026-09-06T06:40:20Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:42:06Z",
+          "conclusion": "success",
+          "name": "Preserve build outputs and evidence, including failures",
+          "number": 8,
+          "startedAt": "2026-09-06T06:42:05Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:42:06Z",
+          "conclusion": "success",
+          "name": "Post Install isolated native .NET SDKs and runtimes",
+          "number": 13,
+          "startedAt": "2026-09-06T06:42:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:42:10Z",
+          "conclusion": "success",
+          "name": "Post Checkout pinned CoreCLR headers and helper sources",
+          "number": 14,
+          "startedAt": "2026-09-06T06:42:06Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:42:15Z",
+          "conclusion": "success",
+          "name": "Post Checkout pinned Samsung source",
+          "number": 15,
+          "startedAt": "2026-09-06T06:42:10Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:42:19Z",
+          "conclusion": "success",
+          "name": "Post Checkout validation tools",
+          "number": 16,
+          "startedAt": "2026-09-06T06:42:15Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:42:19Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 17,
+          "startedAt": "2026-09-06T06:42:19Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34017007698/job/101442442909"
+    },
+    {
+      "completedAt": "2026-09-06T06:40:57Z",
+      "conclusion": "success",
+      "databaseId": 101442443045,
+      "name": "Windows x64 source build and DAP",
+      "startedAt": "2026-09-06T06:38:16Z",
+      "status": "completed",
+      "steps": [
+        {
+          "completedAt": "2026-09-06T06:38:18Z",
+          "conclusion": "success",
+          "name": "Set up job",
+          "number": 1,
+          "startedAt": "2026-09-06T06:38:17Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:38:20Z",
+          "conclusion": "success",
+          "name": "Prepare isolated paths and preserve source line endings",
+          "number": 2,
+          "startedAt": "2026-09-06T06:38:18Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:38:26Z",
+          "conclusion": "success",
+          "name": "Checkout validation tools",
+          "number": 3,
+          "startedAt": "2026-09-06T06:38:20Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:38:30Z",
+          "conclusion": "success",
+          "name": "Checkout pinned Samsung source",
+          "number": 4,
+          "startedAt": "2026-09-06T06:38:26Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:38:50Z",
+          "conclusion": "success",
+          "name": "Checkout pinned CoreCLR headers and helper sources",
+          "number": 5,
+          "startedAt": "2026-09-06T06:38:30Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:39:21Z",
+          "conclusion": "success",
+          "name": "Install isolated native .NET SDKs and runtimes",
+          "number": 6,
+          "startedAt": "2026-09-06T06:38:50Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:40:47Z",
+          "conclusion": "success",
+          "name": "Build and validate the pinned debugger",
+          "number": 7,
+          "startedAt": "2026-09-06T06:39:21Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:40:49Z",
+          "conclusion": "success",
+          "name": "Preserve build outputs and evidence, including failures",
+          "number": 8,
+          "startedAt": "2026-09-06T06:40:47Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:40:49Z",
+          "conclusion": "success",
+          "name": "Post Install isolated native .NET SDKs and runtimes",
+          "number": 13,
+          "startedAt": "2026-09-06T06:40:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:40:51Z",
+          "conclusion": "success",
+          "name": "Post Checkout pinned CoreCLR headers and helper sources",
+          "number": 14,
+          "startedAt": "2026-09-06T06:40:49Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:40:52Z",
+          "conclusion": "success",
+          "name": "Post Checkout pinned Samsung source",
+          "number": 15,
+          "startedAt": "2026-09-06T06:40:51Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:40:54Z",
+          "conclusion": "success",
+          "name": "Post Checkout validation tools",
+          "number": 16,
+          "startedAt": "2026-09-06T06:40:52Z",
+          "status": "completed"
+        },
+        {
+          "completedAt": "2026-09-06T06:40:54Z",
+          "conclusion": "success",
+          "name": "Complete job",
+          "number": 17,
+          "startedAt": "2026-09-06T06:40:54Z",
+          "status": "completed"
+        }
+      ],
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34017007698/job/101442443045"
+    }
+  ],
+  "startedAt": "2026-09-06T06:38:13Z",
+  "status": "completed",
+  "updatedAt": "2026-09-06T06:42:28Z",
+  "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34017007698"
+}
