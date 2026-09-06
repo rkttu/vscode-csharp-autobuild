@@ -1,5 +1,7 @@
 # Upstream version mapping and merge readiness
 
+The subsequent [publication recovery and rollback review](2026-09-06-publication-recovery-and-rollback.md) expands the operational assessment below. It identifies missing quarantine and deliberate recovery-release controls; the successful build and branch-compatibility findings remain unchanged.
+
 On September 6, 2026, the research branch adopted an upstream-based version policy and replaced the initial icon. The new candidate is `2.148.23001`, derived from C# `v2.148.23-prerelease` and netcoredbg `3.2.0-1092`. The preceding `0.1.4000` candidate was a dry run and was never published to Open VSX. [Candidate discovery](../../scripts/variant/discover.py), [new validation run](https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34023125844)
 
 This report records the accepted numeric mapping, release provenance, revision allocation, icon, verification evidence and merge assessment. It separates source-control readiness from the first registry publication.

@@ -10,6 +10,7 @@ These reports record the investigation completed on September 6, 2026. They dist
 6. [Cross-platform validation and release gates](2026-09-06-cross-platform-release.md): the neutral `C# (with netcoredbg)` identity, Open VSX registration and icon review, all eight native and VSIX targets passing, Alpine hosting compatibility, and a successful local editor launch test.
 7. [Build failures, fixes and recovery evidence](2026-09-06-build-troubleshooting.md): compiler and dependency failures, Alpine crash diagnosis, external compatibility code, integration findings and future troubleshooting procedures.
 8. [Upstream version mapping and merge readiness](2026-09-06-versioning-and-merge-readiness.md): the accepted numeric revision policy, paired release tags, warm brown staff icon, revised candidate checks and default-branch publication boundary.
+9. [Publication recovery and rollback boundaries](2026-09-06-publication-recovery-and-rollback.md): partial-upload resumption, public registry withdrawal, installed-user recovery and missing quarantine/recovery-release controls.
 
 The first four reports retain their original investigation scope. The Windows report updates their outstanding Windows build and basic-debugging checks with actual GitHub runner evidence.
 
