@@ -1,0 +1,173 @@
+{
+  "normalization": "None; exact artifact bytes",
+  "files": [
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-alpine-arm64/dap-net10-result.json",
+      "sha256": "2441a10f0a2000bcfa956c8a43169f8c4cf2295287a3cbe4b2cb5b82c42c6eab"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-alpine-arm64/dap-net10.jsonl",
+      "sha256": "0e42be79f5d5942c0d69b88d10d90ab9c5094ca28ec94182d4640e70ba06843b"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-alpine-arm64/dap-net8-result.json",
+      "sha256": "c7a0bfc9718a36c9b1f53195f02269da5a74ac5e6a1c80640a03c1ca2999c1e4"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-alpine-arm64/dap-net8.jsonl",
+      "sha256": "72280a1c3585d7f57677d071efbc4c7f41d51baf83cd432b338189d09aa796d5"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-alpine-arm64/sdk-downloads.json",
+      "sha256": "1ca85b008a405ef94de901d70a8c4221421a09e8bde0f6498aa321b3c2ca734a"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-alpine-arm64/vsix-result.json",
+      "sha256": "83e89c5c3b5f9f1c49d8fd9b6c9ca193d24307812536ca1c53986c0d371e30fc"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-alpine-x64/dap-net10-result.json",
+      "sha256": "1dc478804abf1d144a9978ad4c45e0b15cddf7857234fe13e1c7bd3a6686be39"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-alpine-x64/dap-net10.jsonl",
+      "sha256": "9ed4fc4da754bbd0351ccba0a2dcd8eee697906a67d736b2498681956bf67ea0"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-alpine-x64/dap-net8-result.json",
+      "sha256": "cc814edc1b28e962f7db45ba1374b25dbfa31bc71ffc34528c593d304a95857f"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-alpine-x64/dap-net8.jsonl",
+      "sha256": "123e801471a2bd4e06c397663cd41670a11706c36963c8c13f6c850f2256c281"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-alpine-x64/sdk-downloads.json",
+      "sha256": "1b692184dd501a14fc4140aa70fd82dc069b867327fde48b400eb41925736072"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-alpine-x64/vsix-result.json",
+      "sha256": "02f2320e04a27309726dc830fcb0846de0ecaabc1636307a8ec81ef8905550be"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-darwin-arm64/dap-net10-result.json",
+      "sha256": "18635dc1e874a0772ebc9f2859d9ffa7cf87d89116acff02b82fd97cc8a4ecfa"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-darwin-arm64/dap-net10.jsonl",
+      "sha256": "7c112a9432866c44492b0fab9f14a47867e2346671483e07457dee4fc2221d5a"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-darwin-arm64/dap-net8-result.json",
+      "sha256": "36cae6c0c4cfed8930de605869a2710efcde8573005a3ffc2888eb27ab978a19"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-darwin-arm64/dap-net8.jsonl",
+      "sha256": "8b8a2a9f5bf9c4594061d9ffc2e434af03e72b9725c3e6ba5f86b13be89baa66"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-darwin-arm64/vsix-result.json",
+      "sha256": "0729232c175726f7b96dec110c44a555b65f126e3b7071f2f9ea0fd80deea9eb"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-darwin-x64/dap-net10-result.json",
+      "sha256": "aae3809adfb0f68e9e675f4b2d183a3fa3e770fcad3842942434de2f09da36e1"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-darwin-x64/dap-net10.jsonl",
+      "sha256": "24d520792cc69abcd2c21a2002e8e2f69f985ac770c6b7e54045840605853ea4"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-darwin-x64/dap-net8-result.json",
+      "sha256": "5c97e1999962e02b0bc9adccb60b1ad326cb0a8090327eae60b4892615c08984"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-darwin-x64/dap-net8.jsonl",
+      "sha256": "fcc6d78ad9f79e5aa78708f89a71b24055f26c7ea848c27ca7c14ca777caf894"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-darwin-x64/vsix-result.json",
+      "sha256": "5aa4e2876216980fc833f0eccc52e4d1a3f7d090abed97459b7286625285f6c4"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-linux-arm64/dap-net10-result.json",
+      "sha256": "41e35d9a02d9e673506d52567af7134c3382c54cc51e5a476f10954301b101e0"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-linux-arm64/dap-net10.jsonl",
+      "sha256": "d08a5a1e3f9facc70801dd9e625c6f36551368f47dc72c289aeb426dd50a22c0"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-linux-arm64/dap-net8-result.json",
+      "sha256": "3d5f1add5b73b56cb698e398e2ec5f3ad94a9f78fab7e971ed4d0e5834507c82"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-linux-arm64/dap-net8.jsonl",
+      "sha256": "f26937373939086e63118c6d9044c3471407fe37274db3e1e59577fde6af936e"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-linux-arm64/vsix-result.json",
+      "sha256": "a2a7969063b8341936409a36053da3f2b2a05930677d66bd56b74e49bad632a6"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-linux-x64/dap-net10-result.json",
+      "sha256": "9ad97e942cc01114856732bbd6afb145a40980a88e7666c8a4e2da23d726f708"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-linux-x64/dap-net10.jsonl",
+      "sha256": "50dc70599a5a82d311f149eed8bcee56006365e8777149895ef6a3e8e30fe8e4"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-linux-x64/dap-net8-result.json",
+      "sha256": "bb2431aece8449ac23df8113fe23afb7701c4840d79c29552de132334655d697"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-linux-x64/dap-net8.jsonl",
+      "sha256": "ca4021bb522ea1352c5d4e27a536154d2a172988e0f9e228fab00ab0fb12b8da"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-linux-x64/vsix-result.json",
+      "sha256": "7fa9cae007b5344f6518ba887237ada4ef714a2c3cd1a43781461877c89fc377"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-win32-arm64/dap-net10-result.json",
+      "sha256": "ffd1764092b02d527e5d7ab2d5509eb1f77fdc7b6520cb8a9ecdecd4d2f9bfc3"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-win32-arm64/dap-net10.jsonl",
+      "sha256": "d4b2324921fd218449b1aeea7911c47afc5f5f1c7c5c90f944b3e26b83e0f9d8"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-win32-arm64/dap-net8-result.json",
+      "sha256": "be542bbebf719042aaedb98944d991dbb300fe97b42702ceebe3a270fda1546e"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-win32-arm64/dap-net8.jsonl",
+      "sha256": "2f0f3e1c8a25517a1b516f47fa36b425e1073fffa8b415df979cc05cf4274928"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-win32-arm64/vsix-result.json",
+      "sha256": "921f3ce75622387e24a85f59531295f59513c1fd25e2f661a1e9bb30b7a83d8b"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-win32-x64/dap-net10-result.json",
+      "sha256": "c1f9cb986a068682f47a92c682c6d72bb7cdf9b398d1c9c8ebb2cdab7b61c154"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-win32-x64/dap-net10.jsonl",
+      "sha256": "6e8fd0d3572ee172ddeae55747eaf4ae631e9823c4315d106d696c0d644d1d5e"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-win32-x64/dap-net8-result.json",
+      "sha256": "63aef48ea994620a5517c86ac233db3026496530faf2c12ca90e8b203095ab21"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-win32-x64/dap-net8.jsonl",
+      "sha256": "029993731fcf110ae49550d9ecbac5a6f80d46a2ed90bf593334220e4e0b2b01"
+    },
+    {
+      "file": "vsix/005b91c13a25ef4a-tested-win32-x64/vsix-result.json",
+      "sha256": "787cd647f97e3d7b602abc133176dc0738e80f1e871880f0057c795653e46310"
+    }
+  ]
+}

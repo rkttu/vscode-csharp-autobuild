@@ -1,0 +1,54 @@
+{
+  "candidate": {
+    "debuggerTag": "3.2.0-1092",
+    "debuggerSha": "9744e1f051866215611b8440c638042aa2aa2f72",
+    "csharpTag": "v2.148.23-prerelease",
+    "csharpSha": "2f5806a9f39575bfaf4ca16445f420440a43e050",
+    "recipe": "0bf89d6dbe0e1ec8dfc2197c2fda6f5fc879481d06e15983ead6ce59485d608e",
+    "fingerprint": "005b91c13a25ef4ac632ad434b39e71f975e7a37bd57ad79579eb60b9d582310",
+    "artifactPrefix": "005b91c13a25ef4a",
+    "version": "0.1.4000"
+  },
+  "targets": [
+    {
+      "target": "win32-x64",
+      "file": "csharp-with-netcoredbg-win32-x64-0.1.4000.vsix",
+      "sha256": "b66ba7638e9d8d1e1a2c6d443b9c94d6954924d9e71c21871190e5848a2cd0f8"
+    },
+    {
+      "target": "win32-arm64",
+      "file": "csharp-with-netcoredbg-win32-arm64-0.1.4000.vsix",
+      "sha256": "ca2ff62656a6625a210615c74569e802ef6bbad11704ef6fe4aa8720cd11571d"
+    },
+    {
+      "target": "linux-x64",
+      "file": "csharp-with-netcoredbg-linux-x64-0.1.4000.vsix",
+      "sha256": "0b37138f62d5efd16aeed982bbc2c126e8512a9e5554186f00359306b3207c15"
+    },
+    {
+      "target": "linux-arm64",
+      "file": "csharp-with-netcoredbg-linux-arm64-0.1.4000.vsix",
+      "sha256": "2b72764b65390cd4970f6317ed1a01bf67dca2fd078c77fcd088a62ef5005266"
+    },
+    {
+      "target": "alpine-x64",
+      "file": "csharp-with-netcoredbg-alpine-x64-0.1.4000.vsix",
+      "sha256": "58248df394be9541981dd206e0b423a8173fecd3c18d55b8670ce093a06eeddf"
+    },
+    {
+      "target": "alpine-arm64",
+      "file": "csharp-with-netcoredbg-alpine-arm64-0.1.4000.vsix",
+      "sha256": "73d58e5069b12737e725a6c199ade204c9d52cbd1f1d275a0941899d09d1c77f"
+    },
+    {
+      "target": "darwin-x64",
+      "file": "csharp-with-netcoredbg-darwin-x64-0.1.4000.vsix",
+      "sha256": "da589e758be8c9478d3acf4caafb52938b6853b8f83cfa9f4054ca8b7c97f4d6"
+    },
+    {
+      "target": "darwin-arm64",
+      "file": "csharp-with-netcoredbg-darwin-arm64-0.1.4000.vsix",
+      "sha256": "f6f25dad2dfdca1d4f79cf6defd03b71b82577f512fc89f28b38dcdfc526e01c"
+    }
+  ]
+}

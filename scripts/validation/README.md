@@ -7,12 +7,13 @@ dependencies from [netcoredbg.json](../../config/netcoredbg.json), runs the same
 `aggregate.py`. `validate-unix.py` implements the Unix recipe; the Windows
 implementation remains in `validate-windows.ps1`.
 
-All eight source builds passed with unchanged Samsung inputs. Six targets passed
-both runtime tests. Alpine required external compilation compatibility inputs
-and exact RID dependency selection, then crashed in CoreCLR hosting. A subsequent
-external hosting experiment passed both Alpine CPUs on .NET 8/10 by running
-CoreCLR initialization on an owned 8 MiB pthread stack. Samsung files remain
-unchanged, but the repository now maintains runtime hosting behavior as well.
+The final candidate passed all eight source builds and all sixteen .NET 8/10
+runtime combinations with unchanged Samsung inputs. Alpine required external
+compilation inputs, exact RID dependency selection and a hosting correction:
+CoreCLR initialization runs on an owned 8 MiB pthread stack. Samsung files
+remain unchanged, but the repository now maintains runtime hosting behavior
+as well. All eight VSIX packages also passed the same runtime checks using
+their extracted debugger files.
 The [cross-platform report](../../docs/research/2026-09-06-cross-platform-release.md)
 records the complete matrix, crash evidence and source-preservation boundary.
 The independent [variant workflow](../variant/README.md) cannot package or publish

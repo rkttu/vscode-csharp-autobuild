@@ -1,0 +1,21 @@
+{
+  "success": true,
+  "target": "linux-x64",
+  "version": "0.1.4000",
+  "vsix": "csharp-with-netcoredbg-linux-x64-0.1.4000.vsix",
+  "sha256": "0b37138f62d5efd16aeed982bbc2c126e8512a9e5554186f00359306b3207c15",
+  "runtimeTests": [
+    "8",
+    "10"
+  ],
+  "netcoredbgBuild": {
+    "target": "linux-x64",
+    "upstreamCsharpCommit": "2f5806a9f39575bfaf4ca16445f420440a43e050",
+    "upstreamCsharpVersion": "42.42.42-placeholder",
+    "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+    "debuggerArchiveSha256": "a0c897f0819b4db03c207d5236af5dccdb926c33f28292e207b2b86c0f5f539c",
+    "validationRunId": "34021654129",
+    "validationWorkflowCommit": "0c0cc76ecda64d6092fb79179d65baa841f60588"
+  },
+  "scope": "VSIX identity, permissions, exact bundled hashes and extracted-adapter DAP launch; no IDE UI test"
+}

@@ -1,0 +1,42 @@
+{
+  "engine": "netcoredbg",
+  "program": "/home/runner/work/_temp/vsix-test/fixture-net10/output/Probe.dll",
+  "expectedArchitecture": "x64",
+  "expectedRuntime": "10",
+  "checks": [
+    "conditional breakpoint",
+    "stackTrace",
+    "scopes/variables",
+    "evaluate=42",
+    "step over",
+    "breakpoint after await",
+    "exception breakpoint/info",
+    "stdout and clean exit"
+  ],
+  "capabilities": {
+    "exceptionBreakpointFilters": [
+      {
+        "filter": "user-unhandled",
+        "label": "user-unhandled"
+      },
+      {
+        "filter": "all",
+        "label": "all"
+      }
+    ],
+    "supportTerminateDebuggee": true,
+    "supportsCancelRequest": true,
+    "supportsConditionalBreakpoints": true,
+    "supportsConfigurationDoneRequest": true,
+    "supportsExceptionFilterOptions": true,
+    "supportsExceptionInfoRequest": true,
+    "supportsExceptionOptions": false,
+    "supportsFunctionBreakpoints": true,
+    "supportsSetExpression": true,
+    "supportsSetVariable": true,
+    "supportsTerminateRequest": true
+  },
+  "output": "RUNTIME=.NET 10.0.11;ARCH=X64\nANSWER=42\nAFTER_AWAIT=43\nCAUGHT\nDONE\n",
+  "success": true,
+  "stderr": ""
+}

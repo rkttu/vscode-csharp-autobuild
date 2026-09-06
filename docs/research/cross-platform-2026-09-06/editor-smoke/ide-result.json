@@ -1,0 +1,38 @@
+{
+  "success": true,
+  "editor": "1.135.0",
+  "extensionId": "dotnetdev-kr-custom.csharp-with-netcoredbg",
+  "tests": [
+    {
+      "runtime": "8",
+      "success": true,
+      "checks": [
+        "IDE launch",
+        "conditional breakpoint",
+        "stack and variables",
+        "evaluate",
+        "step",
+        "post-await breakpoint",
+        "native runtime output and clean exit"
+      ],
+      "output": "RUNTIME=.NET 8.0.24;ARCH=Arm64\nANSWER=42\nAFTER_AWAIT=43\nCAUGHT\nDONE\n"
+    },
+    {
+      "runtime": "10",
+      "success": true,
+      "checks": [
+        "IDE launch",
+        "conditional breakpoint",
+        "stack and variables",
+        "evaluate",
+        "step",
+        "post-await breakpoint",
+        "native runtime output and clean exit"
+      ],
+      "output": "RUNTIME=.NET 10.0.11;ARCH=Arm64\nANSWER=42\nAFTER_AWAIT=43\nCAUGHT\nDONE\n"
+    }
+  ],
+  "extensionVersion": "0.1.4000",
+  "extensionPath": "/private/tmp/netcoredbg-windows-research/editor-smoke/extensions/dotnetdev-kr-custom.csharp-with-netcoredbg-0.1.4000",
+  "activation": true
+}

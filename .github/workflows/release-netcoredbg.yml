@@ -15,14 +15,6 @@ on:
         description: Publish verified VSIX packages (main only)
         type: boolean
         default: false
-  push:
-    branches: [research/netcoredbg-windows-validation]
-    paths:
-      - .github/workflows/release-netcoredbg.yml
-      - .github/workflows/netcoredbg-candidate.yml
-      - scripts/variant/**
-      - config/variant.json
-      - assets/netcoredbg/**
 
 permissions:
   contents: read

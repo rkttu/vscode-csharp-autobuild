@@ -1,0 +1,1846 @@
+[
+  {
+    "name": "discover",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101455230107",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python3 scripts/variant/discover.py",
+        "conclusion": "success"
+      },
+      {
+        "name": "Check that incomplete or mismatched evidence blocks release",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger / inputs",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101455253499",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run python3 - <<'PY'",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger / win32-arm64 source and DAP",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101455264906",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Preserve original source line endings on Windows",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Load fixed dependency inputs and isolated paths",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install native SDKs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install Linux compiler dependencies",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Validate Windows",
+        "conclusion": "success"
+      },
+      {
+        "name": "Validate Linux or macOS",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Build and execute in native musl environment",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Preserve evidence and exact packages",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Install native SDKs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger / linux-arm64 source and DAP",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101455264908",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Preserve original source line endings on Windows",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Load fixed dependency inputs and isolated paths",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install native SDKs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install Linux compiler dependencies",
+        "conclusion": "success"
+      },
+      {
+        "name": "Validate Windows",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Validate Linux or macOS",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build and execute in native musl environment",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Preserve evidence and exact packages",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Install native SDKs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger / alpine-x64 source and DAP",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101455264918",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Preserve original source line endings on Windows",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Load fixed dependency inputs and isolated paths",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install native SDKs",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Install Linux compiler dependencies",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Validate Windows",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Validate Linux or macOS",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Build and execute in native musl environment",
+        "conclusion": "success"
+      },
+      {
+        "name": "Preserve evidence and exact packages",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger / darwin-x64 source and DAP",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101455264925",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Preserve original source line endings on Windows",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Load fixed dependency inputs and isolated paths",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install native SDKs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install Linux compiler dependencies",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Validate Windows",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Validate Linux or macOS",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build and execute in native musl environment",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Preserve evidence and exact packages",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Install native SDKs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger / alpine-arm64 source and DAP",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101455264927",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Preserve original source line endings on Windows",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Load fixed dependency inputs and isolated paths",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install native SDKs",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Install Linux compiler dependencies",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Validate Windows",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Validate Linux or macOS",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Build and execute in native musl environment",
+        "conclusion": "success"
+      },
+      {
+        "name": "Preserve evidence and exact packages",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger / linux-x64 source and DAP",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101455264938",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Preserve original source line endings on Windows",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Load fixed dependency inputs and isolated paths",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install native SDKs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install Linux compiler dependencies",
+        "conclusion": "success"
+      },
+      {
+        "name": "Validate Windows",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Validate Linux or macOS",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build and execute in native musl environment",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Preserve evidence and exact packages",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Install native SDKs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger / win32-x64 source and DAP",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101455264947",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Preserve original source line endings on Windows",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Load fixed dependency inputs and isolated paths",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install native SDKs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install Linux compiler dependencies",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Validate Windows",
+        "conclusion": "success"
+      },
+      {
+        "name": "Validate Linux or macOS",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Build and execute in native musl environment",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Preserve evidence and exact packages",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Install native SDKs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger / darwin-arm64 source and DAP",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101455264963",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Preserve original source line endings on Windows",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Load fixed dependency inputs and isolated paths",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install native SDKs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install Linux compiler dependencies",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Validate Windows",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Validate Linux or macOS",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build and execute in native musl environment",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Preserve evidence and exact packages",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Install native SDKs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / debugger / aggregate",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101455924874",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Require all target evidence and package hashes",
+        "conclusion": "success"
+      },
+      {
+        "name": "Reject failed, canceled, or skipped matrix jobs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / package (linux-arm64)",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101455958195",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Apply independent identity and debugger integration",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install public build dependencies",
+        "conclusion": "success"
+      },
+      {
+        "name": "Format changed TypeScript with upstream rules",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build the platform VSIX",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify adapter selection and SDK environment",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify identity, permissions and exact debugger payload",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / package (alpine-x64)",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101455958200",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Apply independent identity and debugger integration",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install public build dependencies",
+        "conclusion": "success"
+      },
+      {
+        "name": "Format changed TypeScript with upstream rules",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build the platform VSIX",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify adapter selection and SDK environment",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify identity, permissions and exact debugger payload",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / package (linux-x64)",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101455958208",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Apply independent identity and debugger integration",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install public build dependencies",
+        "conclusion": "success"
+      },
+      {
+        "name": "Format changed TypeScript with upstream rules",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build the platform VSIX",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify adapter selection and SDK environment",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify identity, permissions and exact debugger payload",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / package (darwin-x64)",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101455958217",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Apply independent identity and debugger integration",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install public build dependencies",
+        "conclusion": "success"
+      },
+      {
+        "name": "Format changed TypeScript with upstream rules",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build the platform VSIX",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify adapter selection and SDK environment",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify identity, permissions and exact debugger payload",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / package (win32-arm64)",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101455958234",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Apply independent identity and debugger integration",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install public build dependencies",
+        "conclusion": "success"
+      },
+      {
+        "name": "Format changed TypeScript with upstream rules",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build the platform VSIX",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify adapter selection and SDK environment",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify identity, permissions and exact debugger payload",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / package (win32-x64)",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101455958249",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Apply independent identity and debugger integration",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install public build dependencies",
+        "conclusion": "success"
+      },
+      {
+        "name": "Format changed TypeScript with upstream rules",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build the platform VSIX",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify adapter selection and SDK environment",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify identity, permissions and exact debugger payload",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / package (alpine-arm64)",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101455958273",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Apply independent identity and debugger integration",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install public build dependencies",
+        "conclusion": "success"
+      },
+      {
+        "name": "Format changed TypeScript with upstream rules",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build the platform VSIX",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify adapter selection and SDK environment",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify identity, permissions and exact debugger payload",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / package (darwin-arm64)",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101455958274",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Apply independent identity and debugger integration",
+        "conclusion": "success"
+      },
+      {
+        "name": "Install public build dependencies",
+        "conclusion": "success"
+      },
+      {
+        "name": "Format changed TypeScript with upstream rules",
+        "conclusion": "success"
+      },
+      {
+        "name": "Build the platform VSIX",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify adapter selection and SDK environment",
+        "conclusion": "success"
+      },
+      {
+        "name": "Verify identity, permissions and exact debugger payload",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / test-vsix (darwin-arm64, arm64, macos-15, darwin)",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101456253290",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Load runtime and container inputs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Execute the adapter extracted from the VSIX",
+        "conclusion": "success"
+      },
+      {
+        "name": "Execute the VSIX adapter in native musl",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / test-vsix (darwin-x64, x64, macos-15-intel, darwin)",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101456253303",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Load runtime and container inputs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Execute the adapter extracted from the VSIX",
+        "conclusion": "success"
+      },
+      {
+        "name": "Execute the VSIX adapter in native musl",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / test-vsix (linux-arm64, arm64, ubuntu-22.04-arm, linux)",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101456253344",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Load runtime and container inputs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Execute the adapter extracted from the VSIX",
+        "conclusion": "success"
+      },
+      {
+        "name": "Execute the VSIX adapter in native musl",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / test-vsix (win32-x64, x64, windows-2022, windows)",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101456253345",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Load runtime and container inputs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Execute the adapter extracted from the VSIX",
+        "conclusion": "success"
+      },
+      {
+        "name": "Execute the VSIX adapter in native musl",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / test-vsix (alpine-x64, x64, ubuntu-22.04, alpine)",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101456253348",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Load runtime and container inputs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Execute the adapter extracted from the VSIX",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Execute the VSIX adapter in native musl",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / test-vsix (alpine-arm64, arm64, ubuntu-22.04-arm, alpine)",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101456253353",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Load runtime and container inputs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Execute the adapter extracted from the VSIX",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Execute the VSIX adapter in native musl",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / test-vsix (linux-x64, x64, ubuntu-22.04, linux)",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101456253388",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Load runtime and container inputs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Execute the adapter extracted from the VSIX",
+        "conclusion": "success"
+      },
+      {
+        "name": "Execute the VSIX adapter in native musl",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / test-vsix (win32-arm64, arm64, windows-11-arm, windows)",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101456253391",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Load runtime and container inputs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Execute the adapter extracted from the VSIX",
+        "conclusion": "success"
+      },
+      {
+        "name": "Execute the VSIX adapter in native musl",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  },
+  {
+    "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v2.148.23-prerelease, 2f5806a9f3... / publish",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34021654129/job/101456470725",
+    "steps": [
+      {
+        "name": "Set up job",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Run actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+        "conclusion": "success"
+      },
+      {
+        "name": "Preserve candidate inputs",
+        "conclusion": "success"
+      },
+      {
+        "name": "Restore an interrupted upload without rebuilding",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run actions/setup-node@820762786026740c76f36085b0efc47a31fe5020",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Install pinned publisher",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Verify the complete release set",
+        "conclusion": "success"
+      },
+      {
+        "name": "Publish and read back every platform",
+        "conclusion": "skipped"
+      },
+      {
+        "name": "Run actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+        "conclusion": "success"
+      },
+      {
+        "name": "Post Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1",
+        "conclusion": "success"
+      },
+      {
+        "name": "Complete job",
+        "conclusion": "success"
+      }
+    ]
+  }
+]

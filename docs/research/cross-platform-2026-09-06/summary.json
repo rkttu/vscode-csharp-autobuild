@@ -176,5 +176,37 @@
   ],
   "passedRuntimeCombinations": 12,
   "requiredRuntimeCombinations": 16,
-  "published": false
+  "published": false,
+  "alpineHostingExperiment": {
+    "runId": 34021312326,
+    "workflowCommit": "9a1271a943503b9dc012594ad7963f7630cde7c2",
+    "passedRuntimeCombinations": 4,
+    "requiredRuntimeCombinations": 4,
+    "sourceUnchanged": true,
+    "scope": "Alpine-only; no aggregate promotion"
+  },
+  "completeCandidate": {
+    "runId": 34021654129,
+    "workflowCommit": "0c0cc76ecda64d6092fb79179d65baa841f60588",
+    "passedNativeRuntimeCombinations": 16,
+    "requiredNativeRuntimeCombinations": 16,
+    "nativeAggregateSuccess": true,
+    "vsixVerification": "all eight targets passed both runtimes",
+    "published": false,
+    "passedVsixRuntimeCombinations": 16,
+    "vsixBuilds": 8,
+    "version": "0.1.4000",
+    "publicationDryRunSuccess": true,
+    "registryUpload": "skipped"
+  },
+  "editorSmoke": {
+    "target": "darwin-arm64",
+    "editor": "VS Code 1.135.0",
+    "activation": true,
+    "runtimes": [
+      "8",
+      "10"
+    ],
+    "success": true
+  }
 }

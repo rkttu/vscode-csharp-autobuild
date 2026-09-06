@@ -1,0 +1,31 @@
+{
+  "runId": 34021654129,
+  "candidateVersion": "0.1.4000",
+  "target": "darwin-arm64",
+  "vsix": "csharp-with-netcoredbg-darwin-arm64-0.1.4000.vsix",
+  "vsixSha256": "f6f25dad2dfdca1d4f79cf6defd03b71b82577f512fc89f28b38dcdfc526e01c",
+  "editorVersion": "1.135.0",
+  "editorCommit": "08d4889f9ec4a1685d257b9b95de036c8e1ce1e5",
+  "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "dotnetRuntimeExtensionVersion": "3.1.0",
+  "userDataAndExtensions": "Separate temporary directories; no change to normal user configuration",
+  "scope": "Installed VSIX in a real VS Code extension host, activation and two local launch sessions; no VSCodium or manual UI acceptance test",
+  "normalization": "Personal SDK root replaced with /local/dotnet in archived JSON",
+  "files": [
+    {
+      "file": "ide-net8.json",
+      "originalSha256": "ea64038e9095460330405f37b5ab33a461817c510968cae03bdc7b6ac4d83893",
+      "archivedSha256": "6ea9e516b45cd535d32423a0b198f4c1d749406f22891fe33589a9c9d60710ca"
+    },
+    {
+      "file": "ide-net10.json",
+      "originalSha256": "7033fe53d1dab9c92e63191b5d194f981ac3fa917ccc38bfde73001a60f50ca9",
+      "archivedSha256": "fe6f3a7ce22e8a1d899139eef5a5e94dd6e938cfeb58c60c77b482bad2d8ee0b"
+    },
+    {
+      "file": "ide-result.json",
+      "originalSha256": "975255c4448998ac4fe1f7134f6f495b96dd0317faeb519b5ca2cd8bd1c54428",
+      "archivedSha256": "975255c4448998ac4fe1f7134f6f495b96dd0317faeb519b5ca2cd8bd1c54428"
+    }
+  ]
+}
