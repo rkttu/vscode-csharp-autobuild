@@ -93,6 +93,18 @@ def apply(source, validated, target, version, repo):
     fs.writeFileSync(path.join(codeExtensionPath, '.debugger', 'install.complete'), '');
 }""")
     factory = source / "src/coreclrDebug/activate.ts"
+    for debug_type in ("clr", "monovsdbg", "monovsdbg_wasm", "coreclr_mobile"):
+        replace_once(factory, f"    disposables.add(vscode.debug.registerDebugAdapterDescriptorFactory('{debug_type}', factory));\n", "")
+    replace_once(factory, "import { BaseVsDbgConfigurationProvider } from '../shared/configurationProvider';\n", "")
+    replace_once(factory, "    csharpOutputChannel: vscode.OutputChannel,", "    _csharpOutputChannel: vscode.OutputChannel,")
+    replace_once(factory, """    /** 'clr' type does not have a intial configuration provider, but we need to register it to support the common debugger features listed in {@link BaseVsDbgConfigurationProvider} */
+    context.subscriptions.push(
+        vscode.debug.registerDebugConfigurationProvider(
+            'clr',
+            new BaseVsDbgConfigurationProvider(platformInformation, csharpOutputChannel)
+        )
+    );
+""", "")
     content = factory.read_text()
     start = content.index("        // debugger has finished installation, kick off our debugger process")
     end = content.index("        return executable;", start) + len("        return executable;")
@@ -124,7 +136,8 @@ endorse, or provide support for this package.
 
 The bundled debugger is built from [Samsung/netcoredbg](https://github.com/Samsung/netcoredbg).
 Original Samsung source files remain unchanged; build inputs and compatibility
-settings are maintained in the [build repository](https://github.com/rkttu/vscode-csharp-autobuild).
+code are maintained in the [build repository](https://github.com/rkttu/vscode-csharp-autobuild).
+Alpine packages include repository-owned CoreCLR hosting compatibility code.
 Component licenses accompany the package. This does not classify every component
 of the upstream C# extension as MIT-licensed.
 

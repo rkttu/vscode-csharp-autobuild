@@ -1,0 +1,71 @@
+{
+  "runId": 34021312326,
+  "workflowCommit": "9a1271a943503b9dc012594ad7963f7630cde7c2",
+  "normalization": "None; exact artifact bytes",
+  "files": [
+    {
+      "file": "alpine-hosting/x64/result.json",
+      "sha256": "f31979fcd723e09a009c2947aa9e57bb492f47b5417ca89c571f51f569b38a6c"
+    },
+    {
+      "file": "alpine-hosting/x64/source-integrity.json",
+      "sha256": "d0e89b4f2be72b07c63724b630e73933b6414f8c8ea1a7b049d9df8fcbcb83ad"
+    },
+    {
+      "file": "alpine-hosting/x64/debugger-architectures.json",
+      "sha256": "06511781b8ef51eafa0e445cae7db7ffa5288d20dbdf2076cc75650406d2aac7"
+    },
+    {
+      "file": "alpine-hosting/x64/package-sha256.json",
+      "sha256": "674443006a820dfc1ff39306be680401d560ab317a0d83d349436cce88a46813"
+    },
+    {
+      "file": "alpine-hosting/x64/dap-net8-result.json",
+      "sha256": "0f067a3d1d3673af02b7ef3c774e8ed33e9eba5385f7adc2056d1c8c554e4414"
+    },
+    {
+      "file": "alpine-hosting/x64/dap-net10-result.json",
+      "sha256": "4b3dea796133991604e17161481370ec7dfa49201915064c6cb4cea3f4ad34a6"
+    },
+    {
+      "file": "alpine-hosting/x64/dap-net8.jsonl",
+      "sha256": "b0d29864da16acbdc492e384519e78f1fb309c16e641098ad3de6769cabd7630"
+    },
+    {
+      "file": "alpine-hosting/x64/dap-net10.jsonl",
+      "sha256": "4158950ee9ffaf4b91774dc60da6851f3ae9b28d63f7e84cd887716f377046f5"
+    },
+    {
+      "file": "alpine-hosting/arm64/result.json",
+      "sha256": "b0c971b2092fc4c3e228f5c2bf4e5928bb3bfeb59ce502f32c35433222b4cecc"
+    },
+    {
+      "file": "alpine-hosting/arm64/source-integrity.json",
+      "sha256": "d0e89b4f2be72b07c63724b630e73933b6414f8c8ea1a7b049d9df8fcbcb83ad"
+    },
+    {
+      "file": "alpine-hosting/arm64/debugger-architectures.json",
+      "sha256": "8f2a8fea6f8e38af844cf8f5c73f31a0c71fcfd72db38fefcd3f2fb0ca38ad0f"
+    },
+    {
+      "file": "alpine-hosting/arm64/package-sha256.json",
+      "sha256": "c343307e5edf17daa0b2ef574ec16e3b7b35297bae033c91be6c267d7d6b6387"
+    },
+    {
+      "file": "alpine-hosting/arm64/dap-net8-result.json",
+      "sha256": "5cb8b283604e2f1ce702092b4d9b11e5da8f181b24d410a906db13e60c818f26"
+    },
+    {
+      "file": "alpine-hosting/arm64/dap-net10-result.json",
+      "sha256": "eb133c97269648a66dace377a13267abc4c7536440388c44bac085f536b3d2fd"
+    },
+    {
+      "file": "alpine-hosting/arm64/dap-net8.jsonl",
+      "sha256": "29eb8981bd0e199230d8b73e2ee8781be863d2900ca48e964c26a288b10b9b68"
+    },
+    {
+      "file": "alpine-hosting/arm64/dap-net10.jsonl",
+      "sha256": "bdb6e532e1055ff0256569e9c7ebe63600c146acd6e463bbd7125c1236d62d6e"
+    }
+  ]
+}

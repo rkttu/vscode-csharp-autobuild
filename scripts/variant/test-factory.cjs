@@ -14,11 +14,27 @@ assert(factory, 'The upstream factory class was moved or removed');
 const text = ts.createPrinter().printNode(ts.EmitHint.Unspecified, factory, parsed);
 const emitted = ts.transpileModule(text, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS } }).outputText;
 class Adapter { constructor(command, args, options) { Object.assign(this, { command, args, options }); } }
-class Util { static existsSync() { return true; } debugAdapterDir() { return '/extension/.debugger'; } }
+class Util {
+    static existsSync() { return true; }
+    debugAdapterDir() { return '/extension/.debugger'; }
+    installCompleteFilePath() { return '/extension/.debugger/install.complete'; }
+}
+const pkg = JSON.parse(fs.readFileSync(path.join(source, 'package.json'), 'utf8'));
+const registered = [];
+class Disposables { add() {} }
 const isolatedEnv = {};
 const sandbox = {
     exports: {}, path, process: { env: isolatedEnv },
-    vscode: { DebugAdapterExecutable: Adapter }, CoreClrDebugUtil: Util,
+    vscode: {
+        DebugAdapterExecutable: Adapter,
+        commands: { registerCommand: () => ({ dispose() {} }) },
+        debug: { registerDebugAdapterDescriptorFactory: (type) => {
+            assert(pkg.contributes.debuggers.some(d => d.type === type), `Undeclared debugger registration: ${type}`);
+            assert(!registered.includes(type), `Duplicate debugger registration: ${type}`);
+            registered.push(type);
+            return { dispose() {} };
+        } },
+    }, CoreClrDebugUtil: Util, CompositeDisposable: Disposables,
     common: { getExtensionPath: () => '/extension' }, omnisharpOptions: { dotNetCliPaths: [] },
     getDotnetInfo: async () => ({ CliPath: '/native-sdk/dotnet' }),
     getTargetArchitecture: (_platform, requested) => requested || 'x86_64',
@@ -27,6 +43,14 @@ vm.runInNewContext(emitted, sandbox, { filename: file });
 const instance = new sandbox.exports.DebugAdapterExecutableFactory(null, {}, {}, { netcoredbgBuild: { target: 'win32-x64' } }, '/extension');
 const executable = new Adapter('/extension/.debugger/netcoredbg/netcoredbg.exe', ['--interpreter=vscode'], { env: { KEEP: 'yes' } });
 (async () => {
+    const activation = parsed.statements.find(s => ts.isFunctionDeclaration(s) && s.name.text === 'activate');
+    assert(activation, 'Debugger activation entry point moved');
+    vm.runInNewContext(ts.transpileModule(ts.createPrinter().printNode(ts.EmitHint.Unspecified, activation, parsed), {
+        compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS },
+    }).outputText, sandbox, { filename: file });
+    await sandbox.exports.activate({ packageJSON: pkg, extensionPath: '/extension' },
+        { extensionPath: '/extension', subscriptions: [] }, {}, {}, {}, undefined);
+    assert.deepEqual(registered, ['coreclr']);
     const session = { type: 'coreclr', configuration: {} };
     const result = await instance.createDebugAdapterDescriptor(session, executable);
     assert.equal(result.command, executable.command);
@@ -38,5 +62,5 @@ const executable = new Adapter('/extension/.debugger/netcoredbg/netcoredbg.exe',
     await assert.rejects(instance.createDebugAdapterDescriptor({ type: 'clr', configuration: {} }, executable), /coreclr/);
     await assert.rejects(instance.createDebugAdapterDescriptor(session, undefined), /bundled netcoredbg/);
     await assert.rejects(instance.createDebugAdapterDescriptor({ type: 'coreclr', configuration: { targetArchitecture: 'arm64' } }, executable), /architecture/);
-    console.log('Factory checks passed: descriptor, args, SDK discovery, environment, unsupported type, missing descriptor, architecture mismatch.');
+    console.log('Activation and factory checks passed: declared debugger registration, descriptor, args, SDK discovery, environment, unsupported type, missing descriptor, architecture mismatch.');
 })().catch(error => { console.error(error); process.exitCode = 1; });
