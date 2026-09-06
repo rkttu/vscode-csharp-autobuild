@@ -84,6 +84,10 @@ def main():
             command.append(f"-DCMAKE_CXX_FLAGS=-include {repo}/scripts/validation/musl-null-compat.h")
             command.append(f"-DCMAKE_PROJECT_TOP_LEVEL_INCLUDES={repo}/scripts/validation/musl-compat.cmake")
             status["externalCompatibilityHeader"] = "scripts/validation/musl-null-compat.h"
+            status["externalRuntimeCompatibility"] = dict(
+                file="scripts/validation/musl-coreclr-host.cpp",
+                sha256=sha256(repo / "scripts/validation/musl-coreclr-host.cpp"),
+                strategy="CoreCLR initialization on an owned 8 MiB pthread stack")
         if family == "darwin":
             command += [f"-DCMAKE_OSX_ARCHITECTURES={'x86_64' if arch == 'x64' else 'arm64'}", "-DCMAKE_OSX_DEPLOYMENT_TARGET=12.0"]
         run(command, "configure.log")
