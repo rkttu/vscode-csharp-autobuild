@@ -1,8 +1,37 @@
-# Windows source-build and DAP validation
+# Native netcoredbg source-build and DAP validation
+
+The reusable [all-platform workflow](../../.github/workflows/validate-netcoredbg.yml)
+now covers Windows, Ubuntu, Alpine and macOS on x64 and ARM64. It reads pinned
+dependencies from [netcoredbg.json](../../config/netcoredbg.json), runs the same
+.NET 8/10 DAP fixture and requires complete, hash-matched evidence in
+`aggregate.py`. `validate-unix.py` implements the Unix recipe; the Windows
+implementation remains in `validate-windows.ps1`.
+
+All eight source builds passed with unchanged Samsung inputs. Six targets passed
+both runtime tests. Alpine required external compilation compatibility inputs
+and exact RID dependency selection, then crashed in CoreCLR hosting. A subsequent
+external hosting experiment passed both Alpine CPUs on .NET 8/10 by running
+CoreCLR initialization on an owned 8 MiB pthread stack. Samsung files remain
+unchanged, but the repository now maintains runtime hosting behavior as well.
+The [cross-platform report](../../docs/research/2026-09-06-cross-platform-release.md)
+records the complete matrix, crash evidence and source-preservation boundary.
+The independent [variant workflow](../variant/README.md) cannot package or publish
+a candidate until the full native gate passes.
+
+`diagnose-netcoredbg-alpine.yml` reuses the pinned failing-run artifacts and
+collects debugger exit codes and stacks on disposable runners. Its successful
+job status describes collection only; its DAP result files remain authoritative.
+The diagnostic workflow never promotes artifacts or publishes an extension.
+
+Manual `validate-netcoredbg.yml` dispatch accepts `platform-scope=alpine` for
+isolated experiments. This mode skips the aggregate and cannot promote a
+debugger. Normal release candidates use the default `all` scope.
+
+## Windows-specific recipe and historical experiment
 
 This experiment builds Samsung netcoredbg on native Windows x64 and ARM64 runners and runs the same basic DAP fixture on .NET 8 and .NET 10. It supports the investigation in [issue #2](https://github.com/rkttu/vscode-csharp-autobuild/issues/2). It does not build VSIX packages, create releases, publish to Open VSX, or update `.last_built_sha`.
 
-The [workflow](../../.github/workflows/validate-netcoredbg-windows.yml) runs on changes to itself or `scripts/validation/**` on the dedicated `research/netcoredbg-windows-validation` branch. This allows verification without changing `main`. It also declares `workflow_dispatch`, which GitHub exposes after a workflow is registered on the default branch. There are no schedule, release, or main-branch push triggers. [GitHub dispatch requirements](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_dispatch)
+The original [Windows workflow](../../.github/workflows/validate-netcoredbg-windows.yml) is retained for manual Windows-only diagnosis. Its initial branch-scoped push trigger enabled the first research run and has since been removed in favor of the reusable all-platform workflow. GitHub exposes `workflow_dispatch` after default-branch registration. [GitHub dispatch requirements](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_dispatch)
 
 ## Pinned inputs and native execution
 

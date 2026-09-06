@@ -115,6 +115,9 @@ def main():
         write(evidence / "resolved-libraries.json", libraries)
         notices = package / "notices"
         notices.mkdir()
+        if family == "alpine":
+            shutil.copy2(repo / "LICENSE", notices / "vscode-csharp-autobuild-LICENSE")
+            shutil.copy2(repo / "scripts/validation/musl-coreclr-host.cpp", notices / "musl-coreclr-host.cpp")
         for file, name in [(source / "LICENSE", "Samsung-netcoredbg-LICENSE"),
                            (source / "third_party/linenoise-ng/LICENSE", "linenoise-ng-LICENSE"),
                            (source / "third_party/json/LICENSE.MIT", "json-LICENSE.MIT"),

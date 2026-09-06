@@ -1,0 +1,12 @@
+[
+  {
+    "name": "diagnose (x64, ubuntu-22.04)",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34020443441/job/101451910158"
+  },
+  {
+    "name": "diagnose (arm64, ubuntu-22.04-arm)",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34020443441/job/101451910191"
+  }
+]

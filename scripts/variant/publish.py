@@ -24,6 +24,7 @@ def main():
     settings = json.loads((repo / "config/netcoredbg.json").read_text())
     variant = json.loads((repo / "config/variant.json").read_text())
     candidate = json.loads(args.candidate.read_text())
+    candidate.pop("resumeRelease", None)
     outputs = []
     for target in settings["targets"]:
         files = list(args.artifacts.rglob(f"{variant['name']}-{target}-{candidate['version']}.vsix"))

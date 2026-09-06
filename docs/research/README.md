@@ -7,6 +7,7 @@ These reports record the investigation completed on September 6, 2026. They dist
 3. [Libre C# product assessment](2026-09-06-libre-csharp-product.md): preserving the existing distribution, support criteria, and comparison with the community extension.
 4. [Separate Samsung debugger variant](2026-09-06-samsung-debugger-variant.md): the proposed `C# (with Samsung Debugger)` identity and independent build and publication paths.
 5. [Windows x64 and ARM64 validation](2026-09-06-windows-validation.md): subsequent native source builds, the MSVC/NuGet build-layout fix, and four passing .NET 8/10 DAP combinations.
+6. [Cross-platform validation and release gates](2026-09-06-cross-platform-release.md): the neutral `C# (with netcoredbg)` identity, Open VSX registration and icon review, six passing targets, Alpine hosting crashes, and the guarded publication implementation.
 
 The first four reports retain their original investigation scope. The Windows report updates their outstanding Windows build and basic-debugging checks with actual GitHub runner evidence.
 

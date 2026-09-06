@@ -1,0 +1,180 @@
+{
+  "date": "2026-09-06",
+  "nativeRunId": 34019887224,
+  "candidateRunId": 34019887593,
+  "crashDiagnosticRunId": 34020443441,
+  "scope": "Before external runtime hosting compatibility experiment; diagnostic job success is not debugger success.",
+  "targets": [
+    {
+      "target": "alpine-arm64",
+      "buildSuccess": true,
+      "success": false,
+      "sourceUnchanged": true,
+      "originalFileCount": 498,
+      "runtimeTests": [
+        {
+          "runtime": "8",
+          "sdk": "8.0.418",
+          "success": false,
+          "error": "dap-net8-console.log: exit 1"
+        },
+        {
+          "runtime": "10",
+          "sdk": "10.0.400",
+          "success": false,
+          "error": "dap-net10-console.log: exit 1"
+        }
+      ]
+    },
+    {
+      "target": "alpine-x64",
+      "buildSuccess": true,
+      "success": false,
+      "sourceUnchanged": true,
+      "originalFileCount": 498,
+      "runtimeTests": [
+        {
+          "runtime": "8",
+          "sdk": "8.0.418",
+          "success": false,
+          "error": "dap-net8-console.log: exit 1"
+        },
+        {
+          "runtime": "10",
+          "sdk": "10.0.400",
+          "success": false,
+          "error": "dap-net10-console.log: exit 1"
+        }
+      ]
+    },
+    {
+      "target": "darwin-arm64",
+      "buildSuccess": true,
+      "success": true,
+      "sourceUnchanged": true,
+      "originalFileCount": 498,
+      "runtimeTests": [
+        {
+          "runtime": "8",
+          "sdk": "8.0.418",
+          "success": true,
+          "error": null
+        },
+        {
+          "runtime": "10",
+          "sdk": "10.0.400",
+          "success": true,
+          "error": null
+        }
+      ]
+    },
+    {
+      "target": "darwin-x64",
+      "buildSuccess": true,
+      "success": true,
+      "sourceUnchanged": true,
+      "originalFileCount": 498,
+      "runtimeTests": [
+        {
+          "runtime": "8",
+          "sdk": "8.0.418",
+          "success": true,
+          "error": null
+        },
+        {
+          "runtime": "10",
+          "sdk": "10.0.400",
+          "success": true,
+          "error": null
+        }
+      ]
+    },
+    {
+      "target": "linux-arm64",
+      "buildSuccess": true,
+      "success": true,
+      "sourceUnchanged": true,
+      "originalFileCount": 498,
+      "runtimeTests": [
+        {
+          "runtime": "8",
+          "sdk": "8.0.418",
+          "success": true,
+          "error": null
+        },
+        {
+          "runtime": "10",
+          "sdk": "10.0.400",
+          "success": true,
+          "error": null
+        }
+      ]
+    },
+    {
+      "target": "linux-x64",
+      "buildSuccess": true,
+      "success": true,
+      "sourceUnchanged": true,
+      "originalFileCount": 498,
+      "runtimeTests": [
+        {
+          "runtime": "8",
+          "sdk": "8.0.418",
+          "success": true,
+          "error": null
+        },
+        {
+          "runtime": "10",
+          "sdk": "10.0.400",
+          "success": true,
+          "error": null
+        }
+      ]
+    },
+    {
+      "target": "win32-arm64",
+      "buildSuccess": true,
+      "success": true,
+      "sourceUnchanged": true,
+      "originalFileCount": 498,
+      "runtimeTests": [
+        {
+          "runtime": "8",
+          "sdk": "8.0.418",
+          "success": true,
+          "error": null
+        },
+        {
+          "runtime": "10",
+          "sdk": "10.0.400",
+          "success": true,
+          "error": null
+        }
+      ]
+    },
+    {
+      "target": "win32-x64",
+      "buildSuccess": true,
+      "success": true,
+      "sourceUnchanged": true,
+      "originalFileCount": 498,
+      "runtimeTests": [
+        {
+          "runtime": "8",
+          "sdk": "8.0.418",
+          "success": true,
+          "error": null
+        },
+        {
+          "runtime": "10",
+          "sdk": "10.0.400",
+          "success": true,
+          "error": null
+        }
+      ]
+    }
+  ],
+  "passedRuntimeCombinations": 12,
+  "requiredRuntimeCombinations": 16,
+  "published": false
+}

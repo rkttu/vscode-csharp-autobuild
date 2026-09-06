@@ -18,6 +18,7 @@ permissions:
 
 jobs:
   debugger:
+    if: ${{ !fromJSON(inputs.candidate).resumeRelease }}
     uses: ./.github/workflows/validate-netcoredbg.yml
     with:
       debugger-tag: ${{ fromJSON(inputs.candidate).debuggerTag }}
@@ -178,6 +179,7 @@ jobs:
 
   publish:
     needs: [debugger, package, test-vsix]
+    if: ${{ always() && !cancelled() && (fromJSON(inputs.candidate).resumeRelease || (needs.debugger.result == 'success' && needs.package.result == 'success' && needs.test-vsix.result == 'success')) }}
     runs-on: ubuntu-22.04
     permissions:
       contents: write
@@ -186,6 +188,7 @@ jobs:
         with:
           persist-credentials: false
       - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        if: ${{ !fromJSON(inputs.candidate).resumeRelease }}
         with:
           pattern: ${{ fromJSON(inputs.candidate).artifactPrefix }}-*
           path: release-artifacts
@@ -193,6 +196,11 @@ jobs:
         env:
           CANDIDATE_JSON: ${{ inputs.candidate }}
         run: python3 -c 'import json, os; json.dump(json.loads(os.environ["CANDIDATE_JSON"]), open("candidate.json", "w"), indent=2)'
+      - name: Restore an interrupted upload without rebuilding
+        if: fromJSON(inputs.candidate).resumeRelease
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/variant/resume.py --candidate candidate.json --artifacts release-artifacts
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         if: inputs.publish
         with:

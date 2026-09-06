@@ -1,0 +1,12 @@
+{
+  "id": 34019887224,
+  "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887224",
+  "head_branch": "research/netcoredbg-windows-validation",
+  "head_sha": "47a4f154c45c6c7471b3c735bd9c1433b8dab2d7",
+  "event": "push",
+  "status": "completed",
+  "conclusion": "failure",
+  "run_attempt": 1,
+  "created_at": "2026-09-06T07:42:53Z",
+  "updated_at": "2026-09-06T07:47:13Z"
+}

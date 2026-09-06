@@ -1,0 +1,52 @@
+[
+  {
+    "name": "inputs",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887224/job/101450386859"
+  },
+  {
+    "name": "win32-x64 source and DAP",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887224/job/101450417501"
+  },
+  {
+    "name": "alpine-arm64 source and DAP",
+    "conclusion": "failure",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887224/job/101450417502"
+  },
+  {
+    "name": "linux-arm64 source and DAP",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887224/job/101450417517"
+  },
+  {
+    "name": "darwin-arm64 source and DAP",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887224/job/101450417520"
+  },
+  {
+    "name": "linux-x64 source and DAP",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887224/job/101450417524"
+  },
+  {
+    "name": "alpine-x64 source and DAP",
+    "conclusion": "failure",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887224/job/101450417540"
+  },
+  {
+    "name": "win32-arm64 source and DAP",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887224/job/101450417541"
+  },
+  {
+    "name": "darwin-x64 source and DAP",
+    "conclusion": "success",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887224/job/101450417552"
+  },
+  {
+    "name": "aggregate",
+    "conclusion": "failure",
+    "html_url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/34019887224/job/101450873428"
+  }
+]

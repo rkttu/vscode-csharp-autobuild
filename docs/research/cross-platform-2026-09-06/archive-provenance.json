@@ -1,0 +1,460 @@
+{
+  "normalization": "UTF-8 without BOM, LF, ANSI CSI removed, trailing whitespace removed; original and archive SHA-256 retained",
+  "files": [
+    {
+      "file": "native/alpine-arm64/result.json",
+      "originalSha256": "1e0ef78e402e0e0c20d0b5ad42afea84fb1907c6173405e7406239ef3f845d00",
+      "archivedSha256": "1e0ef78e402e0e0c20d0b5ad42afea84fb1907c6173405e7406239ef3f845d00"
+    },
+    {
+      "file": "native/alpine-arm64/source-before.json",
+      "originalSha256": "f63243f0d48da29ac7bae3f34488820808fca506e5f01a9c63172421cf2b37d0",
+      "archivedSha256": "f63243f0d48da29ac7bae3f34488820808fca506e5f01a9c63172421cf2b37d0"
+    },
+    {
+      "file": "native/alpine-arm64/source-integrity.json",
+      "originalSha256": "d0e89b4f2be72b07c63724b630e73933b6414f8c8ea1a7b049d9df8fcbcb83ad",
+      "archivedSha256": "d0e89b4f2be72b07c63724b630e73933b6414f8c8ea1a7b049d9df8fcbcb83ad"
+    },
+    {
+      "file": "native/alpine-arm64/debugger-architectures.json",
+      "originalSha256": "3237faa51963b869dbbb04ca5937fc6a7621710fe949b78ccb51066b987ce08b",
+      "archivedSha256": "3237faa51963b869dbbb04ca5937fc6a7621710fe949b78ccb51066b987ce08b"
+    },
+    {
+      "file": "native/alpine-arm64/package-sha256.json",
+      "originalSha256": "a47fc83e3085b42201eed9732ca9e7b52f3a2a2dc34c8f318b3b4bb43e03497a",
+      "archivedSha256": "a47fc83e3085b42201eed9732ca9e7b52f3a2a2dc34c8f318b3b4bb43e03497a"
+    },
+    {
+      "file": "native/alpine-arm64/dbgshim-selection.json",
+      "originalSha256": "6e178fd9fe9f3065252a95b106d6746ff4150bfbb028fac0488827eabdb14845",
+      "archivedSha256": "6e178fd9fe9f3065252a95b106d6746ff4150bfbb028fac0488827eabdb14845"
+    },
+    {
+      "file": "native/alpine-arm64/dap-net8-result.json",
+      "originalSha256": "7dbc92a98e6fd7d03bcc7356269b7aab6598c1b8705821ae10ca260453bd7364",
+      "archivedSha256": "7dbc92a98e6fd7d03bcc7356269b7aab6598c1b8705821ae10ca260453bd7364"
+    },
+    {
+      "file": "native/alpine-arm64/dap-net10-result.json",
+      "originalSha256": "f9a2baec787ff0a50a0630e9f58cadcd82adc076f1c14b760a152d6056403759",
+      "archivedSha256": "f9a2baec787ff0a50a0630e9f58cadcd82adc076f1c14b760a152d6056403759"
+    },
+    {
+      "file": "native/alpine-arm64/dap-net8.jsonl",
+      "originalSha256": "fa85a0adef47c47424ba7549c616c1e0b659d93298ecd6a5d8538c333874520a",
+      "archivedSha256": "fa85a0adef47c47424ba7549c616c1e0b659d93298ecd6a5d8538c333874520a"
+    },
+    {
+      "file": "native/alpine-arm64/dap-net10.jsonl",
+      "originalSha256": "2c143ef080182750f3b9cb8c4aa130424d2695f48993576c58b3c3acf4c7083f",
+      "archivedSha256": "2c143ef080182750f3b9cb8c4aa130424d2695f48993576c58b3c3acf4c7083f"
+    },
+    {
+      "file": "native/alpine-x64/result.json",
+      "originalSha256": "2cab1d905e5fd9616a8aab45205b0aac3b98ecbaad87d1caa3f8f74859016b88",
+      "archivedSha256": "2cab1d905e5fd9616a8aab45205b0aac3b98ecbaad87d1caa3f8f74859016b88"
+    },
+    {
+      "file": "native/alpine-x64/source-before.json",
+      "originalSha256": "f63243f0d48da29ac7bae3f34488820808fca506e5f01a9c63172421cf2b37d0",
+      "archivedSha256": "f63243f0d48da29ac7bae3f34488820808fca506e5f01a9c63172421cf2b37d0"
+    },
+    {
+      "file": "native/alpine-x64/source-integrity.json",
+      "originalSha256": "d0e89b4f2be72b07c63724b630e73933b6414f8c8ea1a7b049d9df8fcbcb83ad",
+      "archivedSha256": "d0e89b4f2be72b07c63724b630e73933b6414f8c8ea1a7b049d9df8fcbcb83ad"
+    },
+    {
+      "file": "native/alpine-x64/debugger-architectures.json",
+      "originalSha256": "f80e40ab14aa72b6b0970b5182354da7425b4386616bab286da1e91607ef7d58",
+      "archivedSha256": "f80e40ab14aa72b6b0970b5182354da7425b4386616bab286da1e91607ef7d58"
+    },
+    {
+      "file": "native/alpine-x64/package-sha256.json",
+      "originalSha256": "93104e86330e899ebaeb07c45100a3b0c16c04e95da1bdd3fee40ca20cecb029",
+      "archivedSha256": "93104e86330e899ebaeb07c45100a3b0c16c04e95da1bdd3fee40ca20cecb029"
+    },
+    {
+      "file": "native/alpine-x64/dbgshim-selection.json",
+      "originalSha256": "4608404a3576c29cf7bcb687820d7f6bbc645b6a9bc2822f8797ce6ac7d34dc3",
+      "archivedSha256": "4608404a3576c29cf7bcb687820d7f6bbc645b6a9bc2822f8797ce6ac7d34dc3"
+    },
+    {
+      "file": "native/alpine-x64/dap-net8-result.json",
+      "originalSha256": "210fb12c994b603388852bc4a3ba205b312ecc3ca02d52a68b668faabe36c12a",
+      "archivedSha256": "210fb12c994b603388852bc4a3ba205b312ecc3ca02d52a68b668faabe36c12a"
+    },
+    {
+      "file": "native/alpine-x64/dap-net10-result.json",
+      "originalSha256": "0b80358e01b5acb6b7e2b4f70b1562d43f59126188194ff8ea2e3410c8e1277f",
+      "archivedSha256": "0b80358e01b5acb6b7e2b4f70b1562d43f59126188194ff8ea2e3410c8e1277f"
+    },
+    {
+      "file": "native/alpine-x64/dap-net8.jsonl",
+      "originalSha256": "fa85a0adef47c47424ba7549c616c1e0b659d93298ecd6a5d8538c333874520a",
+      "archivedSha256": "fa85a0adef47c47424ba7549c616c1e0b659d93298ecd6a5d8538c333874520a"
+    },
+    {
+      "file": "native/alpine-x64/dap-net10.jsonl",
+      "originalSha256": "2c143ef080182750f3b9cb8c4aa130424d2695f48993576c58b3c3acf4c7083f",
+      "archivedSha256": "2c143ef080182750f3b9cb8c4aa130424d2695f48993576c58b3c3acf4c7083f"
+    },
+    {
+      "file": "native/darwin-arm64/result.json",
+      "originalSha256": "89a368b1d5458a2568986b8c521ea31c8e8661271dc3bf740f956754f8e84f18",
+      "archivedSha256": "89a368b1d5458a2568986b8c521ea31c8e8661271dc3bf740f956754f8e84f18"
+    },
+    {
+      "file": "native/darwin-arm64/source-before.json",
+      "originalSha256": "f63243f0d48da29ac7bae3f34488820808fca506e5f01a9c63172421cf2b37d0",
+      "archivedSha256": "f63243f0d48da29ac7bae3f34488820808fca506e5f01a9c63172421cf2b37d0"
+    },
+    {
+      "file": "native/darwin-arm64/source-integrity.json",
+      "originalSha256": "d0e89b4f2be72b07c63724b630e73933b6414f8c8ea1a7b049d9df8fcbcb83ad",
+      "archivedSha256": "d0e89b4f2be72b07c63724b630e73933b6414f8c8ea1a7b049d9df8fcbcb83ad"
+    },
+    {
+      "file": "native/darwin-arm64/debugger-architectures.json",
+      "originalSha256": "9bd802538b0a0a00e0e55e39814e5a0f759f896d4a83ff238be54d4412f6bcc1",
+      "archivedSha256": "9bd802538b0a0a00e0e55e39814e5a0f759f896d4a83ff238be54d4412f6bcc1"
+    },
+    {
+      "file": "native/darwin-arm64/package-sha256.json",
+      "originalSha256": "05dd75edad30271251da2c63ecc7c764a285d69a0d96060c03415170b7ca7971",
+      "archivedSha256": "05dd75edad30271251da2c63ecc7c764a285d69a0d96060c03415170b7ca7971"
+    },
+    {
+      "file": "native/darwin-arm64/dbgshim-selection.json",
+      "originalSha256": "dcfe9772c892de479384c0746f329af6c4340a2338bff1365ec38b9c9737c705",
+      "archivedSha256": "dcfe9772c892de479384c0746f329af6c4340a2338bff1365ec38b9c9737c705"
+    },
+    {
+      "file": "native/darwin-arm64/dap-net8-result.json",
+      "originalSha256": "2ff735daf97c13d0d075efd1534914f82f2371aee9a6ad00e7bf532617d53beb",
+      "archivedSha256": "2ff735daf97c13d0d075efd1534914f82f2371aee9a6ad00e7bf532617d53beb"
+    },
+    {
+      "file": "native/darwin-arm64/dap-net10-result.json",
+      "originalSha256": "eb851ae264c71a275f3ed61cd0bbef2472022cd6d3ad49bcb4d1cb559f2ace59",
+      "archivedSha256": "eb851ae264c71a275f3ed61cd0bbef2472022cd6d3ad49bcb4d1cb559f2ace59"
+    },
+    {
+      "file": "native/darwin-arm64/dap-net8.jsonl",
+      "originalSha256": "2169d54d528da7d2ac40d3e761cb7283d626da2cd9e2e39cc6229fe29dfcc330",
+      "archivedSha256": "2169d54d528da7d2ac40d3e761cb7283d626da2cd9e2e39cc6229fe29dfcc330"
+    },
+    {
+      "file": "native/darwin-arm64/dap-net10.jsonl",
+      "originalSha256": "e6fe29ad91f5f9bfab85100b834ee8f50f6884aaea847b239dcb8e1e375195ff",
+      "archivedSha256": "e6fe29ad91f5f9bfab85100b834ee8f50f6884aaea847b239dcb8e1e375195ff"
+    },
+    {
+      "file": "native/darwin-x64/result.json",
+      "originalSha256": "e205c54fa77184282bf525374699b8b8de08f5ced9dcc0877d318abb07c7fa2e",
+      "archivedSha256": "e205c54fa77184282bf525374699b8b8de08f5ced9dcc0877d318abb07c7fa2e"
+    },
+    {
+      "file": "native/darwin-x64/source-before.json",
+      "originalSha256": "f63243f0d48da29ac7bae3f34488820808fca506e5f01a9c63172421cf2b37d0",
+      "archivedSha256": "f63243f0d48da29ac7bae3f34488820808fca506e5f01a9c63172421cf2b37d0"
+    },
+    {
+      "file": "native/darwin-x64/source-integrity.json",
+      "originalSha256": "d0e89b4f2be72b07c63724b630e73933b6414f8c8ea1a7b049d9df8fcbcb83ad",
+      "archivedSha256": "d0e89b4f2be72b07c63724b630e73933b6414f8c8ea1a7b049d9df8fcbcb83ad"
+    },
+    {
+      "file": "native/darwin-x64/debugger-architectures.json",
+      "originalSha256": "21a3a176821bd795c0cd00d5be0039aa0544baa36b2cbb14b1d7c922ee4280d7",
+      "archivedSha256": "21a3a176821bd795c0cd00d5be0039aa0544baa36b2cbb14b1d7c922ee4280d7"
+    },
+    {
+      "file": "native/darwin-x64/package-sha256.json",
+      "originalSha256": "7d0670b0ca6aa2937105f745495cb6e481709ed5d3ce433a6cb86dc6fcba7d92",
+      "archivedSha256": "7d0670b0ca6aa2937105f745495cb6e481709ed5d3ce433a6cb86dc6fcba7d92"
+    },
+    {
+      "file": "native/darwin-x64/dbgshim-selection.json",
+      "originalSha256": "9c85def9a533a483a7a86f891e7b1ec3a968a0b74d2ff76a6eab0775dcab90dc",
+      "archivedSha256": "9c85def9a533a483a7a86f891e7b1ec3a968a0b74d2ff76a6eab0775dcab90dc"
+    },
+    {
+      "file": "native/darwin-x64/dap-net8-result.json",
+      "originalSha256": "6c3ed2f01e2c7930762ea8500d911f0f18e91c5132b0584b0f1f4f3c0042860f",
+      "archivedSha256": "6c3ed2f01e2c7930762ea8500d911f0f18e91c5132b0584b0f1f4f3c0042860f"
+    },
+    {
+      "file": "native/darwin-x64/dap-net10-result.json",
+      "originalSha256": "af3bfe1e57547bc6699e27a91e238dcbe1d7575a5986408f7fad30c095ec1195",
+      "archivedSha256": "af3bfe1e57547bc6699e27a91e238dcbe1d7575a5986408f7fad30c095ec1195"
+    },
+    {
+      "file": "native/darwin-x64/dap-net8.jsonl",
+      "originalSha256": "feb039a8dfdb79083dcf95e773955f95717825f0495ee0cf3e6b6b12250162cc",
+      "archivedSha256": "feb039a8dfdb79083dcf95e773955f95717825f0495ee0cf3e6b6b12250162cc"
+    },
+    {
+      "file": "native/darwin-x64/dap-net10.jsonl",
+      "originalSha256": "df0218bd5db46eeec94a23845da87709a9eccdb7bc1aac12cf1ade3bd9398ec5",
+      "archivedSha256": "df0218bd5db46eeec94a23845da87709a9eccdb7bc1aac12cf1ade3bd9398ec5"
+    },
+    {
+      "file": "native/linux-arm64/result.json",
+      "originalSha256": "61910c49544b48e452bd9e60e612e8176f885239c86d66db490b100b184a83ef",
+      "archivedSha256": "61910c49544b48e452bd9e60e612e8176f885239c86d66db490b100b184a83ef"
+    },
+    {
+      "file": "native/linux-arm64/source-before.json",
+      "originalSha256": "f63243f0d48da29ac7bae3f34488820808fca506e5f01a9c63172421cf2b37d0",
+      "archivedSha256": "f63243f0d48da29ac7bae3f34488820808fca506e5f01a9c63172421cf2b37d0"
+    },
+    {
+      "file": "native/linux-arm64/source-integrity.json",
+      "originalSha256": "d0e89b4f2be72b07c63724b630e73933b6414f8c8ea1a7b049d9df8fcbcb83ad",
+      "archivedSha256": "d0e89b4f2be72b07c63724b630e73933b6414f8c8ea1a7b049d9df8fcbcb83ad"
+    },
+    {
+      "file": "native/linux-arm64/debugger-architectures.json",
+      "originalSha256": "1c97d07bcfdad50595aa7dc594a3298ef748f6a2d08ac42df1d4d2c43384bb67",
+      "archivedSha256": "1c97d07bcfdad50595aa7dc594a3298ef748f6a2d08ac42df1d4d2c43384bb67"
+    },
+    {
+      "file": "native/linux-arm64/package-sha256.json",
+      "originalSha256": "a31674485b69dde1fb24230eeb63bf8daf4850e8af04cea31d46e881b6a73f2f",
+      "archivedSha256": "a31674485b69dde1fb24230eeb63bf8daf4850e8af04cea31d46e881b6a73f2f"
+    },
+    {
+      "file": "native/linux-arm64/dbgshim-selection.json",
+      "originalSha256": "e2b5c522e60ade11c1c825c315fb53044c59d1466f2f4f32dbe72e2f4c6d5286",
+      "archivedSha256": "e2b5c522e60ade11c1c825c315fb53044c59d1466f2f4f32dbe72e2f4c6d5286"
+    },
+    {
+      "file": "native/linux-arm64/dap-net8-result.json",
+      "originalSha256": "8476addc434635d8b924667b9cbfc047de134136140a13491b2572c4f54f2122",
+      "archivedSha256": "8476addc434635d8b924667b9cbfc047de134136140a13491b2572c4f54f2122"
+    },
+    {
+      "file": "native/linux-arm64/dap-net10-result.json",
+      "originalSha256": "4c1550247a823df483984f9a9404ef7a4198c059dc6cb3b83fb6fc17ec5610c5",
+      "archivedSha256": "4c1550247a823df483984f9a9404ef7a4198c059dc6cb3b83fb6fc17ec5610c5"
+    },
+    {
+      "file": "native/linux-arm64/dap-net8.jsonl",
+      "originalSha256": "37ec829b6766f90fa867ee04a801a6f44c483c26505d82c1466d5845c92ed71d",
+      "archivedSha256": "37ec829b6766f90fa867ee04a801a6f44c483c26505d82c1466d5845c92ed71d"
+    },
+    {
+      "file": "native/linux-arm64/dap-net10.jsonl",
+      "originalSha256": "c8156016a3fd98b294680b8715a1be88ada8fb04496517d95307248c851a6c5f",
+      "archivedSha256": "c8156016a3fd98b294680b8715a1be88ada8fb04496517d95307248c851a6c5f"
+    },
+    {
+      "file": "native/linux-x64/result.json",
+      "originalSha256": "6cb1ca0a7df75ebd06b7c2a003b9c0a6e1b2c862888910b6f6e9a5fd6eca2258",
+      "archivedSha256": "6cb1ca0a7df75ebd06b7c2a003b9c0a6e1b2c862888910b6f6e9a5fd6eca2258"
+    },
+    {
+      "file": "native/linux-x64/source-before.json",
+      "originalSha256": "f63243f0d48da29ac7bae3f34488820808fca506e5f01a9c63172421cf2b37d0",
+      "archivedSha256": "f63243f0d48da29ac7bae3f34488820808fca506e5f01a9c63172421cf2b37d0"
+    },
+    {
+      "file": "native/linux-x64/source-integrity.json",
+      "originalSha256": "d0e89b4f2be72b07c63724b630e73933b6414f8c8ea1a7b049d9df8fcbcb83ad",
+      "archivedSha256": "d0e89b4f2be72b07c63724b630e73933b6414f8c8ea1a7b049d9df8fcbcb83ad"
+    },
+    {
+      "file": "native/linux-x64/debugger-architectures.json",
+      "originalSha256": "0649c613ac8265c3d5fd12fc01f4b846bd2098409ec8eb6a0e6976be2f4febc0",
+      "archivedSha256": "0649c613ac8265c3d5fd12fc01f4b846bd2098409ec8eb6a0e6976be2f4febc0"
+    },
+    {
+      "file": "native/linux-x64/package-sha256.json",
+      "originalSha256": "416efb541e8194b9cf9d31580d4d3c5336bd0914f549eaefb79aa982c5def891",
+      "archivedSha256": "416efb541e8194b9cf9d31580d4d3c5336bd0914f549eaefb79aa982c5def891"
+    },
+    {
+      "file": "native/linux-x64/dbgshim-selection.json",
+      "originalSha256": "1b3d3ec2bfe51a5af7e9842df02f999e3fe6c255eb8f7ca3aa0f5ae3371c8d09",
+      "archivedSha256": "1b3d3ec2bfe51a5af7e9842df02f999e3fe6c255eb8f7ca3aa0f5ae3371c8d09"
+    },
+    {
+      "file": "native/linux-x64/dap-net8-result.json",
+      "originalSha256": "d3153a9d200fa9036edefa4c493ea594b3f86334dde4573d86cd3576bdc1cabb",
+      "archivedSha256": "d3153a9d200fa9036edefa4c493ea594b3f86334dde4573d86cd3576bdc1cabb"
+    },
+    {
+      "file": "native/linux-x64/dap-net10-result.json",
+      "originalSha256": "ed8ac430d87c93dc7791711e83540d4e672cca0b200f2387b6b9825c072e1ed1",
+      "archivedSha256": "ed8ac430d87c93dc7791711e83540d4e672cca0b200f2387b6b9825c072e1ed1"
+    },
+    {
+      "file": "native/linux-x64/dap-net8.jsonl",
+      "originalSha256": "37376a85b3b2d8fa9e3bafdc930ecde5642af024abb0a7b82efa80f7b223c3f9",
+      "archivedSha256": "37376a85b3b2d8fa9e3bafdc930ecde5642af024abb0a7b82efa80f7b223c3f9"
+    },
+    {
+      "file": "native/linux-x64/dap-net10.jsonl",
+      "originalSha256": "3034a03bcd787c5ee4cb53fd12450f4fb848a99affe60f2fe9117aeba94c254b",
+      "archivedSha256": "3034a03bcd787c5ee4cb53fd12450f4fb848a99affe60f2fe9117aeba94c254b"
+    },
+    {
+      "file": "native/win32-arm64/result.json",
+      "originalSha256": "5d321b8c45280dea6931a2c209f1a565f9daadee8eddab8754beb843d022ebc1",
+      "archivedSha256": "381e0a37385a248bb022a622af68eb03088d5595b073b90d7a52359112c9416b"
+    },
+    {
+      "file": "native/win32-arm64/source-before.json",
+      "originalSha256": "438241ee66082b947b3b28db7242674fad525348cbff70ba08576f1933d1c27b",
+      "archivedSha256": "f63243f0d48da29ac7bae3f34488820808fca506e5f01a9c63172421cf2b37d0"
+    },
+    {
+      "file": "native/win32-arm64/source-integrity.json",
+      "originalSha256": "a461faa345bbd9cdee32b6edf90fcdf4ba0a0dff8c35662cd72fef051e7a1ddc",
+      "archivedSha256": "74d282da45958d16be403b9a100555f7dc9b303a76ce99bb1d34233c4434def9"
+    },
+    {
+      "file": "native/win32-arm64/debugger-architectures.json",
+      "originalSha256": "87b30e2f08f58bb43c88a4e5779d07408f59da9ceb1222b18f7a35c9acc92b14",
+      "archivedSha256": "dc837b4223da781b17fa43e4357d6cfb89ea295652cdcc300cd93b18d5dd9a82"
+    },
+    {
+      "file": "native/win32-arm64/package-sha256.json",
+      "originalSha256": "a30180a7388f0811e2957dbf2d087b9c003c28160ef270f5b7bbfbe9b8e66f76",
+      "archivedSha256": "52da8652a683f19a5958bc69a6c07114c581906e37d0d338ab4aae5df8dc12f3"
+    },
+    {
+      "file": "native/win32-arm64/dap-net8-result.json",
+      "originalSha256": "5db644289f18f3990f128fd61ea0965bb7dc9f98a2c968047db6501534d65cd5",
+      "archivedSha256": "8b2b42b9b282706a004fdefc4c9cd825405055070cc040cfc1ddc7ff2f8db898"
+    },
+    {
+      "file": "native/win32-arm64/dap-net10-result.json",
+      "originalSha256": "73801bb682ebcb16bd3b90dc850ce993eeabf8e9b522f3bfc0a50d86197184d6",
+      "archivedSha256": "900b1ddb60c12c079e5810a0857775dd3aecfe6c981460ba96227ff9126e3c1c"
+    },
+    {
+      "file": "native/win32-arm64/dap-net8.jsonl",
+      "originalSha256": "949ec87e3c678b5a07f65a088c1d6c1c5b221dace1e10c923af41fc676e79bff",
+      "archivedSha256": "8a53f0536c63c30772291504a4c603ee5834876344871ff3dfb6bdbb83eb931f"
+    },
+    {
+      "file": "native/win32-arm64/dap-net10.jsonl",
+      "originalSha256": "59bb1bdbdaccb37ea17f8893468c56ae79f4ff556dd74e4f6e2eba07059c88be",
+      "archivedSha256": "91494f3445ac50512d4cfacefa37ca11c6bcf3fa8f974a4aa17cd38a772a7794"
+    },
+    {
+      "file": "native/win32-x64/result.json",
+      "originalSha256": "2c7d1a7465e93d16ce34840685362c14e44015c361864fc83ea1fb034af795ac",
+      "archivedSha256": "83d1d3d9032cf67d2b783f098cfd34f12e638c1bf2867adf2f443cb9f6e5bfdb"
+    },
+    {
+      "file": "native/win32-x64/source-before.json",
+      "originalSha256": "438241ee66082b947b3b28db7242674fad525348cbff70ba08576f1933d1c27b",
+      "archivedSha256": "f63243f0d48da29ac7bae3f34488820808fca506e5f01a9c63172421cf2b37d0"
+    },
+    {
+      "file": "native/win32-x64/source-integrity.json",
+      "originalSha256": "a461faa345bbd9cdee32b6edf90fcdf4ba0a0dff8c35662cd72fef051e7a1ddc",
+      "archivedSha256": "74d282da45958d16be403b9a100555f7dc9b303a76ce99bb1d34233c4434def9"
+    },
+    {
+      "file": "native/win32-x64/debugger-architectures.json",
+      "originalSha256": "6191b6bd9884b24989dd86a3c950b15ea99f9703f73ea7cbae9476f05ab48d34",
+      "archivedSha256": "d924e9fa5434b4912645e19136b07eed42f6d38884ba27725eb6ae4506fd1592"
+    },
+    {
+      "file": "native/win32-x64/package-sha256.json",
+      "originalSha256": "9b2255392251c5934c3b3e9e3698ffe54e7f91bde271f5eea850a446f859c1cb",
+      "archivedSha256": "fcd8131577817ef7cc1b3ddd9905aae36a78d98172e3850e830b03de80f0078c"
+    },
+    {
+      "file": "native/win32-x64/dap-net8-result.json",
+      "originalSha256": "b6f905457ea8146940e9f82054441ed6f8cf653075a44e86973280ff7ab234eb",
+      "archivedSha256": "f5459d50b928becbb79a75d551b37da5a358f811469fbcf738b3bc91e5a9ca42"
+    },
+    {
+      "file": "native/win32-x64/dap-net10-result.json",
+      "originalSha256": "20bd85883c6964168f1de8e8552438b491e2745394ad4661d3cff8d65b13f911",
+      "archivedSha256": "04d54321914ba6f99fe729c15ac5829052ce2801cc7bbfb65caefe31c29d3bb2"
+    },
+    {
+      "file": "native/win32-x64/dap-net8.jsonl",
+      "originalSha256": "88ddc93932d45ca79cccdb01de50677421a48af7c2ac73ae619d1ee789e09b59",
+      "archivedSha256": "b9799fc66fc57260fb4251eafd99f7fb05b5e7c2523d1917d1c0b472abe06801"
+    },
+    {
+      "file": "native/win32-x64/dap-net10.jsonl",
+      "originalSha256": "9b68b812a115fdd7a47cf10a6d7cab41c6f870b3768e4fb14777d6e9af4342b3",
+      "archivedSha256": "c152fd04a48aba37765f44b93787dedb17e79d61ef7e50004bb61ddffea813b7"
+    },
+    {
+      "file": "alpine-crash/x64/dap-net10-result.json",
+      "originalSha256": "7a027c304d8408218f09cd802b1176f3064779ef55b962d10b2bd9f424732690",
+      "archivedSha256": "7a027c304d8408218f09cd802b1176f3064779ef55b962d10b2bd9f424732690"
+    },
+    {
+      "file": "alpine-crash/x64/dap-net10.jsonl",
+      "originalSha256": "51754de78f24cd4480bf8647e7c899abe3609c2c47e0b21d54cd13b73d468d93",
+      "archivedSha256": "51754de78f24cd4480bf8647e7c899abe3609c2c47e0b21d54cd13b73d468d93"
+    },
+    {
+      "file": "alpine-crash/x64/dap-net8-result.json",
+      "originalSha256": "63d7e9c25204777761c462c19a74fca75c64d0957d90a962f530afbadb1dd057",
+      "archivedSha256": "63d7e9c25204777761c462c19a74fca75c64d0957d90a962f530afbadb1dd057"
+    },
+    {
+      "file": "alpine-crash/x64/dap-net8.jsonl",
+      "originalSha256": "177c0da19dbb9c54368fffbe9ec511e8ca429338b5d39558be602def79f1a219",
+      "archivedSha256": "177c0da19dbb9c54368fffbe9ec511e8ca429338b5d39558be602def79f1a219"
+    },
+    {
+      "file": "alpine-crash/x64/net10-core-1.stacks.log",
+      "originalSha256": "a113ed68f23f5ff8f039e965ce56866c25d8c03cc88ec583e8261914d9e22877",
+      "archivedSha256": "a113ed68f23f5ff8f039e965ce56866c25d8c03cc88ec583e8261914d9e22877"
+    },
+    {
+      "file": "alpine-crash/x64/net8-core-1.stacks.log",
+      "originalSha256": "c233f42ddb5a8a7b54995c88f7a53275b2a31ee046c05a4a1115ecbac5c0a8ac",
+      "archivedSha256": "c233f42ddb5a8a7b54995c88f7a53275b2a31ee046c05a4a1115ecbac5c0a8ac"
+    },
+    {
+      "file": "alpine-crash/arm64/dap-net10-result.json",
+      "originalSha256": "9a369605d00cb52d22a6ee9f30c732b79c17b163a14e018460f03dbee53f18dd",
+      "archivedSha256": "9a369605d00cb52d22a6ee9f30c732b79c17b163a14e018460f03dbee53f18dd"
+    },
+    {
+      "file": "alpine-crash/arm64/dap-net10.jsonl",
+      "originalSha256": "51754de78f24cd4480bf8647e7c899abe3609c2c47e0b21d54cd13b73d468d93",
+      "archivedSha256": "51754de78f24cd4480bf8647e7c899abe3609c2c47e0b21d54cd13b73d468d93"
+    },
+    {
+      "file": "alpine-crash/arm64/dap-net8-result.json",
+      "originalSha256": "45a90c2a7000a204c723ffbf7ba696f790c1f297e5bb8bf0526daad1ff23518d",
+      "archivedSha256": "45a90c2a7000a204c723ffbf7ba696f790c1f297e5bb8bf0526daad1ff23518d"
+    },
+    {
+      "file": "alpine-crash/arm64/dap-net8.jsonl",
+      "originalSha256": "177c0da19dbb9c54368fffbe9ec511e8ca429338b5d39558be602def79f1a219",
+      "archivedSha256": "177c0da19dbb9c54368fffbe9ec511e8ca429338b5d39558be602def79f1a219"
+    },
+    {
+      "file": "alpine-crash/arm64/net10-core-1.stacks.log",
+      "originalSha256": "490c6057f0bd389aad01b0a4be0b610f929bc4e7f37006dbc358a0ae4ca94b4a",
+      "archivedSha256": "490c6057f0bd389aad01b0a4be0b610f929bc4e7f37006dbc358a0ae4ca94b4a"
+    },
+    {
+      "file": "alpine-crash/arm64/net8-core-1.stacks.log",
+      "originalSha256": "77ce60dd69abff556c4bc2632bdfc937ec58f55023fa726fabe7863c40be77fa",
+      "archivedSha256": "77ce60dd69abff556c4bc2632bdfc937ec58f55023fa726fabe7863c40be77fa"
+    },
+    {
+      "file": "validation-manifest.json",
+      "originalSha256": "29d5fd40d62bfc484ffbbf49f6243027bafbb33a63c41bac6a914392b415bcf2",
+      "archivedSha256": "29d5fd40d62bfc484ffbbf49f6243027bafbb33a63c41bac6a914392b415bcf2"
+    }
+  ]
+}

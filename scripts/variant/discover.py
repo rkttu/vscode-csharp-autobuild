@@ -62,6 +62,9 @@ def discover():
     shipped_metadata = [data for release in releases if not release["draft"]
                         and (data := metadata(release["body"])) and data.get("published") is True]
     shipped = {data["fingerprint"] for data in shipped_metadata}
+    resumable = {data["fingerprint"]: dict({key: value for key, value in data.items() if key != "published"}, resumeRelease=release["tag_name"])
+                 for release in releases if release["draft"] and (data := metadata(release["body"]))
+                 and data.get("published") is False}
     shipped_debuggers = {data["debuggerSha"] for data in shipped_metadata}
     latest_validated = max(shipped_metadata, key=lambda data: version_key(data["debuggerTag"]), default=None)
     if not selected_tag:
@@ -69,9 +72,16 @@ def discover():
                     or (latest_validated and tag == latest_validated["debuggerTag"])]
     recipe = recipe_fingerprint()
     candidates = []
+    if not selected_tag:
+        # Complete an interrupted multi-platform upload from its preserved bytes.
+        candidates.extend(resumable.values())
     for index, tag in enumerate(sorted(eligible, key=version_key, reverse=True)):
         fingerprint = hashlib.sha256((samsung[tag] + csharp[csharp_tag] + recipe).encode()).hexdigest()
         if fingerprint in shipped:
+            continue
+        if fingerprint in resumable:
+            if selected_tag:
+                candidates.append(resumable[fingerprint])
             continue
         # Each scheduling run reserves a disjoint numeric range, including dry runs.
         patch = int(os.environ.get("GITHUB_RUN_NUMBER", "1")) * 1000 + index

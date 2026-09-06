@@ -1,0 +1,33 @@
+{
+  "success": true,
+  "stage": "complete",
+  "architecture": "arm64",
+  "target": "win32-arm64",
+  "scope": "Standalone source build and DAP launch; no VSIX, IDE, attach, or publication validation.",
+  "netcoredbgTag": "3.2.0-1092",
+  "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+  "coreclrCommit": "60629d14374c56f1cb51819049ad1fa529307f8d",
+  "sdk8": "8.0.418",
+  "sdk10": "10.0.400",
+  "dbgshimVersion": "10.0.731102",
+  "runnerImage": "win11-arm64",
+  "runnerImageVersion": "20260830.155.1",
+  "workflowCommit": "47a4f154c45c6c7471b3c735bd9c1433b8dab2d7",
+  "runId": "34019887224",
+  "sourceUnchanged": true,
+  "runtimeTests": [
+    {
+      "runtime": "8",
+      "sdk": "8.0.418",
+      "success": true,
+      "error": null
+    },
+    {
+      "runtime": "10",
+      "sdk": "10.0.400",
+      "success": true,
+      "error": null
+    }
+  ],
+  "error": null
+}

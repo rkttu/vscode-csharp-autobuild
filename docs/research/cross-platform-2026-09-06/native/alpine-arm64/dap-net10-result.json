@@ -1,0 +1,33 @@
+{
+  "engine": "netcoredbg",
+  "program": "/home/runner/work/_temp/netcoredbg-validation/fixture-net10/output/Probe.dll",
+  "expectedArchitecture": "arm64",
+  "expectedRuntime": "10",
+  "checks": [],
+  "capabilities": {
+    "exceptionBreakpointFilters": [
+      {
+        "filter": "user-unhandled",
+        "label": "user-unhandled"
+      },
+      {
+        "filter": "all",
+        "label": "all"
+      }
+    ],
+    "supportTerminateDebuggee": true,
+    "supportsCancelRequest": true,
+    "supportsConditionalBreakpoints": true,
+    "supportsConfigurationDoneRequest": true,
+    "supportsExceptionFilterOptions": true,
+    "supportsExceptionInfoRequest": true,
+    "supportsExceptionOptions": false,
+    "supportsFunctionBreakpoints": true,
+    "supportsSetExpression": true,
+    "supportsSetVariable": true,
+    "supportsTerminateRequest": true
+  },
+  "success": false,
+  "error": "DAP message timeout",
+  "stderr": "1094.417 I/NETCOREDBG(P 628, T 628): main.cpp: main(442) > Netcoredbg started\n1094.417 I/NETCOREDBG(P 628, T 628): main.cpp: instantiate_protocol(118) > Creating protocol VSCodeProtocol\n1094.418 I/NETCOREDBG(P 628, T 628): main.cpp: main(491) > pidDebugee 0\n1094.418 I/NETCOREDBG(P 628, T 631): ioredirect.cpp: worker(164) > worker started\n"
+}

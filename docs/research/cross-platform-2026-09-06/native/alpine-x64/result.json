@@ -1,0 +1,35 @@
+{
+  "success": false,
+  "stage": "runtime-tests",
+  "target": "alpine-x64",
+  "architecture": "x64",
+  "netcoredbgTag": "3.2.0-1092",
+  "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+  "coreclrCommit": "60629d14374c56f1cb51819049ad1fa529307f8d",
+  "sdk8": "8.0.418",
+  "sdk10": "10.0.400",
+  "dbgshimVersion": "10.0.731102",
+  "workflowCommit": "47a4f154c45c6c7471b3c735bd9c1433b8dab2d7",
+  "runId": "34019887224",
+  "runnerImage": null,
+  "runnerImageVersion": null,
+  "host": "Linux-6.8.0-1064-azure-x86_64-with",
+  "sourceUnchanged": true,
+  "runtimeTests": [
+    {
+      "runtime": "8",
+      "sdk": "8.0.418",
+      "success": false,
+      "error": "dap-net8-console.log: exit 1"
+    },
+    {
+      "runtime": "10",
+      "sdk": "10.0.400",
+      "success": false,
+      "error": "dap-net10-console.log: exit 1"
+    }
+  ],
+  "error": "Runtime validation failed",
+  "scope": "Standalone source build and DAP launch; VSIX integration is a separate gate.",
+  "externalCompatibilityHeader": "scripts/validation/musl-null-compat.h"
+}
