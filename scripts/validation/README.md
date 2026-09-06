@@ -22,6 +22,8 @@ The workflow installs isolated SDKs with an explicit architecture and verifies t
 
 This experiment pins source commits, SDK versions, action commits, and dbgshim. It records other restored package versions and hashes from `project.assets.json`. It does not yet provide a fully locked offline NuGet restore or a frozen runner/compiler image. These limits are separate from preserving Samsung's original files.
 
+The first Windows run exposed an MSVC/NuGet build-directory collision: the native `corguids.vcxproj` read the managed project's `obj/project.assets.json` and failed with `Sequence contains no elements`. The recipe therefore builds native targets with `BUILD_MANAGED=OFF`, publishes the unchanged `ManagedPart.csproj` into a separate directory, and collects the same managed DLLs and dbgshim that upstream installs. This adjustment belongs to the external build recipe.
+
 ## Checks and recorded results
 
 `validate-windows.ps1` performs the following work:

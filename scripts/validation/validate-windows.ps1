@@ -32,7 +32,7 @@ function Invoke-Logged {
 
 function Write-Json {
     param($Value, [string] $Path)
-    $Value | ConvertTo-Json -Depth 30 | Set-Content -Encoding utf8NoBOM $Path
+    ConvertTo-Json -InputObject $Value -Depth 30 | Set-Content -Encoding utf8NoBOM $Path
 }
 
 $status = [ordered]@{
@@ -89,15 +89,34 @@ try {
         '-DCMAKE_POLICY_VERSION_MINIMUM=3.5', '-DCMAKE_BUILD_TYPE=Release',
         "-DCMAKE_INSTALL_PREFIX=$package", "-DCORECLR_DIR=$runtime/src/coreclr", "-DDOTNET_DIR=$($env:DOTNET_ROOT)",
         "-DCLR_CMAKE_HOST_ARCH=$Architecture", "-DCLR_CMAKE_TARGET_ARCH=$Architecture", '-DRID_NAME=win',
-        '-DBUILD_MANAGED=ON', '-DINTEROP_DEBUGGING=OFF', '-DBUILD_TESTING=OFF') 'configure.log'
+        '-DBUILD_MANAGED=OFF', '-DINTEROP_DEBUGGING=OFF', '-DBUILD_TESTING=OFF') 'configure.log'
 
-    $status.stage = 'build'
-    Invoke-Logged cmake @('--build', $build, '--config', 'Release', '--parallel', '4', '--', '/nodeReuse:false') 'build.log'
+    # Upstream places managed project.assets.json beside native .vcxproj files.
+    # MSVC's corguids project can then read the managed assets as its own NuGet
+    # inputs. Build native targets first and publish managed files separately.
+    $status.stage = 'native-build'
+    Invoke-Logged cmake @('--build', $build, '--config', 'Release', '--target', 'netcoredbg',
+        '--parallel', '4', '--', '/nodeReuse:false') 'build.log'
     $status.stage = 'install'
     Invoke-Logged cmake @('--install', $build, '--config', 'Release') 'install.log'
     Copy-Item (Join-Path $build 'CMakeCache.txt') $evidence
 
-    $assetsPath = Join-Path $build 'src/obj/project.assets.json'
+    $status.stage = 'managed-build'
+    $managed = Join-Path $root 'managed'
+    $managedOutput = Join-Path $managed 'publish'
+    New-Item -ItemType Directory -Force $managed | Out-Null
+    Push-Location $root
+    try {
+        Invoke-Logged $dotnet @('publish', (Join-Path $source 'src/managed/ManagedPart.csproj'),
+            '-r', "win-$Architecture", '--self-contained', '-c', 'Release', '-o', $managedOutput,
+            "-p:BaseIntermediateOutputPath=$managed/obj/", "-p:BaseOutputPath=$managed/bin/",
+            '-p:UseDbgShimDependency=true') 'managed-build.log'
+    } finally { Pop-Location }
+    $managedFiles = @('dbgshim.dll', 'ManagedPart.dll', 'Microsoft.CodeAnalysis.dll',
+        'Microsoft.CodeAnalysis.CSharp.dll', 'Microsoft.CodeAnalysis.Scripting.dll', 'Microsoft.CodeAnalysis.CSharp.Scripting.dll')
+    foreach ($name in $managedFiles) { Copy-Item (Join-Path $managedOutput $name) $package }
+
+    $assetsPath = Join-Path $managed 'obj/project.assets.json'
     $assets = Get-Content -Raw $assetsPath | ConvertFrom-Json
     Write-Json $assets.libraries (Join-Path $evidence 'resolved-libraries.json')
     $shim = $assets.libraries.PSObject.Properties.Name | Where-Object { $_ -eq "Microsoft.Diagnostics.DbgShim/$($env:DBGSHIM_VERSION)" }
@@ -170,6 +189,8 @@ try {
     $status.error = $_.Exception.Message
     Write-Host "Validation failed at $($status.stage): $($status.error)"
 } finally {
+    $cache = Join-Path $build 'CMakeCache.txt'
+    if (Test-Path $cache) { Copy-Item $cache $evidence }
     $before = Join-Path $evidence 'source-before.json'
     if (Test-Path $before) {
         try {
