@@ -17,7 +17,25 @@ permissions:
   contents: read
 
 jobs:
+  preflight:
+    if: ${{ !fromJSON(inputs.candidate).resumeRelease }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: dotnet/vscode-csharp
+          ref: ${{ fromJSON(inputs.candidate).csharpSha }}
+          path: upstream
+          persist-credentials: false
+      - name: Check upstream integration before native builds
+        run: python3 scripts/variant/overlay.py --source upstream --check-source
+
   debugger:
+    needs: preflight
     if: ${{ !fromJSON(inputs.candidate).resumeRelease }}
     uses: ./.github/workflows/validate-netcoredbg.yml
     with:
@@ -72,6 +90,8 @@ jobs:
       - name: Format changed TypeScript with upstream rules
         working-directory: upstream
         run: npx prettier --write tasks/packaging/offlinePackagingTasks.ts src/coreclrDebug/activate.ts src/constants/csharpExtensionId.ts src/razor/src/razorExtensionId.ts src/lsptoolshost/logging/loggingUtils.ts
+      - name: Verify packaging target and bundled debugger installation
+        run: node scripts/variant/test-packaging.cjs upstream
       - name: Build the platform VSIX
         working-directory: upstream
         run: npm run vsix:release:package

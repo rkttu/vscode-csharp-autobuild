@@ -8,6 +8,7 @@ import signal
 import subprocess
 import sys
 import time
+import traceback
 import xml.etree.ElementTree as ET
 
 from audit import native_architecture, sha256
@@ -32,6 +33,7 @@ def validate_result(result, runtime, arch, debugger_hash):
 
 def command(cmd, cwd, env, log, timeout):
     started = time.monotonic()
+    cleanup_warning = None
     with log.open('w', encoding='utf-8') as stream:
         process = subprocess.Popen([str(x) for x in cmd], cwd=cwd, env=env, stdout=stream,
                                    stderr=subprocess.STDOUT, start_new_session=os.name != 'nt')
@@ -43,7 +45,10 @@ def command(cmd, cwd, env, log, timeout):
             if os.name == 'nt':
                 subprocess.run(['taskkill', '/PID', str(process.pid), '/T', '/F'], stdout=stream, stderr=stream)
             else:
-                os.killpg(process.pid, signal.SIGKILL)
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
             code = process.wait(timeout=15)
         finally:
             if os.name != 'nt':
@@ -52,7 +57,16 @@ def command(cmd, cwd, env, log, timeout):
                     os.killpg(process.pid, signal.SIGKILL)
                 except ProcessLookupError:
                     pass
-    return dict(exitCode=code, timedOut=timed_out, durationSeconds=round(time.monotonic() - started, 2))
+                except PermissionError as error:
+                    # wait() already reaped the child. Preserve its result and report
+                    # failure to clean up the old group; do not retry a stale group ID.
+                    cleanup_warning = f"Post-exit cleanup for process group {process.pid}: {error}"
+                    print(cleanup_warning, file=stream, flush=True)
+                    print(cleanup_warning, file=sys.stderr, flush=True)
+    result = dict(exitCode=code, timedOut=timed_out, durationSeconds=round(time.monotonic() - started, 2))
+    if cleanup_warning:
+        result['cleanupWarning'] = cleanup_warning
+    return result
 
 
 def run(source, debugger, dotnet, runtime, sdk, arch, work, evidence):
@@ -103,6 +117,7 @@ def run(source, debugger, dotnet, runtime, sdk, arch, work, evidence):
         build_args = [dotnet, 'build', '--artifacts-path', work / 'build', '-v:q']
         build = command([*build_args, work / 'projects/TestRunner/TestRunner.csproj'], work, env,
                         evidence / f'upstream-net{runtime}-runner-build.log', 300)
+        result['runnerBuild'] = build
         assert build['exitCode'] == 0 and not build['timedOut'], 'Upstream TestRunner build failed'
         for name in names:
             record = dict(name=name, success=False, stage='build')
@@ -129,6 +144,8 @@ def run(source, debugger, dotnet, runtime, sdk, arch, work, evidence):
         result.update(success=True, stage='complete')
     except Exception as error:
         result['error'] = str(error) or type(error).__name__
+        (evidence / f'upstream-net{runtime}-traceback.log').write_text(traceback.format_exc(), encoding='utf-8')
+        traceback.print_exc()
     finally:
         changed = [str(file.relative_to(source)) for file, digest in files.items() if not file.is_file() or sha256(file) != digest]
         result['sourceUnchanged'] = bool(files) and not changed

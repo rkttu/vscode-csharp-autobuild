@@ -6,9 +6,17 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+import tempfile
 import zipfile
 
 import versioning
+
+IDENTITY_FILES = (
+    "src/constants/csharpExtensionId.ts",
+    "src/razor/src/razorExtensionId.ts",
+    "src/lsptoolshost/logging/loggingUtils.ts",
+)
+INTEGRATION_FILES = (*IDENTITY_FILES, "tasks/packaging/offlinePackagingTasks.ts", "src/coreclrDebug/activate.ts")
 
 
 def replace_once(path, before, after):
@@ -16,6 +24,97 @@ def replace_once(path, before, after):
     if content.count(before) != 1:
         raise ValueError(f"Upstream integration point changed: {path.name}: {before[:70]}")
     path.write_text(content.replace(before, after))
+
+
+def patch_integration(source, extension_id):
+    for filename in IDENTITY_FILES:
+        replace_once(source / filename, "'ms-dotnettools.csharp'", repr(extension_id))
+
+    tasks = source / "tasks/packaging/offlinePackagingTasks.ts"
+    replace_once(tasks, "await nbgv.setPackageVersion();", """await nbgv.setPackageVersion();
+    const variantVersion = process.env.VARIANT_VERSION;
+    if (!variantVersion || !/^\\d+\\.\\d+\\.\\d+$/.test(variantVersion)) {
+        throw new Error('A fixed independent variant version is required.');
+    }
+    const variantPackage = JSON.parse(fs.readFileSync(path.join(rootPath, 'package.json'), 'utf8'));
+    variantPackage.version = variantVersion;
+    fs.writeFileSync(path.join(rootPath, 'package.json'), JSON.stringify(variantPackage, null, 2) + '\\n');""")
+    # Retain the checked legacy shape for manual builds of previously supported tags.
+    signatures = ("prerelease: boolean", "options: VsixReleasePackageOptions")
+    content = tasks.read_text()
+    matches = [signature for signature in signatures
+               if f"export async function vsixReleasePackageTask({signature}): Promise<void> {{\n    for (const entry of platformEntries) {{" in content]
+    if len(matches) != 1:
+        raise ValueError("Upstream integration point changed: offlinePackagingTasks.ts: vsixReleasePackageTask")
+    signature = matches[0]
+    declaration = f"export async function vsixReleasePackageTask({signature}): Promise<void> {{\n"
+    replace_once(tasks, declaration + "    for (const entry of platformEntries) {", declaration + """
+    const entries = platformEntries.filter((entry) => entry.vsixPlatform.vsceTarget === process.env.VSIX_TARGET);
+    if (entries.length !== 1) {
+        throw new Error('Exactly one supported variant target is required.');
+    }
+    for (const entry of entries) {""")
+    path_parameter = ", codeExtensionPath: string" if signature == signatures[1] else ""
+    path_argument = ", codeExtensionPath" if path_parameter else ""
+    replace_once(tasks,
+                 "async function installDebugger(packageJSON: any, platformInfo: PlatformInformation" + path_parameter + ") {\n"
+                 "    return await installPackageJsonDependency('Debugger', packageJSON, platformInfo" + path_argument + ");\n}",
+                 "async function installDebugger(_packageJSON: any, _platformInfo: PlatformInformation" + path_parameter + ") {\n" + """
+    const debuggerInput = process.env.VALIDATED_DEBUGGER_DIRECTORY;
+    if (!debuggerInput) {
+        throw new Error('Validated debugger directory is required.');
+    }
+    await fs.promises.cp(debuggerInput, path.join(codeExtensionPath, '.debugger', 'netcoredbg'), { recursive: true });
+    fs.writeFileSync(path.join(codeExtensionPath, '.debugger', 'install.complete'), '');
+}""")
+    factory = source / "src/coreclrDebug/activate.ts"
+    for debug_type in ("clr", "monovsdbg", "monovsdbg_wasm", "coreclr_mobile"):
+        replace_once(factory, f"    disposables.add(vscode.debug.registerDebugAdapterDescriptorFactory('{debug_type}', factory));\n", "")
+    replace_once(factory, "import { BaseVsDbgConfigurationProvider } from '../shared/configurationProvider';\n", "")
+    replace_once(factory, "    csharpOutputChannel: vscode.OutputChannel,", "    _csharpOutputChannel: vscode.OutputChannel,")
+    replace_once(factory, """    /** 'clr' type does not have a intial configuration provider, but we need to register it to support the common debugger features listed in {@link BaseVsDbgConfigurationProvider} */
+    context.subscriptions.push(
+        vscode.debug.registerDebugConfigurationProvider(
+            'clr',
+            new BaseVsDbgConfigurationProvider(platformInformation, csharpOutputChannel)
+        )
+    );
+""", "")
+    content = factory.read_text()
+    start = content.index("        // debugger has finished installation, kick off our debugger process")
+    end = content.index("        return executable;", start) + len("        return executable;")
+    content = content[:start] + """        if (_session.type !== 'coreclr' || !executable) {
+            throw new Error('This build supports coreclr sessions with its bundled netcoredbg adapter.');
+        }
+        const dotNetInfo = await getDotnetInfo(omnisharpOptions.dotNetCliPaths);
+        const requestedArchitecture = getTargetArchitecture(
+            this.platformInfo,
+            _session.configuration.targetArchitecture,
+            dotNetInfo
+        );
+        const bundledArchitecture = this.packageJSON.netcoredbgBuild.target.endsWith('-arm64') ? 'arm64' : 'x86_64';
+        if (requestedArchitecture && requestedArchitecture !== bundledArchitecture) {
+            throw new Error('The selected .NET SDK architecture does not match this platform-specific netcoredbg package.');
+        }
+        const dotnetRoot = process.env.DOTNET_ROOT ?? (dotNetInfo.CliPath ? path.dirname(dotNetInfo.CliPath) : '');
+        return new vscode.DebugAdapterExecutable(executable.command, executable.args, {
+            ...executable.options,
+            env: { ...executable.options?.env, ...(dotnetRoot ? { DOTNET_ROOT: dotnetRoot } : {}) },
+        });""" + content[end:]
+    factory.write_text(content)
+
+
+def check_source(source, repo):
+    """Exercise every checked source edit in a temporary copy without debugger artifacts."""
+    config = json.loads((repo / "config/variant.json").read_text())
+    with tempfile.TemporaryDirectory(prefix="netcoredbg-overlay-preflight-") as directory:
+        temporary = Path(directory)
+        for filename in INTEGRATION_FILES:
+            target = temporary / filename
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source / filename, target)
+        patch_integration(temporary, config["publisher"] + "." + config["name"])
+    print("Upstream identity, packaging and adapter integration preflight passed.")
 
 
 def apply(source, validated, target, version, repo, candidate):
@@ -72,71 +171,7 @@ def apply(source, validated, target, version, repo, candidate):
     shutil.copy2(repo / "assets/netcoredbg/icon.png", source / "images/netcoredbgIcon.png")
     with (source / ".vscodeignore").open("a") as ignore:
         ignore.write("\n!.debugger/netcoredbg/notices/**\n")
-    for filename in ["src/constants/csharpExtensionId.ts", "src/razor/src/razorExtensionId.ts",
-                     "src/lsptoolshost/logging/loggingUtils.ts"]:
-        replace_once(source / filename, "'ms-dotnettools.csharp'", repr(config["publisher"] + "." + config["name"]))
-
-    tasks = source / "tasks/packaging/offlinePackagingTasks.ts"
-    replace_once(tasks, "await nbgv.setPackageVersion();", """await nbgv.setPackageVersion();
-    const variantVersion = process.env.VARIANT_VERSION;
-    if (!variantVersion || !/^\\d+\\.\\d+\\.\\d+$/.test(variantVersion)) {
-        throw new Error('A fixed independent variant version is required.');
-    }
-    const variantPackage = JSON.parse(fs.readFileSync(path.join(rootPath, 'package.json'), 'utf8'));
-    variantPackage.version = variantVersion;
-    fs.writeFileSync(path.join(rootPath, 'package.json'), JSON.stringify(variantPackage, null, 2) + '\\n');""")
-    replace_once(tasks, """export async function vsixReleasePackageTask(prerelease: boolean): Promise<void> {
-    for (const entry of platformEntries) {""", """export async function vsixReleasePackageTask(prerelease: boolean): Promise<void> {
-    const entries = platformEntries.filter((entry) => entry.vsixPlatform.vsceTarget === process.env.VSIX_TARGET);
-    if (entries.length !== 1) {
-        throw new Error('Exactly one supported variant target is required.');
-    }
-    for (const entry of entries) {""")
-    replace_once(tasks, """async function installDebugger(packageJSON: any, platformInfo: PlatformInformation) {
-    return await installPackageJsonDependency('Debugger', packageJSON, platformInfo);
-}""", """async function installDebugger(_packageJSON: any, _platformInfo: PlatformInformation) {
-    const debuggerInput = process.env.VALIDATED_DEBUGGER_DIRECTORY;
-    if (!debuggerInput) {
-        throw new Error('Validated debugger directory is required.');
-    }
-    await fsextra.copy(debuggerInput, path.join(codeExtensionPath, '.debugger', 'netcoredbg'));
-    fs.writeFileSync(path.join(codeExtensionPath, '.debugger', 'install.complete'), '');
-}""")
-    factory = source / "src/coreclrDebug/activate.ts"
-    for debug_type in ("clr", "monovsdbg", "monovsdbg_wasm", "coreclr_mobile"):
-        replace_once(factory, f"    disposables.add(vscode.debug.registerDebugAdapterDescriptorFactory('{debug_type}', factory));\n", "")
-    replace_once(factory, "import { BaseVsDbgConfigurationProvider } from '../shared/configurationProvider';\n", "")
-    replace_once(factory, "    csharpOutputChannel: vscode.OutputChannel,", "    _csharpOutputChannel: vscode.OutputChannel,")
-    replace_once(factory, """    /** 'clr' type does not have a intial configuration provider, but we need to register it to support the common debugger features listed in {@link BaseVsDbgConfigurationProvider} */
-    context.subscriptions.push(
-        vscode.debug.registerDebugConfigurationProvider(
-            'clr',
-            new BaseVsDbgConfigurationProvider(platformInformation, csharpOutputChannel)
-        )
-    );
-""", "")
-    content = factory.read_text()
-    start = content.index("        // debugger has finished installation, kick off our debugger process")
-    end = content.index("        return executable;", start) + len("        return executable;")
-    content = content[:start] + """        if (_session.type !== 'coreclr' || !executable) {
-            throw new Error('This build supports coreclr sessions with its bundled netcoredbg adapter.');
-        }
-        const dotNetInfo = await getDotnetInfo(omnisharpOptions.dotNetCliPaths);
-        const requestedArchitecture = getTargetArchitecture(
-            this.platformInfo,
-            _session.configuration.targetArchitecture,
-            dotNetInfo
-        );
-        const bundledArchitecture = this.packageJSON.netcoredbgBuild.target.endsWith('-arm64') ? 'arm64' : 'x86_64';
-        if (requestedArchitecture && requestedArchitecture !== bundledArchitecture) {
-            throw new Error('The selected .NET SDK architecture does not match this platform-specific netcoredbg package.');
-        }
-        const dotnetRoot = process.env.DOTNET_ROOT ?? (dotNetInfo.CliPath ? path.dirname(dotNetInfo.CliPath) : '');
-        return new vscode.DebugAdapterExecutable(executable.command, executable.args, {
-            ...executable.options,
-            env: { ...executable.options?.env, ...(dotnetRoot ? { DOTNET_ROOT: dotnetRoot } : {}) },
-        });""" + content[end:]
-    factory.write_text(content)
+    patch_integration(source, config["publisher"] + "." + config["name"])
     readme = source / "README.md"
     readme.write_text("""# C# (with netcoredbg)
 
@@ -177,10 +212,18 @@ release validation manifest.
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ("source", "validated", "candidate"):
-        parser.add_argument("--" + name, type=Path, required=True)
+    parser.add_argument("--source", type=Path, required=True)
+    parser.add_argument("--check-source", action="store_true")
+    for name in ("validated", "candidate"):
+        parser.add_argument("--" + name, type=Path)
     for name in ("target", "version"):
-        parser.add_argument("--" + name, required=True)
+        parser.add_argument("--" + name)
     args = parser.parse_args()
-    apply(args.source.resolve(), args.validated.resolve(), args.target, args.version, Path(__file__).resolve().parents[2],
-          json.loads(args.candidate.read_text()))
+    repo = Path(__file__).resolve().parents[2]
+    if args.check_source:
+        check_source(args.source.resolve(), repo)
+    else:
+        if not all((args.validated, args.candidate, args.target, args.version)):
+            parser.error("--validated, --candidate, --target and --version are required when applying the overlay")
+        apply(args.source.resolve(), args.validated.resolve(), args.target, args.version, repo,
+              json.loads(args.candidate.read_text()))
