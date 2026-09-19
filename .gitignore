@@ -49,3 +49,8 @@ package-check/
 candidate-matrix.json
 candidate.json
 __pycache__/
+
+# Local .NET validation fixture build outputs
+/scripts/validation/fixture/bin/
+/scripts/validation/fixture/obj/
+/scripts/validation/fixture/output/
