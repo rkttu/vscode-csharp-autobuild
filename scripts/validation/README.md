@@ -44,7 +44,9 @@ The original [Windows workflow](https://github.com/rkttu/vscode-csharp-autobuild
 | x64 runner | `windows-2022` |
 | ARM64 runner | `windows-11-arm` |
 
-The workflow installs isolated SDKs with an explicit architecture and verifies the OS, `dotnet.exe`, `netcoredbg.exe`, `dbgshim.dll`, and debuggee architecture. It uses MSVC's Visual Studio 2022 generator with explicit target and CoreCLR architecture options. Native Windows ARM64 runner availability is documented by [GitHub](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).
+The workflow installs isolated SDKs with an explicit architecture and verifies the OS, `dotnet.exe`, `netcoredbg.exe`, `dbgshim.dll`, and debuggee architecture. Native Windows ARM64 runner availability is documented by [GitHub](https://docs.github.com/en/actions/reference/runners/github-hosted-runners).
+
+The current Windows recipe queries `vswhere` for installations with the target architecture's C++ tools and intersects their Visual Studio major versions with `cmake -E capabilities`. It selects the newest compatible installation and passes its generator and `CMAKE_GENERATOR_INSTANCE` explicitly. This supports Visual Studio 2022 on `windows-2022` and Visual Studio 2026 on the updated ARM64 image without fixing both runners to one compiler release. [CMake's Visual Studio 2026 generator](https://cmake.org/cmake/help/latest/generator/Visual%20Studio%2018%202026.html) requires CMake 4.2 or later. The selected installation, version, architecture, and CMake version appear in `evidence/toolchain.json` and `result.json`; incompatible or missing tools fail before configuration.
 
 `ManagedDependencies.targets` overrides the floating dbgshim version through the external `DirectoryBuildTargetsPath` MSBuild input. No Samsung project file is edited. Original tracked files are hashed before the build and checked again even if a later build or runtime test fails. Generated files are outside that integrity comparison.
 
