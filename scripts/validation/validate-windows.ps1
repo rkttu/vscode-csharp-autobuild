@@ -51,6 +51,7 @@ $status = [ordered]@{
     runnerImageVersion = $env:ImageVersion
     workflowCommit = $env:GITHUB_SHA
     runId = $env:GITHUB_RUN_ID
+    toolchain = $null
     sourceUnchanged = $false
     runtimeTests = @()
     error = $null
@@ -79,6 +80,11 @@ try {
     Invoke-Logged $dotnet @('--list-runtimes') 'dotnet-runtimes.log'
     $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
     Invoke-Logged $vswhere @('-all', '-products', '*', '-format', 'json') 'visual-studio.json'
+    $toolchainPath = Join-Path $evidence 'toolchain.json'
+    Invoke-Logged python @((Join-Path $PSScriptRoot 'windows_toolchain.py'), '--arch', $Architecture,
+        '--vswhere', $vswhere, '--output', $toolchainPath) 'toolchain-selection.log'
+    $toolchain = Get-Content -Raw $toolchainPath | ConvertFrom-Json
+    $status.toolchain = $toolchain
     Invoke-Logged python @((Join-Path $PSScriptRoot 'audit.py'), 'snapshot', '--source', $source,
         '--output', (Join-Path $evidence 'source-before.json')) 'source-snapshot.log'
     Invoke-Logged python @((Join-Path $PSScriptRoot 'audit.py'), 'pe', '--arch', $Architecture,
@@ -86,7 +92,8 @@ try {
 
     $status.stage = 'configure'
     $cmakeArch = if ($Architecture -eq 'arm64') { 'ARM64' } else { 'x64' }
-    Invoke-Logged cmake @('-S', $source, '-B', $build, '-G', 'Visual Studio 17 2022', '-A', $cmakeArch,
+    Invoke-Logged cmake @('-S', $source, '-B', $build, '-G', $toolchain.generator, '-A', $cmakeArch,
+        "-DCMAKE_GENERATOR_INSTANCE=$($toolchain.installationPath)",
         '-DCMAKE_POLICY_VERSION_MINIMUM=3.5', '-DCMAKE_BUILD_TYPE=Release',
         "-DCMAKE_INSTALL_PREFIX=$package", "-DCORECLR_DIR=$runtime/src/coreclr", "-DDOTNET_DIR=$($env:DOTNET_ROOT)",
         "-DCLR_CMAKE_HOST_ARCH=$Architecture", "-DCLR_CMAKE_TARGET_ARCH=$Architecture", '-DRID_NAME=win',

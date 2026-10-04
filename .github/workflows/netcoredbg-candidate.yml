@@ -76,7 +76,7 @@ jobs:
           node-version: '22'
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6
         with:
-          dotnet-version: 10.0.400
+          global-json-file: upstream/msbuild/global.json
       - name: Apply independent identity and debugger integration
         env:
           CANDIDATE_JSON: ${{ inputs.candidate }}

@@ -23,6 +23,11 @@ TypeScript. `test-factory.cjs` checks registration, adapter selection, and SDK
 forwarding. `verify-vsix.py` validates package identity, permissions, icon, payload
 hashes, provenance, and the extracted adapter. Only `coreclr` is advertised.
 
+VSIX packaging installs the SDK requested by the checked-out C# source's
+`msbuild/global.json` through [setup-dotnet's global-json-file input](https://github.com/actions/setup-dotnet#using-the-global-json-file-input).
+Native debugger builds and .NET 8/10 DAP tests retain the independent SDK versions
+from `config/netcoredbg.json`.
+
 ## Versioning and discovery
 
 `versioning.py` maps C# `major.minor.patch` to
