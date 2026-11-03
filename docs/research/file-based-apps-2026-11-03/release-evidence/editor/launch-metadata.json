@@ -1,0 +1,23 @@
+{
+  "VSCODE_PORTABLE": "<editor-test-root>\\portable-data",
+  "windowStyle": "Hidden",
+  "args": [
+    "--user-data-dir",
+    "\"<editor-test-root>\\user-data\"",
+    "--extensions-dir",
+    "\"<editor-test-root>\\extensions\"",
+    "--extensionDevelopmentPath",
+    "\"<editor-test-root>\\driver\"",
+    "--extensionTestsPath",
+    "\"<editor-test-root>\\extension-test.cjs\"",
+    "--disable-gpu",
+    "--skip-welcome",
+    "--skip-release-notes",
+    "--disable-workspace-trust",
+    "--no-sandbox",
+    "\"<editor-test-root>\\workspace\""
+  ],
+  "executable": "validation-artifacts/fba-f5/editor-smoke/portable-code/Code.exe",
+  "pid": 82460,
+  "targetExtensionInstalledNotDevelopment": true
+}

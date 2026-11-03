@@ -1,0 +1,57 @@
+{
+  "success": true,
+  "scope": "Actual CI-built VSIX installed unchanged using Code CLI into isolated extensions; only a separate empty development driver hosts the test harness",
+  "ciRunId": 41587850063,
+  "ciHeadSha": "10b0e9ec62227567521dea0ef8a0d4d212eebedd",
+  "artifactName": "2dd73f55f989ebff-vsix-win32-arm64",
+  "artifactId": 13209169560,
+  "artifactMetadataDigest": "sha256:368b3a9d7a676742e79f64d9b4d591d4d2c04bbd40366755f78e75a7041c269f",
+  "vsix": "csharp-with-netcoredbg-win32-arm64-11.7.18002.vsix",
+  "vsixSha256": "932045fdd0a55b66e8d54a8bf71f32721e2ce180c46bc5e8be21fe905630ef21",
+  "version": "11.7.18002",
+  "main": "./.netcoredbg/entry.cjs",
+  "netcoredbgBuild": {
+    "target": "win32-arm64",
+    "upstreamCsharpCommit": "1c27e135b5dada55a240e4a504bafa759ec578e8",
+    "upstreamCsharpVersion": "11.7.18",
+    "upstreamCsharpTag": "v11.7.18-prerelease",
+    "upstreamPackageVersion": "42.42.42-placeholder",
+    "netcoredbgTag": "3.2.0-1092",
+    "packagingRevision": 2,
+    "releaseTag": "csharp-v11.7.18-netcoredbg-v3.2.0-1092-g9744e1f05186-r2",
+    "versionPolicy": "upstream-patch-revision-v1",
+    "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+    "debuggerArchiveSha256": "6ebf64bdfc231c3a3309a61d8a8ec2600812e7564c16ab6ddb59c30b8ea97c99",
+    "validationRunId": "41587850063",
+    "validationWorkflowCommit": "10b0e9ec62227567521dea0ef8a0d4d212eebedd",
+    "upstreamMain": "./dist/extension"
+  },
+  "modules": {
+    "entry.cjs": {
+      "sha256": "56e8a97842ddda12cd4d25833647683f8251f691dd1bdb9930728fce8d93bc85",
+      "matchesGitSourceAndInstalledBytes": true
+    },
+    "runtime.cjs": {
+      "sha256": "b4466136da22726260f1f3992ecfad63a44e46e999c921bdef1b0c3f45c767f2",
+      "matchesGitSourceAndInstalledBytes": true
+    },
+    "classify.cjs": {
+      "sha256": "e5bc6e1bff60414a423fe93f87528a6b4b048a0bba14005860dae6979b9c3bff",
+      "matchesGitSourceAndInstalledBytes": true
+    }
+  },
+  "compiledUpstreamMainSha256": "b9b22a4523458d4f5e8763e87f84b4cc3c3a60be0321a01fef10c0cb445aecea",
+  "debuggerExecutableSha256": "dc53b62ed5d6378ab7cb66837f8d90ba81c162880c0aeea39e16644d760c8d41",
+  "editorVersion": "1.144.1",
+  "os": "Windows ARM64",
+  "sdk": "10.0.402",
+  "runtime": "10.0.13",
+  "testResult": "editor-result.json",
+  "trace": "editor.dap.jsonl",
+  "testHarness": "extension-test.cjs",
+  "launchMetadata": "launch-metadata.json",
+  "physicalF5KeypressSent": false,
+  "manifestF5BindingAndRealCommandTested": true,
+  "certificateGenerationDisabled": true,
+  "nonFatalDiagnostic": "Adapter tracker read error after FBA termination retained in result; both sessions and host exited0"
+}

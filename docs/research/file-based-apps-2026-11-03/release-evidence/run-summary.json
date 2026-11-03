@@ -1,0 +1,310 @@
+{
+  "runId": 41587850063,
+  "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063",
+  "sourceCommit": "10b0e9ec62227567521dea0ef8a0d4d212eebedd",
+  "featureCommit": "d66f36ebc86c57e62973aa8a836e3339820cbb04",
+  "version": "11.7.18002",
+  "conclusion": "success",
+  "native": [
+    {
+      "target": "alpine-arm64",
+      "jobId": 125757755339,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125757755339"
+    },
+    {
+      "target": "win32-arm64",
+      "jobId": 125757755389,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125757755389"
+    },
+    {
+      "target": "darwin-x64",
+      "jobId": 125757755413,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125757755413"
+    },
+    {
+      "target": "win32-x64",
+      "jobId": 125757755429,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125757755429"
+    },
+    {
+      "target": "linux-arm64",
+      "jobId": 125757755468,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125757755468"
+    },
+    {
+      "target": "linux-x64",
+      "jobId": 125757755489,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125757755489"
+    },
+    {
+      "target": "alpine-x64",
+      "jobId": 125757755639,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125757755639"
+    },
+    {
+      "target": "darwin-arm64",
+      "jobId": 125757755670,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125757755670"
+    }
+  ],
+  "packages": [
+    {
+      "target": "linux-x64",
+      "jobId": 125764799764,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125764799764"
+    },
+    {
+      "target": "darwin-x64",
+      "jobId": 125764799769,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125764799769"
+    },
+    {
+      "target": "win32-arm64",
+      "jobId": 125764799780,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125764799780"
+    },
+    {
+      "target": "linux-arm64",
+      "jobId": 125764799782,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125764799782"
+    },
+    {
+      "target": "alpine-x64",
+      "jobId": 125764799813,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125764799813"
+    },
+    {
+      "target": "win32-x64",
+      "jobId": 125764799821,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125764799821"
+    },
+    {
+      "target": "darwin-arm64",
+      "jobId": 125764799825,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125764799825"
+    },
+    {
+      "target": "alpine-arm64",
+      "jobId": 125764799858,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125764799858"
+    }
+  ],
+  "extractedVsix": [
+    {
+      "target": "win32-x64",
+      "jobId": 125765822934,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125765822934"
+    },
+    {
+      "target": "darwin-x64",
+      "jobId": 125765822979,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125765822979"
+    },
+    {
+      "target": "alpine-arm64",
+      "jobId": 125765822980,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125765822980"
+    },
+    {
+      "target": "win32-arm64",
+      "jobId": 125765823014,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125765823014"
+    },
+    {
+      "target": "darwin-arm64",
+      "jobId": 125765823021,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125765823021"
+    },
+    {
+      "target": "alpine-x64",
+      "jobId": 125765823039,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125765823039"
+    },
+    {
+      "target": "linux-arm64",
+      "jobId": 125765823074,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125765823074"
+    },
+    {
+      "target": "linux-x64",
+      "jobId": 125765823093,
+      "conclusion": "success",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41587850063/job/125765823093"
+    }
+  ],
+  "jobs": [
+    {
+      "id": 125757548992,
+      "name": "discover",
+      "conclusion": "success"
+    },
+    {
+      "id": 125757644192,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / preflight",
+      "conclusion": "success"
+    },
+    {
+      "id": 125757715052,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / debugger / inputs",
+      "conclusion": "success"
+    },
+    {
+      "id": 125757755339,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / debugger / alpine-arm64 source and DAP",
+      "conclusion": "success"
+    },
+    {
+      "id": 125757755389,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / debugger / win32-arm64 source and DAP",
+      "conclusion": "success"
+    },
+    {
+      "id": 125757755413,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / debugger / darwin-x64 source and DAP",
+      "conclusion": "success"
+    },
+    {
+      "id": 125757755429,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / debugger / win32-x64 source and DAP",
+      "conclusion": "success"
+    },
+    {
+      "id": 125757755468,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / debugger / linux-arm64 source and DAP",
+      "conclusion": "success"
+    },
+    {
+      "id": 125757755489,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / debugger / linux-x64 source and DAP",
+      "conclusion": "success"
+    },
+    {
+      "id": 125757755639,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / debugger / alpine-x64 source and DAP",
+      "conclusion": "success"
+    },
+    {
+      "id": 125757755670,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / debugger / darwin-arm64 source and DAP",
+      "conclusion": "success"
+    },
+    {
+      "id": 125764711466,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / debugger / aggregate",
+      "conclusion": "success"
+    },
+    {
+      "id": 125764799764,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / package (linux-x64)",
+      "conclusion": "success"
+    },
+    {
+      "id": 125764799769,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / package (darwin-x64)",
+      "conclusion": "success"
+    },
+    {
+      "id": 125764799780,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / package (win32-arm64)",
+      "conclusion": "success"
+    },
+    {
+      "id": 125764799782,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / package (linux-arm64)",
+      "conclusion": "success"
+    },
+    {
+      "id": 125764799813,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / package (alpine-x64)",
+      "conclusion": "success"
+    },
+    {
+      "id": 125764799821,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / package (win32-x64)",
+      "conclusion": "success"
+    },
+    {
+      "id": 125764799825,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / package (darwin-arm64)",
+      "conclusion": "success"
+    },
+    {
+      "id": 125764799858,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / package (alpine-arm64)",
+      "conclusion": "success"
+    },
+    {
+      "id": 125765822934,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / test-vsix (win32-x64, x64, windows-2022, windows)",
+      "conclusion": "success"
+    },
+    {
+      "id": 125765822979,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / test-vsix (darwin-x64, x64, macos-15-intel, darwin)",
+      "conclusion": "success"
+    },
+    {
+      "id": 125765822980,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / test-vsix (alpine-arm64, arm64, ubuntu-22.04-arm, alpine)",
+      "conclusion": "success"
+    },
+    {
+      "id": 125765823014,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / test-vsix (win32-arm64, arm64, windows-11-arm, windows)",
+      "conclusion": "success"
+    },
+    {
+      "id": 125765823021,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / test-vsix (darwin-arm64, arm64, macos-15, darwin)",
+      "conclusion": "success"
+    },
+    {
+      "id": 125765823039,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / test-vsix (alpine-x64, x64, ubuntu-22.04, alpine)",
+      "conclusion": "success"
+    },
+    {
+      "id": 125765823074,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / test-vsix (linux-arm64, arm64, ubuntu-22.04-arm, linux)",
+      "conclusion": "success"
+    },
+    {
+      "id": 125765823093,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / test-vsix (linux-x64, x64, ubuntu-22.04, linux)",
+      "conclusion": "success"
+    },
+    {
+      "id": 125771261266,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / publish",
+      "conclusion": "success"
+    }
+  ],
+  "priorRun": {
+    "id": 41585795220,
+    "conclusion": "cancelled",
+    "reason": "Stopped before publication after controlled Windows LF/CRLF byte-check reproduction"
+  }
+}

@@ -1,0 +1,159 @@
+{
+  "success": true,
+  "editorVersion": "1.144.1",
+  "checks": [
+    "Actual distribution + owned entry wrapper and F5 manifest binding",
+    "Real extension host activation and command registration",
+    "Source breakpoint at app.cs:2",
+    "Local answer=40",
+    "Expression answer + 2=42",
+    "Step Over to line 3 and answer=42",
+    "Output ANSWER=42 and exit0",
+    "Included project file delegates to the existing selected launch.json configuration",
+    "Project regression source breakpoint at Program.cs:2",
+    "Project regression output PROJECT=42 and exit0"
+  ],
+  "session": {
+    "type": "coreclr",
+    "name": "C#: app.cs",
+    "configuration": {
+      "name": "C#: app.cs",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "<editor-test-root>\\portable-data\\user-data\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\f60603fbacd53780f228f9b6\\run-Mn8Vke\\FileApp.dll",
+      "cwd": "<editor-test-root>\\workspace",
+      "console": "internalConsole",
+      "stopAtEntry": false,
+      "justMyCode": true,
+      "targetArchitecture": "arm64",
+      "env": {
+        "DOTNET_ROOT": "<dotnet-root>"
+      },
+      "__netcoredbgFileAppOutput": "<editor-test-root>\\portable-data\\user-data\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\f60603fbacd53780f228f9b6\\run-Mn8Vke",
+      "requireExactSource": true,
+      "enableStepFiltering": true,
+      "logging": {
+        "exceptions": true,
+        "moduleLoad": true,
+        "programOutput": true,
+        "browserStdOut": true,
+        "elapsedTiming": false,
+        "threadExit": false,
+        "processExit": true,
+        "engineLogging": false,
+        "diagnosticsLog": {
+          "protocolMessages": false,
+          "dispatcherMessages": "none",
+          "debugEngineAPITracing": "none",
+          "debugRuntimeEventTracing": false,
+          "expressionEvaluationTracing": false,
+          "startDebuggingTracing": false
+        },
+        "consoleUsageMessage": true
+      },
+      "suppressJITOptimizations": false,
+      "symbolOptions": {
+        "searchPaths": [],
+        "searchMicrosoftSymbolServer": false,
+        "searchNuGetOrgSymbolServer": false,
+        "cachePath": "",
+        "moduleFilter": {
+          "mode": "loadAllButExcluded",
+          "excludedModules": [],
+          "includedModules": [],
+          "includeSymbolsNextToModules": true,
+          "includeSymbolsOnDemand": true
+        }
+      },
+      "expressionEvaluationOptions": {
+        "allowImplicitFuncEval": true,
+        "allowToString": true,
+        "allowFastEvaluate": true,
+        "showRawValues": false
+      },
+      "terminateChildProcesses": false,
+      "internalConsoleOptions": "openOnSessionStart"
+    }
+  },
+  "locals": [
+    {
+      "evaluateName": "args",
+      "name": "args",
+      "type": "string[]",
+      "value": "{string[0]}",
+      "variablesReference": 0
+    },
+    {
+      "evaluateName": "answer",
+      "name": "answer",
+      "type": "int",
+      "value": "40",
+      "variablesReference": 0
+    }
+  ],
+  "output": "ANSWER=42\r\n",
+  "adapterError": "Error: read error",
+  "projectSession": {
+    "type": "coreclr",
+    "name": "Existing project configuration",
+    "configuration": {
+      "console": "internalConsole",
+      "program": "<editor-test-root>\\workspace\\project\\output\\Regression.dll",
+      "type": "coreclr",
+      "env": {
+        "DOTNET_ROOT": "<dotnet-root>"
+      },
+      "targetArchitecture": "arm64",
+      "stopAtEntry": false,
+      "name": "Existing project configuration",
+      "request": "launch",
+      "cwd": "<editor-test-root>\\workspace\\project",
+      "__configurationTarget": 6,
+      "justMyCode": true,
+      "requireExactSource": true,
+      "enableStepFiltering": true,
+      "logging": {
+        "exceptions": true,
+        "moduleLoad": true,
+        "programOutput": true,
+        "browserStdOut": true,
+        "elapsedTiming": false,
+        "threadExit": false,
+        "processExit": true,
+        "engineLogging": false,
+        "diagnosticsLog": {
+          "protocolMessages": false,
+          "dispatcherMessages": "none",
+          "debugEngineAPITracing": "none",
+          "debugRuntimeEventTracing": false,
+          "expressionEvaluationTracing": false,
+          "startDebuggingTracing": false
+        },
+        "consoleUsageMessage": true
+      },
+      "suppressJITOptimizations": false,
+      "symbolOptions": {
+        "searchPaths": [],
+        "searchMicrosoftSymbolServer": false,
+        "searchNuGetOrgSymbolServer": false,
+        "cachePath": "",
+        "moduleFilter": {
+          "mode": "loadAllButExcluded",
+          "excludedModules": [],
+          "includedModules": [],
+          "includeSymbolsNextToModules": true,
+          "includeSymbolsOnDemand": true
+        }
+      },
+      "expressionEvaluationOptions": {
+        "allowImplicitFuncEval": true,
+        "allowToString": true,
+        "allowFastEvaluate": true,
+        "showRawValues": false
+      },
+      "terminateChildProcesses": false,
+      "internalConsoleOptions": "openOnSessionStart"
+    }
+  },
+  "projectOutput": "ANSWER=42\r\nPROJECT=42\r\n"
+}

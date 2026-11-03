@@ -1,12 +1,14 @@
 # Debug the active C# file with F5
 
-This integration is specific to **C# (with netcoredbg)** builds containing the active-file entry wrapper. It uses the existing extension ID, `dotnetdev-kr-custom.csharp-with-netcoredbg`. Earlier packages without the wrapper can use the [explicit build-task/launch configuration](research/2026-11-03-file-based-app-debugging.md) from the initial investigation. The upstream-preserving `dotnetdev-kr-custom.csharp` distribution is independent.
+Active-file F5 support is available starting with **11.7.18002** of [C# (with netcoredbg) on Open VSX](https://open-vsx.org/extension/dotnetdev-kr-custom/csharp-with-netcoredbg). It uses the existing extension ID, `dotnetdev-kr-custom.csharp-with-netcoredbg`. Earlier packages without the entry wrapper can use the [explicit build-task/launch configuration](research/2026-11-03-file-based-app-debugging.md) from the initial investigation. The upstream-preserving `dotnetdev-kr-custom.csharp` distribution is independent.
 
 Open a saved `.cs` file, put keyboard focus in its editor, and press **F5** while no debug session is active. A dirty file is saved before classification. There is no need to add `.vscode/launch.json` or a project file for a file-based app. The command is also available as **C# (netcoredbg): Debug Active File**.
 
 ## Package availability and changes
 
 An official update retains the same extension ID and receives a new packaging revision under the [existing version policy](../README.md#4-tags-versions-and-provenance). The release must pass the native and extracted-VSIX gates on all eight targets before Open VSX publication. A locally modified VSIX carrying an existing version is a manual test package, not evidence that the update is available from the registry.
+
+Release `11.7.18002` passed those gates, and all eight platform-specific latest feeds returned that version after publication. The [release record](research/2026-11-03-file-based-app-release.md) preserves the workflow and independent public download checks.
 
 Compared with a package without this feature, the new behavior is automatic active-file classification and FBA build/launch through F5. Existing selected project configurations and Continue during a debug session retain their behavior. No workspace `launch.json`, `tasks.json`, or manual-test sample projects are installed by the extension.
 
