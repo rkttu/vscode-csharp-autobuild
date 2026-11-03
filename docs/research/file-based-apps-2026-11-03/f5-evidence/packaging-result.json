@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "target": "win32-arm64",
+  "version": "11.7.18001",
+  "vsix": "with-f5.vsix",
+  "sha256": "af3744fddc8362670c416cccc79b9c130c2a7a110a79ba01dfba92369935ab99",
+  "runtimeTests": [],
+  "upstreamTests": {},
+  "debuggerSha256": "b2efed1936b6996309cfede7815d473cec333c09ac2c4bb3c8382201dee1b681",
+  "netcoredbgBuild": {
+    "target": "win32-arm64",
+    "upstreamCsharpCommit": "1c27e135b5dada55a240e4a504bafa759ec578e8",
+    "upstreamCsharpVersion": "11.7.18",
+    "upstreamCsharpTag": "v11.7.18-prerelease",
+    "upstreamPackageVersion": "42.42.42-placeholder",
+    "netcoredbgTag": "3.2.0-1092",
+    "packagingRevision": 1,
+    "releaseTag": "csharp-v11.7.18-netcoredbg-v3.2.0-1092-g9744e1f05186-r1",
+    "versionPolicy": "upstream-patch-revision-v1",
+    "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+    "debuggerArchiveSha256": "09746c136b177fe5a2e7ee4f558f051169d7322227d525ac2b919aba7e6be58e",
+    "validationRunId": "40745539927",
+    "validationWorkflowCommit": "2963fda28b9e49a281da095d28b157cf7f1fcc88",
+    "upstreamMain": "./dist/extension"
+  },
+  "scope": "VSIX identity, file-app entry/keybinding, permissions, exact bundled hashes"
+}

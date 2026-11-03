@@ -1,0 +1,15 @@
+{
+  "name": "C#: app.cs",
+  "type": "coreclr",
+  "request": "launch",
+  "program": "<f5-work>\\runtime-storage\\file-based-apps\\da4c124d8d33c8946cec1261\\run-XlhuyY\\FileApp.dll",
+  "cwd": "<f5-work>\\runtime standalone",
+  "console": "internalConsole",
+  "stopAtEntry": false,
+  "justMyCode": true,
+  "targetArchitecture": "arm64",
+  "env": {
+    "DOTNET_ROOT": "<dotnet-root>"
+  },
+  "__netcoredbgFileAppOutput": "<f5-work>\\runtime-storage\\file-based-apps\\da4c124d8d33c8946cec1261\\run-XlhuyY"
+}

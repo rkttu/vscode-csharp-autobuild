@@ -1,0 +1,3 @@
+  복원할 프로젝트를 확인하는 중...
+  <probe-root>\editor example\app.cs.csproj을(를) 114밀리초 동안 복원했습니다.
+  app.cs -> <probe-root>\editor example\.file-based-debug\app\app.dll

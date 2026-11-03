@@ -1,0 +1,36 @@
+{
+  "status": "passed-using-official-portable-editor",
+  "date": "2026-11-03",
+  "scope": "Actual published C# variant VSIX plus owned entry/runtime/classifier modules in official portable VS Code extension host",
+  "releaseTag": "csharp-v11.7.18-netcoredbg-v3.2.0-1092-g9744e1f05186-r1",
+  "archive": "csharp-with-netcoredbg-win32-arm64-11.7.18001.vsix",
+  "archiveSha256": "64fc186f08ece89f1dc3710da7ee6830b826115ec2bea5200e37675e426ad1d5",
+  "upstreamMainSha256": "b9b22a4523458d4f5e8763e87f84b4cc3c3a60be0321a01fef10c0cb445aecea",
+  "upstreamCompiledMainUnchanged": true,
+  "initialFailure": "Restricted token Electron AppContainer ACL check; no ACL modification attempted",
+  "escalatedAttemptFailure": "Code is currently being updated; global vscode-updating Inno Setup mutex remained held for30s",
+  "result": "Real extension activation, command invocation, breakpoint, locals, evaluation, Step Over, stdout and exit verified; physical F5 keypress not sent",
+  "preparedTest": "extension-test.cjs",
+  "logs": [
+    "code-stdout.txt",
+    "code-stderr.txt",
+    "portable-stdout.txt",
+    "portable-stderr.txt",
+    "portable-project-stdout.txt",
+    "portable-project-stderr.txt"
+  ],
+  "installedFilesChanged": false,
+  "portableEditor": {
+    "requested": "https://update.code.visualstudio.com/latest/win32-arm64-archive/stable",
+    "resolved": "https://vscode.download.prss.microsoft.com/dbazure/download/stable/261c84cb1eddf11235f9e2c921425e9663fbe556/VSCode-win32-arm64-1.144.1.zip",
+    "sha256": "e4c3ce6dd7f621e07a247b6565767cb3a91621bed67f29783c43c94c2a2d2da6"
+  },
+  "editorResult": "editor-result.json",
+  "dapTrace": "editor-project-run.dap.jsonl",
+  "testedVersion": "1.144.1",
+  "projectFallbackVerified": true,
+  "launchMetadata": "launch-metadata.json",
+  "processCleanup": "process-cleanup.json",
+  "traceExtraction": "editor-project-run.dap.jsonl is exact byte suffix after previously archived editor-fba-only.dap.jsonl; original cumulative trace retained as editor.dap.jsonl",
+  "nonFatalDiagnostic": "Tracker observed Error: read error after first FBA terminated and before project session; both sessions passed asserted exit/output behavior and extension host exited0. Cause not established."
+}

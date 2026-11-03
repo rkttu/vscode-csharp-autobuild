@@ -1,0 +1,9 @@
+  복원할 프로젝트를 확인하는 중...
+  <probe-root>\project\Project.csproj을(를) 40밀리초 동안 복원했습니다.
+  Project -> <probe-root>\project\output\Project.dll
+
+빌드했습니다.
+    경고 0개
+    오류 0개
+
+경과 시간: 00:00:00.83

@@ -1,0 +1,29 @@
+{
+  "args": [
+    "--user-data-dir",
+    "\"<f5-work>\\editor-smoke\\portable-user-data\"",
+    "--extensions-dir",
+    "\"<f5-work>\\editor-smoke\\installed-extensions\"",
+    "--extensionDevelopmentPath",
+    "\"<f5-work>\\editor-smoke\\unpacked\\extension\"",
+    "--extensionTestsPath",
+    "\"<f5-work>\\editor-smoke\\extension-test.cjs\"",
+    "--disable-gpu",
+    "--skip-welcome",
+    "--skip-release-notes",
+    "--disable-workspace-trust",
+    "--no-sandbox",
+    "\"<f5-work>\\editor-smoke\\workspace\""
+  ],
+  "note": "Portable data directory takes precedence over --user-data-dir; settings/profile live under portable-code/data/user-data.",
+  "executable": "portable-code/Code.exe",
+  "windowStyle": "Hidden",
+  "env": {
+    "NUGET_PACKAGES": "<workspace>\\validation-artifacts\\file-based-apps-2026-11-03\\nuget",
+    "APPDATA": "<f5-work>\\editor-smoke\\appdata",
+    "DOTNET_CLI_HOME": "<f5-work>\\editor-smoke\\cli-home",
+    "ELECTRON_RUN_AS_NODE": null,
+    "DOTNET_ROOT": "<dotnet-root>",
+    "DOTNET_CLI_TELEMETRY_OPTOUT": "1"
+  }
+}

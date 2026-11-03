@@ -1,0 +1,39 @@
+{
+  "date": "2026-11-03",
+  "platform": "win32-arm64",
+  "sdk": "10.0.402",
+  "runtime": "10.0.13",
+  "upstreamCommit": "1c27e135b5dada55a240e4a504bafa759ec578e8",
+  "debuggerRelease": "csharp-v11.7.18-netcoredbg-v3.2.0-1092-g9744e1f05186-r1",
+  "debuggerArchiveSha256": "09746c136b177fe5a2e7ee4f558f051169d7322227d525ac2b919aba7e6be58e",
+  "scope": "Actual runtime command, classifier, SDK build and netcoredbg DAP; substituted VS Code UI APIs",
+  "logicTests": 28,
+  "variantPythonTests": 33,
+  "liveMembershipCases": [
+    "included",
+    "Compile.Remove excluded",
+    "ancestor included",
+    "conditional multi-target included"
+  ],
+  "integrationChecks": [
+    "pinned upstream overlay preflight",
+    "overlaid adapter factory",
+    "overlaid packaging functions"
+  ],
+  "normalization": "Local workspace, SDK and user profile prefixes replaced",
+  "existingValidationTests": {
+    "passed": 23,
+    "platformSkipped": 6
+  },
+  "actualEditor": {
+    "scope": "Real extension host, registered command and adapter; F5 manifest verified, physical keypress not sent",
+    "platform": "Windows ARM64",
+    "success": true,
+    "version": "1.144.1",
+    "originalMainUnchanged": true,
+    "result": "editor-result.json",
+    "checks": 10,
+    "projectSelectedConfiguration": "Passed; existing launch.json configuration executed from included project file",
+    "diagnostic": "One tracker read error after FBA terminated; subsequent project session and both exits passed; cause unconfirmed"
+  }
+}

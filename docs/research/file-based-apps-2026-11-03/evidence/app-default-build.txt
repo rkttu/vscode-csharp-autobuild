@@ -1,0 +1,3 @@
+  복원할 프로젝트를 확인하는 중...
+  <probe-root>\app\app.cs.csproj을(를) 15.78초 동안 복원했습니다.
+  app.cs -> <probe-root>\app\output\app.dll

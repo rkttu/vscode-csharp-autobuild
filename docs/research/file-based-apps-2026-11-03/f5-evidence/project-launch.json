@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "type": "coreclr",
+      "request": "launch",
+      "targetArchitecture": "arm64",
+      "cwd": "${workspaceFolder}/project",
+      "name": "Existing project configuration",
+      "program": "${workspaceFolder}/project/output/Regression.dll",
+      "console": "internalConsole"
+    }
+  ],
+  "version": "0.2.0"
+}

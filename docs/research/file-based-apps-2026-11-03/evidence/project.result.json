@@ -1,0 +1,31 @@
+{
+  "success": true,
+  "program": "<probe-root>\\project\\output\\Project.dll",
+  "source": "<probe-root>\\app\\app.cs",
+  "checks": [
+    "breakpoint at app.cs:2",
+    "locals: answer=40",
+    "evaluate: answer \u002B 2=42",
+    "step over to app.cs:3",
+    "locals after step: answer=42",
+    "stdout ANSWER=42; exit 0"
+  ],
+  "locals": [
+    {
+      "evaluateName": "args",
+      "name": "args",
+      "type": "string[]",
+      "value": "{string[0]}",
+      "variablesReference": 0
+    },
+    {
+      "evaluateName": "answer",
+      "name": "answer",
+      "type": "int",
+      "value": "40",
+      "variablesReference": 0
+    }
+  ],
+  "output": "ANSWER=42\r\n",
+  "stderr": ""
+}

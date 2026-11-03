@@ -33,6 +33,11 @@ jobs:
           persist-credentials: false
       - name: Check upstream integration before native builds
         run: python3 scripts/variant/overlay.py --source upstream --check-source
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: '22'
+      - name: Check active-file F5 routing and launch behavior
+        run: node --test scripts/variant/file-based-apps/test-*.cjs
 
   debugger:
     needs: preflight

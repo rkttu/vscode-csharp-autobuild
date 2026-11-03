@@ -23,6 +23,18 @@ TypeScript. `test-factory.cjs` checks registration, adapter selection, and SDK
 forwarding. `verify-vsix.py` validates package identity, permissions, icon, payload
 hashes, provenance, and the extracted adapter. Only `coreclr` is advertised.
 
+The owned `file-based-apps` CommonJS modules add active-file F5 routing through
+a package entry wrapper. Packaging ships only `entry.cjs`, `runtime.cjs`, and
+`classify.cjs` under `.netcoredbg`, with the manifest entry, command, activation
+event, and F5 binding. The wrapper preserves upstream activation/API exports;
+this feature does not add upstream JS/TypeScript source replacements or replace
+the existing language service/debugger implementation. Membership uses evaluated
+MSBuild Compile items, and project-owned files retain normal F5's selected
+configuration rather than automatically choosing a project. Manual test sample
+projects and their launch/task configurations are not packaged. Preflight runs
+the Node tests; VSIX verification checks the original entry point, wrapper/module
+bytes, command, and F5 binding. See [the behavior and limits](../../docs/file-based-apps.md).
+
 VSIX packaging installs the SDK requested by the checked-out C# source's
 `msbuild/global.json` through [setup-dotnet's global-json-file input](https://github.com/actions/setup-dotnet#using-the-global-json-file-input).
 Native debugger builds and .NET 8/10 DAP tests retain the independent SDK versions
@@ -39,6 +51,11 @@ GitHub tags contain the upstream C# version, debugger tag and abbreviated SHA,
 and packaging revision. Package metadata and release manifests retain complete
 commits. Draft and completed releases reserve versions; dry runs do not.
 `versioning.validate` rejects inconsistent identities at every boundary.
+
+The active-file recipe change keeps the same extension ID and uses a new
+packaging revision. A same-version local test VSIX is not a release artifact.
+Publication requires the complete native and extracted-VSIX validation matrix;
+local editor checks do not bypass those gates.
 
 `discover.py` examines upstream tags directly, including tags without GitHub
 releases. It compares source and recipe fingerprints against completed releases,

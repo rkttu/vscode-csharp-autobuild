@@ -1,0 +1,208 @@
+{
+  "success": true,
+  "editorVersion": "1.144.1",
+  "checks": [
+    "Excluded scratch.cs first launches as FBA and hits its breakpoint",
+    "Included Program03 with selected04 runs Project04 quickly and never hits Program03 breakpoint",
+    "Selected03 config hits Program03 line2 with local answer40",
+    "Program03 StepOver and changed local answer42",
+    "Program03 emits expected output and exits0"
+  ],
+  "sessions": [
+    {
+      "stage": "scratch-fba",
+      "name": "C#: scratch.cs",
+      "configuration": {
+        "name": "C#: scratch.cs",
+        "type": "coreclr",
+        "request": "launch",
+        "program": "<regression-work>\\portable-data\\user-data\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ebf2af4ad68c921f94f350ad\\run-3RhTx4\\FileApp.dll",
+        "cwd": "<regression-work>\\workspace\\03-excluded",
+        "console": "internalConsole",
+        "stopAtEntry": false,
+        "justMyCode": true,
+        "targetArchitecture": "arm64",
+        "env": {
+          "DOTNET_ROOT": "<dotnet-root>"
+        },
+        "__netcoredbgFileAppOutput": "<regression-work>\\portable-data\\user-data\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ebf2af4ad68c921f94f350ad\\run-3RhTx4",
+        "requireExactSource": true,
+        "enableStepFiltering": true,
+        "logging": {
+          "exceptions": true,
+          "moduleLoad": true,
+          "programOutput": true,
+          "browserStdOut": true,
+          "elapsedTiming": false,
+          "threadExit": false,
+          "processExit": true,
+          "engineLogging": false,
+          "diagnosticsLog": {
+            "protocolMessages": false,
+            "dispatcherMessages": "none",
+            "debugEngineAPITracing": "none",
+            "debugRuntimeEventTracing": false,
+            "expressionEvaluationTracing": false,
+            "startDebuggingTracing": false
+          },
+          "consoleUsageMessage": true
+        },
+        "suppressJITOptimizations": false,
+        "symbolOptions": {
+          "searchPaths": [],
+          "searchMicrosoftSymbolServer": false,
+          "searchNuGetOrgSymbolServer": false,
+          "cachePath": "",
+          "moduleFilter": {
+            "mode": "loadAllButExcluded",
+            "excludedModules": [],
+            "includedModules": [],
+            "includeSymbolsNextToModules": true,
+            "includeSymbolsOnDemand": true
+          }
+        },
+        "expressionEvaluationOptions": {
+          "allowImplicitFuncEval": true,
+          "allowToString": true,
+          "allowFastEvaluate": true,
+          "showRawValues": false
+        },
+        "terminateChildProcesses": false,
+        "internalConsoleOptions": "openOnSessionStart"
+      }
+    },
+    {
+      "stage": "included-program-selected04",
+      "name": "Project: 04-project",
+      "configuration": {
+        "stopAtEntry": false,
+        "name": "Project: 04-project",
+        "console": "internalConsole",
+        "type": "coreclr",
+        "request": "launch",
+        "program": "<regression-work>\\workspace\\04-project\\output\\Project.dll",
+        "cwd": "<regression-work>\\workspace\\04-project",
+        "__configurationTarget": 6,
+        "justMyCode": true,
+        "requireExactSource": true,
+        "enableStepFiltering": true,
+        "logging": {
+          "exceptions": true,
+          "moduleLoad": true,
+          "programOutput": true,
+          "browserStdOut": true,
+          "elapsedTiming": false,
+          "threadExit": false,
+          "processExit": true,
+          "engineLogging": false,
+          "diagnosticsLog": {
+            "protocolMessages": false,
+            "dispatcherMessages": "none",
+            "debugEngineAPITracing": "none",
+            "debugRuntimeEventTracing": false,
+            "expressionEvaluationTracing": false,
+            "startDebuggingTracing": false
+          },
+          "consoleUsageMessage": true
+        },
+        "suppressJITOptimizations": false,
+        "symbolOptions": {
+          "searchPaths": [],
+          "searchMicrosoftSymbolServer": false,
+          "searchNuGetOrgSymbolServer": false,
+          "cachePath": "",
+          "moduleFilter": {
+            "mode": "loadAllButExcluded",
+            "excludedModules": [],
+            "includedModules": [],
+            "includeSymbolsNextToModules": true,
+            "includeSymbolsOnDemand": true
+          }
+        },
+        "expressionEvaluationOptions": {
+          "allowImplicitFuncEval": true,
+          "allowToString": true,
+          "allowFastEvaluate": true,
+          "showRawValues": false
+        },
+        "terminateChildProcesses": false,
+        "internalConsoleOptions": "openOnSessionStart"
+      }
+    },
+    {
+      "stage": "included-program-selected03",
+      "name": "Project: 03-excluded",
+      "configuration": {
+        "name": "Project: 03-excluded",
+        "type": "coreclr",
+        "request": "launch",
+        "program": "<regression-work>\\workspace\\03-excluded\\output\\ExcludedProject.dll",
+        "cwd": "<regression-work>\\workspace\\03-excluded",
+        "console": "internalConsole",
+        "stopAtEntry": false,
+        "__configurationTarget": 6,
+        "justMyCode": true,
+        "requireExactSource": true,
+        "enableStepFiltering": true,
+        "logging": {
+          "exceptions": true,
+          "moduleLoad": true,
+          "programOutput": true,
+          "browserStdOut": true,
+          "elapsedTiming": false,
+          "threadExit": false,
+          "processExit": true,
+          "engineLogging": false,
+          "diagnosticsLog": {
+            "protocolMessages": false,
+            "dispatcherMessages": "none",
+            "debugEngineAPITracing": "none",
+            "debugRuntimeEventTracing": false,
+            "expressionEvaluationTracing": false,
+            "startDebuggingTracing": false
+          },
+          "consoleUsageMessage": true
+        },
+        "suppressJITOptimizations": false,
+        "symbolOptions": {
+          "searchPaths": [],
+          "searchMicrosoftSymbolServer": false,
+          "searchNuGetOrgSymbolServer": false,
+          "cachePath": "",
+          "moduleFilter": {
+            "mode": "loadAllButExcluded",
+            "excludedModules": [],
+            "includedModules": [],
+            "includeSymbolsNextToModules": true,
+            "includeSymbolsOnDemand": true
+          }
+        },
+        "expressionEvaluationOptions": {
+          "allowImplicitFuncEval": true,
+          "allowToString": true,
+          "allowFastEvaluate": true,
+          "showRawValues": false
+        },
+        "terminateChildProcesses": false,
+        "internalConsoleOptions": "openOnSessionStart"
+      }
+    }
+  ],
+  "diagnostics": [
+    {
+      "stage": "scratch-fba",
+      "afterTerminated": true,
+      "error": "Error: read error"
+    },
+    {
+      "stage": "included-program-selected04",
+      "afterTerminated": true,
+      "error": "Error: read error"
+    }
+  ],
+  "output": {
+    "scratch-fba": "EXCLUDED FBA ANSWER=52\r\n",
+    "included-program-selected04": "SELECTED PROJECT ANSWER=62\r\n",
+    "included-program-selected03": "EXCLUDED-PROJECT CONTROL ANSWER=42\r\n"
+  }
+}

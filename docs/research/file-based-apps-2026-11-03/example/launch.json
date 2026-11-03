@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug file-based app with netcoredbg",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Build file-based app for netcoredbg",
+      "program": "${workspaceFolder}/.file-based-debug/app/app.dll",
+      "cwd": "${workspaceFolder}",
+      "args": [],
+      "console": "internalConsole",
+      "stopAtEntry": false
+    }
+  ]
+}

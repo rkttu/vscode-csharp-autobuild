@@ -16,7 +16,40 @@ IDENTITY_FILES = (
     "src/razor/src/razorExtensionId.ts",
     "src/lsptoolshost/logging/loggingUtils.ts",
 )
-INTEGRATION_FILES = (*IDENTITY_FILES, "tasks/packaging/offlinePackagingTasks.ts", "src/coreclrDebug/activate.ts")
+INTEGRATION_FILES = (*IDENTITY_FILES, "tasks/packaging/offlinePackagingTasks.ts", "src/coreclrDebug/activate.ts",
+                     "package.json", ".vscodeignore")
+FILE_APP_COMMAND = "netcoredbg.debugActiveFile"
+FILE_APP_WHEN = "editorTextFocus && editorLangId == csharp && !inDebugMode"
+FILE_APP_MODULES = ("entry.cjs", "runtime.cjs", "classify.cjs")
+
+
+def install_file_app_support(source, package, repo):
+    """Add owned modules and a manifest entry wrapper; do not rewrite upstream JS/TS."""
+    original_main = package.get("main")
+    normalized_main = original_main.replace("\\", "/") if isinstance(original_main, str) else ""
+    if not normalized_main or normalized_main.startswith("/") or ":" in normalized_main \
+            or ".." in normalized_main.split("/") or normalized_main.startswith("./.netcoredbg/"):
+        raise ValueError("Unexpected upstream extension entry point")
+    if any(binding.get("key", "").lower() == "f5"
+           for binding in package.get("contributes", {}).get("keybindings", [])):
+        raise ValueError("Upstream now contributes an F5 binding; review file-app routing")
+    contributes = package.setdefault("contributes", {})
+    commands = contributes.setdefault("commands", [])
+    if any(command.get("command") == FILE_APP_COMMAND for command in commands):
+        raise ValueError("File-app command is already registered")
+    commands.append({"command": FILE_APP_COMMAND, "title": "C# (netcoredbg): Debug Active File"})
+    contributes.setdefault("keybindings", []).append({
+        "command": FILE_APP_COMMAND, "key": "f5", "when": FILE_APP_WHEN,
+    })
+    package.setdefault("activationEvents", []).append("onCommand:" + FILE_APP_COMMAND)
+    package.setdefault("netcoredbgBuild", {})["upstreamMain"] = original_main
+    package["main"] = "./.netcoredbg/entry.cjs"
+    destination = source / ".netcoredbg"
+    destination.mkdir(exist_ok=False)
+    for module in FILE_APP_MODULES:
+        shutil.copy2(repo / "scripts/variant/file-based-apps" / module, destination / module)
+    with (source / ".vscodeignore").open("a") as ignore:
+        ignore.write("\n!.netcoredbg/**\n")
 
 
 def replace_once(path, before, after):
@@ -114,7 +147,9 @@ def check_source(source, repo):
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source / filename, target)
         patch_integration(temporary, config["publisher"] + "." + config["name"])
-    print("Upstream identity, packaging and adapter integration preflight passed.")
+        package = json.loads((temporary / "package.json").read_text())
+        install_file_app_support(temporary, package, repo)
+    print("Upstream identity, packaging, adapter and file-app entry integration preflight passed.")
 
 
 def apply(source, validated, target, version, repo, candidate):
@@ -167,6 +202,7 @@ def apply(source, validated, target, version, repo, candidate):
                                   versionPolicy=candidate["versionPolicy"],
                                   netcoredbgCommit=manifest["netcoredbgCommit"], debuggerArchiveSha256=record["sha256"],
                                   validationRunId=manifest["runId"], validationWorkflowCommit=manifest["workflowCommit"])
+    install_file_app_support(source, pkg, repo)
     pkg_path.write_text(json.dumps(pkg, indent=2) + "\n")
     shutil.copy2(repo / "assets/netcoredbg/icon.png", source / "images/netcoredbgIcon.png")
     with (source / ".vscodeignore").open("a") as ignore:
@@ -196,6 +232,15 @@ to avoid competing coreclr registrations and language services.
 
 Build provenance is available in package.json under netcoredbgBuild and in the
 release validation manifest.
+
+For the active saved .cs file, F5 builds and debugs a file-based app when it
+starts with a shebang, contains a #: directive, has no same-directory/ancestor
+C# project, or is excluded from every such project's evaluated Compile items.
+An included file uses the existing selected project debugging configuration.
+File-based apps require .NET SDK 10.0.100 or later. Evaluation errors stop the
+launch instead of treating an unknown project membership as exclusion. This
+flow uses managed Debug output and the Debug Console; it does not supply Hot
+Reload or file-app launch-profile discovery.
 
 ---
 

@@ -21,3 +21,8 @@ The first four reports retain their original investigation scope. The Windows re
 The adjacent dated evidence directories contain source hashes, API snapshots, build logs, and DAP traces. Personal paths in archived evidence were replaced. The original DAP fixture and probe are preserved with their macOS ARM64 experiment; those historical results do not establish execution on other platforms.
 
 The existing production workflow and `dotnetdev-kr-custom.csharp` publication policy remain unchanged.
+
+## Subsequent investigations
+
+- [Active-file F5 release record](2026-11-03-file-based-app-release.md) (November 3, 2026): implementation scope, local and user verification, selected-project regression, and publication tracking.
+- [File-based app debugging without additional upstream changes](2026-11-03-file-based-app-debugging.md) (November 3, 2026): issue #11, explicit SDK build plus `coreclr` launch, the Dev Kit discovery boundary, active-file F5 implementation, and local debugger/editor evidence. The [user guide](../file-based-apps.md) describes the routing rules, existing selected-project behavior, package changes, and release requirements.

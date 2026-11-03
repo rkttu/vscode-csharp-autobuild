@@ -1,0 +1,5 @@
+{
+  "requested": "https://update.code.visualstudio.com/latest/win32-arm64-archive/stable",
+  "resolved": "https://vscode.download.prss.microsoft.com/dbazure/download/stable/261c84cb1eddf11235f9e2c921425e9663fbe556/VSCode-win32-arm64-1.144.1.zip",
+  "sha256": "e4c3ce6dd7f621e07a247b6565767cb3a91621bed67f29783c43c94c2a2d2da6"
+}

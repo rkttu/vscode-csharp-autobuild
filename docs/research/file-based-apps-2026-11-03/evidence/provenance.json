@@ -1,0 +1,43 @@
+{
+  "date": "2026-11-03",
+  "os": "Windows ARM64",
+  "sdk": "10.0.402",
+  "runtime": "10.0.13",
+  "releaseTag": "csharp-v11.7.18-netcoredbg-v3.2.0-1092-g9744e1f05186-r1",
+  "debuggerUrl": "https://github.com/rkttu/vscode-csharp-autobuild/releases/download/csharp-v11.7.18-netcoredbg-v3.2.0-1092-g9744e1f05186-r1/netcoredbg-win32-arm64.zip",
+  "debuggerArchiveSha256": "09746c136b177fe5a2e7ee4f558f051169d7322227d525ac2b919aba7e6be58e",
+  "scope": "Direct DAP against distribution debugger archive; not installed extension UI",
+  "initialBuild": "dotnet build app/app.cs -c Debug --output app/output -p:PublishAot=false -p:DebugType=portable -p:Optimize=false",
+  "verifiedDefaultBuild": "dotnet build app/app.cs --configuration Debug --output app/output --nologo",
+  "projectRegressionBuild": "dotnet build project/Project.csproj --configuration Debug --output project/output --nologo",
+  "fileBasedAppProjectOrSolutionFiles": [],
+  "fileBasedAppResult": "fileapp.result.json",
+  "projectRegressionResult": "project.result.json",
+  "reproductionScript": "run.ps1",
+  "exactDocumentationExample": {
+    "source": "docs/research/file-based-apps-2026-11-03/example/app.cs",
+    "globalJson": {
+      "sdk": {
+        "version": "10.0.100",
+        "rollForward": "latestFeature",
+        "allowPrerelease": false
+      }
+    },
+    "directory": "editor example",
+    "resolvedSdk": "10.0.402",
+    "build": "dotnet build app.cs --configuration Debug --output .file-based-debug/app",
+    "result": "example.result.json",
+    "trace": "example.dap.jsonl",
+    "buildLog": "example-default-build.txt",
+    "success": true
+  },
+  "debuggerCommand": "netcoredbg --interpreter=vscode",
+  "sdkSelection": "global.json exact 10.0.402 rollForward disable",
+  "debuggerExecutableSha256": "b2efed1936b6996309cfede7815d473cec333c09ac2c4bb3c8382201dee1b681",
+  "normalizedPaths": {
+    "<user-profile>": "Local user profile",
+    "<probe-root>": "Original ignored validation workspace",
+    "<dotnet-root>": "Selected native ARM64 .NET installation"
+  },
+  "examplePdbSignature": "BSJB"
+}

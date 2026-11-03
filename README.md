@@ -18,7 +18,7 @@ The netcoredbg distribution uses native builds and functional tests on eight pla
 
 The upstream-preserving build changes publication metadata, the package notice, and the npm registry used for building. It does not replace the debugger or rewrite upstream extension behavior. Its workflow and `.last_built_sha` state remain independent of the netcoredbg pipeline.
 
-The netcoredbg variant applies a small, checked overlay in a disposable C# checkout. The overlay changes extension identity, package branding, debugger acquisition, adapter selection, and SDK environment forwarding. An unexpected upstream integration change fails the build instead of silently applying an incomplete overlay. Original Samsung source files remain unchanged; this repository owns the external build and runtime compatibility code.
+The netcoredbg variant applies a small, checked overlay in a disposable C# checkout. The overlay changes extension identity, package branding, debugger acquisition, adapter selection, and SDK environment forwarding. Active-file F5 support adds repository-owned CommonJS modules and a manifest entry wrapper without additional upstream JS/TypeScript source edits. An unexpected upstream integration change fails the build instead of silently applying an incomplete overlay. Original Samsung source files remain unchanged; this repository owns the external build and runtime compatibility code.
 
 This differs from the community-maintained [muhammadsammy C# extension](https://github.com/muhammadsammy/free-vscode-csharp) by keeping a separate upstream-preserving distribution and automating native debugger builds, checked integration, and gated releases. It does not claim broader feature support than that project.
 
@@ -62,6 +62,8 @@ A minimal `.vscode/launch.json` for an application named `Example` targeting .NE
 
 The bundled debugger needs no separate download or manual adapter path setting. The extension retains upstream SDK discovery and runtime acquisition where possible. If SDK discovery fails, inspect `dotnet --info` and the editor's C#/.NET output channels, including any configured runtime acquisition paths.
 
+The active-file F5 integration builds and debugs standalone `.cs` files with .NET SDK 10.0.100 or later, without requiring `launch.json`. Shebangs and `#:` directives explicitly select file-based execution; otherwise it evaluates project membership from the file's directory through the filesystem root. Project-owned files use the existing selected debugging configuration; opening a file does not select a different project. See [active-file debugging](docs/file-based-apps.md) for the full rules and package changes. Official availability requires a new packaging revision under the same extension ID and all existing release gates; a local test VSIX is separate from registry publication.
+
 ## 3. Validation coverage and limits
 
 Every new candidate, including a C#-only update, builds and tests the debugger on all eight native targets. The pipeline then packages eight VSIX files and repeats the functional tests against each extracted debugger. A passing candidate covers 16 target/runtime combinations in each phase.
@@ -75,6 +77,7 @@ The gate includes:
 - The 30 automated upstream DAP scenarios listed in [`config/upstream-dap-tests.json`](config/upstream-dap-tests.json), including function breakpoints, attach, pause, disconnect, threads, exit codes, non-English names, exceptions, async stepping, generics, arrays, and indexers
 - Strict rejection of missing scenarios, failed assertions, timeouts, changed binaries, or incomplete platform results
 - C# compilation and adapter-factory integration checks
+- Active-file F5 classification/runtime tests, plus exact packaged entry-wrapper and command/keybinding checks
 - VSIX identity, executable permissions, icon, provenance, and absence of a bundled `vsdbg` payload
 
 The test runner generates external .NET 8 and .NET 10 projects that compile the original Samsung test files. It does not rewrite upstream test assertions. The manual-only `VSCodeTest297killNCD` scenario is outside the automated upstream list. New or reordered upstream scenarios stop the candidate for review.

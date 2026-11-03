@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 import versioning
+from overlay import FILE_APP_COMMAND, FILE_APP_MODULES, FILE_APP_WHEN
 
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "scripts/validation"))
@@ -38,6 +39,16 @@ def verify(vsix, validated, target, version, root, run_dap):
                 assert pkg[key] == config[key], f"Wrong extension {key}"
             assert pkg["version"] == version
             build = pkg["netcoredbgBuild"]
+            assert pkg["main"] == "./.netcoredbg/entry.cjs", "Missing file-app entry wrapper"
+            upstream_main = build["upstreamMain"].replace("\\", "/")
+            assert not upstream_main.startswith("/") and ":" not in upstream_main and ".." not in upstream_main.split("/")
+            original_entry = "extension/" + upstream_main.removeprefix("./")
+            assert original_entry in names or original_entry + ".js" in names, "Original extension entry missing"
+            for module in FILE_APP_MODULES:
+                assert zip_in.read("extension/.netcoredbg/" + module) == \
+                    (REPO / "scripts/variant/file-based-apps" / module).read_bytes(), "File-app module differs: " + module
+            assert sum(c.get("command") == FILE_APP_COMMAND for c in pkg["contributes"]["commands"]) == 1
+            assert {"command": FILE_APP_COMMAND, "key": "f5", "when": FILE_APP_WHEN} in pkg["contributes"]["keybindings"]
             versioning.validate(dict(version=pkg["version"], csharpTag=build["upstreamCsharpTag"],
                                      csharpSha=build["upstreamCsharpCommit"], csharpVersion=build["upstreamCsharpVersion"],
                                      debuggerTag=build["netcoredbgTag"], debuggerSha=build["netcoredbgCommit"],
@@ -114,7 +125,7 @@ def verify(vsix, validated, target, version, root, run_dap):
         result["netcoredbgBuild"] = pkg["netcoredbgBuild"]
     except Exception as error:
         result["error"] = str(error) or type(error).__name__
-    result["scope"] = "VSIX identity, permissions, exact bundled hashes" + (" and extracted-adapter DAP launch; no IDE UI test" if run_dap else "")
+    result["scope"] = "VSIX identity, file-app entry/keybinding, permissions, exact bundled hashes" + (" and extracted-adapter DAP launch; no IDE UI test" if run_dap else "")
     (evidence / "vsix-result.json").write_text(json.dumps(result, indent=2) + "\n")
     print(json.dumps(result, indent=2))
     return result
