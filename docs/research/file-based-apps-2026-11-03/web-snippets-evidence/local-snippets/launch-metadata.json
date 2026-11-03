@@ -1,0 +1,30 @@
+{
+  "pid": 67936,
+  "executable": "<workspace>\\validation-artifacts\\fba-f5\\editor-smoke\\portable-code\\Code.exe",
+  "args": [
+    "--user-data-dir",
+    "\"<snippet-editor-root>\\portable-data\\user-data\"",
+    "--extensions-dir",
+    "\"<snippet-editor-root>\\extensions\"",
+    "--extensionDevelopmentPath",
+    "\"<snippet-editor-root>\\driver\"",
+    "--extensionTestsPath",
+    "\"<snippet-editor-root>\\extension-test.cjs\"",
+    "--remote-debugging-port=59410",
+    "--remote-debugging-address=127.0.0.1",
+    "--disable-gpu",
+    "--skip-welcome",
+    "--skip-release-notes",
+    "--disable-workspace-trust",
+    "--no-sandbox",
+    "\"<snippet-editor-root>\\workspace\""
+  ],
+  "VSCODE_PORTABLE": "<snippet-editor-root>\\portable-data",
+  "windowStyle": "Hidden",
+  "targetExtensionInstalledNotDevelopment": true,
+  "version": "11.7.18003",
+  "vsixSha256": "19de9ef5cb3812b4593b702dab3cc90b64d11bc9e42bba234f4c96269283c8d5",
+  "sourceCommit": "LOCAL-WORKING-TREE-SNIPPETS",
+  "ciRunId": "local-overlay",
+  "remoteRendererPort": 59410
+}

@@ -1,0 +1,3 @@
+  Determining projects to restore...
+  Restored <editor-snippets-root>\workspace\builds\web\app.cs.csproj (in 36 ms).
+  app.cs -> <editor-snippets-root>\workspace\builds\web\output\app.dll

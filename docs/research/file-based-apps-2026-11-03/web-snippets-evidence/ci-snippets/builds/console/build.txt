@@ -1,0 +1,15 @@
+  Determining projects to restore...
+  Restored <editor-snippets-root>\workspace\builds\console\app.cs.csproj (in 46 ms).
+  app.cs -> <editor-snippets-root>\workspace\builds\console\output\app.dll
+
+Welcome to .NET 10.0!
+---------------------
+SDK Version: 10.0.402
+
+----------------
+Write your first app: https://aka.ms/dotnet-hello-world
+Find out what's new: https://aka.ms/dotnet-whats-new
+Explore documentation: https://aka.ms/dotnet-docs
+Report issues and find source on GitHub: https://github.com/dotnet/core
+Use 'dotnet --help' to see available commands or visit: https://aka.ms/dotnet-cli
+--------------------------------------------------------------------------------------

@@ -1,0 +1,37 @@
+{
+  "success": true,
+  "checkedAt": "2026-11-03T22:53:16.4993123+09:00",
+  "profile": "editor-web",
+  "extensionHostReportedExitCode": 0,
+  "processes": [
+    {
+      "pid": 90580,
+      "running": false
+    },
+    {
+      "pid": 91480,
+      "running": false
+    },
+    {
+      "pid": 75896,
+      "running": false
+    },
+    {
+      "pid": 89224,
+      "running": false
+    },
+    {
+      "pid": 90408,
+      "running": false
+    },
+    {
+      "pid": 88448,
+      "running": false
+    },
+    {
+      "pid": 88888,
+      "running": false
+    }
+  ],
+  "existingUserProcessesTouched": false
+}

@@ -1,0 +1,3 @@
+  Determining projects to restore...
+  Restored <editor-snippets-root>\workspace\builds\paths-envproperty\app.cs.csproj (in 37 ms).
+  app.cs -> <editor-snippets-root>\workspace\builds\paths-envproperty\output\app.dll

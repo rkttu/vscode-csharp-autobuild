@@ -1,0 +1,17 @@
+{
+  "success": true,
+  "checkedAt": "2026-11-03T22:53:16.5150671+09:00",
+  "profile": "editor-snippets",
+  "extensionHostReportedExitCode": 0,
+  "processes": [
+    {
+      "pid": 92700,
+      "running": false
+    },
+    {
+      "pid": 91912,
+      "running": false
+    }
+  ],
+  "existingUserProcessesTouched": false
+}

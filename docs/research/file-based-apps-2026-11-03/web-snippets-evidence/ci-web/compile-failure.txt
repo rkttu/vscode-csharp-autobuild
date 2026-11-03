@@ -1,0 +1,4 @@
+<editor-web-root>\workspace\app.cs(4,2): error CS0246: The type or namespace name 'DllImportAttribute' could not be found (are you missing a using directive or an assembly reference?) [<editor-web-root>\workspace\app.cs.csproj]
+<editor-web-root>\workspace\app.cs(4,2): error CS0246: The type or namespace name 'DllImport' could not be found (are you missing a using directive or an assembly reference?) [<editor-web-root>\workspace\app.cs.csproj]
+<editor-web-root>\workspace\app.cs(4,2): error CS0246: The type or namespace name 'DllImportAttribute' could not be found (are you missing a using directive or an assembly reference?) [<editor-web-root>\workspace\app.cs.csproj]
+<editor-web-root>\workspace\app.cs(4,2): error CS0246: The type or namespace name 'DllImport' could not be found (are you missing a using directive or an assembly reference?) [<editor-web-root>\workspace\app.cs.csproj]

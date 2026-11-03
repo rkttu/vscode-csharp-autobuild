@@ -1,0 +1,21 @@
+{
+  "success": true,
+  "checkedAt": "2026-11-03T21:28:19.9380578+09:00",
+  "editorMainPid": 67936,
+  "extensionHostPid": 74764,
+  "extensionHostReportedExitCode": 0,
+  "processes": [
+    {
+      "pid": 67936,
+      "running": false
+    },
+    {
+      "pid": 74764,
+      "running": false
+    }
+  ],
+  "applicationsExecuted": false,
+  "certificateCommandsExecuted": false,
+  "browserCommandsExecuted": false,
+  "existingUserProcessesTouched": false
+}

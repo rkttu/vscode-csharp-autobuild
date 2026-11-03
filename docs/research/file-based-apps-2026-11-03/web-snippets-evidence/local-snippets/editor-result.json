@@ -1,0 +1,225 @@
+{
+  "success": true,
+  "editorVersion": "1.144.1",
+  "checks": [
+    "Installed manifest registers second C# snippet file and preserves 42 upstream snippets",
+    "Installed FBA asset includes shebang, disableaot and property prefixes",
+    "Every installed FBA static snippet expands through registered editor command without unresolved tabstops"
+  ],
+  "snippets": [
+    {
+      "name": "FBA: Console application",
+      "prefixes": [
+        "fba-console"
+      ],
+      "filename": "01-fba-console.cs",
+      "text": "#!/usr/bin/env -S dotnet --\r\n#:property TargetFramework=net10.0\r\n\r\nConsole.WriteLine(\"Hello, World!\");\r\n",
+      "selectionCount": 1
+    },
+    {
+      "name": "FBA: Minimal web application",
+      "prefixes": [
+        "fba-web"
+      ],
+      "filename": "02-fba-web.cs",
+      "text": "#!/usr/bin/env -S dotnet --\r\n#:sdk Microsoft.NET.Sdk.Web\r\n#:property TargetFramework=net10.0\r\n#:property PublishAot=false\r\n\r\nvar builder = WebApplication.CreateBuilder(args);\r\nvar app = builder.Build();\r\n\r\napp.MapGet(\"/\", () => \"Hello, World!\");\r\n\r\napp.Run();\r\n",
+      "selectionCount": 1
+    },
+    {
+      "name": "FBA: MSBuild property directive",
+      "prefixes": [
+        "fba-property"
+      ],
+      "filename": "03-fba-property.cs",
+      "text": "#:property PropertyName=Value",
+      "selectionCount": 1
+    },
+    {
+      "name": "FBA: NuGet package directive",
+      "prefixes": [
+        "fba-package"
+      ],
+      "filename": "04-fba-package.cs",
+      "text": "#:package PackageName@version",
+      "selectionCount": 1
+    },
+    {
+      "name": "FBA: Disable Native AOT",
+      "prefixes": [
+        "fba-disableaot"
+      ],
+      "filename": "05-fba-disableaot.cs",
+      "text": "#:property PublishAot=false",
+      "selectionCount": 1
+    },
+    {
+      "name": "FBA: Unix shebang",
+      "prefixes": [
+        "fba-shebang"
+      ],
+      "filename": "06-fba-shebang.cs",
+      "text": "#!/usr/bin/env -S dotnet --\r\n",
+      "selectionCount": 1
+    },
+    {
+      "name": "FBA: Simple Unix shebang",
+      "prefixes": [
+        "fba-shebang-simple"
+      ],
+      "filename": "07-fba-shebang-simple.cs",
+      "text": "#!/usr/bin/env dotnet\r\n",
+      "selectionCount": 1
+    },
+    {
+      "name": "FBA: SDK directive",
+      "prefixes": [
+        "fba-sdk"
+      ],
+      "filename": "08-fba-sdk.cs",
+      "text": "#:sdk Microsoft.NET.Sdk",
+      "selectionCount": 1
+    },
+    {
+      "name": "FBA: Target framework directive",
+      "prefixes": [
+        "fba-framework"
+      ],
+      "filename": "09-fba-framework.cs",
+      "text": "#:property TargetFramework=net10.0",
+      "selectionCount": 1
+    },
+    {
+      "name": "FBA: Nullable reference types",
+      "prefixes": [
+        "fba-nullable"
+      ],
+      "filename": "10-fba-nullable.cs",
+      "text": "#:property Nullable=enable",
+      "selectionCount": 1
+    },
+    {
+      "name": "FBA: Source file paths",
+      "prefixes": [
+        "fba-paths"
+      ],
+      "filename": "11-fba-paths.cs",
+      "text": "var filePath = AppContext.GetData(\"EntryPointFilePath\") as string;\r\nvar directoryPath = AppContext.GetData(\"EntryPointFileDirectoryPath\") as string;\r\nConsole.WriteLine($\"File: {filePath}\");\r\nConsole.WriteLine($\"Directory: {directoryPath}\");\r\n",
+      "selectionCount": 1
+    },
+    {
+      "name": "FBA: Minimal API text endpoint",
+      "prefixes": [
+        "fba-mapget"
+      ],
+      "filename": "12-fba-mapget.cs",
+      "text": "app.MapGet(\"/\", () => \"Hello, World!\");",
+      "selectionCount": 1
+    },
+    {
+      "name": "FBA: Minimal API JSON endpoint",
+      "prefixes": [
+        "fba-mapjson"
+      ],
+      "filename": "13-fba-mapjson.cs",
+      "text": "app.MapGet(\"/random\", () => new\r\n{\r\n    timestamp = DateTimeOffset.UtcNow,\r\n    value = Random.Shared.Next(0, 100)\r\n});\r\n",
+      "selectionCount": 1
+    },
+    {
+      "name": "FBA: Project reference directive",
+      "prefixes": [
+        "fba-project"
+      ],
+      "filename": "14-fba-project.cs",
+      "text": "#:project ../SharedLibrary/SharedLibrary.csproj",
+      "selectionCount": 1
+    },
+    {
+      "name": "FBA: Include source file directive",
+      "prefixes": [
+        "fba-include"
+      ],
+      "filename": "15-fba-include.cs",
+      "text": "#:include helpers.cs",
+      "selectionCount": 1
+    },
+    {
+      "name": "FBA: MSBuild environment property with fallback",
+      "prefixes": [
+        "fba-envproperty"
+      ],
+      "filename": "16-fba-envproperty.cs",
+      "text": "#:property LogLevel=$([MSBuild]::ValueOrDefault('$(LOG_LEVEL)', 'Information'))",
+      "selectionCount": 1
+    },
+    {
+      "name": "FBA: Runtime environment variable with fallback",
+      "prefixes": [
+        "fba-env"
+      ],
+      "filename": "17-fba-env.cs",
+      "text": "var value = Environment.GetEnvironmentVariable(\"VARIABLE_NAME\") ?? \"defaultValue\";",
+      "selectionCount": 1
+    },
+    {
+      "name": "FBA: JSON and environment configuration",
+      "prefixes": [
+        "fba-config"
+      ],
+      "filename": "18-fba-config.cs",
+      "text": "var configurationBuilder = new Microsoft.Extensions.Configuration.ConfigurationBuilder();\r\nMicrosoft.Extensions.Configuration.FileConfigurationExtensions.SetBasePath(\r\n    configurationBuilder, AppContext.GetData(\"EntryPointFileDirectoryPath\") as string ?? AppContext.BaseDirectory);\r\nMicrosoft.Extensions.Configuration.JsonConfigurationExtensions.AddJsonFile(\r\n    configurationBuilder, \"appsettings.json\", optional: true, reloadOnChange: false);\r\nMicrosoft.Extensions.Configuration.EnvironmentVariablesExtensions.AddEnvironmentVariables(configurationBuilder);\r\nvar configuration = configurationBuilder.Build();\r\n",
+      "selectionCount": 1
+    },
+    {
+      "name": "FBA: JSON source generation context",
+      "prefixes": [
+        "fba-jsoncontext"
+      ],
+      "filename": "19-fba-jsoncontext.cs",
+      "text": "[System.Text.Json.Serialization.JsonSerializable(typeof(JsonModel))]\r\ninternal partial class AppJsonContext : System.Text.Json.Serialization.JsonSerializerContext\r\n{\r\n}\r\n",
+      "selectionCount": 1
+    },
+    {
+      "name": "FBA: Serialize JSON with generated metadata",
+      "prefixes": [
+        "fba-jsonserialize"
+      ],
+      "filename": "20-fba-jsonserialize.cs",
+      "text": "var json = System.Text.Json.JsonSerializer.Serialize(value, AppJsonContext.Default.JsonModel);",
+      "selectionCount": 1
+    },
+    {
+      "name": "FBA: Cancellable periodic loop",
+      "prefixes": [
+        "fba-periodic"
+      ],
+      "filename": "21-fba-periodic.cs",
+      "text": "using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));\r\nusing var cancellation = new CancellationTokenSource();\r\nConsoleCancelEventHandler cancelHandler = (_, eventArgs) =>\r\n{\r\n    eventArgs.Cancel = true;\r\n    cancellation.Cancel();\r\n};\r\nConsole.CancelKeyPress += cancelHandler;\r\n\r\ntry\r\n{\r\n    while (await timer.WaitForNextTickAsync(cancellation.Token))\r\n    {\r\n        Console.WriteLine(DateTimeOffset.Now);\r\n    }\r\n}\r\ncatch (OperationCanceledException) when (cancellation.IsCancellationRequested)\r\n{\r\n}\r\nfinally\r\n{\r\n    Console.CancelKeyPress -= cancelHandler;\r\n}",
+      "selectionCount": 1
+    }
+  ],
+  "scope": {
+    "unchangedInstalledLocalVsix": true,
+    "targetExtensionInjected": false,
+    "physicalKeyInput": false,
+    "snippetCommandUsed": "editor.action.insertSnippet",
+    "userVisibleInstancesTouched": false
+  },
+  "extensionPath": "<snippet-editor-root>\\extensions\\dotnetdev-kr-custom.csharp-with-netcoredbg-11.7.18003",
+  "version": "11.7.18003",
+  "upstream": {
+    "entry": {
+      "language": "csharp",
+      "path": "./snippets/csharp.json"
+    },
+    "count": 42,
+    "sha256": "f13a59a5f350e95303d936631a4db4735d458ce5ec4fb55fdd26e88e53433589"
+  },
+  "fba": {
+    "entry": {
+      "language": "csharp",
+      "path": "./.netcoredbg/snippets/fba-csharp.json"
+    },
+    "count": 21,
+    "sha256": "d53e47b51ebb89f3233d45ff45ca2733f094c50f72ea78e9453ee4ff8c8f88db"
+  }
+}

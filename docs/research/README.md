@@ -24,7 +24,7 @@ The existing production workflow and `dotnetdev-kr-custom.csharp` publication po
 
 ## Subsequent investigations
 
-- [Web bootstrap and FBA snippets release](2026-11-03-file-based-web-snippets-release.md) (November 3, 2026): release preparation for launch profiles, browser readiness, development HTTPS, 21 snippets, and README installation-guidance cleanup.
+- [Web bootstrap and FBA snippets release](2026-11-03-file-based-web-snippets-release.md) (November 3, 2026): completed `11.7.18004` publication, 29 successful CI jobs, actual installed-package checks, launch profiles, browser readiness, development HTTPS, 21 snippets, and README installation-guidance cleanup.
 
 - [Web file-based app bootstrap](2026-11-03-file-based-web-bootstrap.md) (November 3, 2026): evaluated SDK identity, launch profiles, browser readiness, development HTTPS certificates, and a wrapper-level implementation path.
 - [Extension recommendation controls](2026-11-03-extension-recommendations.md) (November 3, 2026): package-level notification defaults, targeted workspace/profile exclusions, inherited Dev Kit guidance, and the registry/host boundary.

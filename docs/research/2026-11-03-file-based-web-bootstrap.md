@@ -1,6 +1,11 @@
 # Web file-based app launch bootstrap
 
-Research date: November 3, 2026. Distribution baseline: `dotnetdev-kr-custom.csharp-with-netcoredbg` 11.7.18003; C# source `1c27e135b5dada55a240e4a504bafa759ec578e8`; netcoredbg source `9744e1f051866215611b8440c638042aa2aa2f72`. The investigation below led to an isolated local Web prototype described at the end. It is not a published release. Automated verification does not create or trust certificates.
+Research date: November 3, 2026. Distribution baseline: `dotnetdev-kr-custom.csharp-with-netcoredbg` 11.7.18003; C# source `1c27e135b5dada55a240e4a504bafa759ec578e8`; netcoredbg source `9744e1f051866215611b8440c638042aa2aa2f72`. The investigation below led to an isolated local Web prototype described at the end. That prototype package is distinct from the subsequent published release. Automated verification does not create or trust certificates.
+
+The feature subsequently shipped in **11.7.18004**. The
+[release record](2026-11-03-file-based-web-snippets-release.md) preserves its
+publication and installed-package verification; the prototype evidence below
+remains a separate historical result.
 
 ## Finding
 

@@ -1,0 +1,116 @@
+{
+  "allVersions": {
+    "latest": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/latest",
+    "11.7.18004": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/11.7.18004",
+    "11.7.18003": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/11.7.18003",
+    "11.7.18002": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/11.7.18002",
+    "11.7.18001": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/11.7.18001",
+    "11.5.15001": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/11.5.15001",
+    "11.3.18001": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/11.3.18001",
+    "11.2.14001": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/11.2.14001",
+    "11.1.32001": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/11.1.32001",
+    "2.160.4001": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/2.160.4001",
+    "2.148.23002": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/2.148.23002",
+    "2.148.23001": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/2.148.23001"
+  },
+  "allVersionsUrl": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/versions",
+  "averageRating": 5.0,
+  "bugs": "https://github.com/rkttu/vscode-csharp-autobuild/issues",
+  "bundledExtensions": [],
+  "categories": [
+    "Debuggers",
+    "Programming Languages",
+    "Linters",
+    "Snippets",
+    "Formatters"
+  ],
+  "dependencies": [
+    {
+      "extension": "vscode-dotnet-runtime",
+      "namespace": "ms-dotnettools",
+      "url": "https://open-vsx.org/api/ms-dotnettools/vscode-dotnet-runtime"
+    }
+  ],
+  "deprecated": false,
+  "description": "Community C# language support with the netcoredbg debugger.",
+  "displayName": "C# (with netcoredbg)",
+  "downloadCount": 17731,
+  "downloadSizes": {
+    "alpine-x64": 77589537
+  },
+  "downloadable": true,
+  "downloads": {
+    "alpine-x64": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/11.7.18004/file/dotnetdev-kr-custom.csharp-with-netcoredbg-11.7.18004@alpine-x64.vsix"
+  },
+  "engines": {
+    "vscode": "^1.106.0"
+  },
+  "extensionKind": [
+    "workspace"
+  ],
+  "files": {
+    "download": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/11.7.18004/file/dotnetdev-kr-custom.csharp-with-netcoredbg-11.7.18004@alpine-x64.vsix",
+    "signature": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/11.7.18004/file/dotnetdev-kr-custom.csharp-with-netcoredbg-11.7.18004@alpine-x64.sigzip",
+    "manifest": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/11.7.18004/file/package.json",
+    "readme": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/11.7.18004/file/readme.md",
+    "changelog": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/11.7.18004/file/changelog.md",
+    "license": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/11.7.18004/file/license.txt",
+    "icon": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/11.7.18004/file/netcoredbgIcon.png",
+    "vsixmanifest": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/11.7.18004/file/extension.vsixmanifest",
+    "sha256": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/alpine-x64/11.7.18004/file/dotnetdev-kr-custom.csharp-with-netcoredbg-11.7.18004@alpine-x64.sha256",
+    "publicKey": "https://open-vsx.org/api/-/public-key/14ccb407-4e79-41ed-be5a-6d608325c45a"
+  },
+  "galleryColor": "",
+  "galleryTheme": "",
+  "homepage": "https://github.com/rkttu/vscode-csharp-autobuild#readme",
+  "license": "SEE LICENSE IN RuntimeLicenses/license.txt",
+  "localizedLanguages": [],
+  "name": "csharp-with-netcoredbg",
+  "namespace": "dotnetdev-kr-custom",
+  "namespaceDisplayName": "dotnetdev-kr-custom",
+  "namespaceUrl": "https://open-vsx.org/api/dotnetdev-kr-custom",
+  "preRelease": false,
+  "preview": false,
+  "publishedBy": {
+    "avatarUrl": "https://avatars.githubusercontent.com/u/1297346?v=4",
+    "fullName": "Jung Hyun Nam",
+    "homepage": "https://github.com/rkttu",
+    "loginName": "rkttu",
+    "provider": "github"
+  },
+  "publishedWithTrustedPublishing": false,
+  "qna": "https://github.com/dotnet/vscode-csharp/issues",
+  "repository": "https://github.com/rkttu/vscode-csharp-autobuild.git",
+  "reviewCount": 1,
+  "reviewsUrl": "https://open-vsx.org/api/dotnetdev-kr-custom/csharp-with-netcoredbg/reviews",
+  "sponsorLink": "",
+  "tags": [
+    ".NET",
+    ".NET Core",
+    "__ext_cshtml",
+    "__ext_razor",
+    "__ext_xaml",
+    "ASP.NET",
+    "ASP.NETRazor",
+    "aspnetcorerazor",
+    "c#",
+    "color-theme",
+    "coreclr",
+    "csharp",
+    "debuggers",
+    "dotnet",
+    "json",
+    "keybindings",
+    "multi-root ready",
+    "snippet",
+    "theme",
+    "xaml"
+  ],
+  "targetPlatform": "alpine-x64",
+  "timestamp": "2026-11-03T14:07:36.888222Z",
+  "verified": true,
+  "version": "11.7.18004",
+  "versionAlias": [
+    "latest"
+  ]
+}

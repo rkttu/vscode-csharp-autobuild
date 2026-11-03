@@ -1,0 +1,186 @@
+{
+  "FBA: Console application": {
+    "prefix": "fba-console",
+    "body": [
+      "#!/usr/bin/env -S dotnet --",
+      "#:property TargetFramework=net10.0",
+      "",
+      "Console.WriteLine(\"${1:Hello, World!}\");",
+      "$0"
+    ],
+    "description": "Create a .NET 10 file-based console application in a new C# file.",
+    "isFileTemplate": true
+  },
+  "FBA: Minimal web application": {
+    "prefix": "fba-web",
+    "body": [
+      "#!/usr/bin/env -S dotnet --",
+      "#:sdk Microsoft.NET.Sdk.Web",
+      "#:property TargetFramework=net10.0",
+      "#:property PublishAot=false",
+      "",
+      "var builder = WebApplication.CreateBuilder(args);",
+      "var app = builder.Build();",
+      "",
+      "app.MapGet(\"${1:/}\", () => \"${2:Hello, World!}\");",
+      "",
+      "app.Run();",
+      "$0"
+    ],
+    "description": "Create a .NET 10 ASP.NET Core file-based application in a new C# file.",
+    "isFileTemplate": true
+  },
+  "FBA: MSBuild property directive": {
+    "prefix": "fba-property",
+    "body": "#:property ${1:PropertyName}=${2:Value}$0",
+    "description": "Set an MSBuild property before the C# code: #:property Name=value."
+  },
+  "FBA: NuGet package directive": {
+    "prefix": "fba-package",
+    "body": "#:package ${1:PackageName}@${2:version}$0",
+    "description": "Reference a NuGet package before the C# code; replace both the package name and version."
+  },
+  "FBA: Disable Native AOT": {
+    "prefix": "fba-disableaot",
+    "body": "#:property PublishAot=false$0",
+    "description": "Disable Native AOT publishing for this file-based application."
+  },
+  "FBA: Unix shebang": {
+    "prefix": "fba-shebang",
+    "body": [
+      "#!/usr/bin/env -S dotnet --",
+      "$0"
+    ],
+    "description": "Insert as the first line for Unix execution with argument forwarding; requires env -S, LF, no BOM, and executable permission."
+  },
+  "FBA: Simple Unix shebang": {
+    "prefix": "fba-shebang-simple",
+    "body": [
+      "#!/usr/bin/env dotnet",
+      "$0"
+    ],
+    "description": "Fallback for Unix systems without env -S; requires LF, no BOM, and executable permission. dotnet may consume CLI-style arguments."
+  },
+  "FBA: SDK directive": {
+    "prefix": "fba-sdk",
+    "body": "#:sdk ${1|Microsoft.NET.Sdk,Microsoft.NET.Sdk.Web,Microsoft.NET.Sdk.Worker|}$0",
+    "description": "Select an SDK before the C# code. Additional packages may be needed by the application."
+  },
+  "FBA: Target framework directive": {
+    "prefix": "fba-framework",
+    "body": "#:property TargetFramework=${1:net10.0}$0",
+    "description": "Set the target framework before the C# code; file-based applications require .NET 10 or later."
+  },
+  "FBA: Nullable reference types": {
+    "prefix": "fba-nullable",
+    "body": "#:property Nullable=${1|enable,disable,annotations,warnings|}$0",
+    "description": "Configure nullable reference types before the C# code."
+  },
+  "FBA: Source file paths": {
+    "prefix": "fba-paths",
+    "body": [
+      "var ${1:filePath} = AppContext.GetData(\"EntryPointFilePath\") as string;",
+      "var ${2:directoryPath} = AppContext.GetData(\"EntryPointFileDirectoryPath\") as string;",
+      "Console.WriteLine(\\$\"File: {${1:filePath}}\");",
+      "Console.WriteLine(\\$\"Directory: {${2:directoryPath}}\");",
+      "$0"
+    ],
+    "description": "Read and display optional original entry-point source paths; they may be unavailable after publishing."
+  },
+  "FBA: Minimal API text endpoint": {
+    "prefix": "fba-mapget",
+    "body": "${1:app}.MapGet(\"${2:/}\", () => \"${3:Hello, World!}\");$0",
+    "description": "Add a text endpoint to an ASP.NET Core application before app.Run()."
+  },
+  "FBA: Minimal API JSON endpoint": {
+    "prefix": "fba-mapjson",
+    "body": [
+      "${1:app}.MapGet(\"${2:/random}\", () => new",
+      "{",
+      "\ttimestamp = DateTimeOffset.UtcNow,",
+      "\tvalue = Random.Shared.Next(${3:0}, ${4:100})",
+      "});",
+      "$0"
+    ],
+    "description": "Add a JSON endpoint with a timestamp and random integer before app.Run(); use JSON source generation when publishing with Native AOT."
+  },
+  "FBA: Project reference directive": {
+    "prefix": "fba-project",
+    "body": "#:project ${1:../SharedLibrary/SharedLibrary.csproj}$0",
+    "description": "Reference another project before the C# code; replace the relative project path."
+  },
+  "FBA: Include source file directive": {
+    "prefix": "fba-include",
+    "body": "#:include ${1:helpers.cs}$0",
+    "description": "Include a C# file containing declarations, not top-level statements; requires .NET SDK 10.0.300 or later."
+  },
+  "FBA: MSBuild environment property with fallback": {
+    "prefix": "fba-envproperty",
+    "body": "#:property ${1:LogLevel}=\\$([MSBuild]::ValueOrDefault('\\$(${2:LOG_LEVEL})', '${3:Information}'))$0",
+    "description": "Set a build-time property from an environment variable with a fallback; insert before the C# code."
+  },
+  "FBA: Runtime environment variable with fallback": {
+    "prefix": "fba-env",
+    "body": "var ${1:value} = Environment.GetEnvironmentVariable(\"${2:VARIABLE_NAME}\") ?? \"${3:defaultValue}\";$0",
+    "description": "Read an environment variable at runtime and use a fallback when it is unset."
+  },
+  "FBA: JSON and environment configuration": {
+    "prefix": "fba-config",
+    "body": [
+      "var ${1:configurationBuilder} = new Microsoft.Extensions.Configuration.ConfigurationBuilder();",
+      "Microsoft.Extensions.Configuration.FileConfigurationExtensions.SetBasePath(",
+      "\t${1:configurationBuilder}, AppContext.GetData(\"EntryPointFileDirectoryPath\") as string ?? AppContext.BaseDirectory);",
+      "Microsoft.Extensions.Configuration.JsonConfigurationExtensions.AddJsonFile(",
+      "\t${1:configurationBuilder}, \"${2:appsettings.json}\", optional: true, reloadOnChange: false);",
+      "Microsoft.Extensions.Configuration.EnvironmentVariablesExtensions.AddEnvironmentVariables(${1:configurationBuilder});",
+      "var ${3:configuration} = ${1:configurationBuilder}.Build();",
+      "$0"
+    ],
+    "description": "Build JSON configuration with environment overrides; requires the Web SDK/shared framework or configuration packages."
+  },
+  "FBA: JSON source generation context": {
+    "prefix": "fba-jsoncontext",
+    "body": [
+      "[System.Text.Json.Serialization.JsonSerializable(typeof(${1:JsonModel}))]",
+      "internal partial class ${2:AppJsonContext} : System.Text.Json.Serialization.JsonSerializerContext",
+      "{",
+      "}",
+      "$0"
+    ],
+    "description": "Append a JSON source generation context after all top-level statements; replace JsonModel with the type to serialize."
+  },
+  "FBA: Serialize JSON with generated metadata": {
+    "prefix": "fba-jsonserialize",
+    "body": "var ${1:json} = System.Text.Json.JsonSerializer.Serialize(${2:value}, ${3:AppJsonContext}.Default.${4:JsonModel});$0",
+    "description": "Serialize using a generated JSON context for Native AOT; match the value, context, and generated type metadata."
+  },
+  "FBA: Cancellable periodic loop": {
+    "prefix": "fba-periodic",
+    "body": [
+      "using var ${1:timer} = new PeriodicTimer(TimeSpan.FromSeconds(${2:1}));",
+      "using var ${3:cancellation} = new CancellationTokenSource();",
+      "ConsoleCancelEventHandler ${4:cancelHandler} = (_, eventArgs) =>",
+      "{",
+      "\teventArgs.Cancel = true;",
+      "\t${3:cancellation}.Cancel();",
+      "};",
+      "Console.CancelKeyPress += ${4:cancelHandler};",
+      "",
+      "try",
+      "{",
+      "\twhile (await ${1:timer}.WaitForNextTickAsync(${3:cancellation}.Token))",
+      "\t{",
+      "\t\t${0:Console.WriteLine(DateTimeOffset.Now);}",
+      "\t}",
+      "}",
+      "catch (OperationCanceledException) when (${3:cancellation}.IsCancellationRequested)",
+      "{",
+      "}",
+      "finally",
+      "{",
+      "\tConsole.CancelKeyPress -= ${4:cancelHandler};",
+      "}"
+    ],
+    "description": "Run asynchronous periodic work until Ctrl+C, dispose resources, and remove the console cancellation handler."
+  }
+}

@@ -10,21 +10,23 @@ An official update retains the same extension ID and receives a new packaging re
 
 Release `11.7.18002` passed those gates, and all eight platform-specific latest feeds returned that version after publication. The [release record](research/2026-11-03-file-based-app-release.md) preserves the workflow and independent public download checks. It also records the [completed acceptance review for issue #11](research/2026-11-03-file-based-app-release.md#issue-11-completion-review).
 
-The follow-up **11.7.18003** release fixes retry after errors. All eight platform-specific latest feeds now return that version. Its [release record](research/2026-11-03-file-based-app-retry-release.md) preserves the 29 successful CI jobs, installed-package retry checks, and public package verification.
+The follow-up **11.7.18003** release fixes retry after errors. Its [release record](research/2026-11-03-file-based-app-retry-release.md) preserves the 29 successful CI jobs, installed-package retry checks, and public package verification. **11.7.18004** adds Web startup support and 21 FBA snippets; the [new release record](research/2026-11-03-file-based-web-snippets-release.md) preserves its eight-platform gates, actual installed-package checks and public verification.
 
 Compared with a package without this feature, the new behavior is automatic active-file classification and FBA build/launch through F5. Existing selected project configurations and Continue during a debug session retain their behavior. No workspace `launch.json`, `tasks.json`, or manual-test sample projects are installed by the extension.
 
-## Local Web bootstrap prototype
+## Web startup support in 11.7.18004
 
-The November 3 local **LOCAL WEB TEST** VSIX adds ASP.NET Core startup support on top of `11.7.18003`. It retains that version only for isolated manual testing; this feature has not been published to Open VSX. Its implementation and verification scope are recorded in the [Web bootstrap investigation](research/2026-11-03-file-based-web-bootstrap.md).
+Release **11.7.18004** adds ASP.NET Core startup support, following the November 3 isolated **LOCAL WEB TEST** prototype. Its implementation and verification scope are recorded in the [Web bootstrap investigation](research/2026-11-03-file-based-web-bootstrap.md) and [release record](research/2026-11-03-file-based-web-snippets-release.md).
 
 The same build invocation returns evaluated Web SDK/framework metadata. For a managed Web server, the wrapper reads the original source's adjacent `sample.run.json`, or `Properties/launchSettings.json` when present, and uses the first supported `Project` profile. It applies environment variables, application URLs and command-line arguments. `launchBrowser: true` opens the profile's launch URL after the debugger reports a listening address; `false` or an omitted value in an existing profile leaves the browser closed.
 
-Without a profile, an in-memory development profile enables browser launch and supplies dynamic HTTPS/HTTP ports when endpoint settings are absent. HTTPS checks the development certificate using the selected SDK and asks before creating or trusting it. Cancellation stops this launch and permits another F5. Explicit HTTP endpoints skip certificate preparation. No project, launch configuration or profile file is generated in the source directory.
+Without a profile, an in-memory development profile enables browser launch and supplies dynamic HTTPS/HTTP ports when endpoint settings are absent. HTTPS checks the development certificate using the selected SDK and asks before creating or trusting it. Cancellation during certificate preparation stops this launch and permits another F5. HTTP-only endpoint settings in the profile, environment or command-line arguments skip certificate preparation. No project, launch configuration or profile file is generated in the source directory.
+
+Application code and appsettings can override Kestrel endpoints or certificates after this preparation, so those custom settings are not inferred in advance. Linux certificate trust depends on the installed .NET/OS trust tooling and browser stores; a failed trust check stops HTTPS preparation, while an explicit HTTP profile can run without it. The SDK's own first-use certificate generation is separate from the extension's explicit trust confirmation.
 
 The package README also removes the inherited Dev Kit installation recommendation. Extension recommendation settings are unchanged. Existing project-file routing and the earlier retry fix remain in place.
 
-The subsequent local **LOCAL FBA SNIPPETS TEST** package adds [21 FBA snippets](file-based-app-snippets.md), including Console/Web starters, shebang and managed-publishing directives, source paths, configuration, API endpoints, JSON source generation, and periodic work. It preserves the existing 42 upstream C# snippets and the local Web bootstrap behavior. These additions are not yet published to Open VSX.
+The same release includes [21 FBA snippets](file-based-app-snippets.md), including Console/Web starters, shebang and managed-publishing directives, source paths, configuration, API endpoints, JSON source generation, and periodic work. It preserves the existing 42 upstream C# snippets. The earlier **LOCAL FBA SNIPPETS TEST** package remains a separate pre-release test artifact.
 
 ## How the launch is selected
 
@@ -74,7 +76,7 @@ Console.WriteLine("Standalone file-based app");
 
 The build runs with the source directory as its working directory, Debug configuration, portable symbols, optimization disabled, and managed output. Each launch has an isolated output directory in extension storage, so names and concurrent sessions cannot overwrite one another. The output is removed after its debug session terminates. NuGet directives can require a package restore.
 
-This flow launches the source file as a managed app; it does not debug a Native AOT executable. Application output uses the Debug Console. Interactive stdin and Hot Reload are outside this flow. The published `11.7.18003` package does not discover file-app launch profiles; the local Web prototype described above adds that behavior for Web servers. F5 continues to use the editor's normal Continue action during an existing debug session. User keyboard-shortcut overrides retain their normal precedence.
+This flow launches the source file as a managed app; it does not debug a Native AOT executable. Application output uses the Debug Console. Interactive stdin and Hot Reload are outside this flow. Web-server launch-profile support requires `11.7.18004` or later. F5 continues to use the editor's normal Continue action during an existing debug session. User keyboard-shortcut overrides retain their normal precedence.
 
 ## Retrying after a build error
 
@@ -84,7 +86,7 @@ In the affected **11.7.18002** package, an open **C# file debugging failed** not
 
 ## Implementation and validation
 
-Repository-owned modules live in [`scripts/variant/file-based-apps`](../scripts/variant/file-based-apps). Packaging adds `.netcoredbg/entry.cjs`, `runtime.cjs`, and `classify.cjs`, plus `web.cjs` in the local Web prototype; updates manifest `main` to the wrapper; preserves the original entry in `netcoredbgBuild.upstreamMain`; and registers the command, activation event, and F5 binding. The wrapper registers the command and calls the original upstream activation function, preserving its returned API and other exports. There are no additional upstream JS/TypeScript source replacements for this feature. It uses the existing bundled debugger and language service implementations, and the existing `coreclr` adapter factory remains the sole adapter owner.
+Repository-owned modules live in [`scripts/variant/file-based-apps`](../scripts/variant/file-based-apps). Packaging adds `.netcoredbg/entry.cjs`, `runtime.cjs`, `classify.cjs`, and (starting in `11.7.18004`) `web.cjs`; updates manifest `main` to the wrapper; preserves the original entry in `netcoredbgBuild.upstreamMain`; and registers the command, activation event, and F5 binding. The wrapper registers the command and calls the original upstream activation function, preserving its returned API and other exports. There are no additional upstream JS/TypeScript source replacements for this feature. It uses the existing bundled debugger and language service implementations, and the existing `coreclr` adapter factory remains the sole adapter owner.
 
 The release preflight runs the classifier, runtime, and wrapper tests. VSIX verification checks the entry point, original upstream entry, command/binding, and exact owned module bytes. Existing native and extracted-VSIX project-based debugger gates remain enabled.
 

@@ -1,0 +1,3 @@
+  Determining projects to restore...
+  Restored <snippet-editor-root>\workspace\builds\json-source-generation\app.cs.csproj (in 41 ms).
+  app.cs -> <snippet-editor-root>\workspace\builds\json-source-generation\output\app.dll

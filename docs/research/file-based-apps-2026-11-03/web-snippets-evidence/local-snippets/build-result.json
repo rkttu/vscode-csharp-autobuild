@@ -1,0 +1,162 @@
+{
+  "success": true,
+  "source": "Actual installed VS Code static snippet expansions",
+  "sdk": "10.0.402",
+  "applicationsExecuted": false,
+  "certificateCommandsExecuted": false,
+  "networkPackagesRequired": false,
+  "builds": [
+    {
+      "name": "console",
+      "source": "<snippet-editor-root>\\workspace\\builds\\console\\app.cs",
+      "arguments": [
+        "dotnet",
+        "build",
+        "<snippet-editor-root>\\workspace\\builds\\console\\app.cs",
+        "--configuration",
+        "Debug",
+        "--output",
+        "<snippet-editor-root>\\workspace\\builds\\console\\output",
+        "-p:PublishAot=false",
+        "-p:DebugType=portable",
+        "-p:UseSharedCompilation=false",
+        "--disable-build-servers",
+        "--nologo"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.776,
+      "dllExists": true,
+      "pdbExists": true,
+      "sourceSha256": "19c316e4b50d4f983ed1d0be7c194953c1c2f76c3b7251261db2a6763a31ce43"
+    },
+    {
+      "name": "web",
+      "source": "<snippet-editor-root>\\workspace\\builds\\web\\app.cs",
+      "arguments": [
+        "dotnet",
+        "build",
+        "<snippet-editor-root>\\workspace\\builds\\web\\app.cs",
+        "--configuration",
+        "Debug",
+        "--output",
+        "<snippet-editor-root>\\workspace\\builds\\web\\output",
+        "-p:PublishAot=false",
+        "-p:DebugType=portable",
+        "-p:UseSharedCompilation=false",
+        "--disable-build-servers",
+        "--nologo"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.126,
+      "dllExists": true,
+      "pdbExists": true,
+      "sourceSha256": "91337ec94f41e2f28db5bac1187c10ff085c026686bc08a9c64490a5fffa644d"
+    },
+    {
+      "name": "paths-envproperty",
+      "source": "<snippet-editor-root>\\workspace\\builds\\paths-envproperty\\app.cs",
+      "arguments": [
+        "dotnet",
+        "build",
+        "<snippet-editor-root>\\workspace\\builds\\paths-envproperty\\app.cs",
+        "--configuration",
+        "Debug",
+        "--output",
+        "<snippet-editor-root>\\workspace\\builds\\paths-envproperty\\output",
+        "-p:PublishAot=false",
+        "-p:DebugType=portable",
+        "-p:UseSharedCompilation=false",
+        "--disable-build-servers",
+        "--nologo"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.818,
+      "dllExists": true,
+      "pdbExists": true,
+      "sourceSha256": "49a3450787a90d147c19cf1128788bcccb1c511b06971ca4174fdc5d2a6f66e7"
+    },
+    {
+      "name": "periodic",
+      "source": "<snippet-editor-root>\\workspace\\builds\\periodic\\app.cs",
+      "arguments": [
+        "dotnet",
+        "build",
+        "<snippet-editor-root>\\workspace\\builds\\periodic\\app.cs",
+        "--configuration",
+        "Debug",
+        "--output",
+        "<snippet-editor-root>\\workspace\\builds\\periodic\\output",
+        "-p:PublishAot=false",
+        "-p:DebugType=portable",
+        "-p:UseSharedCompilation=false",
+        "--disable-build-servers",
+        "--nologo"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 1.778,
+      "dllExists": true,
+      "pdbExists": true,
+      "sourceSha256": "077ff66b43a272723729724cf9c1133cfcf87ce5fdf85d0332471954fc53679e"
+    },
+    {
+      "name": "configuration-endpoints",
+      "source": "<snippet-editor-root>\\workspace\\builds\\configuration-endpoints\\app.cs",
+      "arguments": [
+        "dotnet",
+        "build",
+        "<snippet-editor-root>\\workspace\\builds\\configuration-endpoints\\app.cs",
+        "--configuration",
+        "Debug",
+        "--output",
+        "<snippet-editor-root>\\workspace\\builds\\configuration-endpoints\\output",
+        "-p:PublishAot=false",
+        "-p:DebugType=portable",
+        "-p:UseSharedCompilation=false",
+        "--disable-build-servers",
+        "--nologo"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.141,
+      "dllExists": true,
+      "pdbExists": true,
+      "sourceSha256": "b44b215fc378083a9a9784100b99c90620eb6b6083b04605d01e1921589130e6"
+    },
+    {
+      "name": "json-source-generation",
+      "source": "<snippet-editor-root>\\workspace\\builds\\json-source-generation\\app.cs",
+      "arguments": [
+        "dotnet",
+        "build",
+        "<snippet-editor-root>\\workspace\\builds\\json-source-generation\\app.cs",
+        "--configuration",
+        "Debug",
+        "--output",
+        "<snippet-editor-root>\\workspace\\builds\\json-source-generation\\output",
+        "-p:PublishAot=false",
+        "-p:DebugType=portable",
+        "-p:UseSharedCompilation=false",
+        "--disable-build-servers",
+        "--nologo"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 2.053,
+      "dllExists": true,
+      "pdbExists": true,
+      "sourceSha256": "ba38c4e8df019594ed838b3ef0b428b02ee82fad02827765249acb8d32ff88bd"
+    }
+  ],
+  "propertyEvaluation": [
+    {
+      "case": "fallback",
+      "expected": "Information",
+      "actual": "Information",
+      "exitCode": 0
+    },
+    {
+      "case": "environment",
+      "expected": "Warning",
+      "actual": "Warning",
+      "exitCode": 0
+    }
+  ]
+}

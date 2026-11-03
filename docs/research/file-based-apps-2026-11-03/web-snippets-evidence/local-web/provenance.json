@@ -1,0 +1,103 @@
+{
+  "success": true,
+  "packageOrigin": "Local overlay of unchanged public 11.7.18003 engine package",
+  "publicReleaseOrCIArtifact": false,
+  "vsix": "csharp-with-netcoredbg-LOCAL-WEB-win32-arm64-11.7.18003.vsix",
+  "vsixSha256": "6a390dcaf06b6b803b6b76a4d758b40c911a523afbb06daffda998b19786fc8d",
+  "installedCompared": true,
+  "modules": {
+    "entry.cjs": {
+      "sha256": "56e8a97842ddda12cd4d25833647683f8251f691dd1bdb9930728fce8d93bc85",
+      "canonicalWorkingTreeSnapshotMatched": true,
+      "installedMatched": true
+    },
+    "runtime.cjs": {
+      "sha256": "01f89c8db46f33916b3121471759c5a4d7b2c0977cb805daf9811f5bb63d9b71",
+      "canonicalWorkingTreeSnapshotMatched": true,
+      "installedMatched": true
+    },
+    "classify.cjs": {
+      "sha256": "e5bc6e1bff60414a423fe93f87528a6b4b048a0bba14005860dae6979b9c3bff",
+      "canonicalWorkingTreeSnapshotMatched": true,
+      "installedMatched": true
+    },
+    "web.cjs": {
+      "sha256": "ea24b83680a3956d8a64e384803be461eed0a2d0c776815d65757b5fcf779dc2",
+      "canonicalWorkingTreeSnapshotMatched": true,
+      "installedMatched": true
+    }
+  },
+  "version": "11.7.18003",
+  "main": "./.netcoredbg/entry.cjs",
+  "build": {
+    "target": "win32-arm64",
+    "upstreamCsharpCommit": "1c27e135b5dada55a240e4a504bafa759ec578e8",
+    "upstreamCsharpVersion": "11.7.18",
+    "upstreamCsharpTag": "v11.7.18-prerelease",
+    "upstreamPackageVersion": "42.42.42-placeholder",
+    "netcoredbgTag": "3.2.0-1092",
+    "packagingRevision": 3,
+    "releaseTag": "csharp-v11.7.18-netcoredbg-v3.2.0-1092-g9744e1f05186-r3",
+    "versionPolicy": "upstream-patch-revision-v1",
+    "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+    "debuggerArchiveSha256": "0c5cfb9af2883d24cfdf7b350d9a1d8efa8caf709ad3b3ab247a15ecfe5765a7",
+    "validationRunId": "41602853096",
+    "validationWorkflowCommit": "1d5f543dc86fa5aba6da0c8c2c2f94c2668836c7",
+    "upstreamMain": "./dist/extension",
+    "localTest": {
+      "purpose": "LOCAL WEB BOOTSTRAP TEST; not a published release",
+      "createdAt": "2026-11-03T12:02:00.677965+00:00",
+      "baseVsixSha256": "15ce16bab7305f11fc40b18c8738ee9226d2fb4acb6301e49f702ae8f3dcb39f",
+      "ownedModulesSha256": {
+        "entry.cjs": "56e8a97842ddda12cd4d25833647683f8251f691dd1bdb9930728fce8d93bc85",
+        "runtime.cjs": "01f89c8db46f33916b3121471759c5a4d7b2c0977cb805daf9811f5bb63d9b71",
+        "classify.cjs": "e5bc6e1bff60414a423fe93f87528a6b4b048a0bba14005860dae6979b9c3bff",
+        "web.cjs": "ea24b83680a3956d8a64e384803be461eed0a2d0c776815d65757b5fcf779dc2"
+      },
+      "retainsBaseIdentityAndVersion": true
+    }
+  },
+  "engineFilesUnchangedFromPublic18003": true,
+  "engineFiles": {
+    "extension/.debugger/install.complete": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "extension/.debugger/netcoredbg/ManagedPart.dll": "7da1b841a57e777400ada754cef9c1ad1cd8848b4c477b4c69e37d1e353a3124",
+    "extension/.debugger/netcoredbg/Microsoft.CodeAnalysis.CSharp.Scripting.dll": "64050c89e7bf7905f6c7ec9eb1594dcea5fbbd2868341f9ef99b58e9dea01605",
+    "extension/.debugger/netcoredbg/Microsoft.CodeAnalysis.CSharp.dll": "e9cc57c55a95146f98b55dd46fdd881b4be48925e3773ef4aa5ac622b76903a6",
+    "extension/.debugger/netcoredbg/Microsoft.CodeAnalysis.Scripting.dll": "066f1d39b5e211e343c8c79f374438884b1684fa27dc8c29a9000f88615bf764",
+    "extension/.debugger/netcoredbg/Microsoft.CodeAnalysis.dll": "97553a05b1f8aad2f29349f0fc7893ceb6dd199bd769d3e1092839957c7c0cdb",
+    "extension/.debugger/netcoredbg/dbgshim.dll": "a9c116424acd30298b3e30e622f1afde1a951d3055cf7aa1985fd429c9842e1e",
+    "extension/.debugger/netcoredbg/netcoredbg.exe": "34e9bf875671f9d2d5d0e25f0169f1fada8ac37f29b3f5c0157850f3bad38a2a",
+    "extension/.debugger/netcoredbg/notices/Samsung-netcoredbg-LICENSE": "6cd03b0de8299b0800f22b35ae842c931ded7684a2d1ba4f1d4188bab9b09a11",
+    "extension/.debugger/netcoredbg/notices/dotnet-runtime-LICENSE.TXT": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b",
+    "extension/.debugger/netcoredbg/notices/dotnet-runtime-THIRD-PARTY-NOTICES.TXT": "6d15e10a101c6bfff2ab4429ed061bf76c456fc4b23ad6b03e0d0f8377148a21",
+    "extension/.debugger/netcoredbg/notices/json-LICENSE.MIT": "7b875bb7a4e28abb7956ea821b4b7d88ff6a2a4fabf261c3993730a365ec56dd",
+    "extension/.debugger/netcoredbg/notices/linenoise-ng-LICENSE": "c676d229c8807fa8701cf5cd9d59788d41de2b4803803a34d35570e700a18363",
+    "extension/.debugger/netcoredbg/notices/nuget/microsoft.csharp/4.4.0/LICENSE.TXT": "d7a68596ab69b06f51ca278a6545148e4269a9381c26d597c13df5d88e08cf5b",
+    "extension/.debugger/netcoredbg/notices/nuget/microsoft.csharp/4.4.0/THIRD-PARTY-NOTICES.TXT": "0ef4dce1f4e8965f19a3b8b2f984f337d5c35e5aaf7f8a36b95aec66c301963a",
+    "extension/.debugger/netcoredbg/notices/nuget/netstandard.library/2.0.3/LICENSE.TXT": "fc95de1436a321aadbfafd21f8a8506a2f4678bfc003bd806d6b59d3088efadc",
+    "extension/.debugger/netcoredbg/notices/nuget/netstandard.library/2.0.3/THIRD-PARTY-NOTICES.TXT": "0684b2349427ee28e392ae8914645832e59731dba8a38a984f72b3fb8769c76b",
+    "extension/dist/extension.js": "b9b22a4523458d4f5e8763e87f84b4cc3c3a60be0321a01fef10c0cb445aecea"
+  },
+  "readmes": {
+    "extension/readme.md": "4fa3e5ec1083a78742e647559db2dd316c888ee00534f1d8dcf5e86177f06add"
+  },
+  "scope": "Actual unchanged locally assembled VSIX installed in new isolated profile, four owned modules and README updated over public 11.7.18003 engine bytes; separate empty test driver only",
+  "editorVersion": "1.144.1",
+  "os": "Windows ARM64",
+  "sdk": "10.0.402",
+  "physicalF5KeypressSent": false,
+  "manifestBindingAndRegisteredCommandTested": true,
+  "automaticBrowserLauncherTested": true,
+  "realBrowserUiTested": false,
+  "httpsCertificateTrustTested": false,
+  "userManualInstanceTouched": false,
+  "checks": 14,
+  "testResult": "editor-result.json",
+  "trace": "editor.dap.jsonl",
+  "limits": [
+    "Local build, not a published package or CI release",
+    "Windows ARM64 / VS Code 1.144.1 / SDK10.0.402 only",
+    "HTTP-only explicit profile; real browser UI and HTTPS certificate trust excluded; own-profile OS launcher recorder exercised serverReadyAction",
+    "Registered F5 command and binding; no physical key input"
+  ]
+}

@@ -1,0 +1,272 @@
+{
+  "conclusion": "success",
+  "headSha": "ca5d10d97431181d934369c76c28347fac8a05a6",
+  "startedAt": "2026-11-03T13:24:36Z",
+  "status": "completed",
+  "updatedAt": "2026-11-03T14:17:23Z",
+  "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504",
+  "runId": "41644074504",
+  "jobs": [
+    {
+      "databaseId": 125944679796,
+      "name": "discover",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:24:40Z",
+      "completedAt": "2026-11-03T13:24:55Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125944679796"
+    },
+    {
+      "databaseId": 125944824122,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / preflight",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:24:59Z",
+      "completedAt": "2026-11-03T13:25:08Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125944824122"
+    },
+    {
+      "databaseId": 125944937005,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / debugger / inputs",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:25:10Z",
+      "completedAt": "2026-11-03T13:25:14Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125944937005"
+    },
+    {
+      "databaseId": 125944992118,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / debugger / win32-arm64 source and DAP",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:25:17Z",
+      "completedAt": "2026-11-03T13:39:02Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125944992118"
+    },
+    {
+      "databaseId": 125944992151,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / debugger / linux-arm64 source and DAP",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:25:19Z",
+      "completedAt": "2026-11-03T13:37:00Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125944992151"
+    },
+    {
+      "databaseId": 125944992170,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / debugger / alpine-arm64 source and DAP",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:25:19Z",
+      "completedAt": "2026-11-03T13:36:53Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125944992170"
+    },
+    {
+      "databaseId": 125944992194,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / debugger / darwin-x64 source and DAP",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:25:18Z",
+      "completedAt": "2026-11-03T13:47:11Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125944992194"
+    },
+    {
+      "databaseId": 125944992203,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / debugger / darwin-arm64 source and DAP",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:25:17Z",
+      "completedAt": "2026-11-03T13:39:24Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125944992203"
+    },
+    {
+      "databaseId": 125944992214,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / debugger / win32-x64 source and DAP",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:25:17Z",
+      "completedAt": "2026-11-03T13:37:15Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125944992214"
+    },
+    {
+      "databaseId": 125944992316,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / debugger / linux-x64 source and DAP",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:25:17Z",
+      "completedAt": "2026-11-03T13:36:25Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125944992316"
+    },
+    {
+      "databaseId": 125944992457,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / debugger / alpine-x64 source and DAP",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:25:17Z",
+      "completedAt": "2026-11-03T13:38:02Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125944992457"
+    },
+    {
+      "databaseId": 125956434871,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / debugger / aggregate",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:47:14Z",
+      "completedAt": "2026-11-03T13:47:25Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125956434871"
+    },
+    {
+      "databaseId": 125956557324,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / package (alpine-x64)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:47:27Z",
+      "completedAt": "2026-11-03T13:50:04Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125956557324"
+    },
+    {
+      "databaseId": 125956557406,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / package (alpine-arm64)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:47:28Z",
+      "completedAt": "2026-11-03T13:50:08Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125956557406"
+    },
+    {
+      "databaseId": 125956557420,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / package (linux-x64)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:47:28Z",
+      "completedAt": "2026-11-03T13:49:55Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125956557420"
+    },
+    {
+      "databaseId": 125956557461,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / package (win32-arm64)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:47:28Z",
+      "completedAt": "2026-11-03T13:49:20Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125956557461"
+    },
+    {
+      "databaseId": 125956557465,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / package (darwin-x64)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:47:28Z",
+      "completedAt": "2026-11-03T13:50:14Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125956557465"
+    },
+    {
+      "databaseId": 125956557482,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / package (darwin-arm64)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:47:28Z",
+      "completedAt": "2026-11-03T13:49:21Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125956557482"
+    },
+    {
+      "databaseId": 125956557611,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / package (linux-arm64)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:47:27Z",
+      "completedAt": "2026-11-03T13:50:04Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125956557611"
+    },
+    {
+      "databaseId": 125956557960,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / package (win32-x64)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:47:28Z",
+      "completedAt": "2026-11-03T13:49:45Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125956557960"
+    },
+    {
+      "databaseId": 125958043793,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / test-vsix (win32-x64, x64, windows-2022, windows)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:50:16Z",
+      "completedAt": "2026-11-03T14:01:56Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125958043793"
+    },
+    {
+      "databaseId": 125958043812,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / test-vsix (alpine-x64, x64, ubuntu-22.04, alpine)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:50:16Z",
+      "completedAt": "2026-11-03T14:01:37Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125958043812"
+    },
+    {
+      "databaseId": 125958043847,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / test-vsix (darwin-x64, x64, macos-15-intel, darwin)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:50:16Z",
+      "completedAt": "2026-11-03T14:06:09Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125958043847"
+    },
+    {
+      "databaseId": 125958043873,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / test-vsix (win32-arm64, arm64, windows-11-arm, windows)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:50:17Z",
+      "completedAt": "2026-11-03T14:02:34Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125958043873"
+    },
+    {
+      "databaseId": 125958043910,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / test-vsix (alpine-arm64, arm64, ubuntu-22.04-arm, alpine)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:50:19Z",
+      "completedAt": "2026-11-03T14:01:30Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125958043910"
+    },
+    {
+      "databaseId": 125958044000,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / test-vsix (linux-arm64, arm64, ubuntu-22.04-arm, linux)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:50:19Z",
+      "completedAt": "2026-11-03T14:00:46Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125958044000"
+    },
+    {
+      "databaseId": 125958044118,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / test-vsix (linux-x64, x64, ubuntu-22.04, linux)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:50:17Z",
+      "completedAt": "2026-11-03T14:01:15Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125958044118"
+    },
+    {
+      "databaseId": 125958044414,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / test-vsix (darwin-arm64, arm64, macos-15, darwin)",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T13:50:17Z",
+      "completedAt": "2026-11-03T14:01:41Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125958044414"
+    },
+    {
+      "databaseId": 125966649055,
+      "name": "candidate (3.2.0-1092, 9744e1f051866215611b8440c638042aa2aa2f72, v11.7.18-prerelease, 1c27e135b5d... / publish",
+      "status": "completed",
+      "conclusion": "success",
+      "startedAt": "2026-11-03T14:06:12Z",
+      "completedAt": "2026-11-03T14:17:22Z",
+      "url": "https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41644074504/job/125966649055"
+    }
+  ]
+}

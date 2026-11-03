@@ -1,0 +1,30 @@
+{
+  "pid": 90580,
+  "executable": "<workspace>\\validation-artifacts\\fba-f5\\editor-smoke\\portable-code\\Code.exe",
+  "args": [
+    "--user-data-dir",
+    "\"<editor-web-root>\\portable-data\\user-data\"",
+    "--extensions-dir",
+    "\"<editor-web-root>\\extensions\"",
+    "--extensionDevelopmentPath",
+    "\"<editor-web-root>\\driver\"",
+    "--extensionTestsPath",
+    "\"<editor-web-root>\\extension-test.cjs\"",
+    "--remote-debugging-port=60170",
+    "--remote-debugging-address=127.0.0.1",
+    "--disable-gpu",
+    "--skip-welcome",
+    "--skip-release-notes",
+    "--disable-workspace-trust",
+    "--no-sandbox",
+    "\"<editor-web-root>\\workspace\""
+  ],
+  "VSCODE_PORTABLE": "<editor-web-root>\\portable-data",
+  "windowStyle": "Hidden",
+  "targetExtensionInstalledNotDevelopment": true,
+  "version": "11.7.18004",
+  "vsixSha256": "0d239dff83d3120786ff3596a046fd0866b045f1d883c86fb83c64a7d808d0c5",
+  "sourceCommit": "ca5d10d97431181d934369c76c28347fac8a05a6",
+  "ciRunId": "41644074504",
+  "remoteRendererPort": 60170
+}

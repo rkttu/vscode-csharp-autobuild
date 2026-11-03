@@ -1,10 +1,11 @@
 # C# file-based app snippets
 
-The local **LOCAL FBA SNIPPETS TEST** package adds 21 repository-owned C# snippets
-alongside the upstream extension's existing 42 snippets. This is a local prototype
-based on `11.7.18003`; the public Open VSX release does not yet include this set.
-The [active-file F5 guide](file-based-apps.md) describes debugging and the local Web
-bootstrap prototype included in the same test package.
+Release **11.7.18004** adds 21 repository-owned C# snippets alongside the upstream
+extension's existing 42 snippets. It is available on
+[Open VSX](https://open-vsx.org/extension/dotnetdev-kr-custom/csharp-with-netcoredbg).
+The earlier **LOCAL FBA SNIPPETS TEST** package remains a separate prototype.
+The [active-file F5 guide](file-based-apps.md) describes debugging and the Web
+startup support included in the same release.
 
 ## Use the snippets
 
@@ -110,3 +111,9 @@ verified local Web prototype. Evidence is retained under
 These tests did not synthesize typed prefixes, Tab navigation or picker UI,
 run the applications, install certificates, open a browser, or execute Unix
 shebangs. Existing visible manual-test instances were preserved.
+
+The unchanged CI-built `11.7.18004` Windows ARM64 VSIX separately passed the same
+21 insertions, six build compositions and two property evaluations, plus 14 Web
+debugging/regression checks. All 29 release jobs passed. The
+[release record](research/2026-11-03-file-based-web-snippets-release.md) preserves
+its actual package hash and the public-registry verification.

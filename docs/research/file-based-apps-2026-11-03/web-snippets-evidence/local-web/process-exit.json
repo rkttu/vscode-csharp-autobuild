@@ -1,0 +1,39 @@
+{
+  "success": true,
+  "checkedAt": "2026-11-03T21:03:49.9736799+09:00",
+  "editorMainPid": 83820,
+  "extensionHostPid": 60472,
+  "browserRecorderPid": 48040,
+  "extensionHostReportedExitCode": 0,
+  "processes": [
+    {
+      "pid": 83820,
+      "running": false
+    },
+    {
+      "pid": 60472,
+      "running": false
+    },
+    {
+      "pid": 48040,
+      "running": false
+    },
+    {
+      "pid": 63256,
+      "running": false
+    },
+    {
+      "pid": 33604,
+      "running": false
+    },
+    {
+      "pid": 70160,
+      "running": false
+    },
+    {
+      "pid": 80564,
+      "running": false
+    }
+  ],
+  "existingUserProcessesTouched": false
+}

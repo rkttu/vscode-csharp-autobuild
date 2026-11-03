@@ -1,0 +1,522 @@
+{
+  "success": true,
+  "editorVersion": "1.144.1",
+  "checks": [
+    "CI VSIX installed unchanged as production extension; F5 binding verified",
+    "Actual missing-using compiler error returns false without dismissing its notification",
+    "Same-file F5 retry starts after source repair while old notification remains undismissed",
+    "Retried app hits its source breakpoint with local answer=40",
+    "Retried app supports evaluate and Step Over to answer=42",
+    "Retried app prints ANSWER=42 and exits0",
+    "Same file gains Web SDK; real launch applies HTTP run.json args/env and no browser or certificate setup",
+    "Actual ASP.NET Core process emits Now listening on selected owned-loopback HTTP endpoint",
+    "HTTP request hits same-file endpoint source breakpoint with local answer=40 and evaluate=42",
+    "Step Over changes answer to42; HTTP200 response proves child process received profile arguments and environment",
+    "Stopping owned Web session terminates server and releases its HTTP endpoint",
+    "Built-in serverReadyAction consumes real listening event and invokes isolated OS launcher with correct loopback launchUrl",
+    "Included project file still launches selected project configuration and hits its source breakpoint",
+    "Selected project prints PROJECT=42 and exits0"
+  ],
+  "sessions": [
+    {
+      "type": "coreclr",
+      "name": "C#: app.cs",
+      "configuration": {
+        "name": "C#: app.cs",
+        "type": "coreclr",
+        "request": "launch",
+        "program": "<editor-web-root>\\portable-data\\user-data\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\e4511153b18b541b72d56d5c\\run-rvy3FT\\FileApp.dll",
+        "cwd": "<editor-web-root>\\workspace",
+        "console": "internalConsole",
+        "stopAtEntry": false,
+        "justMyCode": true,
+        "targetArchitecture": "arm64",
+        "env": {
+          "DOTNET_ROOT": "<dotnet-root>"
+        },
+        "__netcoredbgFileAppOutput": "<editor-web-root>\\portable-data\\user-data\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\e4511153b18b541b72d56d5c\\run-rvy3FT",
+        "requireExactSource": true,
+        "enableStepFiltering": true,
+        "logging": {
+          "exceptions": true,
+          "moduleLoad": true,
+          "programOutput": true,
+          "browserStdOut": true,
+          "elapsedTiming": false,
+          "threadExit": false,
+          "processExit": true,
+          "engineLogging": false,
+          "diagnosticsLog": {
+            "protocolMessages": false,
+            "dispatcherMessages": "none",
+            "debugEngineAPITracing": "none",
+            "debugRuntimeEventTracing": false,
+            "expressionEvaluationTracing": false,
+            "startDebuggingTracing": false
+          },
+          "consoleUsageMessage": true
+        },
+        "suppressJITOptimizations": false,
+        "symbolOptions": {
+          "searchPaths": [],
+          "searchMicrosoftSymbolServer": false,
+          "searchNuGetOrgSymbolServer": false,
+          "cachePath": "",
+          "moduleFilter": {
+            "mode": "loadAllButExcluded",
+            "excludedModules": [],
+            "includedModules": [],
+            "includeSymbolsNextToModules": true,
+            "includeSymbolsOnDemand": true
+          }
+        },
+        "expressionEvaluationOptions": {
+          "allowImplicitFuncEval": true,
+          "allowToString": true,
+          "allowFastEvaluate": true,
+          "showRawValues": false
+        },
+        "terminateChildProcesses": false,
+        "internalConsoleOptions": "openOnSessionStart"
+      }
+    },
+    {
+      "type": "coreclr",
+      "name": "C#: app.cs",
+      "configuration": {
+        "name": "C#: app.cs",
+        "type": "coreclr",
+        "request": "launch",
+        "program": "<editor-web-root>\\portable-data\\user-data\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\e4511153b18b541b72d56d5c\\run-Zr8tdf\\FileApp.dll",
+        "cwd": "<editor-web-root>\\workspace",
+        "console": "internalConsole",
+        "stopAtEntry": false,
+        "justMyCode": true,
+        "targetArchitecture": "arm64",
+        "args": [
+          "--probe",
+          "hello world",
+          "--switch",
+          "enabled"
+        ],
+        "checkForDevCert": false,
+        "env": {
+          "ASPNETCORE_URLS": "http://127.0.0.1:52528",
+          "ASPNETCORE_ENVIRONMENT": "Development",
+          "FBA_WEB_MARKER": "owned-http-editor",
+          "DOTNET_LAUNCH_PROFILE": "OwnedHttpProbe",
+          "DOTNET_ROOT": "<dotnet-root>"
+        },
+        "__netcoredbgFileAppOutput": "<editor-web-root>\\portable-data\\user-data\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\e4511153b18b541b72d56d5c\\run-Zr8tdf",
+        "requireExactSource": true,
+        "enableStepFiltering": true,
+        "logging": {
+          "exceptions": true,
+          "moduleLoad": true,
+          "programOutput": true,
+          "browserStdOut": true,
+          "elapsedTiming": false,
+          "threadExit": false,
+          "processExit": true,
+          "engineLogging": false,
+          "diagnosticsLog": {
+            "protocolMessages": false,
+            "dispatcherMessages": "none",
+            "debugEngineAPITracing": "none",
+            "debugRuntimeEventTracing": false,
+            "expressionEvaluationTracing": false,
+            "startDebuggingTracing": false
+          },
+          "consoleUsageMessage": true
+        },
+        "suppressJITOptimizations": false,
+        "symbolOptions": {
+          "searchPaths": [],
+          "searchMicrosoftSymbolServer": false,
+          "searchNuGetOrgSymbolServer": false,
+          "cachePath": "",
+          "moduleFilter": {
+            "mode": "loadAllButExcluded",
+            "excludedModules": [],
+            "includedModules": [],
+            "includeSymbolsNextToModules": true,
+            "includeSymbolsOnDemand": true
+          }
+        },
+        "expressionEvaluationOptions": {
+          "allowImplicitFuncEval": true,
+          "allowToString": true,
+          "allowFastEvaluate": true,
+          "showRawValues": false
+        },
+        "terminateChildProcesses": false,
+        "internalConsoleOptions": "openOnSessionStart"
+      }
+    },
+    {
+      "type": "coreclr",
+      "name": "C#: app.cs",
+      "configuration": {
+        "name": "C#: app.cs",
+        "type": "coreclr",
+        "request": "launch",
+        "program": "<editor-web-root>\\portable-data\\user-data\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\e4511153b18b541b72d56d5c\\run-P2A37O\\FileApp.dll",
+        "cwd": "<editor-web-root>\\workspace",
+        "console": "internalConsole",
+        "stopAtEntry": false,
+        "justMyCode": true,
+        "targetArchitecture": "arm64",
+        "args": [
+          "--probe",
+          "hello world",
+          "--switch",
+          "enabled"
+        ],
+        "serverReadyAction": {
+          "action": "openExternally",
+          "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+          "uriFormat": "%s/probe?via=ready"
+        },
+        "checkForDevCert": false,
+        "env": {
+          "ASPNETCORE_URLS": "http://127.0.0.1:52528",
+          "ASPNETCORE_ENVIRONMENT": "Development",
+          "FBA_WEB_MARKER": "owned-http-editor",
+          "DOTNET_LAUNCH_PROFILE": "OwnedHttpProbe",
+          "DOTNET_ROOT": "<dotnet-root>"
+        },
+        "__netcoredbgFileAppOutput": "<editor-web-root>\\portable-data\\user-data\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\e4511153b18b541b72d56d5c\\run-P2A37O",
+        "requireExactSource": true,
+        "enableStepFiltering": true,
+        "logging": {
+          "exceptions": true,
+          "moduleLoad": true,
+          "programOutput": true,
+          "browserStdOut": true,
+          "elapsedTiming": false,
+          "threadExit": false,
+          "processExit": true,
+          "engineLogging": false,
+          "diagnosticsLog": {
+            "protocolMessages": false,
+            "dispatcherMessages": "none",
+            "debugEngineAPITracing": "none",
+            "debugRuntimeEventTracing": false,
+            "expressionEvaluationTracing": false,
+            "startDebuggingTracing": false
+          },
+          "consoleUsageMessage": true
+        },
+        "suppressJITOptimizations": false,
+        "symbolOptions": {
+          "searchPaths": [],
+          "searchMicrosoftSymbolServer": false,
+          "searchNuGetOrgSymbolServer": false,
+          "cachePath": "",
+          "moduleFilter": {
+            "mode": "loadAllButExcluded",
+            "excludedModules": [],
+            "includedModules": [],
+            "includeSymbolsNextToModules": true,
+            "includeSymbolsOnDemand": true
+          }
+        },
+        "expressionEvaluationOptions": {
+          "allowImplicitFuncEval": true,
+          "allowToString": true,
+          "allowFastEvaluate": true,
+          "showRawValues": false
+        },
+        "terminateChildProcesses": false,
+        "internalConsoleOptions": "openOnSessionStart"
+      }
+    },
+    {
+      "type": "coreclr",
+      "name": "Existing project configuration",
+      "configuration": {
+        "cwd": "<editor-web-root>\\workspace\\project",
+        "name": "Existing project configuration",
+        "request": "launch",
+        "stopAtEntry": false,
+        "console": "internalConsole",
+        "type": "coreclr",
+        "program": "<editor-web-root>\\workspace\\project\\output\\Regression.dll",
+        "targetArchitecture": "arm64",
+        "env": {
+          "DOTNET_ROOT": "<dotnet-root>"
+        },
+        "__configurationTarget": 6,
+        "justMyCode": true,
+        "requireExactSource": true,
+        "enableStepFiltering": true,
+        "logging": {
+          "exceptions": true,
+          "moduleLoad": true,
+          "programOutput": true,
+          "browserStdOut": true,
+          "elapsedTiming": false,
+          "threadExit": false,
+          "processExit": true,
+          "engineLogging": false,
+          "diagnosticsLog": {
+            "protocolMessages": false,
+            "dispatcherMessages": "none",
+            "debugEngineAPITracing": "none",
+            "debugRuntimeEventTracing": false,
+            "expressionEvaluationTracing": false,
+            "startDebuggingTracing": false
+          },
+          "consoleUsageMessage": true
+        },
+        "suppressJITOptimizations": false,
+        "symbolOptions": {
+          "searchPaths": [],
+          "searchMicrosoftSymbolServer": false,
+          "searchNuGetOrgSymbolServer": false,
+          "cachePath": "",
+          "moduleFilter": {
+            "mode": "loadAllButExcluded",
+            "excludedModules": [],
+            "includedModules": [],
+            "includeSymbolsNextToModules": true,
+            "includeSymbolsOnDemand": true
+          }
+        },
+        "expressionEvaluationOptions": {
+          "allowImplicitFuncEval": true,
+          "allowToString": true,
+          "allowFastEvaluate": true,
+          "showRawValues": false
+        },
+        "terminateChildProcesses": false,
+        "internalConsoleOptions": "openOnSessionStart"
+      }
+    }
+  ],
+  "notificationDismissCommandsIssued": 0,
+  "physicalF5KeypressSent": false,
+  "installedExtensionPath": "<editor-web-root>\\extensions\\dotnetdev-kr-custom.csharp-with-netcoredbg-11.7.18004",
+  "version": "11.7.18004",
+  "targetInstalledAsProduction": true,
+  "f5Binding": {
+    "command": "netcoredbg.debugActiveFile",
+    "key": "f5",
+    "when": "editorTextFocus && editorLangId == csharp && !inDebugMode"
+  },
+  "failedBuild": {
+    "returned": false,
+    "elapsedMilliseconds": 4049,
+    "compiler": {
+      "code": "CS0246",
+      "symbol": "DllImport",
+      "capturedOutput": "compile-failure.txt"
+    }
+  },
+  "notificationAfterFailure": {
+    "available": true,
+    "compileFailureNotificationPresent": true,
+    "visibleCompileFailureNotificationPresent": true
+  },
+  "notificationAfterRetryStarted": {
+    "available": true,
+    "compileFailureNotificationPresent": true,
+    "visibleCompileFailureNotificationPresent": true
+  },
+  "locals": [
+    {
+      "evaluateName": "args",
+      "name": "args",
+      "type": "string[]",
+      "value": "{string[0]}",
+      "variablesReference": 0
+    },
+    {
+      "evaluateName": "answer",
+      "name": "answer",
+      "type": "int",
+      "value": "40",
+      "variablesReference": 0
+    }
+  ],
+  "adapterDiagnostics": [
+    "Error: read error",
+    "Error: read error",
+    "Error: read error"
+  ],
+  "webLanguageServiceBeforeBuild": {
+    "diagnostics": [
+      {
+        "message": "The local function 'NativeCall' is declared but never used",
+        "code": {
+          "value": "CS8321",
+          "target": {
+            "$mid": 1,
+            "path": "/query/roslyn.query",
+            "scheme": "https",
+            "authority": "msdn.microsoft.com",
+            "query": "appId=roslyn&k=k(CS8321)"
+          }
+        },
+        "severity": 1
+      }
+    ],
+    "hover": []
+  },
+  "httpProfile": {
+    "profilePath": "<editor-web-root>\\workspace\\app.run.json",
+    "origin": "http://127.0.0.1:52528",
+    "certificateTrustExecuted": false,
+    "automaticBrowserRequested": false,
+    "actualReadyOutput": "      Now listening on: http://127.0.0.1:52528\r",
+    "readyMilliseconds": 5266,
+    "stoppedServerNoLongerListening": true,
+    "externalLauncherNotInvoked": true,
+    "profileName": "OwnedHttpProbe",
+    "profileEvidence": "First Web DAP configuration has no serverReadyAction; next Web configuration enables it"
+  },
+  "webSwitch": {
+    "sameSourcePath": "<editor-web-root>\\workspace\\app.cs",
+    "frameworks": [
+      {
+        "name": "Microsoft.NETCore.App",
+        "version": "10.0.0"
+      },
+      {
+        "name": "Microsoft.AspNetCore.App",
+        "version": "10.0.0"
+      }
+    ],
+    "configuration": {
+      "name": "C#: app.cs",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "<editor-web-root>\\portable-data\\user-data\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\e4511153b18b541b72d56d5c\\run-Zr8tdf\\FileApp.dll",
+      "cwd": "<editor-web-root>\\workspace",
+      "console": "internalConsole",
+      "stopAtEntry": false,
+      "justMyCode": true,
+      "targetArchitecture": "arm64",
+      "args": [
+        "--probe",
+        "hello world",
+        "--switch",
+        "enabled"
+      ],
+      "checkForDevCert": false,
+      "env": {
+        "ASPNETCORE_URLS": "http://127.0.0.1:52528",
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "FBA_WEB_MARKER": "owned-http-editor",
+        "DOTNET_LAUNCH_PROFILE": "OwnedHttpProbe",
+        "DOTNET_ROOT": "<dotnet-root>"
+      },
+      "__netcoredbgFileAppOutput": "<editor-web-root>\\portable-data\\user-data\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\e4511153b18b541b72d56d5c\\run-Zr8tdf",
+      "requireExactSource": true,
+      "enableStepFiltering": true,
+      "logging": {
+        "exceptions": true,
+        "moduleLoad": true,
+        "programOutput": true,
+        "browserStdOut": true,
+        "elapsedTiming": false,
+        "threadExit": false,
+        "processExit": true,
+        "engineLogging": false,
+        "diagnosticsLog": {
+          "protocolMessages": false,
+          "dispatcherMessages": "none",
+          "debugEngineAPITracing": "none",
+          "debugRuntimeEventTracing": false,
+          "expressionEvaluationTracing": false,
+          "startDebuggingTracing": false
+        },
+        "consoleUsageMessage": true
+      },
+      "suppressJITOptimizations": false,
+      "symbolOptions": {
+        "searchPaths": [],
+        "searchMicrosoftSymbolServer": false,
+        "searchNuGetOrgSymbolServer": false,
+        "cachePath": "",
+        "moduleFilter": {
+          "mode": "loadAllButExcluded",
+          "excludedModules": [],
+          "includedModules": [],
+          "includeSymbolsNextToModules": true,
+          "includeSymbolsOnDemand": true
+        }
+      },
+      "expressionEvaluationOptions": {
+        "allowImplicitFuncEval": true,
+        "allowToString": true,
+        "allowFastEvaluate": true,
+        "showRawValues": false
+      },
+      "terminateChildProcesses": false,
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    "endpointLocals": [
+      {
+        "evaluateName": "answer",
+        "name": "answer",
+        "type": "int",
+        "value": "40",
+        "variablesReference": 0
+      },
+      {
+        "evaluateName": "args",
+        "name": "args",
+        "namedVariables": 4,
+        "type": "string[]",
+        "value": "{string[4]}",
+        "variablesReference": 2
+      }
+    ]
+  },
+  "httpResponse": {
+    "status": 200,
+    "body": {
+      "answer": 42,
+      "marker": "owned-http-editor",
+      "launchProfile": "OwnedHttpProbe",
+      "args": [
+        "--probe",
+        "hello world",
+        "--switch",
+        "enabled"
+      ]
+    }
+  },
+  "webLanguageServiceAfterBuild": {
+    "diagnostics": [],
+    "hover": [
+      "```csharp\r\nclass Microsoft.AspNetCore.Builder.WebApplication\r\n```\r\n  \r\nThe web application used to configure the HTTP pipeline, and routes\\.  \r\n"
+    ]
+  },
+  "browserReady": {
+    "expectedUrl": "http://127.0.0.1:52528/probe?via=ready",
+    "record": {
+      "url": "http://127.0.0.1:52528/probe?via=ready",
+      "recordedAt": "2026-11-03T13:51:48.4480251+00:00",
+      "processId": 75896
+    },
+    "actualReadyOutput": "      Now listening on: http://127.0.0.1:52528\r",
+    "externalBrowserSettingScope": "Isolated test user profile only",
+    "osDefaultBrowserChanged": false,
+    "targetExtensionInjected": false,
+    "browserUiRendered": false,
+    "tlsTested": false
+  },
+  "output": "ANSWER=42\r\ninfo: Microsoft.Hosting.Lifetime[14]\r\n      Now listening on: http://127.0.0.1:52528\r\nMicrosoft.Hosting.Lifetime: Information: Now listening on: http://127.0.0.1:52528\r\ninfo: Microsoft.Hosting.Lifetime[0]\r\n      Application started. Press Ctrl+C to shut down.\r\nMicrosoft.Hosting.Lifetime: Information: Application started. Press Ctrl+C to shut down.\r\ninfo: Microsoft.Hosting.Lifetime[0]\r\n      Hosting environment: Development\r\nMicrosoft.Hosting.Lifetime: Information: Hosting environment: Development\r\ninfo: Microsoft.Hosting.Lifetime[0]\r\n      Content root path: <editor-web-root>\\workspace\r\nMicrosoft.Hosting.Lifetime: Information: Content root path: <editor-web-root>\\workspace\r\ninfo: Microsoft.AspNetCore.Hosting.Diagnostics[1]\r\n      Request starting HTTP/1.1 GET http://127.0.0.1:52528/probe - - -\r\nMicrosoft.AspNetCore.Hosting.Diagnostics: Information: Request starting HTTP/1.1 GET http://127.0.0.1:52528/probe - - -\r\ninfo: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]\r\n      Executing endpoint 'HTTP: GET /probe'\r\nMicrosoft.AspNetCore.Routing.EndpointMiddleware: Information: Executing endpoint 'HTTP: GET /probe'\r\nMicrosoft.AspNetCore.Http.Result.JsonResult: Information: Writing value of type '<>f__AnonymousType0`4' as Json.\r\ninfo: Microsoft.AspNetCore.Http.Result.JsonResult[3]\r\n      Writing value of type '<>f__AnonymousType0`4' as Json.\r\ninfo: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]\r\n      Executed endpoint 'HTTP: GET /probe'\r\nMicrosoft.AspNetCore.Routing.EndpointMiddleware: Information: Executed endpoint 'HTTP: GET /probe'\r\ninfo: Microsoft.AspNetCore.Hosting.Diagnostics[2]\r\n      Request finished HTTP/1.1 GET http://127.0.0.1:52528/probe - 200 - application/json;+charset=utf-8 317.1244ms\r\nMicrosoft.AspNetCore.Hosting.Diagnostics: Information: Request finished HTTP/1.1 GET http://127.0.0.1:52528/probe - 200 - application/json;+charset=utf-8 317.1244ms\r\ninfo: Microsoft.Hosting.Lifetime[14]\r\n      Now listening on: http://127.0.0.1:52528\r\nMicrosoft.Hosting.Lifetime: Information: Now listening on: http://127.0.0.1:52528\r\ninfo: Microsoft.Hosting.Lifetime[0]\r\n      Application started. Press Ctrl+C to shut down.\r\nMicrosoft.Hosting.Lifetime: Information: Application started. Press Ctrl+C to shut down.\r\nMicrosoft.Hosting.Lifetime: Information: Hosting environment: Development\r\ninfo: Microsoft.Hosting.Lifetime[0]\r\n      Hosting environment: Development\r\ninfo: Microsoft.Hosting.Lifetime[0]\r\n      Content root path: <editor-web-root>\\workspace\r\nMicrosoft.Hosting.Lifetime: Information: Content root path: <editor-web-root>\\workspace\r\nPROJECT=42\r\n",
+  "certificateCommandsObserved": false,
+  "scope": {
+    "actualInstalledCiVsix": true,
+    "targetExtensionInjected": false,
+    "physicalF5KeypressSent": false,
+    "automaticBrowserLauncherTested": true,
+    "realBrowserUiTested": false,
+    "httpsCertificateTrustTested": false,
+    "existingUserEditorTouched": false
+  }
+}
