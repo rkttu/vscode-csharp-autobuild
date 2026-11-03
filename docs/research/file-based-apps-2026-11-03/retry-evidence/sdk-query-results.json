@@ -1,0 +1,32 @@
+[
+  {
+    "step": "plain",
+    "sdk": "11.0.100-rc.2.26504.105",
+    "properties": {
+      "UsingMicrosoftNETSdkWeb": "",
+      "PublishAot": "true",
+      "TargetFramework": "net11.0"
+    },
+    "exitCode": 0
+  },
+  {
+    "step": "add-web-sdk",
+    "properties": {
+      "UsingMicrosoftNETSdkWeb": "true",
+      "PublishAot": "true",
+      "TargetFramework": "net11.0"
+    },
+    "exitCode": 0,
+    "elapsedMilliseconds": 493
+  },
+  {
+    "step": "set-publish-aot-false",
+    "properties": {
+      "UsingMicrosoftNETSdkWeb": "true",
+      "PublishAot": "false",
+      "TargetFramework": "net11.0"
+    },
+    "exitCode": 0,
+    "elapsedMilliseconds": 465
+  }
+]
