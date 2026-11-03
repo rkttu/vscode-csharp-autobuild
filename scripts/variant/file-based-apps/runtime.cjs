@@ -80,6 +80,7 @@ function insideDirectory(directory, candidate) {
 function activate(context, dependencies = {}) {
     const vscode = dependencies.vscode || require('vscode');
     const classifyFile = dependencies.classifyFile || require('./classify.cjs').classifyFile;
+    const webSupport = dependencies.webSupport || require('./web.cjs');
     const environment = dependencies.env || process.env;
     const getDotnet = dependencies.findDotnet || (() => findDotnet(environment));
     const storage = (context.globalStorageUri || context.storageUri)?.fsPath;
@@ -190,13 +191,29 @@ function activate(context, dependencies = {}) {
                     generated = await fs.promises.mkdtemp(path.join(parent, 'run-'));
                     ownedOutputs.add(generated);
                     progress.report({ message: 'Building file-based app' });
-                    await runDotnet(['build', source, '--configuration', 'Debug', '--output', generated,
+                    const buildResult = await runDotnet(['build', source, '--configuration', 'Debug', '--output', generated,
                         '-p:AssemblyName=FileApp', '-p:DebugType=portable', '-p:Optimize=false', '-p:PublishAot=false',
-                        '-p:UseSharedCompilation=false', '--disable-build-servers', '--nologo']);
+                        '-p:UseSharedCompilation=false', '--disable-build-servers', '--nologo',
+                        '-target:Build', ...webSupport.BUILD_METADATA_ARGS]);
                     const program = path.join(generated, 'FileApp.dll');
                     await fs.promises.access(program);
                     await fs.promises.access(path.join(generated, 'FileApp.pdb'));
                     controller.signal.throwIfAborted();
+                    progress.report({ message: 'Preparing web launch settings' });
+                    const webLaunch = await webSupport.prepareWebLaunch({
+                        source,
+                        metadata: webSupport.parseBuildMetadata(stdout(buildResult)),
+                        environment,
+                        signal: controller.signal,
+                        runDotnet,
+                        vscode,
+                        output,
+                        onProgress: message => progress.report({ message }),
+                    });
+                    controller.signal.throwIfAborted();
+                    if (webLaunch?.env?.DOTNET_ROOT && comparable(webLaunch.env.DOTNET_ROOT) !== comparable(selected.root)) {
+                        throw new Error('The web launch profile DOTNET_ROOT does not identify the selected dotnet installation.');
+                    }
                     progress.report({ message: 'Starting netcoredbg' });
                     const started = await vscode.debug.startDebugging(vscode.workspace.getWorkspaceFolder(sourceUri), {
                         name: `C#: ${path.basename(source)}`,
@@ -208,7 +225,12 @@ function activate(context, dependencies = {}) {
                         stopAtEntry: false,
                         justMyCode: true,
                         targetArchitecture: architecture === 'arm64' ? 'arm64' : 'x86_64',
-                        env: { DOTNET_ROOT: selected.root },
+                        ...(webLaunch ? {
+                            args: webLaunch.args,
+                            serverReadyAction: webLaunch.serverReadyAction,
+                            checkForDevCert: false,
+                        } : {}),
+                        env: { ...webLaunch?.env, DOTNET_ROOT: selected.root },
                         __netcoredbgFileAppOutput: generated,
                     });
                     handedToDebugger = started;

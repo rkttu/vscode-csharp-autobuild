@@ -13,15 +13,18 @@ class FileAppPackagingTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.source = Path(self.temp.name)
         (self.source / ".vscodeignore").write_text("src/**\n")
+        (self.source / "snippets").mkdir()
+        (self.source / "snippets/csharp.json").write_text('{"Existing":{"prefix":"prop","body":"original"}}')
         self.package = {"main": "./dist/extension", "contributes": {
             "commands": [{"command": "existing"}],
             "keybindings": [{"command": "existing", "key": "ctrl+f9"}],
+            "snippets": [{"language": "csharp", "path": "./snippets/csharp.json"}],
         }, "activationEvents": ["onLanguage:csharp"], "netcoredbgBuild": {"target": "linux-x64"}}
 
     def install(self):
         overlay.install_file_app_support(self.source, self.package, Path(__file__).resolve().parents[2])
 
-    def test_wraps_entry_and_packages_only_runtime_modules(self):
+    def test_wraps_entry_and_preserves_upstream_snippets_with_owned_assets(self):
         original = json.loads(json.dumps(self.package))
         self.install()
         self.assertEqual(self.package["main"], "./.netcoredbg/entry.cjs")
@@ -34,8 +37,20 @@ class FileAppPackagingTests(unittest.TestCase):
         })
         self.assertIn("onCommand:" + overlay.FILE_APP_COMMAND, self.package["activationEvents"])
         modules = self.source / ".netcoredbg"
-        self.assertEqual({p.name for p in modules.iterdir()}, set(overlay.FILE_APP_MODULES))
+        self.assertEqual({p.name for p in modules.iterdir() if p.is_file()}, set(overlay.FILE_APP_MODULES))
+        self.assertEqual(self.package["contributes"]["snippets"], original["contributes"]["snippets"] + [
+            {"language": "csharp", "path": overlay.FILE_APP_SNIPPETS},
+        ])
+        self.assertEqual((self.source / "snippets/csharp.json").read_text(), '{"Existing":{"prefix":"prop","body":"original"}}')
+        repo = Path(__file__).resolve().parents[2]
+        for asset in overlay.FILE_APP_ASSETS:
+            self.assertEqual((modules / asset).read_bytes(), (repo / "scripts/variant/file-based-apps" / asset).read_bytes())
         self.assertIn("!.netcoredbg/**", (self.source / ".vscodeignore").read_text())
+
+    def test_rejects_duplicate_owned_snippet_registration(self):
+        self.package["contributes"]["snippets"].append({"language": "csharp", "path": overlay.FILE_APP_SNIPPETS})
+        with self.assertRaisesRegex(ValueError, "snippets are already registered"):
+            overlay.install_file_app_snippets(self.source, self.package, Path(__file__).resolve().parents[2])
 
     def test_fails_if_upstream_claims_f5(self):
         self.package["contributes"]["keybindings"].append({"command": "upstream", "key": "F5"})

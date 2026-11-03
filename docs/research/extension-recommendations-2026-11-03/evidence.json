@@ -1,0 +1,50 @@
+{
+  "date": "2026-11-03",
+  "scope": "Read-only package and host-source inspection; no user configuration or production packaging changes",
+  "vsix": {
+    "version": "11.7.18003",
+    "id": "dotnetdev-kr-custom.csharp-with-netcoredbg",
+    "target": "win32-arm64",
+    "sha256": "15ce16bab7305f11fc40b18c8738ee9226d2fb4acb6301e49f702ae8f3dcb39f",
+    "extensionDependencies": [
+      "ms-dotnettools.vscode-dotnet-runtime"
+    ],
+    "extensionPack": [],
+    "hasRecommendationFields": false,
+    "hasWalkthroughs": false,
+    "hasInheritedRecommendedInstallText": true,
+    "configurationDefaultsKeys": [
+      "[xaml]",
+      "explorer.fileNesting.patterns"
+    ]
+  },
+  "inspectedClient": {
+    "version": "1.144.1",
+    "commit": "261c84cb1eddf11235f9e2c921425e9663fbe556",
+    "productJsonSha256": "7e7d7e2899b2c946e7a7baed2c701361c547f6e30924b24fbe7d7ea069b7f8ab",
+    "devKitRecommendation": {
+      "onFileOpen": [
+        {
+          "pathGlob": "{**/*.cs,**/global.json,**/*.csproj,**/*.cshtml,**/*.sln}",
+          "important": true
+        },
+        {
+          "languages": [
+            "csharp"
+          ],
+          "important": true
+        },
+        {
+          "pathGlob": "{**/project.json,**/appsettings.json}"
+        }
+      ]
+    },
+    "officialCSharpEntryInInspectedRecommendationMap": null,
+    "devKitInLanguageExtensionTips": true
+  },
+  "limitations": [
+    "The two specific UI cards were not instrumented individually; this records package declarations and concrete host rules.",
+    "configurationDefaults behavior was checked in source, not enabled in the user profile or released package.",
+    "Open VSX registry selection does not alone establish the recommendation behavior of a client."
+  ]
+}

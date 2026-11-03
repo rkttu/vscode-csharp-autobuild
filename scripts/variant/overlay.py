@@ -17,10 +17,24 @@ IDENTITY_FILES = (
     "src/lsptoolshost/logging/loggingUtils.ts",
 )
 INTEGRATION_FILES = (*IDENTITY_FILES, "tasks/packaging/offlinePackagingTasks.ts", "src/coreclrDebug/activate.ts",
-                     "package.json", ".vscodeignore")
+                     "package.json", ".vscodeignore", "README.md")
 FILE_APP_COMMAND = "netcoredbg.debugActiveFile"
 FILE_APP_WHEN = "editorTextFocus && editorLangId == csharp && !inDebugMode"
-FILE_APP_MODULES = ("entry.cjs", "runtime.cjs", "classify.cjs")
+FILE_APP_MODULES = ("entry.cjs", "runtime.cjs", "classify.cjs", "web.cjs")
+FILE_APP_SNIPPETS = "./.netcoredbg/snippets/fba-csharp.json"
+FILE_APP_ASSETS = ("snippets/fba-csharp.json", "snippets/NOTICE.md", "snippets/examples-LICENSE.txt")
+
+
+def install_file_app_snippets(source, package, repo):
+    """Register owned C# snippets while preserving upstream snippet registrations."""
+    snippets = package.setdefault("contributes", {}).setdefault("snippets", [])
+    if any(entry.get("path") == FILE_APP_SNIPPETS for entry in snippets):
+        raise ValueError("File-app snippets are already registered")
+    for asset in FILE_APP_ASSETS:
+        destination = source / ".netcoredbg" / asset
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(repo / "scripts/variant/file-based-apps" / asset, destination)
+    snippets.append({"language": "csharp", "path": FILE_APP_SNIPPETS})
 
 
 def install_file_app_support(source, package, repo):
@@ -48,6 +62,7 @@ def install_file_app_support(source, package, repo):
     destination.mkdir(exist_ok=False)
     for module in FILE_APP_MODULES:
         shutil.copy2(repo / "scripts/variant/file-based-apps" / module, destination / module)
+    install_file_app_snippets(source, package, repo)
     with (source / ".vscodeignore").open("a") as ignore:
         ignore.write("\n!.netcoredbg/**\n")
 
@@ -57,6 +72,22 @@ def replace_once(path, before, after):
     if content.count(before) != 1:
         raise ValueError(f"Upstream integration point changed: {path.name}: {before[:70]}")
     path.write_text(content.replace(before, after))
+
+
+def readme_without_devkit_install_recommendation(content):
+    """Keep upstream documentation without its official-extension install recommendation."""
+    introduction = " and is shipped along with [C# Dev Kit][csdevkitextension]"
+    start_heading = "## Recommended Install\n"
+    end_heading = "## Features\n"
+    if any(content.count(marker) != 1 for marker in (introduction, start_heading, end_heading)):
+        raise ValueError("Upstream README installation guidance changed; review the variant documentation")
+    content = content.replace(introduction, "", 1)
+    start = content.index(start_heading)
+    end = content.index(end_heading, start)
+    content = content[:start] + content[end:]
+    if content.count("[csdevkitextension]") == 1:
+        content = re.sub(r"^\[csdevkitextension\]:[^\n]*(?:\n|$)", "", content, flags=re.MULTILINE)
+    return content
 
 
 def patch_integration(source, extension_id):
@@ -149,6 +180,7 @@ def check_source(source, repo):
         patch_integration(temporary, config["publisher"] + "." + config["name"])
         package = json.loads((temporary / "package.json").read_text())
         install_file_app_support(temporary, package, repo)
+        readme_without_devkit_install_recommendation((temporary / "README.md").read_text())
     print("Upstream identity, packaging, adapter and file-app entry integration preflight passed.")
 
 
@@ -240,11 +272,18 @@ An included file uses the existing selected project debugging configuration.
 File-based apps require .NET SDK 10.0.100 or later. Evaluation errors stop the
 launch instead of treating an unknown project membership as exclusion. This
 flow uses managed Debug output and the Debug Console; it does not supply Hot
-Reload or file-app launch-profile discovery.
+Reload. Web server file apps apply launch profiles, prepare development HTTPS
+certificates with consent when needed, and open a browser after server readiness.
+
+C# snippets with fba- prefixes include file-app starters, build directives and
+reusable code fragments. Use Insert Snippet in the Command Palette, or select a
+snippet from IntelliSense. Tab expansion follows the editor's tabCompletion
+setting. Adapted examples credit dotnetdev-kr/dotnet-fba-examples; their MIT
+license and attribution accompany the snippets under .netcoredbg/snippets.
 
 ---
 
-""" + readme.read_text())
+""" + readme_without_devkit_install_recommendation(readme.read_text()))
     replace_once(readme, "Build provenance is available in package.json under netcoredbgBuild and in the\nrelease validation manifest.",
                  f"This package follows C# {candidate['csharpVersion']} ({candidate['csharpTag']}) and includes "
                  f"netcoredbg {candidate['debuggerTag']} at commit {candidate['debuggerSha']}. "

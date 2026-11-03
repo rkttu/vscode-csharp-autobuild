@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 import versioning
-from overlay import FILE_APP_COMMAND, FILE_APP_MODULES, FILE_APP_WHEN
+from overlay import FILE_APP_ASSETS, FILE_APP_COMMAND, FILE_APP_MODULES, FILE_APP_SNIPPETS, FILE_APP_WHEN
 
 REPO = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO / "scripts/validation"))
@@ -47,6 +47,10 @@ def verify(vsix, validated, target, version, root, run_dap):
             for module in FILE_APP_MODULES:
                 assert zip_in.read("extension/.netcoredbg/" + module) == \
                     (REPO / "scripts/variant/file-based-apps" / module).read_bytes(), "File-app module differs: " + module
+            for asset in FILE_APP_ASSETS:
+                assert zip_in.read("extension/.netcoredbg/" + asset) == \
+                    (REPO / "scripts/variant/file-based-apps" / asset).read_bytes(), "File-app asset differs: " + asset
+            assert pkg["contributes"]["snippets"].count({"language": "csharp", "path": FILE_APP_SNIPPETS}) == 1
             assert sum(c.get("command") == FILE_APP_COMMAND for c in pkg["contributes"]["commands"]) == 1
             assert {"command": FILE_APP_COMMAND, "key": "f5", "when": FILE_APP_WHEN} in pkg["contributes"]["keybindings"]
             versioning.validate(dict(version=pkg["version"], csharpTag=build["upstreamCsharpTag"],

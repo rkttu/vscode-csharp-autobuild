@@ -55,6 +55,7 @@ function fixture(t, options = {}) {
     const dependencies = {
         vscode,
         env: {},
+        ...(options.webSupport ? { webSupport: options.webSupport } : {}),
         findDotnet: async () => ({ executable: path.join(root, 'dotnet', 'dotnet.exe'), root: path.join(root, 'dotnet') }),
         classifyFile: async input => {
             calls.classifications.push(input);
@@ -71,7 +72,13 @@ function fixture(t, options = {}) {
                 const outputDirectory = args[args.indexOf('--output') + 1];
                 fs.writeFileSync(path.join(outputDirectory, 'FileApp.dll'), 'fixture DLL');
                 fs.writeFileSync(path.join(outputDirectory, 'FileApp.pdb'), 'fixture PDB');
-                return { stdout: 'Build succeeded.\n' };
+                return { stdout: JSON.stringify({
+                    Properties: {
+                        UsingMicrosoftNETSdkWeb: options.web ? 'true' : '',
+                        OutputType: 'Exe', TargetFrameworkIdentifier: '.NETCoreApp',
+                    },
+                    Items: { FrameworkReference: options.web ? [{ Identity: 'Microsoft.AspNetCore.App' }] : [] },
+                }) };
             }
             throw new Error(`Unexpected command: ${args.join(' ')}`);
         },
@@ -112,6 +119,56 @@ test('a project-owned file delegates to normal F5 without imposing the file-app 
     assert.deepEqual(f.calls.commands, ['workbench.action.debug.start']);
     assert.equal(f.calls.launches.length, 0);
     assert.equal(f.calls.processes.length, 0);
+});
+
+test('Web SDK build metadata applies HTTP run.json without certificate commands or a second evaluation', async t => {
+    const f = fixture(t, { web: true });
+    fs.writeFileSync(path.join(path.dirname(f.source), 'tool.run.json'), JSON.stringify({ profiles: {
+        local: { commandName: 'Project', launchBrowser: true, applicationUrl: 'http://localhost:5123',
+            launchUrl: 'health', commandLineArgs: '--message "hello world"', environmentVariables: { WEB_TEST: 'ready' } },
+    } }));
+    assert.equal(await f.api.debugActiveFile(), true);
+    const config = f.calls.launches[0].config;
+    assert.equal(config.env.ASPNETCORE_URLS, 'http://localhost:5123');
+    assert.equal(config.env.WEB_TEST, 'ready');
+    assert.equal(config.env.DOTNET_LAUNCH_PROFILE, 'local');
+    assert.deepEqual(config.args, ['--message', 'hello world']);
+    assert.equal(config.checkForDevCert, false);
+    assert.equal(config.serverReadyAction.action, 'openExternally');
+    assert.equal(config.serverReadyAction.uriFormat, '%s/health');
+    assert.equal(f.calls.processes.filter(call => call.args[0] === 'build').length, 1);
+    assert(!f.calls.processes.some(call => call.args[0] === 'dev-certs'));
+    const build = f.calls.processes.find(call => call.args[0] === 'build');
+    assert(build.args.includes('-target:Build'));
+    assert(build.args.includes('-getItem:FrameworkReference'));
+});
+
+test('failed Web builds never enter certificate or browser preparation', async t => {
+    let prepared = 0;
+    const f = fixture(t, { web: true, buildError: new Error('CS1002'), webSupport: {
+        BUILD_METADATA_ARGS: [], parseBuildMetadata: () => ({ isWebServer: true }),
+        prepareWebLaunch: async () => { prepared++; },
+    } });
+    assert.equal(await f.api.debugActiveFile(), false);
+    assert.equal(prepared, 0);
+    assert.equal(f.calls.launches.length, 0);
+});
+
+test('cancelling Web preparation releases F5 and cleans its output before a retry', async t => {
+    let cancelFirst = true;
+    const f = fixture(t, { web: true, webSupport: {
+        BUILD_METADATA_ARGS: [], parseBuildMetadata: () => ({ isWebServer: true }),
+        prepareWebLaunch: async ({ signal }) => {
+            if (cancelFirst) { cancelFirst = false; f.cancel(); signal.throwIfAborted(); }
+            return { env: { ASPNETCORE_URLS: 'http://localhost:5123' }, args: [] };
+        },
+    } });
+    assert.equal(await f.api.debugActiveFile(), false);
+    const failedBuild = f.calls.processes.find(call => call.args[0] === 'build');
+    assert(!fs.existsSync(failedBuild.args[failedBuild.args.indexOf('--output') + 1]));
+    assert.deepEqual(f.calls.errors, []);
+    assert.equal(await f.api.debugActiveFile(), true);
+    assert.equal(f.calls.launches.length, 1);
 });
 
 test('evaluation failures do not silently turn a project file into an FBA', async t => {
