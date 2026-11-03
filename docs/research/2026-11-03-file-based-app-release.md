@@ -24,4 +24,10 @@ Local test packages retained the base version and carried LOCAL branding. They a
 
 The requested release uses C# `v11.7.18-prerelease` at `1c27e135b5dada55a240e4a504bafa759ec578e8` and netcoredbg `3.2.0-1092` at `9744e1f051866215611b8440c638042aa2aa2f72`, matching the local validation inputs. The release workflow determines the next unreserved packaging revision.
 
-At preparation time, the full candidate workflow and registry publication are pending. This section will record the source commit, workflow result, public version, and readback verification once the authorized release completes. Local test results alone do not establish those outcomes.
+The implementation was committed and pushed to `main` as [`d66f36ebc86c57e62973aa8a836e3339820cbb04`](https://github.com/rkttu/vscode-csharp-autobuild/commit/d66f36ebc86c57e62973aa8a836e3339820cbb04). The [authorized release run](https://github.com/rkttu/vscode-csharp-autobuild/actions/runs/41585795220) selected candidate `11.7.18002`, packaging revision 2, fingerprint `74abeaff6a8f21736805c80d60a916f5bae86aea3e6c642a05798b7addfa5a3c`.
+
+The first run's discovery and F5 preflight passed, followed by seven native targets. While the final native target was running, a controlled Git checkout reproduced a release-verification issue: the Linux-packaged CJS modules have LF endings, but a Windows checkout with `core.autocrlf=true` changes their bytes to CRLF. All three exact module comparisons fail in that checkout and pass with `core.autocrlf=false`.
+
+The Windows extracted-VSIX job now sets `core.autocrlf=false` before its first checkout, matching the existing native-validation policy. The verifier's exact-byte contract is retained. The first run was stopped before publication so the corrected workflow can run the complete candidate again. This is a verification-environment correction, not a change to F5 runtime behavior. [Controlled checkout evidence](file-based-apps-2026-11-03/f5-evidence/line-ending-repro.json) records the result.
+
+Final native/extracted-VSIX validation and registry publication are pending the corrected run. This section will record its source commit, workflow result, and public readback once complete; local checks and a selected candidate version alone do not establish publication.

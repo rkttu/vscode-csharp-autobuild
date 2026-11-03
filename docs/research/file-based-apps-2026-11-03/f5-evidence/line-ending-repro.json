@@ -1,0 +1,28 @@
+{
+  "success": true,
+  "scope": "Controlled real Git checkout-index using core.autocrlf true/false and exact verify-vsix read_bytes contract",
+  "results": [
+    {
+      "module": "entry.cjs",
+      "packageHasCRLF": false,
+      "autocrlfTrueHasCRLF": true,
+      "rawByteComparisonWithAutocrlfTrue": false,
+      "rawByteComparisonWithAutocrlfFalse": true
+    },
+    {
+      "module": "runtime.cjs",
+      "packageHasCRLF": false,
+      "autocrlfTrueHasCRLF": true,
+      "rawByteComparisonWithAutocrlfTrue": false,
+      "rawByteComparisonWithAutocrlfFalse": true
+    },
+    {
+      "module": "classify.cjs",
+      "packageHasCRLF": false,
+      "autocrlfTrueHasCRLF": true,
+      "rawByteComparisonWithAutocrlfTrue": false,
+      "rawByteComparisonWithAutocrlfFalse": true
+    }
+  ],
+  "recommendation": "Set core.autocrlf false before Windows test-vsix root checkout; retain exact packaged-byte validation."
+}
