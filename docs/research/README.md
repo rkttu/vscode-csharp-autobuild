@@ -24,6 +24,6 @@ The existing production workflow and `dotnetdev-kr-custom.csharp` publication po
 
 ## Subsequent investigations
 
-- [F5 retry reliability release](2026-11-03-file-based-app-retry-release.md) (November 3, 2026): retry after compilation/save errors while notifications remain open, regression evidence, and publication.
+- [F5 retry reliability release](2026-11-03-file-based-app-retry-release.md) (November 3, 2026): completed `11.7.18003` publication, retry after compilation/save errors while notifications remain open, installed-package regression, and the separate SDK transition investigation.
 - [Active-file F5 release record](2026-11-03-file-based-app-release.md) (November 3, 2026): implementation scope, local and user verification, selected-project regression, completed `11.7.18002` publication, public readback, installed-release editor verification, and [issue #11 acceptance](2026-11-03-file-based-app-release.md#issue-11-completion-review).
 - [File-based app debugging without additional upstream changes](2026-11-03-file-based-app-debugging.md) (November 3, 2026): issue #11, explicit SDK build plus `coreclr` launch, the Dev Kit discovery boundary, active-file F5 implementation, and local debugger/editor evidence. The [user guide](../file-based-apps.md) describes the routing rules, existing selected-project behavior, package changes, and release requirements.

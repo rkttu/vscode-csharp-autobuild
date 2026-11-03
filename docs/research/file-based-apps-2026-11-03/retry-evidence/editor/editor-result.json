@@ -1,0 +1,300 @@
+{
+  "success": true,
+  "editorVersion": "1.144.1",
+  "checks": [
+    "Unchanged CI VSIX installed as production extension; F5 binding verified",
+    "Actual missing-using compiler error returns false without dismissing its notification",
+    "Same-file F5 retry starts after source repair while old notification remains undismissed",
+    "Retried app hits its source breakpoint with local answer=40",
+    "Retried app supports evaluate and Step Over to answer=42",
+    "Retried app prints ANSWER=42 and exits0",
+    "Same file gains #:sdk Web directive; F5 builds WebApplication with ASP.NET Core framework",
+    "Web SDK switched app prints WEB_TYPE and exits0; language service state recorded separately",
+    "Included project file still launches selected project configuration and hits its source breakpoint",
+    "Selected project prints PROJECT=42 and exits0"
+  ],
+  "sessions": [
+    {
+      "type": "coreclr",
+      "name": "C#: app.cs",
+      "configuration": {
+        "name": "C#: app.cs",
+        "type": "coreclr",
+        "request": "launch",
+        "program": "<retry-editor-root>\\portable-data\\user-data\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\31fa2d098b9afc2de1c9953b\\run-kr9UDF\\FileApp.dll",
+        "cwd": "<retry-editor-root>\\workspace",
+        "console": "internalConsole",
+        "stopAtEntry": false,
+        "justMyCode": true,
+        "targetArchitecture": "arm64",
+        "env": {
+          "DOTNET_ROOT": "<dotnet-root>"
+        },
+        "__netcoredbgFileAppOutput": "<retry-editor-root>\\portable-data\\user-data\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\31fa2d098b9afc2de1c9953b\\run-kr9UDF",
+        "requireExactSource": true,
+        "enableStepFiltering": true,
+        "logging": {
+          "exceptions": true,
+          "moduleLoad": true,
+          "programOutput": true,
+          "browserStdOut": true,
+          "elapsedTiming": false,
+          "threadExit": false,
+          "processExit": true,
+          "engineLogging": false,
+          "diagnosticsLog": {
+            "protocolMessages": false,
+            "dispatcherMessages": "none",
+            "debugEngineAPITracing": "none",
+            "debugRuntimeEventTracing": false,
+            "expressionEvaluationTracing": false,
+            "startDebuggingTracing": false
+          },
+          "consoleUsageMessage": true
+        },
+        "suppressJITOptimizations": false,
+        "symbolOptions": {
+          "searchPaths": [],
+          "searchMicrosoftSymbolServer": false,
+          "searchNuGetOrgSymbolServer": false,
+          "cachePath": "",
+          "moduleFilter": {
+            "mode": "loadAllButExcluded",
+            "excludedModules": [],
+            "includedModules": [],
+            "includeSymbolsNextToModules": true,
+            "includeSymbolsOnDemand": true
+          }
+        },
+        "expressionEvaluationOptions": {
+          "allowImplicitFuncEval": true,
+          "allowToString": true,
+          "allowFastEvaluate": true,
+          "showRawValues": false
+        },
+        "terminateChildProcesses": false,
+        "internalConsoleOptions": "openOnSessionStart"
+      }
+    },
+    {
+      "type": "coreclr",
+      "name": "C#: app.cs",
+      "configuration": {
+        "name": "C#: app.cs",
+        "type": "coreclr",
+        "request": "launch",
+        "program": "<retry-editor-root>\\portable-data\\user-data\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\31fa2d098b9afc2de1c9953b\\run-4sOwcP\\FileApp.dll",
+        "cwd": "<retry-editor-root>\\workspace",
+        "console": "internalConsole",
+        "stopAtEntry": false,
+        "justMyCode": true,
+        "targetArchitecture": "arm64",
+        "env": {
+          "DOTNET_ROOT": "<dotnet-root>"
+        },
+        "__netcoredbgFileAppOutput": "<retry-editor-root>\\portable-data\\user-data\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\31fa2d098b9afc2de1c9953b\\run-4sOwcP",
+        "requireExactSource": true,
+        "enableStepFiltering": true,
+        "logging": {
+          "exceptions": true,
+          "moduleLoad": true,
+          "programOutput": true,
+          "browserStdOut": true,
+          "elapsedTiming": false,
+          "threadExit": false,
+          "processExit": true,
+          "engineLogging": false,
+          "diagnosticsLog": {
+            "protocolMessages": false,
+            "dispatcherMessages": "none",
+            "debugEngineAPITracing": "none",
+            "debugRuntimeEventTracing": false,
+            "expressionEvaluationTracing": false,
+            "startDebuggingTracing": false
+          },
+          "consoleUsageMessage": true
+        },
+        "suppressJITOptimizations": false,
+        "symbolOptions": {
+          "searchPaths": [],
+          "searchMicrosoftSymbolServer": false,
+          "searchNuGetOrgSymbolServer": false,
+          "cachePath": "",
+          "moduleFilter": {
+            "mode": "loadAllButExcluded",
+            "excludedModules": [],
+            "includedModules": [],
+            "includeSymbolsNextToModules": true,
+            "includeSymbolsOnDemand": true
+          }
+        },
+        "expressionEvaluationOptions": {
+          "allowImplicitFuncEval": true,
+          "allowToString": true,
+          "allowFastEvaluate": true,
+          "showRawValues": false
+        },
+        "terminateChildProcesses": false,
+        "internalConsoleOptions": "openOnSessionStart"
+      }
+    },
+    {
+      "type": "coreclr",
+      "name": "Existing project configuration",
+      "configuration": {
+        "cwd": "<retry-editor-root>\\workspace\\project",
+        "name": "Existing project configuration",
+        "request": "launch",
+        "stopAtEntry": false,
+        "console": "internalConsole",
+        "type": "coreclr",
+        "program": "<retry-editor-root>\\workspace\\project\\output\\Regression.dll",
+        "targetArchitecture": "arm64",
+        "env": {
+          "DOTNET_ROOT": "<dotnet-root>"
+        },
+        "__configurationTarget": 6,
+        "justMyCode": true,
+        "requireExactSource": true,
+        "enableStepFiltering": true,
+        "logging": {
+          "exceptions": true,
+          "moduleLoad": true,
+          "programOutput": true,
+          "browserStdOut": true,
+          "elapsedTiming": false,
+          "threadExit": false,
+          "processExit": true,
+          "engineLogging": false,
+          "diagnosticsLog": {
+            "protocolMessages": false,
+            "dispatcherMessages": "none",
+            "debugEngineAPITracing": "none",
+            "debugRuntimeEventTracing": false,
+            "expressionEvaluationTracing": false,
+            "startDebuggingTracing": false
+          },
+          "consoleUsageMessage": true
+        },
+        "suppressJITOptimizations": false,
+        "symbolOptions": {
+          "searchPaths": [],
+          "searchMicrosoftSymbolServer": false,
+          "searchNuGetOrgSymbolServer": false,
+          "cachePath": "",
+          "moduleFilter": {
+            "mode": "loadAllButExcluded",
+            "excludedModules": [],
+            "includedModules": [],
+            "includeSymbolsNextToModules": true,
+            "includeSymbolsOnDemand": true
+          }
+        },
+        "expressionEvaluationOptions": {
+          "allowImplicitFuncEval": true,
+          "allowToString": true,
+          "allowFastEvaluate": true,
+          "showRawValues": false
+        },
+        "terminateChildProcesses": false,
+        "internalConsoleOptions": "openOnSessionStart"
+      }
+    }
+  ],
+  "notificationDismissCommandsIssued": 0,
+  "physicalF5KeypressSent": false,
+  "installedExtensionPath": "<retry-editor-root>\\extensions\\dotnetdev-kr-custom.csharp-with-netcoredbg-11.7.18003",
+  "version": "11.7.18003",
+  "targetInstalledAsProduction": true,
+  "f5Binding": {
+    "command": "netcoredbg.debugActiveFile",
+    "key": "f5",
+    "when": "editorTextFocus && editorLangId == csharp && !inDebugMode"
+  },
+  "failedBuild": {
+    "returned": false,
+    "elapsedMilliseconds": 2461,
+    "compiler": {
+      "code": "CS0246",
+      "symbol": "DllImport",
+      "capturedOutput": "compile-failure.txt"
+    }
+  },
+  "notificationAfterFailure": {
+    "available": true,
+    "compileFailureNotificationPresent": true,
+    "visibleCompileFailureNotificationPresent": true
+  },
+  "notificationAfterRetryStarted": {
+    "available": true,
+    "compileFailureNotificationPresent": true,
+    "visibleCompileFailureNotificationPresent": true
+  },
+  "locals": [
+    {
+      "evaluateName": "args",
+      "name": "args",
+      "type": "string[]",
+      "value": "{string[0]}",
+      "variablesReference": 0
+    },
+    {
+      "evaluateName": "answer",
+      "name": "answer",
+      "type": "int",
+      "value": "40",
+      "variablesReference": 0
+    }
+  ],
+  "adapterDiagnostics": [
+    "Error: read error",
+    "Error: read error"
+  ],
+  "webLanguageServiceBeforeBuild": {
+    "diagnostics": [
+      {
+        "message": "The name 'WebApplication' does not exist in the current context",
+        "code": {
+          "value": "CS0103",
+          "target": {
+            "$mid": 1,
+            "path": "/query/roslyn.query",
+            "scheme": "https",
+            "authority": "msdn.microsoft.com",
+            "query": "appId=roslyn&k=k(CS0103)"
+          }
+        },
+        "severity": 0
+      }
+    ],
+    "hover": []
+  },
+  "webSwitch": {
+    "sameSourcePath": "<retry-editor-root>\\workspace\\app.cs",
+    "appVariable": {
+      "evaluateName": "app",
+      "name": "app",
+      "namedVariables": 19,
+      "type": "Microsoft.AspNetCore.Builder.WebApplication",
+      "value": "{Microsoft.AspNetCore.Builder.WebApplication}",
+      "variablesReference": 3
+    },
+    "frameworks": [
+      {
+        "name": "Microsoft.NETCore.App",
+        "version": "10.0.0"
+      },
+      {
+        "name": "Microsoft.AspNetCore.App",
+        "version": "10.0.0"
+      }
+    ]
+  },
+  "webLanguageServiceAfterBuild": {
+    "diagnostics": [],
+    "hover": [
+      "```csharp\r\nclass Microsoft.AspNetCore.Builder.WebApplication\r\n```\r\n  \r\nThe web application used to configure the HTTP pipeline, and routes\\.  \r\n"
+    ]
+  },
+  "output": "ANSWER=42\r\nWEB_TYPE=Microsoft.AspNetCore.Builder.WebApplication\r\nPROJECT=42\r\n"
+}

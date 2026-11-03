@@ -1,0 +1,33 @@
+{
+  "success": true,
+  "scope": "Published CI-built VSIX installed unchanged; plain document opened, edited/saved to Web SDK before first F5 command",
+  "version": "11.7.18002",
+  "platform": "win32-arm64",
+  "editor": "VS Code 1.144.1",
+  "sdk": "10.0.402",
+  "runtime": "10.0.13",
+  "cursorTested": false,
+  "vsixSha256": "932045fdd0a55b66e8d54a8bf71f32721e2ce180c46bc5e8be21fe905630ef21",
+  "installedBytesMatchedArchive": {
+    ".netcoredbg/entry.cjs": "56e8a97842ddda12cd4d25833647683f8251f691dd1bdb9930728fce8d93bc85",
+    ".netcoredbg/runtime.cjs": "b4466136da22726260f1f3992ecfad63a44e46e999c921bdef1b0c3f45c767f2",
+    ".netcoredbg/classify.cjs": "e5bc6e1bff60414a423fe93f87528a6b4b048a0bba14005860dae6979b9c3bff",
+    "dist/extension.js": "b9b22a4523458d4f5e8763e87f84b4cc3c3a60be0321a01fef10c0cb445aecea",
+    ".debugger/netcoredbg/netcoredbg.exe": "dc53b62ed5d6378ab7cb66837f8d90ba81c162880c0aeea39e16644d760c8d41"
+  },
+  "targetExtensionInstalledNotDevelopment": true,
+  "physicalF5KeypressSent": false,
+  "bindingAndRegisteredCommandVerified": true,
+  "rawContextKeysRead": false,
+  "languageServiceRecoveredAfterMilliseconds": 3524,
+  "firstF5CommandElapsedMilliseconds": 3390,
+  "sourcePath": "workspace/app.cs",
+  "testHarness": "extension-test.cjs",
+  "trace": "editor.dap.jsonl",
+  "userManualProfileTouched": false,
+  "limits": [
+    "Single isolated Windows ARM64 / SDK 10.0.402 case, not the user's SDK 11 RC1 or home directory",
+    "The reported post-edit F5 failure was not reproduced; transient diagnostics were observed and cleared",
+    "Physical key routing and Cursor are outside this API-command test"
+  ]
+}

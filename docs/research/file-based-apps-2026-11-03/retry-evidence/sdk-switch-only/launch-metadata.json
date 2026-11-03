@@ -1,0 +1,24 @@
+{
+  "pid": 77248,
+  "executable": "<workspace>\\validation-artifacts\\fba-f5\\editor-smoke\\portable-code\\Code.exe",
+  "args": [
+    "--user-data-dir",
+    "\"<sdk-switch-test-root>\\portable-data\\user-data\"",
+    "--extensions-dir",
+    "\"<sdk-switch-test-root>\\extensions\"",
+    "--extensionDevelopmentPath",
+    "\"<sdk-switch-test-root>\\driver\"",
+    "--extensionTestsPath",
+    "\"<sdk-switch-test-root>\\extension-test.cjs\"",
+    "--disable-gpu",
+    "--skip-welcome",
+    "--skip-release-notes",
+    "--disable-workspace-trust",
+    "--no-sandbox",
+    "\"<sdk-switch-test-root>\\workspace\""
+  ],
+  "VSCODE_PORTABLE": "<sdk-switch-test-root>\\portable-data",
+  "windowStyle": "Hidden",
+  "targetExtensionInstalledNotDevelopment": true,
+  "version": "11.7.18002"
+}

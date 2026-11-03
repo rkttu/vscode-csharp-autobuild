@@ -1,0 +1,186 @@
+{
+  "success": true,
+  "editorVersion": "1.144.1",
+  "scope": "Published 11.7.18002 unchanged; plain file opened then Web directive edited/saved before its first F5; real command not physical key",
+  "checks": [
+    "Published 11.7.18002 installed unchanged as production extension; binding checked",
+    "Same open plain C# document gains Web SDK directive and WebApplication code through editor edit/save",
+    "First F5 contributed command remains registered and starts after Web SDK edit",
+    "Web SDK build reaches source breakpoint with a WebApplication local",
+    "Web application prints its framework type and exits0"
+  ],
+  "plainLanguageTimeline": [
+    {
+      "elapsedMilliseconds": 0,
+      "hover": [],
+      "diagnostics": []
+    },
+    {
+      "elapsedMilliseconds": 1003,
+      "hover": [],
+      "diagnostics": []
+    },
+    {
+      "elapsedMilliseconds": 2004,
+      "hover": [],
+      "diagnostics": []
+    },
+    {
+      "elapsedMilliseconds": 3020,
+      "hover": [
+        "```csharp\r\nclass System.Console\r\n```\r\n  \r\nRepresents the standard input, output, and error streams for console applications\\. This class cannot be inherited\\.  \r\n"
+      ],
+      "diagnostics": []
+    }
+  ],
+  "webLanguageTimeline": [
+    {
+      "elapsedMilliseconds": 0,
+      "hover": [],
+      "diagnostics": []
+    },
+    {
+      "elapsedMilliseconds": 1038,
+      "hover": [],
+      "diagnostics": [
+        {
+          "code": {
+            "value": "CS0103",
+            "target": {
+              "$mid": 1,
+              "path": "/query/roslyn.query",
+              "scheme": "https",
+              "authority": "msdn.microsoft.com",
+              "query": "appId=roslyn&k=k(CS0103)"
+            }
+          },
+          "message": "The name 'WebApplication' does not exist in the current context",
+          "severity": 0
+        }
+      ]
+    },
+    {
+      "elapsedMilliseconds": 2053,
+      "hover": [
+        "```csharp\r\nclass Microsoft.AspNetCore.Builder.WebApplication\r\n```\r\n  \r\nThe web application used to configure the HTTP pipeline, and routes\\.  \r\n"
+      ],
+      "diagnostics": [
+        {
+          "code": {
+            "value": "CS0103",
+            "target": {
+              "$mid": 1,
+              "path": "/query/roslyn.query",
+              "scheme": "https",
+              "authority": "msdn.microsoft.com",
+              "query": "appId=roslyn&k=k(CS0103)"
+            }
+          },
+          "message": "The name 'WebApplication' does not exist in the current context",
+          "severity": 0
+        }
+      ]
+    },
+    {
+      "elapsedMilliseconds": 3524,
+      "hover": [
+        "```csharp\r\nclass Microsoft.AspNetCore.Builder.WebApplication\r\n```\r\n  \r\nThe web application used to configure the HTTP pipeline, and routes\\.  \r\n"
+      ],
+      "diagnostics": []
+    }
+  ],
+  "sessions": [
+    {
+      "name": "C#: app.cs",
+      "type": "coreclr",
+      "configuration": {
+        "name": "C#: app.cs",
+        "type": "coreclr",
+        "request": "launch",
+        "program": "<sdk-switch-test-root>\\portable-data\\user-data\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\6d5f44049ba0700659eb2c68\\run-RMqdmk\\FileApp.dll",
+        "cwd": "<sdk-switch-test-root>\\workspace",
+        "console": "internalConsole",
+        "stopAtEntry": false,
+        "justMyCode": true,
+        "targetArchitecture": "arm64",
+        "env": {
+          "DOTNET_ROOT": "<dotnet-root>"
+        },
+        "__netcoredbgFileAppOutput": "<sdk-switch-test-root>\\portable-data\\user-data\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\6d5f44049ba0700659eb2c68\\run-RMqdmk",
+        "requireExactSource": true,
+        "enableStepFiltering": true,
+        "logging": {
+          "exceptions": true,
+          "moduleLoad": true,
+          "programOutput": true,
+          "browserStdOut": true,
+          "elapsedTiming": false,
+          "threadExit": false,
+          "processExit": true,
+          "engineLogging": false,
+          "diagnosticsLog": {
+            "protocolMessages": false,
+            "dispatcherMessages": "none",
+            "debugEngineAPITracing": "none",
+            "debugRuntimeEventTracing": false,
+            "expressionEvaluationTracing": false,
+            "startDebuggingTracing": false
+          },
+          "consoleUsageMessage": true
+        },
+        "suppressJITOptimizations": false,
+        "symbolOptions": {
+          "searchPaths": [],
+          "searchMicrosoftSymbolServer": false,
+          "searchNuGetOrgSymbolServer": false,
+          "cachePath": "",
+          "moduleFilter": {
+            "mode": "loadAllButExcluded",
+            "excludedModules": [],
+            "includedModules": [],
+            "includeSymbolsNextToModules": true,
+            "includeSymbolsOnDemand": true
+          }
+        },
+        "expressionEvaluationOptions": {
+          "allowImplicitFuncEval": true,
+          "allowToString": true,
+          "allowFastEvaluate": true,
+          "showRawValues": false
+        },
+        "terminateChildProcesses": false,
+        "internalConsoleOptions": "openOnSessionStart"
+      }
+    }
+  ],
+  "installedExtensionPath": "<sdk-switch-test-root>\\extensions\\dotnetdev-kr-custom.csharp-with-netcoredbg-11.7.18002",
+  "binding": {
+    "command": "netcoredbg.debugActiveFile",
+    "key": "f5",
+    "when": "editorTextFocus && editorLangId == csharp && !inDebugMode"
+  },
+  "plainLanguageReady": true,
+  "webLanguageReady": true,
+  "beforeFirstF5": {
+    "languageId": "csharp",
+    "isDirty": false,
+    "activeSourceMatches": true,
+    "commandRegistered": true,
+    "standardDebugCommandRegistered": true,
+    "workspaceTrusted": true,
+    "activeDebugSession": null,
+    "windowFocused": true,
+    "contextScope": "Extension API observations; editor focus command issued; raw context keys not read; no physical key sent"
+  },
+  "firstF5Return": true,
+  "firstF5ElapsedMilliseconds": 3390,
+  "webAppLocal": {
+    "evaluateName": "app",
+    "name": "app",
+    "namedVariables": 19,
+    "type": "Microsoft.AspNetCore.Builder.WebApplication",
+    "value": "{Microsoft.AspNetCore.Builder.WebApplication}",
+    "variablesReference": 4
+  },
+  "output": "WEB_TYPE=Microsoft.AspNetCore.Builder.WebApplication\r\n"
+}

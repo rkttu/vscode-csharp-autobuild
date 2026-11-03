@@ -1,0 +1,30 @@
+{
+  "ownedOnly": true,
+  "userInstanceTouched": false,
+  "successfulMainPid": 77248,
+  "successfulHostLogExit0": true,
+  "startupFailureCleanup": {
+    "pid": 76008,
+    "reason": "Initial sandboxed launch failed AppContainer ACL startup check",
+    "stopped": true,
+    "ownedCommandLineMatched": true
+  },
+  "processes": [
+    {
+      "pid": 76008,
+      "running": false
+    },
+    {
+      "pid": 64740,
+      "running": false
+    },
+    {
+      "pid": 70776,
+      "running": false
+    },
+    {
+      "pid": 77248,
+      "running": false
+    }
+  ]
+}

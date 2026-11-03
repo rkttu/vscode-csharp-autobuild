@@ -10,6 +10,8 @@ An official update retains the same extension ID and receives a new packaging re
 
 Release `11.7.18002` passed those gates, and all eight platform-specific latest feeds returned that version after publication. The [release record](research/2026-11-03-file-based-app-release.md) preserves the workflow and independent public download checks. It also records the [completed acceptance review for issue #11](research/2026-11-03-file-based-app-release.md#issue-11-completion-review).
 
+The follow-up **11.7.18003** release fixes retry after errors. All eight platform-specific latest feeds now return that version. Its [release record](research/2026-11-03-file-based-app-retry-release.md) preserves the 29 successful CI jobs, installed-package retry checks, and public package verification.
+
 Compared with a package without this feature, the new behavior is automatic active-file classification and FBA build/launch through F5. Existing selected project configurations and Continue during a debug session retain their behavior. No workspace `launch.json`, `tasks.json`, or manual-test sample projects are installed by the extension.
 
 ## How the launch is selected
@@ -64,9 +66,9 @@ This flow launches the source file as a managed app; it does not debug a Native 
 
 ## Retrying after a build error
 
-A compilation error prevents the debugger from starting. Version **11.7.18002** also has a retry bug: an open **C# file debugging failed** notification keeps that file's previous command pending, so another F5 does not save or rebuild the corrected file. Close the notification, including its entry in the notification center, then press F5 again.
+A compilation error prevents the debugger from starting. **11.7.18003 fixes retry after build or save errors:** error notifications display without waiting for dismissal, so failed output is cleaned up and the next F5 can save and rebuild the corrected file even while an earlier notification remains open. Update the extension and reload the editor window to load the corrected runtime.
 
-The source fix displays errors without waiting for notification dismissal, allowing failed output cleanup and the next F5 to proceed. Regression tests retain an unresolved notification while retrying after build and save failures. This fix is not included in the published `11.7.18002` package.
+In the affected **11.7.18002** package, an open **C# file debugging failed** notification keeps that file's previous command pending. Until updating, close the notification, including its entry in the notification center, then press F5 again. Regression tests for the fix retain an unresolved notification while retrying after build and save failures.
 
 ## Implementation and validation
 
@@ -77,6 +79,8 @@ The release preflight runs the classifier, runtime, and wrapper tests. VSIX veri
 Local validation on Windows ARM64 covered actual MSBuild membership for included, excluded, ancestor, and conditional multi-target cases. The real runtime command, classifier, .NET SDK 10.0.402 build, and distributed netcoredbg passed breakpoint, locals, evaluation, stepping, changed-value, output, and exit checks. An initial **real VS Code 1.144.1 extension-host run** passed FBA and existing selected-project debugging with the published variant plus the new owned entry/modules, keeping the original compiled C# extension unchanged. [Initial evidence and scopes](research/file-based-apps-2026-11-03/f5-evidence/README.md) distinguish those local checks from release verification.
 
 The unchanged **CI-built 11.7.18002 Windows ARM64 VSIX** was then installed normally in an isolated editor and passed ten assertions for FBA and existing selected-project debugging. Its hash matches the public Open VSX download. These automated editor tests verified the F5 manifest and invoked its registered command through the real editor API; no physical keypress was synthesized. The [release evidence](research/file-based-apps-2026-11-03/release-evidence/README.md) records this installed-package check, the separate eight-platform native/extracted-VSIX debugger matrix, and verified publication. The matrix does not establish eight-platform FBA editor coverage.
+
+The unchanged **11.7.18003** CI package also passed ten [installed-editor assertions](research/file-based-apps-2026-11-03/retry-evidence/editor/README.md), including a real compiler failure followed by a successful same-file retry while its error notification remained visible. Same-file Web SDK conversion and selected-project debugging passed as well. This remains Windows ARM64/VS Code API-command coverage; Cursor and physical F5 input were not exercised. The intermittent Web SDK resource-glob failure and reported editor SDK/property refresh delays remain separate investigations.
 
 Run the focused logic tests with Node 22 or later:
 

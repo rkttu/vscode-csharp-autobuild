@@ -64,6 +64,8 @@ The bundled debugger needs no separate download or manual adapter path setting. 
 
 The active-file F5 integration, available starting with **11.7.18002**, builds and debugs standalone `.cs` files with .NET SDK 10.0.100 or later, without requiring `launch.json`. Shebangs and `#:` directives explicitly select file-based execution; otherwise it evaluates project membership from the file's directory through the filesystem root. Project-owned files use the existing selected debugging configuration; opening a file does not select a different project. See [active-file debugging](docs/file-based-apps.md) for the full rules and package changes, and the [release record](docs/research/2026-11-03-file-based-app-release.md) for the eight-platform validation and public readback.
 
+Update to **11.7.18003 or later** for the [F5 retry fix](docs/research/2026-11-03-file-based-app-retry-release.md): correcting a build or save error can start another F5 run while the earlier error notification remains open.
+
 ## 3. Validation coverage and limits
 
 Every new candidate, including a C#-only update, builds and tests the debugger on all eight native targets. The pipeline then packages eight VSIX files and repeats the functional tests against each extracted debugger. A passing candidate covers 16 target/runtime combinations in each phase.

@@ -1,0 +1,82 @@
+{
+  "success": true,
+  "ciRunId": 41602853096,
+  "ciHeadSha": "1d5f543dc86fa5aba6da0c8c2c2f94c2668836c7",
+  "version": "11.7.18003",
+  "artifactName": "de497678aeb0d9c9-vsix-win32-arm64",
+  "artifactId": 13216786967,
+  "artifactMetadataDigest": "sha256:757373b03396cf2e564e96562540b9e510258e4b19a737e86804628b2b45a1c5",
+  "artifactMetadataDigestScope": "Outer GitHub Actions artifact ZIP metadata; distinct from actual VSIX hash",
+  "vsix": "csharp-with-netcoredbg-win32-arm64-11.7.18003.vsix",
+  "vsixSha256": "15ce16bab7305f11fc40b18c8738ee9226d2fb4acb6301e49f702ae8f3dcb39f",
+  "vsixHashMatchesPackageJob": true,
+  "installedCompared": true,
+  "modules": {
+    "entry.cjs": {
+      "sha256": "56e8a97842ddda12cd4d25833647683f8251f691dd1bdb9930728fce8d93bc85",
+      "canonicalGitMatched": true,
+      "installedMatched": true
+    },
+    "runtime.cjs": {
+      "sha256": "5f1692df304538ded82e2945afc24ae193d4f19d92034e560bdcb473c3cddf4d",
+      "canonicalGitMatched": true,
+      "installedMatched": true
+    },
+    "classify.cjs": {
+      "sha256": "e5bc6e1bff60414a423fe93f87528a6b4b048a0bba14005860dae6979b9c3bff",
+      "canonicalGitMatched": true,
+      "installedMatched": true
+    }
+  },
+  "main": "./.netcoredbg/entry.cjs",
+  "build": {
+    "target": "win32-arm64",
+    "upstreamCsharpCommit": "1c27e135b5dada55a240e4a504bafa759ec578e8",
+    "upstreamCsharpVersion": "11.7.18",
+    "upstreamCsharpTag": "v11.7.18-prerelease",
+    "upstreamPackageVersion": "42.42.42-placeholder",
+    "netcoredbgTag": "3.2.0-1092",
+    "packagingRevision": 3,
+    "releaseTag": "csharp-v11.7.18-netcoredbg-v3.2.0-1092-g9744e1f05186-r3",
+    "versionPolicy": "upstream-patch-revision-v1",
+    "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+    "debuggerArchiveSha256": "0c5cfb9af2883d24cfdf7b350d9a1d8efa8caf709ad3b3ab247a15ecfe5765a7",
+    "validationRunId": "41602853096",
+    "validationWorkflowCommit": "1d5f543dc86fa5aba6da0c8c2c2f94c2668836c7",
+    "upstreamMain": "./dist/extension"
+  },
+  "debuggerExecutableSha256": "34e9bf875671f9d2d5d0e25f0169f1fada8ac37f29b3f5c0157850f3bad38a2a",
+  "debuggerHashMatchesPackageJob": true,
+  "compiledUpstreamMainSha256": "b9b22a4523458d4f5e8763e87f84b4cc3c3a60be0321a01fef10c0cb445aecea",
+  "originalEntryInstalledMatched": true,
+  "scope": "Actual unchanged CI-built 11.7.18003 VSIX installed normally in isolated extensions; separate empty development driver hosts test harness",
+  "editorVersion": "1.144.1",
+  "os": "Windows ARM64",
+  "sdk": "10.0.402",
+  "runtime": "10.0.13",
+  "runtimeEvidence": "System.Private.CoreLib module paths in all three DAP sessions select Microsoft.NETCore.App/10.0.13",
+  "actualEditorChecks": 10,
+  "testResult": "editor-result.json",
+  "trace": "editor.dap.jsonl",
+  "testHarness": "extension-test.cjs",
+  "notificationEvidence": "notification-observation.json",
+  "physicalF5KeypressSent": false,
+  "manifestBindingAndRegisteredCommandTested": true,
+  "cursorTested": false,
+  "userManualInstanceTouched": false,
+  "nonFatalDiagnostics": [
+    "Error: read error",
+    "Error: read error"
+  ],
+  "coverage": [
+    "Real compiler failure returns before notification dismissal",
+    "Same-file using repair then successful F5 retry with old failure notification still present",
+    "Breakpoint, variables, expression evaluation, Step Over, stdout and exit0",
+    "Same-file Web SDK directive transition and ASP.NET Core framework reference",
+    "Existing selected project breakpoint/output/exit0"
+  ],
+  "limits": [
+    "Windows ARM64 / VS Code 1.144.1 / SDK 10.0.402 only; not Cursor or physical key input",
+    "CI artifact test and package-job hash match; public release readback recorded separately"
+  ]
+}

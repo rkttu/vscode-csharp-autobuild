@@ -1,0 +1,23 @@
+{
+  "success": true,
+  "observationScope": "Read only the isolated test editor renderer DOM over its own loopback CDP port; opened notification center; no target extension code injection",
+  "actualCompilerError": {
+    "code": "CS0246",
+    "symbol": "DllImport",
+    "capturedOutput": "compile-failure.txt"
+  },
+  "failedCommandReturned": false,
+  "failedCommandElapsedMilliseconds": 2461,
+  "afterFailure": {
+    "available": true,
+    "compileFailureNotificationPresent": true,
+    "visibleCompileFailureNotificationPresent": true
+  },
+  "afterRetryStarted": {
+    "available": true,
+    "compileFailureNotificationPresent": true,
+    "visibleCompileFailureNotificationPresent": true
+  },
+  "notificationDismissCommandsIssued": 0,
+  "compileFailureNotificationRetainedAcrossSuccessfulRetry": true
+}
