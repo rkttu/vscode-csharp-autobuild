@@ -1,0 +1,33 @@
+{
+  "runtimeSha256": "b4466136da22726260f1f3992ecfad63a44e46e999c921bdef1b0c3f45c767f2",
+  "builds": [
+    {
+      "sourceFixed": false
+    },
+    {
+      "sourceFixed": true
+    }
+  ],
+  "notifications": [
+    "C# file debugging failed: CS0246: DllImportAttribute missing (fixture compile failure). See the C# File Debugging output."
+  ],
+  "launches": [
+    "<repo-root>\\validation-artifacts\\fba-retry-diagnosis-2026-11-03\\storage\\file-based-apps\\420d51ef40d68afefcd2cffe\\run-J1H7L5\\FileApp.dll"
+  ],
+  "snapshots": [
+    {
+      "phase": "notification-undismissed-after-source-fix-and-second-F5",
+      "builds": 1,
+      "launches": 0,
+      "firstSettled": false,
+      "secondSettled": false
+    },
+    {
+      "phase": "notification-dismissed-then-third-F5",
+      "builds": 2,
+      "launches": 1
+    }
+  ],
+  "success": true,
+  "conclusion": "Awaiting showErrorMessage keeps the same-file pending operation alive. Fixing source cannot trigger a new build until the old notification promise resolves."
+}

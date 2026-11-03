@@ -62,6 +62,12 @@ The build runs with the source directory as its working directory, Debug configu
 
 This flow launches the source file as a managed app; it does not debug a Native AOT executable. Application output uses the Debug Console. Interactive stdin, launch-profile discovery for file-based apps, and Hot Reload are outside this flow. F5 continues to use the editor's normal Continue action during an existing debug session. User keyboard-shortcut overrides retain their normal precedence.
 
+## Retrying after a build error
+
+A compilation error prevents the debugger from starting. Version **11.7.18002** also has a retry bug: an open **C# file debugging failed** notification keeps that file's previous command pending, so another F5 does not save or rebuild the corrected file. Close the notification, including its entry in the notification center, then press F5 again.
+
+The source fix displays errors without waiting for notification dismissal, allowing failed output cleanup and the next F5 to proceed. Regression tests retain an unresolved notification while retrying after build and save failures. This fix is not included in the published `11.7.18002` package.
+
 ## Implementation and validation
 
 Repository-owned modules live in [`scripts/variant/file-based-apps`](../scripts/variant/file-based-apps). Packaging adds `.netcoredbg/entry.cjs`, `runtime.cjs`, and `classify.cjs`; updates manifest `main` to the wrapper; preserves the original entry in `netcoredbgBuild.upstreamMain`; and registers the command, activation event, and F5 binding. The wrapper registers the command and calls the original upstream activation function, preserving its returned API and other exports. There are no additional upstream JS/TypeScript source replacements for this feature. It uses the existing bundled debugger and language service implementations, and the existing `coreclr` adapter factory remains the sole adapter owner.

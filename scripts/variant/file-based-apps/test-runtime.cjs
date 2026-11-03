@@ -32,7 +32,10 @@ function fixture(t, options = {}) {
         window: {
             activeTextEditor: { document },
             createOutputChannel: () => ({ append: value => calls.logs.push(value), appendLine: value => calls.logs.push(value), dispose() {} }),
-            showErrorMessage: async message => calls.errors.push(message),
+            showErrorMessage: message => {
+                calls.errors.push(message);
+                return options.showErrorMessage ? options.showErrorMessage(message) : Promise.resolve(undefined);
+            },
             withProgress: async (_settings, callback) => callback({ report() {} }, {
                 isCancellationRequested: false,
                 onCancellationRequested: callback => { cancellation = callback; return { dispose() {} }; },
@@ -64,6 +67,7 @@ function fixture(t, options = {}) {
             if (args[0] === '--version') return { stdout: options.sdk || '10.0.402\n' };
             if (args[0] === '--info') return { stdout: `Host:\n  Version: 10.0.13\n  Architecture: ${options.arch || 'arm64'}\n` };
             if (args[0] === 'build') {
+                if (options.buildError) throw options.buildError;
                 const outputDirectory = args[args.indexOf('--output') + 1];
                 fs.writeFileSync(path.join(outputDirectory, 'FileApp.dll'), 'fixture DLL');
                 fs.writeFileSync(path.join(outputDirectory, 'FileApp.pdb'), 'fixture PDB');
@@ -189,6 +193,59 @@ test('failed debug launch removes its own output and does not reuse stale bytes'
     const f = fixture(t, { startResult: false });
     assert.equal(await f.api.debugActiveFile(), false);
     assert(!fs.existsSync(f.calls.launches[0].config.program));
+});
+
+test('a build failure releases the file for retry while its error notification remains open', async t => {
+    let dismiss;
+    const notification = new Promise(resolve => { dismiss = resolve; });
+    const options = { buildError: new Error('CS0246: DllImport could not be found'), showErrorMessage: () => notification };
+    const f = fixture(t, options);
+    const failed = f.api.debugActiveFile();
+    t.after(async () => { dismiss(); await failed; });
+
+    assert.equal(await Promise.race([failed, new Promise(resolve => setTimeout(() => resolve('still waiting for notification'), 250))]), false);
+    const failedBuild = f.calls.processes.find(call => call.args[0] === 'build');
+    assert(!fs.existsSync(failedBuild.args[failedBuild.args.indexOf('--output') + 1]), 'Failed output must be cleaned before the notification closes');
+
+    options.buildError = undefined;
+    fs.writeFileSync(f.source, 'using System.Runtime.InteropServices;\nConsole.WriteLine("fixed");\n');
+    f.document.isDirty = true;
+    assert.equal(await f.api.debugActiveFile(), true);
+    assert.equal(f.calls.saves, 1);
+    assert.equal(f.calls.processes.filter(call => call.args[0] === 'build').length, 2);
+    assert.equal(f.calls.launches.length, 1);
+});
+
+test('a save failure releases the file for retry while its error notification remains open', async t => {
+    let dismiss;
+    const notification = new Promise(resolve => { dismiss = resolve; });
+    const f = fixture(t, { dirty: true, showErrorMessage: () => notification });
+    const save = f.document.save;
+    f.document.save = async () => { throw new Error('Could not save source'); };
+    const failed = f.api.debugActiveFile();
+    t.after(async () => { dismiss(); await failed; });
+
+    assert.equal(await Promise.race([failed, new Promise(resolve => setTimeout(() => resolve('still waiting for notification'), 250))]), false);
+    assert.equal(f.calls.processes.length, 0);
+    f.document.save = save;
+    assert.equal(await f.api.debugActiveFile(), true);
+    assert.equal(f.calls.launches.length, 1);
+});
+
+test('notification delivery failures are logged without preventing a retry', async t => {
+    for (const [showErrorMessage, diagnostic] of [
+        [() => Promise.reject(new Error('Notification service unavailable')), 'Notification service unavailable'],
+        [() => { throw new Error('Notification service unavailable'); }, 'Notification service unavailable'],
+        [() => Promise.reject(undefined), 'undefined'],
+    ]) {
+        const options = { buildError: new Error('Build failed'), showErrorMessage };
+        const f = fixture(t, options);
+        assert.equal(await f.api.debugActiveFile(), false);
+        assert(f.calls.logs.some(line => line.includes(`Could not show error notification: ${diagnostic}`)));
+        options.buildError = undefined;
+        assert.equal(await f.api.debugActiveFile(), true);
+        assert.equal(f.calls.launches.length, 1);
+    }
 });
 
 test('cancelling classification prevents a fallback project launch', async t => {

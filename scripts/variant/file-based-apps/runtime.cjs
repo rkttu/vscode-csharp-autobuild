@@ -92,6 +92,22 @@ function activate(context, dependencies = {}) {
     const packagedTarget = context.extension?.packageJSON?.netcoredbgBuild?.target;
     const expectedArchitecture = packagedTarget ? (packagedTarget.endsWith('-arm64') ? 'arm64' : 'x64') : undefined;
 
+    function showError(message) {
+        // The notification promise settles on dismissal, which must not hold a file's pending operation.
+        const failed = error => {
+            try {
+                output.appendLine(`Could not show error notification: ${error?.message || String(error)}`);
+            } catch {
+                // Notification delivery may finish after the extension's output channel is disposed.
+            }
+        };
+        try {
+            void Promise.resolve(vscode.window.showErrorMessage(message)).catch(failed);
+        } catch (error) {
+            failed(error);
+        }
+    }
+
     async function cleanup(directory) {
         // Only paths created by this controller may be removed. Never trust a session's field alone.
         if (!ownedOutputs.has(directory)) return;
@@ -204,7 +220,7 @@ function activate(context, dependencies = {}) {
         } catch (error) {
             if (error.name !== 'AbortError') {
                 output.appendLine(error.stack || error.message || String(error));
-                await vscode.window.showErrorMessage(`C# file debugging failed: ${error.message || error}. See the C# File Debugging output.`);
+                showError(`C# file debugging failed: ${error.message || error}. See the C# File Debugging output.`);
             }
             return false;
         } finally {
@@ -215,12 +231,12 @@ function activate(context, dependencies = {}) {
 
     async function command() {
         if (vscode.workspace.isTrusted === false) {
-            await vscode.window.showErrorMessage('Trust this workspace before building or debugging a C# file.');
+            showError('Trust this workspace before building or debugging a C# file.');
             return false;
         }
         const document = vscode.window.activeTextEditor?.document;
         if (!document || document.uri.scheme !== 'file' || path.extname(document.uri.fsPath).toLowerCase() !== '.cs') {
-            await vscode.window.showErrorMessage('Open a saved C# file before starting file debugging.');
+            showError('Open a saved C# file before starting file debugging.');
             return false;
         }
         const source = path.resolve(document.uri.fsPath);
@@ -230,7 +246,7 @@ function activate(context, dependencies = {}) {
                 if (document.isDirty && !await document.save()) return false;
                 return debugFile(document.uri, source, document.getText());
             } catch (error) {
-                await vscode.window.showErrorMessage(`C# file debugging failed: ${error.message || error}.`);
+                showError(`C# file debugging failed: ${error.message || error}.`);
                 return false;
             }
         })();
