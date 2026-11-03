@@ -2,15 +2,15 @@
 
 Research date: November 3, 2026. Scope: [issue #11](https://github.com/rkttu/vscode-csharp-autobuild/issues/11), specifically `dotnetdev-kr-custom.csharp-with-netcoredbg`. Repository inspected at `e649fc114938312a730a639eb8af445db3ffe0e6`.
 
-Implementation follow-up: [active-file F5 routing](../file-based-apps.md) adds the user's marker/project-membership rules in repository-owned modules and a manifest entry wrapper. The sections below retain the original investigation's explicit-configuration scope and evidence.
+Implementation follow-up: [active-file F5 routing](../file-based-apps.md) adds the user's marker/project-membership rules in repository-owned modules and a manifest entry wrapper. It shipped in **11.7.18002**, and all four issue acceptance criteria are fulfilled; see the [completion review](2026-11-03-file-based-app-release.md#issue-11-completion-review). The sections below retain the original investigation's explicit-configuration scope and evidence.
 
 ## Finding
 
-File-based apps can use the existing netcoredbg launch path: build the `.cs` file with the .NET SDK into a known directory, then launch its managed DLL through `type: "coreclr"`. This needs no additional changes to `dotnet/vscode-csharp` or `Samsung/netcoredbg`, and no user-maintained `.csproj` or `.sln`. It does require an explicit build task and launch configuration, or a small companion extension to create the same launch programmatically.
+File-based apps can use the existing netcoredbg launch path: build the `.cs` file with the .NET SDK into a known directory, then launch its managed DLL through `type: "coreclr"`. This needs no additional changes to `dotnet/vscode-csharp` or `Samsung/netcoredbg`, and no user-maintained `.csproj` or `.sln`. The initial experiment used an explicit build task and launch configuration. The subsequently shipped F5 wrapper creates the build and launch programmatically, without those workspace configuration files.
 
 The existing distribution already has an upstream integration overlay in [`scripts/variant/overlay.py`](../../scripts/variant/overlay.py). Here, “without upstream changes” means retaining that existing distribution and adding no new upstream source edits for file-based debugging.
 
-The smallest recommended next step for #11 is to document the task/configuration route and add a file-based fixture to the release gate. A companion extension is an optional usability improvement for a later step.
+The initial recommendation was to document the task/configuration route and add a file-based fixture to the release gate, with an optional companion command later. The subsequent implementation delivered active-file F5 inside this distribution, followed by installed-release editor verification and publication. The [release record](2026-11-03-file-based-app-release.md) documents that completed work separately from this initial probe.
 
 ## Why an enablement setting is insufficient
 
@@ -80,12 +80,12 @@ An initial exploratory build explicitly disabled AOT and optimization and select
 
 The [evidence README](file-based-apps-2026-11-03/evidence/README.md) contains reproduction instructions and the standalone DAP client's source. Paths in archived logs were normalized; binaries, SDK caches, and build outputs are omitted. These are direct DAP sessions against the distributed debugger archive, not sessions launched through an installed VSIX or editor UI.
 
-## Options and tradeoffs
+## Options considered during the initial investigation
 
 | Approach | Additional upstream source edits | Assessment |
 | --- | --- | --- |
-| Build task + explicit `coreclr` DLL launch | None | Recommended first implementation; works with the existing adapter contract and can be documented now. |
-| Companion extension: build then call `debug.startDebugging` | None | Suitable for a **Debug current C# file** command, saved source outside a workspace, or fewer configuration files. Requires a separately owned extension and editor tests. |
+| Build task + explicit `coreclr` DLL launch | None | Initial recommendation; verified with the existing adapter contract and documented in this report. |
+| Companion extension: build then call `debug.startDebugging` | None | Proposed for a **Debug current C# file** command, saved source outside a workspace, or fewer configuration files. The later implementation uses owned modules inside this distribution instead of a separate extension. |
 | `dotnet` configuration with `projectPath` set to `.cs` | Not a supported shortcut in this variant | Automatic discovery belongs to a different integration path; the variant advertises only `coreclr`. |
 | Start independently and attach | None at the adapter level | Possible fallback, but early breakpoints require the app to wait and users must select the correct process. Less suitable for the requested launch experience. |
 | Launch `dotnet run app.cs` as the debuggee | Unproven | Launches the SDK CLI before the application; do not assume child-process debugging or early breakpoint behavior. |
@@ -96,13 +96,15 @@ Multiple configuration providers can coexist, but their [resolve order is arbitr
 
 That helper should use the same SDK root/architecture as the adapter, respect the source directory's `global.json`, and isolate outputs by full source path. It should stop on a failed build and avoid treating every `.cs` file inside an existing project as a standalone app. These are implementation recommendations, not capabilities verified by this research. The SDK run-API could eventually provide richer launch discovery; it is unnecessary for the minimal deterministic build/launch flow.
 
-## Limits and completion of #11
+## Initial probe limits and subsequent completion of #11
 
 - This is managed DLL debugging. File-based apps' Native AOT publish defaults do not make native executables suitable for netcoredbg. Use the Debug build output from this example, rather than a `dotnet publish` native executable. See the [SDK file-app design](https://github.com/dotnet/sdk/blob/v10.0.100/documentation/general/dotnet-run-file.md).
 - A source directive or inherited `Directory.Build.props`/`.targets` can alter the assembly name, debug symbols, target framework, or output layout. Adapt a fixed example for those cases; a helper must inspect or control the actual output. NuGet directives can require restore/network access.
-- The example needs a saved file and an opened folder. Automatic F5/editor-arrow discovery, web launch-profile parity, Hot Reload, and interactive-terminal behavior are separate integration work. `internalConsole` is sufficient for this noninteractive fixture.
-- The local probe verifies debugger protocol behavior on one host. It does not establish installed-extension editor behavior or an eight-platform file-based-app matrix.
+- The explicit task/launch example needs a saved file and an opened folder. Automatic F5 was outside the initial probe and was subsequently implemented in the distribution. Web launch-profile parity, Hot Reload, and interactive-terminal behavior remain outside that flow. `internalConsole` is sufficient for this noninteractive fixture.
+- The initial local probe verifies debugger protocol behavior on one host. Its evidence does not establish installed-extension editor behavior or an eight-platform file-based-app matrix. Later [F5 evidence](file-based-apps-2026-11-03/f5-evidence/README.md) and [installed-release evidence](file-based-apps-2026-11-03/release-evidence/README.md) record the separate editor checks.
 
-To satisfy the remaining issue acceptance criteria, exercise the supplied configuration in an installed distribution and retain evidence that existing project-based debugging works. For ongoing support, the recommended release-gate addition is a .NET 10 file-based DAP fixture in both native and extracted-VSIX tests, while retaining existing project-based .NET 8/10 checks. That fixture should create no user project and assert source breakpoint binding, variables, stepping, output, and exit. Include an SDK-version failure case and paths with spaces; expand later for `#:package`, changed assembly names, and inherited build settings.
+At the end of the initial probe, installed-distribution and existing-project editor checks were still needed for issue acceptance. Both subsequently passed with the unchanged CI-built `11.7.18002` VSIX, and the eight-target release passed its native and extracted-VSIX gates before publication. The [completion review](2026-11-03-file-based-app-release.md#issue-11-completion-review) maps all four original acceptance criteria to the retained evidence.
 
-No production overlay, release workflow, or upstream source was changed for this investigation. Research documentation alone is outside the release recipe fingerprint, so it does not request a new package build. Issue acceptance remains open until the editor and release-gate work is completed.
+For future coverage, a dedicated .NET 10 file-based DAP fixture in every native and extracted-VSIX job would extend the current editor and project-based .NET 8/10 checks. Such a fixture should create no user project and assert source breakpoint binding, variables, stepping, output, and exit. SDK-version failures, paths with spaces, `#:package`, changed assembly names, and inherited build settings are useful expansion cases. This recommendation is follow-up coverage work, not an unmet original acceptance criterion.
+
+The initial DAP investigation changed no production overlay, release workflow, or upstream source. Subsequent implementation and release changes are recorded in the release report. Research documentation alone is outside the release recipe fingerprint, so this completion update does not request a new package build.
