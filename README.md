@@ -70,6 +70,8 @@ Update to **11.7.18003 or later** for the [F5 retry fix](docs/research/2026-11-0
 
 ## 3. Validation coverage and limits
 
+The [FBA stability contract](docs/stability-contract.md) defines the required VSCodium baseline, repeated-workflow acceptance and evidence rules. It is a qualification policy; the required VSCodium targets and editor timing budgets remain pending installed-editor calibration.
+
 Every new candidate, including a C#-only update, builds and tests the debugger on all eight native targets. The pipeline then packages eight VSIX files and repeats the functional tests against each extracted debugger. A passing candidate covers 16 target/runtime combinations in each phase.
 
 The gate includes:
