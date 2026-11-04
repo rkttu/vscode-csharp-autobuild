@@ -92,6 +92,7 @@ function activate(context, dependencies = {}) {
     const ownedOutputs = new Set();
     const failedCleanups = new Set();
     const cleanupInFlight = new Map();
+    const launches = new Map();
     const controllers = new Set();
     const packagedTarget = context.extension?.packageJSON?.netcoredbgBuild?.target;
     const expectedArchitecture = packagedTarget ? (packagedTarget.endsWith('-arm64') ? 'arm64' : 'x64') : undefined;
@@ -147,16 +148,89 @@ function activate(context, dependencies = {}) {
         if (directory !== undefined) await cleanup(directory);
     }
 
-    const terminated = vscode.debug.onDidTerminateDebugSession(session => {
-        const directory = session.configuration?.__netcoredbgFileAppOutput;
-        if (typeof directory === 'string') void cleanup(directory);
+    function matchesLaunch(session, launch) {
+        const config = session.configuration;
+        return session.type === 'coreclr' && config?.type === 'coreclr' &&
+            config.__netcoredbgFileAppOutput === launch.directory && config.program === launch.program &&
+            (!launch.session || launch.session.id === session.id);
+    }
+
+    async function finishLaunch(launch) {
+        launch.terminal = true;
+        launches.delete(launch.directory);
+        await cleanup(launch.directory);
+    }
+
+    function stopCancelledSession(launch) {
+        if (!launch.session || launch.terminal) return;
+        if (!launch.stopPromise) {
+            // Schedule after assigning the promise so reentrant events cannot request a second stop.
+            launch.stopPromise = Promise.resolve().then(async () => {
+                if (launch.terminal) return;
+                try {
+                    await vscode.debug.stopDebugging(launch.session);
+                    // The editor can resolve stop before emitting termination. Keep output until that event.
+                } catch (error) {
+                    if (launch.terminal) return;
+                    const message = `Could not stop the cancelled C# debug session "${launch.session.name}": ${error?.message || String(error)}. Stop that session manually; its output has been preserved. See the C# File Debugging output.`;
+                    try { output.appendLine(`${message}\nSession: ${launch.session.id}\nOutput: ${launch.directory}`); } catch { /* The output channel may already be disposed. */ }
+                    showError(message);
+                }
+            });
+        }
+        return launch.stopPromise;
+    }
+
+    const startedSession = vscode.debug.onDidStartDebugSession(session => {
+        const launch = launches.get(session.configuration?.__netcoredbgFileAppOutput);
+        if (!launch || launch.terminal || !matchesLaunch(session, launch)) return;
+        launch.session = session;
+        if (launch.cancelled) void stopCancelledSession(launch);
     });
+    const terminated = vscode.debug.onDidTerminateDebugSession(session => {
+        const launch = launches.get(session.configuration?.__netcoredbgFileAppOutput);
+        if (launch && matchesLaunch(session, launch)) void finishLaunch(launch);
+    });
+
+    async function startFileDebugging(folder, config, signal) {
+        const launch = { directory: config.__netcoredbgFileAppOutput, program: config.program,
+            cancelled: false, terminal: false, session: undefined, stopPromise: undefined };
+        launches.set(launch.directory, launch);
+        let abort;
+        const cancelled = new Promise((_resolve, reject) => {
+            abort = () => {
+                launch.cancelled = true;
+                void stopCancelledSession(launch);
+                reject(signal.reason);
+            };
+            signal.addEventListener('abort', abort, { once: true });
+            if (signal.aborted) abort();
+        });
+        const start = Promise.resolve().then(() => {
+            signal.throwIfAborted();
+            return vscode.debug.startDebugging(folder, config);
+        }).then(async started => {
+            if (!started && !launch.session) await finishLaunch(launch);
+            signal.throwIfAborted();
+            return started;
+        }, async error => {
+            if (!launch.session) await finishLaunch(launch);
+            signal.throwIfAborted();
+            throw error;
+        });
+        try {
+            // Cancellation releases the command; the original start remains observed in the background.
+            return await Promise.race([start, cancelled]);
+        } finally {
+            signal.removeEventListener('abort', abort);
+        }
+    }
 
     async function debugFile(sourceUri, source, text) {
         const controller = new AbortController();
         controllers.add(controller);
         let generated;
-        let handedToDebugger = false;
+        let launchOwnsOutput = false;
         try {
             return await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
@@ -241,7 +315,9 @@ function activate(context, dependencies = {}) {
                         throw new Error('The web launch profile DOTNET_ROOT does not identify the selected dotnet installation.');
                     }
                     progress.report({ message: 'Starting netcoredbg' });
-                    const started = await vscode.debug.startDebugging(vscode.workspace.getWorkspaceFolder(sourceUri), {
+                    // From here the launch tracker owns cleanup, including results arriving after cancellation.
+                    launchOwnsOutput = true;
+                    const started = await startFileDebugging(vscode.workspace.getWorkspaceFolder(sourceUri), {
                         name: `C#: ${path.basename(source)}`,
                         type: 'coreclr',
                         request: 'launch',
@@ -258,12 +334,11 @@ function activate(context, dependencies = {}) {
                         } : {}),
                         env: { ...webLaunch?.env, DOTNET_ROOT: selected.root },
                         __netcoredbgFileAppOutput: generated,
-                    });
+                    }, controller.signal);
                     if (!started) {
                         controller.signal.throwIfAborted();
                         throw new Error('The editor did not start the netcoredbg debug session. Check C# and Debug Console output for details before retrying');
                     }
-                    handedToDebugger = started;
                     return started;
                 } finally {
                     cancel.dispose();
@@ -277,7 +352,7 @@ function activate(context, dependencies = {}) {
             return false;
         } finally {
             controllers.delete(controller);
-            if (generated && !handedToDebugger) await cleanup(generated);
+            if (generated && !launchOwnsOutput) await cleanup(generated);
         }
     }
 
@@ -312,7 +387,7 @@ function activate(context, dependencies = {}) {
     }
 
     const registered = vscode.commands.registerCommand(COMMAND, command);
-    context.subscriptions.push(registered, terminated, output, {
+    context.subscriptions.push(registered, startedSession, terminated, output, {
         dispose() { for (const controller of controllers) controller.abort(); },
     });
     return { debugActiveFile: command };

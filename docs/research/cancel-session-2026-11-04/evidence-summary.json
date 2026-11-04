@@ -1,0 +1,130 @@
+{
+  "date": "2026-11-04",
+  "platform": "Windows ARM64",
+  "editorVersion": "1.144.1",
+  "installedAdapterExtensionVersion": "11.7.18004",
+  "sdkVersion": "10.0.403",
+  "runtimeVersion": "10.0.14",
+  "scope": {
+    "realEditorApi": true,
+    "nativeAdapterFromNormallyInstalledVsix": true,
+    "runtimeLoadedDirectly": true,
+    "injectedProgressCancellation": true,
+    "directInstalledCommand": false,
+    "physicalF5": false,
+    "VSCodium": false,
+    "macOS": false,
+    "published": false
+  },
+  "checks": [
+    "Public 11.7.18004 normally installed and activated in isolated profile",
+    "Injected cancellation releases foreground command before real start API settles and preserves pending DLL",
+    "Real start event preserves ownership fields; exactly its session is stopped and output is cleaned",
+    "Same-file retry uses fresh output and real netcoredbg breakpoint with answer=40",
+    "Normal retry termination cleans output without a cancellation error"
+  ],
+  "beforeTerminalGuard": {
+    "success": false,
+    "runtimeSha256": "c947f42cb41c60fa3b2651bda62b009c7bbcec5ec2939ed49a7d55929df6fbf4",
+    "assertion": "Stop API completion must not delete DLL before the actual termination event",
+    "observations": [
+      {
+        "event": "progress-cancel",
+        "afterCancelMs": 0,
+        "detail": null
+      },
+      {
+        "event": "foreground-cancel-returned",
+        "afterCancelMs": 0,
+        "detail": null
+      },
+      {
+        "event": "runtime-stop-request",
+        "afterCancelMs": 238,
+        "detail": "c21fc263-9137-4a14-9656-4aec36e2fa06"
+      },
+      {
+        "event": "runtime-stop-resolved",
+        "afterCancelMs": 254,
+        "detail": "c21fc263-9137-4a14-9656-4aec36e2fa06"
+      },
+      {
+        "event": "post-stop-resolve-output",
+        "afterCancelMs": 313,
+        "detail": {
+          "sessionId": "c21fc263-9137-4a14-9656-4aec36e2fa06",
+          "terminated": false,
+          "programExists": false
+        }
+      },
+      {
+        "event": "editor-terminate",
+        "afterCancelMs": 1531,
+        "detail": "c21fc263-9137-4a14-9656-4aec36e2fa06"
+      }
+    ]
+  },
+  "afterTerminalGuard": {
+    "success": true,
+    "runtimeSha256": "670c1af456fd5d48de06e0efc10ddcb4d8b94eacc231473843d702ada6dcfbb0",
+    "observations": [
+      {
+        "event": "progress-cancel",
+        "afterCancelMs": 0,
+        "detail": null
+      },
+      {
+        "event": "foreground-cancel-returned",
+        "afterCancelMs": 1,
+        "detail": null
+      },
+      {
+        "event": "runtime-stop-request",
+        "afterCancelMs": 242,
+        "detail": "00d12156-6203-4104-baad-d59213609615"
+      },
+      {
+        "event": "runtime-stop-resolved",
+        "afterCancelMs": 267,
+        "detail": {
+          "id": "00d12156-6203-4104-baad-d59213609615",
+          "terminated": false,
+          "programExists": true
+        }
+      },
+      {
+        "event": "post-stop-resolve-output",
+        "afterCancelMs": 327,
+        "detail": {
+          "sessionId": "00d12156-6203-4104-baad-d59213609615",
+          "terminated": false,
+          "programExists": true
+        }
+      },
+      {
+        "event": "editor-terminate",
+        "afterCancelMs": 1357,
+        "detail": {
+          "id": "00d12156-6203-4104-baad-d59213609615",
+          "programExists": true
+        }
+      },
+      {
+        "event": "editor-terminate",
+        "afterCancelMs": 4939,
+        "detail": {
+          "id": "229b49f9-9f12-4202-b034-c36ee6c68278",
+          "programExists": true
+        }
+      }
+    ]
+  },
+  "artifactSha256": {
+    "editor-test.cjs": "2c1c9704eb7891a5b23ab7e1511e9510136582a38f053d06a56c1047e27f347f",
+    "prepare.py": "02c87247d49065388d6610d18e98a0ee9116579648d4562701378a1d1db88689",
+    "run-editor.ps1": "d4afcbd6d9d0a6eac8e564ca9cd24a2d41ec46a66609a54bc88b95b6c95f5add",
+    "before-terminal-guard.json": "ae4bb8cf3297e1f13a41babf95b67447494db4a1ecb89984c75a202858068ae8",
+    "editor-result.json": "65ed1928f9601249a530b978a29195b9aaa42279d6f76c58f38806eff02e51f1"
+  },
+  "interpretation": "Observed API completion before termination notification; no claim about process liveness in that interval. The fixed runtime retained the DLL until termination was observed and removed output afterward."
+}

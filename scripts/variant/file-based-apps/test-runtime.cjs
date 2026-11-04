@@ -18,9 +18,21 @@ function fixture(t, options = {}) {
     fs.mkdirSync(sourceDirectory);
     const source = path.join(sourceDirectory, 'tool.cs');
     fs.writeFileSync(source, 'int answer = 40;\nanswer += 2;\nConsole.WriteLine(answer);\n');
-    const calls = { commands: [], launches: [], processes: [], classifications: [], errors: [], saves: 0, logs: [] };
+    const calls = { commands: [], launches: [], stops: [], processes: [], classifications: [], errors: [], saves: 0, logs: [] };
     let termination;
+    let started;
     let cancellation;
+    const sessions = new Map();
+    let nextSession = 0;
+    const sessionFor = (config, overrides = {}) => ({
+        id: `session-${++nextSession}`, type: config.type, name: config.name, configuration: config, ...overrides,
+    });
+    const startSession = (config, overrides) => {
+        const session = sessionFor(config, overrides);
+        sessions.set(config, session);
+        started?.(session);
+        return session;
+    };
     const document = {
         uri: { scheme: 'file', fsPath: source },
         isDirty: Boolean(options.dirty),
@@ -39,9 +51,9 @@ function fixture(t, options = {}) {
                 calls.errors.push(message);
                 return options.showErrorMessage ? options.showErrorMessage(message) : Promise.resolve(undefined);
             },
-            withProgress: async (_settings, callback) => callback({ report() {} }, {
+            withProgress: async (_settings, callback) => callback({ report: value => options.reportProgress?.(value) }, {
                 isCancellationRequested: false,
-                onCancellationRequested: callback => { cancellation = callback; return { dispose() {} }; },
+                onCancellationRequested: callback => { cancellation = callback; return { dispose() { cancellation = undefined; } }; },
             }),
         },
         workspace: { isTrusted: options.trusted !== false, getWorkspaceFolder: () => options.noWorkspace ? undefined : { name: 'workspace' } },
@@ -50,10 +62,20 @@ function fixture(t, options = {}) {
             executeCommand: async command => { calls.commands.push(command); return true; },
         },
         debug: {
+            onDidStartDebugSession: callback => { started = callback; return { dispose() { started = undefined; } }; },
             onDidTerminateDebugSession: callback => { termination = callback; return { dispose() {} }; },
             startDebugging: async (folder, config) => {
                 calls.launches.push({ folder, config });
-                return options.startDebugging ? options.startDebugging(folder, config) : options.startResult !== false;
+                if (options.startDebugging) return options.startDebugging(folder, config);
+                if (options.startResult === false) return false;
+                startSession(config);
+                return true;
+            },
+            stopDebugging: async session => {
+                assert(session, 'Stopping all editor sessions is forbidden');
+                calls.stops.push(session);
+                if (options.stopDebugging) return options.stopDebugging(session);
+                termination(session);
             },
         },
     };
@@ -92,7 +114,8 @@ function fixture(t, options = {}) {
     };
     const api = activate(context, dependencies);
     return { root, source, document, vscode, context, dependencies, calls, api,
-        terminate: config => termination({ configuration: config }), cancel: () => cancellation() };
+        startSession, emitStart: session => started?.(session),
+        terminate: config => termination(sessions.get(config) || sessionFor(config)), cancel: () => cancellation?.() };
 }
 
 async function waitFor(predicate, message) {
@@ -439,11 +462,203 @@ test('cancellation during a declined debug start is quiet and releases the file 
     resolveStart(false);
     assert.equal(await operation, false);
     assert.deepEqual(f.calls.errors, []);
-    assert(!fs.existsSync(f.calls.launches[0].config.program));
+    await waitFor(() => !fs.existsSync(f.calls.launches[0].config.program), 'The declined start must clean cancelled output');
     options.startDebugging = async () => true;
     assert.equal(await f.api.debugActiveFile(), true);
     assert.equal(f.calls.launches.length, 2);
     assert(fs.existsSync(f.calls.launches[1].config.program));
+});
+
+for (const eventBeforeCancel of [false, true]) {
+    test(`cancelling a pending start stops only its session and preserves output until stop (${eventBeforeCancel ? 'event first' : 'cancel first'})`, async t => {
+        let resolveStart;
+        let resolveStop;
+        const removals = [];
+        const options = {
+            startDebugging: () => new Promise(resolve => { resolveStart = resolve; }),
+            stopDebugging: () => new Promise(resolve => { resolveStop = resolve; }),
+            removeOutput: async (directory, settings) => { removals.push(directory); await fs.promises.rm(directory, settings); },
+        };
+        const f = fixture(t, options);
+        const operation = f.api.debugActiveFile();
+        await waitFor(() => resolveStart, 'The start request must be pending');
+        const config = f.calls.launches[0].config;
+        let session;
+        if (eventBeforeCancel) session = f.startSession(config);
+        f.cancel();
+        if (!eventBeforeCancel) session = f.startSession(config);
+        resolveStart(true);
+        assert.equal(await operation, false, 'Cancellation must not be reported as a successful launch');
+        await waitFor(() => resolveStop, 'The cancelled session must be stopped');
+        assert.deepEqual(f.calls.stops, [session]);
+        assert(fs.existsSync(config.program), 'A session being stopped still owns its DLL');
+        resolveStop();
+        await new Promise(resolve => setImmediate(resolve));
+        assert.deepEqual(removals, [], 'Stop completion must not even request deletion before termination');
+        assert(fs.existsSync(config.program), 'Stop completion alone must not delete output before termination');
+        f.terminate(config);
+        await waitFor(() => !fs.existsSync(config.__netcoredbgFileAppOutput), 'Stopped session output must be cleaned');
+        assert.deepEqual(f.calls.errors, []);
+        options.startDebugging = undefined;
+        assert.equal(await f.api.debugActiveFile(), true);
+        assert(fs.existsSync(f.calls.launches[1].config.program));
+    });
+}
+
+test('cancellation releases the pending command and a later start event stops only the old session', async t => {
+    let resolveStart;
+    const options = { startDebugging: () => new Promise(resolve => { resolveStart = resolve; }) };
+    const f = fixture(t, options);
+    const operation = f.api.debugActiveFile();
+    await waitFor(() => resolveStart, 'The first start request must be pending');
+    const old = f.calls.launches[0].config;
+    f.cancel();
+    let timer;
+    const result = await Promise.race([operation, new Promise(resolve => {
+        timer = setTimeout(() => resolve('still pending'), 1000);
+    })]).finally(() => clearTimeout(timer));
+    assert.equal(result, false, 'A pending editor start must not keep the cancelled file command pending');
+    options.startDebugging = undefined;
+    assert.equal(await f.api.debugActiveFile(), true);
+    const retried = f.calls.launches[1].config;
+    assert(fs.existsSync(old.program), 'The editor may still start the old session');
+    resolveStart(true);
+    await new Promise(resolve => setImmediate(resolve));
+    assert(fs.existsSync(old.program), 'A true result without a session handle must retain output');
+    const oldSession = f.startSession(old);
+    await waitFor(() => !fs.existsSync(old.__netcoredbgFileAppOutput), 'The late cancelled session must stop and clean');
+    assert.deepEqual(f.calls.stops, [oldSession]);
+    assert(fs.existsSync(retried.program), 'Old-session termination must preserve the retry');
+    assert.deepEqual(f.calls.errors, []);
+});
+
+test('cancelled pending starts that later decline or reject clean their output quietly', async t => {
+    for (const reject of [false, true]) {
+        let settle;
+        const f = fixture(t, { startDebugging: () => new Promise((resolve, fail) => {
+            settle = () => reject ? fail(new Error('Adapter start failed after cancellation')) : resolve(false);
+        }) });
+        const operation = f.api.debugActiveFile();
+        await waitFor(() => settle, 'The start request must be pending');
+        const config = f.calls.launches[0].config;
+        f.cancel();
+        settle();
+        assert.equal(await operation, false);
+        await waitFor(() => !fs.existsSync(config.__netcoredbgFileAppOutput), 'The failed background start must clean output');
+        assert.deepEqual(f.calls.errors, []);
+        assert.deepEqual(f.calls.stops, []);
+    }
+});
+
+test('a stop failure reports once and preserves live output until actual termination', async t => {
+    let resolveStart;
+    const options = {
+        startDebugging: () => new Promise(resolve => { resolveStart = resolve; }),
+        stopDebugging: async () => { throw new Error('Adapter refused disconnect'); },
+        showErrorMessage: () => new Promise(() => {}),
+    };
+    const f = fixture(t, options);
+    const operation = f.api.debugActiveFile();
+    await waitFor(() => resolveStart, 'The start request must be pending');
+    const old = f.calls.launches[0].config;
+    const session = f.startSession(old);
+    f.cancel();
+    resolveStart(true);
+    assert.equal(await operation, false);
+    await waitFor(() => f.calls.errors.length, 'Stop failure must be reported');
+    assert.match(f.calls.errors[0], /stop.*cancelled.*debug session/i);
+    assert(f.calls.errors[0].includes(session.name), 'The notification must identify the session to stop manually');
+    assert(f.calls.logs.some(line => line.includes('Adapter refused disconnect')));
+    f.emitStart(session);
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(f.calls.stops.length, 1);
+    assert.equal(f.calls.errors.length, 1);
+    options.startDebugging = undefined;
+    assert.equal(await f.api.debugActiveFile(), true);
+    assert(fs.existsSync(old.program), 'Unconfirmed stop must never enter the cleanup-retry queue');
+    assert(fs.existsSync(f.calls.launches[1].config.program));
+    f.terminate(old);
+    await waitFor(() => !fs.existsSync(old.__netcoredbgFileAppOutput), 'Actual termination permits cleanup');
+    assert(fs.existsSync(f.calls.launches[1].config.program));
+});
+
+test('termination before a stop rejection stays terminal and quiet', async t => {
+    let resolveStart;
+    let rejectStop;
+    const f = fixture(t, {
+        startDebugging: () => new Promise(resolve => { resolveStart = resolve; }),
+        stopDebugging: () => new Promise((_resolve, reject) => { rejectStop = reject; }),
+    });
+    const operation = f.api.debugActiveFile();
+    await waitFor(() => resolveStart, 'The start request must be pending');
+    const config = f.calls.launches[0].config;
+    f.startSession(config);
+    f.cancel();
+    resolveStart(true);
+    assert.equal(await operation, false);
+    await waitFor(() => rejectStop, 'The cancelled session must be stopping');
+    f.terminate(config);
+    await waitFor(() => !fs.existsSync(config.__netcoredbgFileAppOutput), 'Termination must permit cleanup');
+    rejectStop(new Error('Already terminated'));
+    await new Promise(resolve => setImmediate(resolve));
+    assert.deepEqual(f.calls.errors, []);
+});
+
+test('cancelled launch ignores unrelated session events even when they carry its output field', async t => {
+    let resolveStart;
+    let resolveStop;
+    const f = fixture(t, {
+        startDebugging: () => new Promise(resolve => { resolveStart = resolve; }),
+        stopDebugging: () => new Promise(resolve => { resolveStop = resolve; }),
+    });
+    const operation = f.api.debugActiveFile();
+    await waitFor(() => resolveStart, 'The start request must be pending');
+    const config = f.calls.launches[0].config;
+    f.cancel();
+    f.startSession({ ...config, program: path.join(path.dirname(config.program), 'Other.dll') });
+    f.startSession(config, { type: 'node' });
+    assert.deepEqual(f.calls.stops, []);
+    assert(fs.existsSync(config.program));
+    const session = f.startSession(config);
+    const impostor = { ...session, id: 'unrelated-session' };
+    f.emitStart(impostor);
+    f.terminate({ ...config });
+    await new Promise(resolve => setImmediate(resolve));
+    assert(fs.existsSync(config.program), 'An unrelated termination must not release a captured session output');
+    await waitFor(() => resolveStop, 'The matching session must be stopped');
+    assert.deepEqual(f.calls.stops, [session]);
+    resolveStart(true);
+    assert.equal(await operation, false);
+    resolveStop();
+    await new Promise(resolve => setImmediate(resolve));
+    assert(fs.existsSync(config.program));
+    f.terminate(config);
+    await waitFor(() => !fs.existsSync(config.__netcoredbgFileAppOutput), 'Only the matching session may release output');
+});
+
+test('an uncancelled start rejection reports the failure and cleans output', async t => {
+    const f = fixture(t, { startDebugging: async () => { throw new Error('Adapter start rejected'); } });
+    assert.equal(await f.api.debugActiveFile(), false);
+    assert(!fs.existsSync(f.calls.launches[0].config.program));
+    assert.equal(f.calls.errors.length, 1);
+    assert.match(f.calls.errors[0], /Adapter start rejected/);
+    assert.deepEqual(f.calls.stops, []);
+});
+
+test('cancellation just before handoff skips the start API and cleans output before retry', async t => {
+    let cancelFirst = true;
+    const f = fixture(t, { reportProgress: progress => {
+        if (cancelFirst && progress.message === 'Starting netcoredbg') { cancelFirst = false; f.cancel(); }
+    } });
+    assert.equal(await f.api.debugActiveFile(), false);
+    const build = f.calls.processes.find(call => call.args[0] === 'build');
+    const directory = build.args[build.args.indexOf('--output') + 1];
+    await waitFor(() => !fs.existsSync(directory), 'A pre-cancelled launch must release its output');
+    assert.deepEqual(f.calls.launches, []);
+    assert.deepEqual(f.calls.errors, []);
+    assert.equal(await f.api.debugActiveFile(), true);
+    assert.equal(f.calls.launches.length, 1);
+    assert.deepEqual(f.calls.stops, []);
 });
 
 test('a build failure releases the file for retry while its error notification remains open', async t => {
