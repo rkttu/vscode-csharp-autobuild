@@ -542,8 +542,12 @@ test('cancelled pending starts that later decline or reject clean their output q
         await waitFor(() => settle, 'The start request must be pending');
         const config = f.calls.launches[0].config;
         f.cancel();
-        settle();
-        assert.equal(await operation, false);
+        let timer;
+        assert.equal(await Promise.race([operation, new Promise(resolve => {
+            timer = setTimeout(() => resolve('still pending'), 1000);
+        })]).finally(() => clearTimeout(timer)), false);
+        await new Promise(resolve => setImmediate(resolve));
+        settle(); // Reject or decline in a later turn, after the cancellation race has settled.
         await waitFor(() => !fs.existsSync(config.__netcoredbgFileAppOutput), 'The failed background start must clean output');
         assert.deepEqual(f.calls.errors, []);
         assert.deepEqual(f.calls.stops, []);

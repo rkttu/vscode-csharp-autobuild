@@ -7,6 +7,7 @@ The editor driver loads the current repository-owned runtime directly. It delega
 ## Observations
 
 - Seven of eight initial handoff tests failed against the previous runtime; the uncancelled-rejection control passed. The final logic suite passes 71 Node tests and 34 Python tests, including nine added handoff cases.
+- The Node suite also passes with `--unhandled-rejections=strict`. Delayed decline/rejection cases settle the original start in a later event-loop turn after the foreground cancellation has already returned.
 - The first implementation cleaned output when the stop Promise resolved. A strengthened real-editor check failed: 59 ms after that resolution, the DLL was gone while the termination event was still pending. This records event ordering, without claiming the debuggee remained alive during that interval.
 - The final runtime waits for the matching termination event. In the successful control, the DLL existed at stop completion, 60 ms later, and in the termination observer; cleanup then completed.
 - The cancelled foreground command returned before the held start request completed. The later session retained its output/program fields, and only that exact session was stopped.
