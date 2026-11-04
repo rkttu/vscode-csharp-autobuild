@@ -4,6 +4,7 @@ const crypto = require('node:crypto');
 const childProcess = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
+const { performance } = require('node:perf_hooks');
 
 const COMMAND = 'netcoredbg.debugActiveFile';
 
@@ -30,6 +31,17 @@ function findDotnet(env = process.env, platform = process.platform) {
 
 function runProcess(executable, args, options = {}) {
     return new Promise((resolve, reject) => {
+        let completion;
+        let closed = false;
+        const finish = () => {
+            if (!closed || !completion) return;
+            const { error, stdout, stderr } = completion;
+            if (error) {
+                error.stdout = stdout;
+                error.stderr = stderr;
+                reject(error);
+            } else resolve({ stdout, stderr, exitCode: 0 });
+        };
         const child = childProcess.execFile(executable, args, {
             cwd: options.cwd,
             env: { ...process.env, ...options.env, DOTNET_CLI_UI_LANGUAGE: 'en-US', MSBUILDDISABLENODEREUSE: '1' },
@@ -39,14 +51,11 @@ function runProcess(executable, args, options = {}) {
             maxBuffer: 8 * 1024 * 1024,
             encoding: 'utf8',
         }, (error, stdout, stderr) => {
-            if (error) {
-                error.stdout = stdout;
-                error.stderr = stderr;
-                reject(error);
-            } else {
-                resolve({ stdout, stderr, exitCode: 0 });
-            }
+            completion = { error, stdout, stderr };
+            finish();
         });
+        // An abort error can arrive before process/stdio close. Do not let callers clean output yet.
+        child.once('close', () => { closed = true; finish(); });
         if (options.onOutput) {
             child.stdout.on('data', options.onOutput);
             child.stderr.on('data', options.onOutput);
@@ -84,6 +93,10 @@ function activate(context, dependencies = {}) {
     const environment = dependencies.env || process.env;
     const getDotnet = dependencies.findDotnet || (() => findDotnet(environment));
     const removeOutput = dependencies.removeOutput || ((directory, options) => fs.promises.rm(directory, options));
+    const now = dependencies.now || (() => performance.now());
+    const preparationTimeoutMs = dependencies.preparationTimeoutMs ?? 5 * 60 * 1000;
+    const scheduleTimeout = dependencies.scheduleTimeout || setTimeout;
+    const cancelTimeout = dependencies.clearTimeout || clearTimeout;
     const storage = (context.globalStorageUri || context.storageUri)?.fsPath;
     if (!storage) throw new Error('C# file debugging requires an extension storage directory.');
     const outputBase = path.resolve(storage, 'file-based-apps');
@@ -238,10 +251,48 @@ function activate(context, dependencies = {}) {
                 cancellable: true,
             }, async (progress, cancellation) => {
                 const cancel = cancellation.onCancellationRequested(() => controller.abort());
+                const began = now();
+                let phase;
+                let phaseBegan = began;
+                let outcome = 'completed';
+                let preparationActive = true;
+                const expire = () => {
+                    if (!preparationActive || controller.signal.aborted) return;
+                    const error = new Error(`Preparation timed out during ${phase || 'SDK discovery'} after ${Math.round(now() - began)} ms (limit ${preparationTimeoutMs} ms). Check project evaluation, SDK and restore output before retrying`);
+                    error.name = 'TimeoutError';
+                    controller.abort(error);
+                };
+                const timer = scheduleTimeout(expire, preparationTimeoutMs);
+                const checkpoint = () => {
+                    if (preparationActive && now() - began >= preparationTimeoutMs) expire();
+                    controller.signal.throwIfAborted();
+                };
+                const stopPreparation = () => {
+                    preparationActive = false;
+                    cancelTimeout(timer);
+                };
+                const phaseLog = message => {
+                    try { output.appendLine(message); } catch { /* Diagnostics must not replace the operation result. */ }
+                };
+                const logPhase = status => {
+                    if (phase) phaseLog(`Phase ${status}: ${phase} (${Math.round(now() - phaseBegan)} ms; total ${Math.round(now() - began)} ms)`);
+                };
+                const setPhase = name => {
+                    checkpoint();
+                    logPhase('completed');
+                    phase = name;
+                    phaseBegan = now();
+                    phaseLog(`Phase started: ${phase}`);
+                    progress.report({ message: phase });
+                    checkpoint();
+                };
                 try {
                     if (cancellation.isCancellationRequested) controller.abort();
+                    setPhase('Locating .NET SDK');
                     const selected = await getDotnet();
+                    checkpoint();
                     const runDotnet = async (args, options = {}) => {
+                        checkpoint();
                         const settings = { cwd: path.dirname(source), signal: controller.signal, ...options };
                         output.appendLine(`dotnet ${args.map(value => JSON.stringify(value)).join(' ')}`);
                         const result = dependencies.runDotnet ?
@@ -251,13 +302,14 @@ function activate(context, dependencies = {}) {
                                 env: { ...environment, DOTNET_ROOT: selected.root },
                                 onOutput: chunk => output.append(chunk.toString()),
                             });
+                        checkpoint();
                         if (result && typeof result !== 'string' && result.exitCode && result.exitCode !== 0) {
                             throw new Error(`dotnet exited with code ${result.exitCode}: ${result.stderr || result.stdout || ''}`);
                         }
                         return result;
                     };
 
-                    progress.report({ message: 'Checking project membership' });
+                    setPhase('Checking project membership');
                     const classification = await classifyFile({
                         filePath: source,
                         text,
@@ -265,12 +317,15 @@ function activate(context, dependencies = {}) {
                         runDotnet,
                         signal: controller.signal,
                     });
-                    controller.signal.throwIfAborted();
+                    checkpoint();
                     output.appendLine(`${source}: ${classification.kind} (${classification.reason})`);
                     if (classification.kind === 'project') {
-                        return vscode.commands.executeCommand('workbench.action.debug.start');
+                        stopPreparation();
+                        setPhase('Starting selected project configuration');
+                        return await vscode.commands.executeCommand('workbench.action.debug.start');
                     }
                     if (classification.kind !== 'file') throw new Error('Could not classify the active C# file.');
+                    setPhase('Checking .NET SDK');
                     requireFileAppSdk(stdout(await runDotnet(['--version'])));
                     const architecture = sdkArchitecture(stdout(await runDotnet(['--info'])));
                     if (expectedArchitecture && architecture !== expectedArchitecture) {
@@ -285,12 +340,13 @@ function activate(context, dependencies = {}) {
                     if (environment.DOTNET_ROOT && comparable(environment.DOTNET_ROOT) !== comparable(selected.root)) {
                         throw new Error('DOTNET_ROOT does not identify the selected dotnet installation. Correct DOTNET_ROOT before debugging this file.');
                     }
+                    setPhase('Preparing build output');
                     const key = crypto.createHash('sha256').update(source).digest('hex').slice(0, 24);
                     const parent = path.join(outputBase, key);
                     await fs.promises.mkdir(parent, { recursive: true });
                     generated = await fs.promises.mkdtemp(path.join(parent, 'run-'));
                     ownedOutputs.add(generated);
-                    progress.report({ message: 'Building file-based app' });
+                    setPhase('Building file-based app');
                     const buildResult = await runDotnet(['build', source, '--configuration', 'Debug', '--output', generated,
                         '-p:AssemblyName=FileApp', '-p:DebugType=portable', '-p:Optimize=false', '-p:PublishAot=false',
                         '-p:UseSharedCompilation=false', '--disable-build-servers', '--nologo',
@@ -298,8 +354,10 @@ function activate(context, dependencies = {}) {
                     const program = path.join(generated, 'FileApp.dll');
                     await fs.promises.access(program);
                     await fs.promises.access(path.join(generated, 'FileApp.pdb'));
-                    controller.signal.throwIfAborted();
-                    progress.report({ message: 'Preparing web launch settings' });
+                    checkpoint();
+                    // Certificate consent, OS trust and editor-owned launches do not use this deadline.
+                    stopPreparation();
+                    setPhase('Preparing web launch settings');
                     const webLaunch = await webSupport.prepareWebLaunch({
                         source,
                         metadata: webSupport.parseBuildMetadata(stdout(buildResult)),
@@ -314,7 +372,7 @@ function activate(context, dependencies = {}) {
                     if (webLaunch?.env?.DOTNET_ROOT && comparable(webLaunch.env.DOTNET_ROOT) !== comparable(selected.root)) {
                         throw new Error('The web launch profile DOTNET_ROOT does not identify the selected dotnet installation.');
                     }
-                    progress.report({ message: 'Starting netcoredbg' });
+                    setPhase('Starting netcoredbg');
                     // From here the launch tracker owns cleanup, including results arriving after cancellation.
                     launchOwnsOutput = true;
                     const started = await startFileDebugging(vscode.workspace.getWorkspaceFolder(sourceUri), {
@@ -340,7 +398,13 @@ function activate(context, dependencies = {}) {
                         throw new Error('The editor did not start the netcoredbg debug session. Check C# and Debug Console output for details before retrying');
                     }
                     return started;
+                } catch (error) {
+                    const failure = controller.signal.aborted ? controller.signal.reason : error;
+                    outcome = failure?.name === 'TimeoutError' ? 'timed out' : failure?.name === 'AbortError' ? 'cancelled' : 'failed';
+                    throw failure;
                 } finally {
+                    stopPreparation();
+                    logPhase(outcome);
                     cancel.dispose();
                 }
             });

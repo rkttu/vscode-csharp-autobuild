@@ -1,0 +1,71 @@
+{
+  "date": "2026-11-04",
+  "success": true,
+  "platform": "Windows ARM64",
+  "sdkVersion": "10.0.403",
+  "runtimeVersion": "10.0.14",
+  "runtimeSha256": "2d429bafee64c389ccef9864602e9677b09027d9bb5d93e2d0941f0dfa9c898e",
+  "scope": {
+    "realDotnetCli": true,
+    "runtimeLoadedDirectly": true,
+    "mockedEditorApi": true,
+    "syntheticDeadlineAndClockOnFirstBuild": true,
+    "actualFiveMinuteWait": false,
+    "sameRuntimeRetry": true,
+    "realDebugger": false,
+    "installedCommand": false,
+    "physicalF5": false,
+    "VSCodium": false,
+    "macOS": false,
+    "published": false
+  },
+  "checks": [
+    "Injected deadline during a real dotnet build reports phase timeout, launches no debug session and removes owned run output",
+    "Same runtime and source retry completes real SDK checks/build with a fresh preparation budget while prior notification stays open",
+    "Real SDK work emits failed and successful phase/cumulative duration diagnostics",
+    "Mocked matching session termination cleans the successful real build output"
+  ],
+  "deadlineInjection": {
+    "defaultBudgetMs": 300000,
+    "testClockOffsetAddedMs": 300001,
+    "callbackScheduledAfterFirstBuildPhaseReportMs": 50,
+    "interpretation": "The first timeout uses a test-only clock offset and explicit deadline callback. Its reported cumulative milliseconds are synthetic, not a five-minute wait or measured performance. Actual dotnet commands execute natively without a runDotnet replacement. Retry runs in the same runtime instance with a fresh preparation budget and constant clock offset."
+  },
+  "phaseLogs": [
+    "Phase started: Locating .NET SDK",
+    "Phase completed: Locating .NET SDK (0 ms; total 0 ms)",
+    "Phase started: Checking project membership",
+    "Phase completed: Checking project membership (0 ms; total 1 ms)",
+    "Phase started: Checking .NET SDK",
+    "Phase completed: Checking .NET SDK (357 ms; total 358 ms)",
+    "Phase started: Preparing build output",
+    "Phase completed: Preparing build output (1 ms; total 359 ms)",
+    "Phase started: Building file-based app",
+    "Phase timed out: Building file-based app (300065 ms; total 300424 ms)",
+    "Phase started: Locating .NET SDK",
+    "Phase completed: Locating .NET SDK (0 ms; total 0 ms)",
+    "Phase started: Checking project membership",
+    "Phase completed: Checking project membership (0 ms; total 0 ms)",
+    "Phase started: Checking .NET SDK",
+    "Phase completed: Checking .NET SDK (316 ms; total 316 ms)",
+    "Phase started: Preparing build output",
+    "Phase completed: Preparing build output (1 ms; total 318 ms)",
+    "Phase started: Building file-based app",
+    "Phase completed: Building file-based app (1754 ms; total 2072 ms)",
+    "Phase started: Preparing web launch settings",
+    "Phase completed: Preparing web launch settings (1 ms; total 2073 ms)",
+    "Phase started: Starting netcoredbg",
+    "Phase completed: Starting netcoredbg (0 ms; total 2073 ms)"
+  ],
+  "positiveBuildTiming": "Phase completed: Building file-based app (1754 ms; total 2072 ms)",
+  "positiveBuildTimingInterpretation": "Only the successful second build has no changing clock offset during the operation; its phase and cumulative durations are observed elapsed times for this one local run, not latency budgets or qualification.",
+  "cleanup": {
+    "firstRunOutputsAbsentAfterTimeout": true,
+    "retryDllAndPdbPresentBeforeMockedTermination": true,
+    "retryOutputAbsentAfterMockedTermination": true
+  },
+  "artifactSha256": {
+    "control.cjs": "953aab5422da33628c047d334f499967fa6b52b465b62f0a0e5a444180088aa9",
+    "result.json": "89dd67f3d16fe3d8784554da02036f43faf46afde33084055e50148241044817"
+  }
+}
