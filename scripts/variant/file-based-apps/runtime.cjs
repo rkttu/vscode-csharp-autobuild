@@ -115,7 +115,8 @@ function activate(context, dependencies = {}) {
     async function cleanup(directory) {
         // Only paths created by this controller may be removed. Never trust a session's field alone.
         if (!ownedOutputs.has(directory)) return;
-        if (!insideDirectory(outputBase, directory)) throw new Error('Refusing to remove a file-app output outside extension storage.');
+        // Refuse unsafe paths without rejecting the fire-and-forget termination callback.
+        if (!insideDirectory(outputBase, directory)) return;
         if (cleanupInFlight.has(directory)) return cleanupInFlight.get(directory);
         failedCleanups.delete(directory);
         const operation = (async () => {
