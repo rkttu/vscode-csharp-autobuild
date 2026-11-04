@@ -88,6 +88,12 @@ In the affected **11.7.18002** package, an open **C# file debugging failed** not
 
 The current development recipe also reports when the editor returns `false` instead of starting a netcoredbg session. Inspect **C# File Debugging**, **C#**, and **Debug Console** output for the underlying reason, then retry. The failed launch releases its temporary output and pending operation while its notification remains open. Cancelling the file-debugging progress while a declined start is pending remains quiet. This diagnostic improvement has not yet been assigned a published release version; it does not identify the cause of every declined launch.
 
+The development recipe also releases the file command when its progress is cancelled while the editor's start request is pending. That request remains tracked: if its session starts later, only the session matching that run's output, program and debugger type is stopped. Output stays available until that session's termination event arrives, including when the stop request completes first. If stopping fails, an error asks you to stop the session manually and its output is preserved. You can run **C# (netcoredbg): Debug Active File** again while an earlier start is still pending; its eventual termination cannot remove the retry's output.
+
+Normal Continue/Stop controls apply once a successful launch has finished its progress. A start request that never settles, or a successful start whose session event never arrives, retains output for safety. This change adds no timeout or cleanup across extension-host shutdown, crash or reload, and is not yet assigned a published release version.
+
+The [November 4 cancellation control](research/cancel-session-2026-11-04/README.md) records the local Windows ARM64 real-API check, including output preservation between stop completion and the termination event. It distinguishes injected progress cancellation and direct runtime loading from installed-command and VSCodium qualification.
+
 ## Implementation and validation
 
 The [stability contract](stability-contract.md) separates existing debugger/editor evidence from required VSCodium qualification and defines repeated-workflow, timing and recovery acceptance. Publishing the contract does not qualify an unmeasured target.
