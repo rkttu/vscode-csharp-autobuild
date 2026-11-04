@@ -467,6 +467,7 @@ function activate(context, dependencies = {}) {
     // Scan only published terminal receipts, without holding activation or a new file command pending.
     const recoveryReady = recovery.recover().catch(error => {
         cleanupLog(`Could not recover terminal file-app outputs: ${error?.message || String(error)}`);
+        return { scanned: 0, attempted: 0, removed: 0 };
     });
     return { debugActiveFile: command, recoveryReady };
 }

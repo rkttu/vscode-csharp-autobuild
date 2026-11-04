@@ -97,6 +97,7 @@ function createRecovery({ baseDirectory, removeOutput, isOwned, log = () => {}, 
     }
     async function entryContents(entry, allowed) {
         const directory = await io.opendir(entry);
+        // Node's async directory iterator closes its handle on exhaustion, break and loop-body throws.
         for await (const child of directory) {
             if (!allowed.has(child.name)) throw unsafe(`unexpected entry content: ${entry}`);
         }
@@ -228,6 +229,7 @@ function createRecovery({ baseDirectory, removeOutput, isOwned, log = () => {}, 
                 const parent = await queueDirectory(READY);
                 if (!parent) return result;
                 const directory = await io.opendir(parent);
+                // for-await closes the directory when the bounded pass breaks early.
                 for await (const entry of directory) {
                     result.scanned++;
                     if (UUID.test(entry.name)) {

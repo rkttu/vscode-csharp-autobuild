@@ -7,6 +7,7 @@ const path = require('node:path');
 const test = require('node:test');
 const { activate, COMMAND, requireFileAppSdk, sdkArchitecture, runProcess } = require('./runtime.cjs');
 const { classifyFile: classifyWithMsbuild } = require('./classify.cjs');
+const vm = require('node:vm');
 
 function fixture(t, options = {}) {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'netcoredbg-fba-runtime-'));
@@ -692,6 +693,22 @@ test('background recovery does not hold a fresh file command pending', async t =
     await second.api.recoveryReady;
     assert(!fs.existsSync(retired));
     assert(fs.existsSync(second.calls.launches[0].config.program));
+});
+
+test('an unexpected recovery rejection preserves a stable zero-count result without notifying', async t => {
+    const f = fixture(t);
+    await f.api.recoveryReady;
+    const module = { exports: {} };
+    vm.runInNewContext(fs.readFileSync(require.resolve('./runtime.cjs'), 'utf8'), {
+        module, process, AbortController, setTimeout, clearTimeout,
+        require: name => name === './recovery.cjs' ? { createRecovery: () => ({
+            recover: () => Promise.reject(new Error('Unexpected recovery failure')),
+        }) } : require(name),
+    });
+    const api = module.exports.activate(f.context, f.dependencies);
+    assert.deepEqual(JSON.parse(JSON.stringify(await api.recoveryReady)), { scanned: 0, attempted: 0, removed: 0 });
+    assert(f.calls.logs.some(line => line.includes('Unexpected recovery failure')));
+    assert.deepEqual(f.calls.errors, []);
 });
 
 test('a new activation preserves output whose cancelled editor start is still unresolved', async t => {

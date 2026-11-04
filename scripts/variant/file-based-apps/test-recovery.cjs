@@ -531,6 +531,37 @@ test('overlapping recovery calls share one pass', async t => {
     assert.equal(calls, 1);
 });
 
+test('native directory iterators close handles when unexpected entry content throws', async t => {
+    const f = fixture(t);
+    const entry = f.ready();
+    fs.writeFileSync(path.join(entry.directory, 'unrelated.txt'), 'keep');
+    const handles = [];
+    const io = { ...fs.promises, opendir: async (...args) => {
+        const handle = await fs.promises.opendir(...args);
+        handles.push(handle);
+        return handle;
+    } };
+    assert.equal((await f.manager({ fs: io }).recover()).attempted, 0);
+    assert(handles.length >= 2);
+    for (const handle of handles) await assert.rejects(async () => handle.read(), { code: 'ERR_DIR_CLOSED' });
+    assert(fs.existsSync(path.join(entry.directory, 'unrelated.txt')));
+    assert(fs.existsSync(entry.output));
+});
+
+test('native directory iterators close handles when a bounded recovery pass breaks', async t => {
+    const f = fixture(t);
+    f.ready();
+    const handles = [];
+    const io = { ...fs.promises, opendir: async (...args) => {
+        const handle = await fs.promises.opendir(...args);
+        handles.push(handle);
+        return handle;
+    } };
+    assert.equal((await f.manager({ fs: io }).recover()).removed, 1);
+    assert(handles.length >= 3);
+    for (const handle of handles) await assert.rejects(async () => handle.read(), { code: 'ERR_DIR_CLOSED' });
+});
+
 test('two hosts can concurrently recover the same immutable entry', async t => {
     const f = fixture(t);
     const entry = f.ready();

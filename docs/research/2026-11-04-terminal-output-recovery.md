@@ -27,10 +27,11 @@ Ready paths are not reused. Two hosts can therefore clean the same terminal entr
 
 ## Validation and limits
 
-- All **128 Node tests** pass under `--unhandled-rejections=strict`, with no skips, in three complete consecutive final runs. All **34 Python tests** pass.
-- The **44 recovery cases** include malformed/oversized/version-mismatched records, unknown sibling files, path escape, native junction/symlink and external-sentinel preservation, partial removal, staging failures, unavailable identity, source replacement, bounded scans, and concurrent hosts.
+- All **131 Node tests** pass under `--unhandled-rejections=strict`, with no skips, in three complete consecutive final runs. All **34 Python tests** pass.
+- The **46 recovery cases** include malformed/oversized/version-mismatched records, unknown sibling files, path escape, native junction/symlink and external-sentinel preservation, partial removal, staging failures, unavailable identity, source replacement, bounded scans, and concurrent hosts.
 - A native two-process test publishes a terminal entry, exits its owner Node process, then recovers it in a fresh Node process while retaining unmarked output. It does not kill a live .NET build or an installed editor.
 - Runtime integration checks fresh activation with another host's live output, stale original-path replacement, unresolved cancelled starts, and nonblocking recovery. The Windows concurrency case passed 25 consecutive targeted runs after its fix.
 - A local overlay control loads the packaged entry and new dependency with mocked upstream/editor APIs, preserving command registration and the upstream API. This is not an installed VSIX test.
+- Native handle controls confirm `ERR_DIR_CLOSED` after both a loop-body throw and the bounded scan's early break, consistent with [Node's async-directory iteration contract](https://nodejs.org/docs/latest-v24.x/api/fs.html#fspromisesopendirpath-options). An unexpected background rejection also returns the same zero-count result shape and logs without a notification.
 
 The tests are reproducible with the commands in [the file-debug guide](../file-based-apps.md#implementation-and-validation); the separate-process control is in [test-recovery.cjs](../../scripts/variant/file-based-apps/test-recovery.cjs). No package version or release is assigned. Installed VSCodium/macOS crash/reload qualification, actual process-tree/Web-port cleanup, arbitrary filesystem-operation time limits, power-loss durability and malicious same-user filesystem replacement remain outside this change. Issue #18 stays open.
