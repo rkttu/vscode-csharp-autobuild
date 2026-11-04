@@ -107,6 +107,12 @@ function activate(context, dependencies = {}) {
     const cleanupInFlight = new Map();
     const launches = new Map();
     const controllers = new Set();
+    const cleanupLog = message => {
+        try { output.appendLine(message); } catch { /* Cleanup may outlive the output channel. */ }
+    };
+    const recovery = require('./recovery.cjs').createRecovery({
+        baseDirectory: outputBase, removeOutput, isOwned: directory => ownedOutputs.has(directory), log: cleanupLog,
+    });
     const packagedTarget = context.extension?.packageJSON?.netcoredbgBuild?.target;
     const expectedArchitecture = packagedTarget ? (packagedTarget.endsWith('-arm64') ? 'arm64' : 'x64') : undefined;
 
@@ -136,15 +142,16 @@ function activate(context, dependencies = {}) {
         const operation = (async () => {
             try {
                 // Node retries transient busy/permission errors with linear backoff, at most three times.
-                await removeOutput(directory, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
+                if (recovery.has(directory)) {
+                    if (!await recovery.remove(directory)) throw new Error('Terminal output recovery did not confirm deletion');
+                }
+                else await removeOutput(directory, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
                 ownedOutputs.delete(directory);
             } catch (error) {
+                try { await recovery.preserve(directory); }
+                catch (cause) { cleanupLog(`Could not persist terminal file-app output ${directory}: ${cause?.message || String(cause)}`); }
                 failedCleanups.add(directory);
-                try {
-                    output.appendLine(`Could not clean file-app output ${directory}: ${error?.message || String(error)}`);
-                } catch {
-                    // Cleanup may finish after the extension's output channel is disposed.
-                }
+                cleanupLog(`Could not clean file-app output ${directory}: ${error?.message || String(error)}`);
             }
         })();
         cleanupInFlight.set(directory, operation);
@@ -457,7 +464,11 @@ function activate(context, dependencies = {}) {
     context.subscriptions.push(registered, startedSession, terminated, output, {
         dispose() { for (const controller of controllers) controller.abort(); },
     });
-    return { debugActiveFile: command };
+    // Scan only published terminal receipts, without holding activation or a new file command pending.
+    const recoveryReady = recovery.recover().catch(error => {
+        cleanupLog(`Could not recover terminal file-app outputs: ${error?.message || String(error)}`);
+    });
+    return { debugActiveFile: command, recoveryReady };
 }
 
 module.exports = { activate, COMMAND, findDotnet, runProcess, requireFileAppSdk, sdkArchitecture };

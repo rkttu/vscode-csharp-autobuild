@@ -24,8 +24,8 @@ forwarding. `verify-vsix.py` validates package identity, permissions, icon, payl
 hashes, provenance, and the extracted adapter. Only `coreclr` is advertised.
 
 The owned `file-based-apps` CommonJS modules add active-file F5 routing through
-a package entry wrapper. Packaging ships only `entry.cjs`, `runtime.cjs`, and
-`classify.cjs` under `.netcoredbg`, with the manifest entry, command, activation
+a package entry wrapper. The current packaging recipe ships `entry.cjs`, `runtime.cjs`,
+`classify.cjs`, `web.cjs`, and the unreleased `recovery.cjs` under `.netcoredbg`, with the manifest entry, command, activation
 event, and F5 binding. The wrapper preserves upstream activation/API exports;
 this feature does not add upstream JS/TypeScript source replacements or replace
 the existing language service/debugger implementation. Membership uses evaluated
