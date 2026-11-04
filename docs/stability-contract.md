@@ -10,7 +10,7 @@ This policy applies to `dotnetdev-kr-custom.csharp-with-netcoredbg`. It defines 
 | --- | --- | --- |
 | Eight native VSIX targets, .NET 8/10 | Source-built and extracted-VSIX debugger/DAP release gates; see [pinned inputs](../config/netcoredbg.json) | Existing debugger coverage; not an editor/FBA qualification |
 | Native macOS ARM64 VSCodium, stable .NET 10 | User reports and separate historical macOS VS Code checks | Required editor target; installed VSCodium qualification pending |
-| Native Windows ARM64 VSCodium, stable .NET 10 | Windows VS Code prototypes and CLI fixtures provide comparison data | Required editor target; installed VSCodium qualification pending |
+| Native Windows ARM64 VSCodium, stable .NET 10 | [Installed local-candidate Web lifecycle control](research/web-lifecycle-2026-11-05/README.md): command API, real breakpoint, targeted Stop, PID/port/output cleanup and dirty-file retry | Partial installed-editor evidence; required qualification matrix and physical F5 pending |
 | Windows ARM64 VS Code 1.144.1 | Retained installed FBA API-command tests; later local diagnostic prototype | Comparison control; not evidence for native F5 input or VSCodium |
 | Windows ARM64 SDK 10.0.403/runtime 10.0.14 | Local CLI phase measurements below | CLI control only; no editor/debugger qualification |
 | .NET 11 RC3, macOS ARM64 VSCodium | Reported CLI build success and a user-confirmed Slim HTTPS source correction | Exploratory; no stable-baseline claim |
@@ -64,13 +64,13 @@ Use a monotonic clock for elapsed durations and UTC timestamps for correlation. 
 | Classification | Source captured → file/project/error decision, including all candidate evaluations | Limited CLI control measured; project-heavy/editor calibration pending, #15 |
 | Restore/build | Build process starts → exit and required output/metadata verified | CLI control measured; network restore and editor calibration pending, #15 |
 | Debugger readiness | Debug request → initialized/breakpoint-bound or explicit terminal failure | Unmeasured, #15; a true startDebugging return alone is insufficient |
-| Web readiness | Process launch → reported listening address and expected HTTP response | CLI process control measured; debugger/editor calibration pending, #15 |
-| Cleanup/retry readiness | Stop/exit/failure/cancel → owned resources released and next command accepted | Unmeasured in installed editor, #15/#18 |
+| Web readiness | Process launch → reported listening address and expected HTTP response | CLI and limited installed VSCodium HTTP controls measured; calibration pending, #15 |
+| Cleanup/retry readiness | Stop/exit/failure/cancel → owned resources released and next command accepted | Limited installed VSCodium Stop/retry control measured; full failure/cancellation matrix pending, #15/#18 |
 | Context refresh | Saved directive/project/SDK change → matching language-service context | Unmeasured in required targets, #15/#17 |
 
 For each required target and fixture, #15 must first collect cold/warm samples and failures, then propose numeric phase deadlines with the measurement record and a rationale. Review and version the accepted budget values before enabling a qualification gate. Missing measurements or an unset budget mean **not qualified**, never pass or zero latency. A budget breach preserves the elapsed duration, last phase and first-failure log and requires investigation.
 
-Separate local/offline fixture budgets from network restore and interactive certificate work. Bound a complete phase as well as each child process; the current five-minute per-process timeout does not bound a sequence of project evaluations. This contract does not change that timeout or claim the total bound is already implemented; enforcement belongs to #18 and #15.
+Separate local/offline fixture budgets from network restore and interactive certificate work. Bound a complete phase as well as each child process. PR #26 adds a shared five-minute cooperative cancellation deadline for noninteractive preparation, including sequential project evaluations. Save, cleanup, interactive certificate work and debugger handoff/session lifetime remain outside that deadline; calibrated budgets and their qualification still belong to #18 and #15.
 
 ### Initial CLI control measurements
 
