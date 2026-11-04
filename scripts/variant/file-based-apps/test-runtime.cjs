@@ -5,7 +5,8 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
-const { activate, COMMAND, requireFileAppSdk, sdkArchitecture } = require('./runtime.cjs');
+const { activate, COMMAND, requireFileAppSdk, sdkArchitecture, runProcess } = require('./runtime.cjs');
+const { classifyFile: classifyWithMsbuild } = require('./classify.cjs');
 
 function fixture(t, options = {}) {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'netcoredbg-fba-runtime-'));
@@ -85,7 +86,10 @@ function fixture(t, options = {}) {
         env: {},
         ...(options.webSupport ? { webSupport: options.webSupport } : {}),
         ...(options.removeOutput ? { removeOutput: options.removeOutput } : {}),
-        findDotnet: async () => ({ executable: path.join(root, 'dotnet', 'dotnet.exe'), root: path.join(root, 'dotnet') }),
+        ...(options.now ? { now: options.now } : {}),
+        ...(options.preparationTimeoutMs !== undefined ? { preparationTimeoutMs: options.preparationTimeoutMs } : {}),
+        ...(options.scheduleTimeout ? { scheduleTimeout: options.scheduleTimeout, clearTimeout: options.clearTimeout } : {}),
+        findDotnet: options.findDotnet || (async () => ({ executable: path.join(root, 'dotnet', 'dotnet.exe'), root: path.join(root, 'dotnet') })),
         classifyFile: async input => {
             calls.classifications.push(input);
             if (options.classify) return options.classify(input, calls, vscode);
@@ -123,6 +127,205 @@ async function waitFor(predicate, message) {
     while (!predicate() && Date.now() < deadline) await new Promise(resolve => setImmediate(resolve));
     assert(predicate(), message);
 }
+
+function preparationFixture(t, options = {}) {
+    let elapsed = 0;
+    let latest;
+    const timers = new Set();
+    const f = fixture(t, { ...options, preparationTimeoutMs: 100, now: () => elapsed,
+        scheduleTimeout: callback => { latest = { callback }; timers.add(latest); return latest; },
+        clearTimeout: timer => timers.delete(timer),
+    });
+    return { ...f, advance: ms => { elapsed += ms; }, timers,
+        expire: () => { assert(latest, 'A preparation deadline must be armed'); elapsed += 100; latest.callback(); } };
+}
+
+test('one preparation deadline bounds cumulative ancestor and multi-target evaluations', async t => {
+    const f = preparationFixture(t, { classify: input => classifyWithMsbuild({ ...input, fs: {
+        readdir: async directory => directory === path.dirname(f.source) ? ['A.csproj', 'B.csproj'].map(name => ({
+            name, isFile: () => true, isSymbolicLink: () => false,
+        })) : [],
+        realpath: fs.promises.realpath,
+    } }) });
+    const run = f.dependencies.runDotnet;
+    f.dependencies.runDotnet = async (args, settings) => {
+        if (args[0] !== 'msbuild') return run(args, settings);
+        f.calls.processes.push({ args, settings });
+        f.advance(40);
+        return { stdout: JSON.stringify({ Properties: { TargetFrameworks: 'net8.0;net10.0' }, Items: { Compile: [] } }) };
+    };
+    assert.equal(await f.api.debugActiveFile(), false);
+    assert.equal(f.calls.processes.length, 3, 'The next evaluation must not receive a fresh time budget');
+    assert.equal(f.calls.launches.length, 0);
+    assert.equal(f.calls.errors.length, 1);
+    assert.match(f.calls.errors[0], /timed out.*Checking project membership.*120 ms/i);
+    assert.equal(f.calls.classifications[0].signal.reason.name, 'TimeoutError');
+    assert.equal(f.timers.size, 0);
+});
+
+test('a preparation deadline waits for the build to settle before cleanup and retry gets a fresh deadline', async t => {
+    let settleChild;
+    let buildSignal;
+    const f = preparationFixture(t, { showErrorMessage: () => new Promise(() => {}) });
+    const run = f.dependencies.runDotnet;
+    f.dependencies.runDotnet = async (args, settings) => {
+        const result = await run(args, settings);
+        if (args[0] !== 'build') return result;
+        buildSignal = settings.signal;
+        return new Promise((_resolve, reject) => {
+            settleChild = () => reject(Object.assign(new Error('Child aborted'), { name: 'AbortError' }));
+        });
+    };
+    const operation = f.api.debugActiveFile();
+    await waitFor(() => settleChild, 'The build must be pending');
+    const build = f.calls.processes.find(call => call.args[0] === 'build');
+    const directory = build.args[build.args.indexOf('--output') + 1];
+    f.expire();
+    assert.equal(buildSignal.reason.name, 'TimeoutError');
+    let returned = false;
+    void operation.then(() => { returned = true; });
+    await new Promise(resolve => setImmediate(resolve));
+    assert(!returned, 'Do not abandon a process that can still write output');
+    assert(fs.existsSync(path.join(directory, 'FileApp.dll')));
+    settleChild();
+    assert.equal(await operation, false);
+    assert(!fs.existsSync(directory));
+    assert.match(f.calls.errors[0], /timed out.*Building file-based app.*100 ms/i);
+    assert(f.calls.logs.some(line => /Phase timed out: Building file-based app/.test(line)));
+    f.dependencies.runDotnet = run;
+    assert.equal(await f.api.debugActiveFile(), true);
+    assert.notEqual(path.dirname(f.calls.launches[0].config.program), directory);
+    assert(fs.existsSync(f.calls.launches[0].config.program));
+    assert.equal(f.calls.errors.length, 1);
+    assert.equal(f.timers.size, 0);
+});
+
+test('user cancellation remains quiet when a queued preparation deadline fires afterward', async t => {
+    const f = preparationFixture(t, { classify: ({ signal }) => new Promise((_resolve, reject) => {
+        signal.addEventListener('abort', () => reject(Object.assign(new Error('Process aborted'), { name: 'AbortError' })), { once: true });
+    }) });
+    const operation = f.api.debugActiveFile();
+    await waitFor(() => f.calls.classifications.length, 'Classification must be pending');
+    f.cancel();
+    f.expire();
+    assert.equal(await operation, false);
+    assert.equal(f.calls.classifications[0].signal.reason.name, 'AbortError');
+    assert.deepEqual(f.calls.errors, []);
+    assert(f.calls.logs.some(line => /Phase cancelled: Checking project membership/.test(line)));
+    assert.equal(f.timers.size, 0);
+});
+
+test('a real failure overtaken by cancellation remains in diagnostics without an error notification', async t => {
+    const f = preparationFixture(t, { classify: async () => {
+        f.cancel();
+        throw new Error('Project import failed during cancellation');
+    } });
+    assert.equal(await f.api.debugActiveFile(), false);
+    assert.deepEqual(f.calls.errors, []);
+    assert(f.calls.logs.some(line => line.includes('Project import failed during cancellation')));
+    assert(f.calls.logs.some(line => /Phase cancelled: Checking project membership/.test(line)));
+    assert.equal(f.timers.size, 0);
+});
+
+test('the preparation deadline is disarmed before Web certificate interaction', async t => {
+    const f = preparationFixture(t, { webSupport: {
+        BUILD_METADATA_ARGS: [], parseBuildMetadata: () => ({ isWebServer: true }),
+        prepareWebLaunch: async ({ signal }) => {
+            assert.equal(f.timers.size, 0);
+            f.expire(); // A previously queued timer must not time out user interaction.
+            assert(!signal.aborted);
+        },
+    } });
+    assert.equal(await f.api.debugActiveFile(), true);
+    assert.deepEqual(f.calls.errors, []);
+    assert.equal(f.timers.size, 0);
+});
+
+test('the preparation deadline is disarmed before delegating existing project debugging', async t => {
+    const f = preparationFixture(t, { kind: 'project' });
+    const execute = f.vscode.commands.executeCommand;
+    f.vscode.commands.executeCommand = async command => {
+        assert.equal(f.timers.size, 0);
+        f.expire();
+        return execute(command);
+    };
+    assert.equal(await f.api.debugActiveFile(), true);
+    assert.deepEqual(f.calls.commands, ['workbench.action.debug.start']);
+    assert.equal(f.calls.processes.length, 0);
+    assert.deepEqual(f.calls.errors, []);
+});
+
+test('phase diagnostics include monotonic phase and cumulative durations and preserve original failures', async t => {
+    const f = preparationFixture(t, { classify: async () => { f.advance(7); throw new Error('Broken project import'); } });
+    assert.equal(await f.api.debugActiveFile(), false);
+    assert.match(f.calls.errors[0], /Broken project import/);
+    assert(f.calls.logs.some(line => /Phase started: Checking project membership/.test(line)));
+    assert(f.calls.logs.some(line => /Phase failed: Checking project membership \(7 ms; total 7 ms\)/.test(line)));
+    assert.equal(f.timers.size, 0);
+});
+
+test('phase logging failures do not change a launch result or its original error', async t => {
+    for (const broken of [false, true]) {
+        const f = preparationFixture(t, {
+            appendLine: line => { if (line.startsWith('Phase ')) throw new Error('Phase output unavailable'); },
+            classify: async () => {
+                if (broken) throw new Error('Original project failure');
+                return { kind: 'file', reason: 'standalone' };
+            },
+        });
+        assert.equal(await f.api.debugActiveFile(), !broken);
+        assert.equal(f.timers.size, 0);
+        if (broken) assert.match(f.calls.errors[0], /Original project failure/);
+        else assert.deepEqual(f.calls.errors, []);
+    }
+});
+
+test('a preparation deadline aborts a real child and cleanup follows direct-child termination', { timeout: 10000 }, async t => {
+    let childPid;
+    const exited = () => assert.throws(() => process.kill(childPid, 0), error => error.code === 'ESRCH');
+    const f = preparationFixture(t, { removeOutput: async (directory, settings) => {
+        assert(childPid, 'A real child must have started');
+        exited();
+        await fs.promises.rm(directory, settings);
+    } });
+    const run = f.dependencies.runDotnet;
+    f.dependencies.runDotnet = async (args, settings) => {
+        if (args[0] !== 'build') return run(args, settings);
+        f.calls.processes.push({ args, settings });
+        let text = '';
+        return runProcess(process.execPath, ['-e', 'process.stdout.write("READY_PID=" + process.pid + "\\n"); setInterval(() => {}, 1000);'], {
+            ...settings, onOutput: chunk => {
+                text += chunk.toString();
+                const ready = /^READY_PID=(\d+)\r?$/m.exec(text);
+                if (!childPid && ready) { childPid = Number(ready[1]); f.expire(); }
+            },
+        });
+    };
+    const operation = f.api.debugActiveFile();
+    t.after(async () => { f.context.subscriptions.at(-1).dispose(); await operation; });
+    assert.equal(await operation, false);
+    exited();
+    const build = f.calls.processes.find(call => call.args[0] === 'build');
+    assert(!fs.existsSync(build.args[build.args.indexOf('--output') + 1]));
+    assert.equal(f.calls.errors.length, 1);
+    assert.match(f.calls.errors[0], /timed out.*Building file-based app/i);
+    assert.equal(f.calls.launches.length, 0);
+    assert.equal(f.timers.size, 0);
+});
+
+test('waiting for child close preserves stdout, stderr, exit errors and spawn failures', async t => {
+    const missing = path.join(fixture(t).root, 'missing-executable');
+    const result = await runProcess(process.execPath, ['-e', 'process.stdout.write("out"); process.stderr.write("err");']);
+    assert.equal(result.stdout, 'out');
+    assert.equal(result.stderr, 'err');
+    await assert.rejects(runProcess(process.execPath, ['-e', 'process.stdout.write("failed"); process.stderr.write("reason"); process.exitCode=7;']), error => {
+        assert.equal(error.code, 7);
+        assert.equal(error.stdout, 'failed');
+        assert.equal(error.stderr, 'reason');
+        return true;
+    });
+    await assert.rejects(runProcess(missing, []), { code: 'ENOENT' });
+});
 
 test('F5 builds the saved captured file with SDK cwd, then launches existing coreclr adapter', async t => {
     const f = fixture(t, { dirty: true, noWorkspace: true, classify: async (input, calls, vscode) => {

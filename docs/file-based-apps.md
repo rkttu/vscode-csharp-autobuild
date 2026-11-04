@@ -94,6 +94,12 @@ Normal Continue/Stop controls apply once a successful launch has finished its pr
 
 The [November 4 cancellation control](research/cancel-session-2026-11-04/README.md) records the local Windows ARM64 real-API check, including output preservation between stop completion and the termination event. It distinguishes injected progress cancellation and direct runtime loading from installed-command and VSCodium qualification.
 
+The current development recipe shares a **five-minute preparation deadline** across SDK discovery, project membership evaluation (including ancestor projects and target frameworks), SDK checks, and compilation through DLL/PDB verification. Each subprocess no longer receives a fresh preparation budget. **C# File Debugging** records phase starts, outcomes, phase durations and total elapsed milliseconds using a monotonic clock. A preparation timeout reports its phase and cumulative elapsed time; a later command gets a fresh deadline. Explicit user cancellation remains quiet.
+
+The preparation timer is disarmed before Web settings/certificate interaction and before delegating an included file to existing project debugging. Save, output cleanup, Web interaction, debugger handoff and session lifetime are outside this shared deadline; the existing per-process limit still applies to .NET commands in Web preparation. Expiry requests cancellation and waits for the direct child process and its streams to close before cleaning output. Filesystem work or a process that does not exit can delay completion: this is not a five-minute command-return guarantee, process-tree cleanup guarantee, or measured release-performance threshold. This preparation improvement is not yet assigned a published release version.
+
+The [preparation deadline controls](research/preparation-deadline-2026-11-04/README.md) retain the logic/native-child checks and a real .NET SDK timeout/retry control, with its injected clock and mocked editor scope stated explicitly.
+
 ## Implementation and validation
 
 The [stability contract](stability-contract.md) separates existing debugger/editor evidence from required VSCodium qualification and defines repeated-workflow, timing and recovery acceptance. Publishing the contract does not qualify an unmeasured target.
