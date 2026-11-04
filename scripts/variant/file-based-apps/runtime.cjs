@@ -233,6 +233,10 @@ function activate(context, dependencies = {}) {
                         env: { ...webLaunch?.env, DOTNET_ROOT: selected.root },
                         __netcoredbgFileAppOutput: generated,
                     });
+                    if (!started) {
+                        controller.signal.throwIfAborted();
+                        throw new Error('The editor did not start the netcoredbg debug session. Check C# and Debug Console output for details before retrying');
+                    }
                     handedToDebugger = started;
                     return started;
                 } finally {
