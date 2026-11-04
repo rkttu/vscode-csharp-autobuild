@@ -400,6 +400,9 @@ function activate(context, dependencies = {}) {
                     return started;
                 } catch (error) {
                     const failure = controller.signal.aborted ? controller.signal.reason : error;
+                    if (failure !== error && error?.name !== 'AbortError') {
+                        phaseLog(`Error observed during ${phase} after cancellation: ${error?.stack || error?.message || String(error)}`);
+                    }
                     outcome = failure?.name === 'TimeoutError' ? 'timed out' : failure?.name === 'AbortError' ? 'cancelled' : 'failed';
                     throw failure;
                 } finally {

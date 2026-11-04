@@ -215,6 +215,18 @@ test('user cancellation remains quiet when a queued preparation deadline fires a
     assert.equal(f.timers.size, 0);
 });
 
+test('a real failure overtaken by cancellation remains in diagnostics without an error notification', async t => {
+    const f = preparationFixture(t, { classify: async () => {
+        f.cancel();
+        throw new Error('Project import failed during cancellation');
+    } });
+    assert.equal(await f.api.debugActiveFile(), false);
+    assert.deepEqual(f.calls.errors, []);
+    assert(f.calls.logs.some(line => line.includes('Project import failed during cancellation')));
+    assert(f.calls.logs.some(line => /Phase cancelled: Checking project membership/.test(line)));
+    assert.equal(f.timers.size, 0);
+});
+
 test('the preparation deadline is disarmed before Web certificate interaction', async t => {
     const f = preparationFixture(t, { webSupport: {
         BUILD_METADATA_ARGS: [], parseBuildMetadata: () => ({ isWebServer: true }),

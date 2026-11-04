@@ -4,7 +4,7 @@
   "platform": "Windows ARM64",
   "sdkVersion": "10.0.403",
   "runtimeVersion": "10.0.14",
-  "runtimeSha256": "2d429bafee64c389ccef9864602e9677b09027d9bb5d93e2d0941f0dfa9c898e",
+  "runtimeSha256": "83718b5e1ae5ce27b301fbb7cc83254f7df7ab5344a96de5293a1c280763766b",
   "scope": {
     "realDotnetCli": true,
     "runtimeLoadedDirectly": true,
@@ -37,27 +37,27 @@
     "Phase started: Checking project membership",
     "Phase completed: Checking project membership (0 ms; total 1 ms)",
     "Phase started: Checking .NET SDK",
-    "Phase completed: Checking .NET SDK (357 ms; total 358 ms)",
+    "Phase completed: Checking .NET SDK (660 ms; total 661 ms)",
     "Phase started: Preparing build output",
-    "Phase completed: Preparing build output (1 ms; total 359 ms)",
+    "Phase completed: Preparing build output (2 ms; total 663 ms)",
     "Phase started: Building file-based app",
-    "Phase timed out: Building file-based app (300065 ms; total 300424 ms)",
+    "Phase timed out: Building file-based app (300061 ms; total 300723 ms)",
     "Phase started: Locating .NET SDK",
     "Phase completed: Locating .NET SDK (0 ms; total 0 ms)",
     "Phase started: Checking project membership",
     "Phase completed: Checking project membership (0 ms; total 0 ms)",
     "Phase started: Checking .NET SDK",
-    "Phase completed: Checking .NET SDK (316 ms; total 316 ms)",
+    "Phase completed: Checking .NET SDK (414 ms; total 414 ms)",
     "Phase started: Preparing build output",
-    "Phase completed: Preparing build output (1 ms; total 318 ms)",
+    "Phase completed: Preparing build output (1 ms; total 415 ms)",
     "Phase started: Building file-based app",
-    "Phase completed: Building file-based app (1754 ms; total 2072 ms)",
+    "Phase completed: Building file-based app (2418 ms; total 2833 ms)",
     "Phase started: Preparing web launch settings",
-    "Phase completed: Preparing web launch settings (1 ms; total 2073 ms)",
+    "Phase completed: Preparing web launch settings (1 ms; total 2834 ms)",
     "Phase started: Starting netcoredbg",
-    "Phase completed: Starting netcoredbg (0 ms; total 2073 ms)"
+    "Phase completed: Starting netcoredbg (0 ms; total 2834 ms)"
   ],
-  "positiveBuildTiming": "Phase completed: Building file-based app (1754 ms; total 2072 ms)",
+  "positiveBuildTiming": "Phase completed: Building file-based app (2418 ms; total 2833 ms)",
   "positiveBuildTimingInterpretation": "Only the successful second build has no changing clock offset during the operation; its phase and cumulative durations are observed elapsed times for this one local run, not latency budgets or qualification.",
   "cleanup": {
     "firstRunOutputsAbsentAfterTimeout": true,
@@ -66,6 +66,6 @@
   },
   "artifactSha256": {
     "control.cjs": "953aab5422da33628c047d334f499967fa6b52b465b62f0a0e5a444180088aa9",
-    "result.json": "89dd67f3d16fe3d8784554da02036f43faf46afde33084055e50148241044817"
+    "result.json": "e67756289695c606bb503fa4e7dd8e8a8c11d00bb388cd671000188ec63fd8c7"
   }
 }
