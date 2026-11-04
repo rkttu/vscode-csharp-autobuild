@@ -84,6 +84,8 @@ A compilation error prevents the debugger from starting. **11.7.18003 fixes retr
 
 In the affected **11.7.18002** package, an open **C# file debugging failed** notification keeps that file's previous command pending. Until updating, close the notification, including its entry in the notification center, then press F5 again. Regression tests for the fix retain an unresolved notification while retrying after build and save failures.
 
+The current development recipe also reports when the editor returns `false` instead of starting a netcoredbg session. Inspect **C# File Debugging**, **C#**, and **Debug Console** output for the underlying reason, then retry. The failed launch releases its temporary output and pending operation while its notification remains open. Cancelling the file-debugging progress while a declined start is pending remains quiet. This diagnostic improvement has not yet been assigned a published release version; it does not identify the cause of every declined launch.
+
 ## Implementation and validation
 
 The [stability contract](stability-contract.md) separates existing debugger/editor evidence from required VSCodium qualification and defines repeated-workflow, timing and recovery acceptance. Publishing the contract does not qualify an unmeasured target.

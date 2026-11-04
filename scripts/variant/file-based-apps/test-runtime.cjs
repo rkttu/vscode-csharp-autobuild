@@ -48,7 +48,10 @@ function fixture(t, options = {}) {
         },
         debug: {
             onDidTerminateDebugSession: callback => { termination = callback; return { dispose() {} }; },
-            startDebugging: async (folder, config) => { calls.launches.push({ folder, config }); return options.startResult !== false; },
+            startDebugging: async (folder, config) => {
+                calls.launches.push({ folder, config });
+                return options.startDebugging ? options.startDebugging(folder, config) : options.startResult !== false;
+            },
         },
     };
     const context = { globalStorageUri: { fsPath: path.join(root, 'storage') }, subscriptions: [], extension: { packageJSON: { netcoredbgBuild: { target: 'win32-arm64' } } } };
@@ -250,6 +253,50 @@ test('failed debug launch removes its own output and does not reuse stale bytes'
     const f = fixture(t, { startResult: false });
     assert.equal(await f.api.debugActiveFile(), false);
     assert(!fs.existsSync(f.calls.launches[0].config.program));
+    assert.equal(f.calls.errors.length, 1);
+    assert.match(f.calls.errors[0], /editor did not start the netcoredbg debug session/);
+    assert.match(f.calls.errors[0], /Debug Console/);
+    assert(f.calls.logs.some(message => message.includes('editor did not start the netcoredbg debug session')));
+});
+
+test('a declined debug start permits retry while its notification remains open', { timeout: 2000 }, async t => {
+    let dismiss;
+    const notification = new Promise(resolve => { dismiss = resolve; });
+    t.after(() => dismiss());
+    const options = { startResult: false, showErrorMessage: () => notification };
+    const f = fixture(t, options);
+    assert.equal(await f.api.debugActiveFile(), false);
+    const rejected = f.calls.launches[0].config;
+    assert.equal(f.calls.errors.length, 1);
+    assert(!fs.existsSync(rejected.program));
+    options.startResult = true;
+    f.document.isDirty = true;
+    assert.equal(await f.api.debugActiveFile(), true);
+    assert.equal(f.calls.saves, 1);
+    assert.equal(f.calls.launches.length, 2);
+    const retried = f.calls.launches[1].config;
+    assert.notEqual(retried.program, rejected.program);
+    assert(fs.existsSync(retried.program));
+    assert.equal(f.calls.errors.length, 1, 'Retry must not duplicate the earlier failure');
+});
+
+test('cancellation during a declined debug start is quiet and releases the file for retry', { timeout: 2000 }, async t => {
+    let resolveStart;
+    const options = { startDebugging: () => new Promise(resolve => { resolveStart = resolve; }) };
+    const f = fixture(t, options);
+    const operation = f.api.debugActiveFile();
+    const startDeadline = Date.now() + 1000;
+    while (!resolveStart && Date.now() < startDeadline) await new Promise(resolve => setImmediate(resolve));
+    assert.equal(typeof resolveStart, 'function', 'The command must reach debug start before cancellation');
+    f.cancel();
+    resolveStart(false);
+    assert.equal(await operation, false);
+    assert.deepEqual(f.calls.errors, []);
+    assert(!fs.existsSync(f.calls.launches[0].config.program));
+    options.startDebugging = async () => true;
+    assert.equal(await f.api.debugActiveFile(), true);
+    assert.equal(f.calls.launches.length, 2);
+    assert(fs.existsSync(f.calls.launches[1].config.program));
 });
 
 test('a build failure releases the file for retry while its error notification remains open', async t => {
