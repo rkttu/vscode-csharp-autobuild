@@ -7,6 +7,7 @@ const path = require('node:path');
 const test = require('node:test');
 const { activate, COMMAND, requireFileAppSdk, sdkArchitecture, runProcess } = require('./runtime.cjs');
 const { classifyFile: classifyWithMsbuild } = require('./classify.cjs');
+const vm = require('node:vm');
 
 function fixture(t, options = {}) {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'netcoredbg-fba-runtime-'));
@@ -80,7 +81,7 @@ function fixture(t, options = {}) {
             },
         },
     };
-    const context = { globalStorageUri: { fsPath: path.join(root, 'storage') }, subscriptions: [], extension: { packageJSON: { netcoredbgBuild: { target: 'win32-arm64' } } } };
+    const context = { globalStorageUri: { fsPath: options.storage || path.join(root, 'storage') }, subscriptions: [], extension: { packageJSON: { netcoredbgBuild: { target: 'win32-arm64' } } } };
     const dependencies = {
         vscode,
         env: {},
@@ -126,6 +127,12 @@ async function waitFor(predicate, message) {
     const deadline = Date.now() + 1000;
     while (!predicate() && Date.now() < deadline) await new Promise(resolve => setImmediate(resolve));
     assert(predicate(), message);
+}
+
+function terminalOutputs(f) {
+    const queue = path.join(f.context.globalStorageUri.fsPath, 'file-based-apps', 'terminal-cleanup-v1');
+    if (!fs.existsSync(queue)) return [];
+    return fs.readdirSync(queue, { withFileTypes: true }).filter(entry => entry.isDirectory()).map(entry => path.join(queue, entry.name, 'output'));
 }
 
 function preparationFixture(t, options = {}) {
@@ -509,17 +516,18 @@ test('failed cleanup is retried by the next command without removing live sessio
     options.startResult = false;
     assert.equal(await f.api.debugActiveFile(), false);
     const failed = f.calls.launches[1].config;
-    assert(fs.existsSync(failed.program), 'An exhausted deletion attempt leaves output for later recovery');
+    const [retired] = terminalOutputs(f);
+    assert(fs.existsSync(path.join(retired, 'FileApp.dll')), 'A terminal receipt retains failed output for later recovery');
     assert(f.calls.logs.some(line => line.includes('Could not clean file-app output')));
     locked = false;
     options.startResult = true;
     assert.equal(await f.api.debugActiveFile(), true);
     const retried = f.calls.launches[2].config;
-    assert(!fs.existsSync(failed.program), 'The next command must retry the failed cleanup');
+    assert(!fs.existsSync(retired), 'The next command must retry the failed cleanup');
     assert(fs.existsSync(active.program), 'Recovery must preserve an earlier live session');
     assert(fs.existsSync(retried.program), 'The new session must retain its distinct output');
     assert.notEqual(retried.program, failed.program);
-    assert.deepEqual(removals, [path.dirname(failed.program), path.dirname(failed.program)]);
+    assert.deepEqual(removals, [path.dirname(failed.program), retired]);
     assert.equal(f.calls.errors.length, 1, 'Cleanup must preserve the original launch failure');
 });
 
@@ -573,12 +581,13 @@ test('cleanup logging failure preserves the original result and failed output ca
     };
     const f = fixture(t, options);
     assert.equal(await f.api.debugActiveFile(), false);
-    const failed = f.calls.launches[0].config;
+    const [retired] = terminalOutputs(f);
+    assert(fs.existsSync(path.join(retired, 'FileApp.dll')));
     assert.equal(f.calls.errors.length, 1, 'A failed cleanup log must not replace the launch error');
     locked = false;
     options.startResult = true;
     assert.equal(await f.api.debugActiveFile(), true);
-    assert(!fs.existsSync(failed.program));
+    assert(!fs.existsSync(retired));
     assert(fs.existsSync(f.calls.launches[1].config.program));
 });
 
@@ -591,18 +600,21 @@ test('persistent cleanup failures permit fresh launches and retry only one older
     const f = fixture(t, options);
     assert.equal(await f.api.debugActiveFile(), false);
     assert.equal(await f.api.debugActiveFile(), false);
-    const first = f.calls.launches[0].config;
-    const second = f.calls.launches[1].config;
+    const first = removals[1]; // The second command already retried the first queued output.
+    const second = terminalOutputs(f).find(directory => directory !== first);
+    assert(first && second);
     options.startResult = true;
     const before = removals.length;
     assert.equal(await f.api.debugActiveFile(), true);
     assert.equal(removals.length, before + 1, 'A command must not sweep the entire failed-output backlog');
-    assert.equal(removals.at(-1), path.dirname(first.program));
+    assert.equal(removals.at(-1), first);
     assert.equal(await f.api.debugActiveFile(), true);
     assert.equal(removals.length, before + 2);
-    assert.equal(removals.at(-1), path.dirname(second.program), 'A locked output must not starve another failed output');
+    assert.equal(removals.at(-1), second, 'A locked output must not starve another failed output');
     assert.equal(f.calls.errors.length, 2, 'Recovery failure must not become an additional launch error');
-    for (const launch of f.calls.launches) assert(fs.existsSync(launch.config.program));
+    assert(fs.existsSync(path.join(first, 'FileApp.dll')));
+    assert(fs.existsSync(path.join(second, 'FileApp.dll')));
+    for (const launch of f.calls.launches.slice(2)) assert(fs.existsSync(launch.config.program));
 });
 
 test('cleanup failure preserves quiet cancellation and the next command recovers its output', async t => {
@@ -621,15 +633,99 @@ test('cleanup failure preserves quiet cancellation and the next command recovers
         },
     });
     assert.equal(await f.api.debugActiveFile(), false);
-    const build = f.calls.processes.find(call => call.args[0] === 'build');
-    const failedOutput = build.args[build.args.indexOf('--output') + 1];
-    assert(fs.existsSync(failedOutput));
+    const [failedOutput] = terminalOutputs(f);
+    assert(fs.existsSync(path.join(failedOutput, 'FileApp.dll')));
     assert.deepEqual(f.calls.errors, []);
     locked = false;
     assert.equal(await f.api.debugActiveFile(), true);
     assert(!fs.existsSync(failedOutput));
     assert.deepEqual(f.calls.errors, []);
     assert.equal(f.calls.launches.length, 1);
+});
+
+test('a fresh activation recovers a terminal receipt while preserving another host live output', async t => {
+    let locked = true;
+    const options = { removeOutput: async (directory, settings) => {
+        if (locked) throw Object.assign(new Error('Deletion locked'), { code: 'EPERM' });
+        await fs.promises.rm(directory, settings);
+    } };
+    const first = fixture(t, options);
+    await first.api.recoveryReady;
+    assert.equal(await first.api.debugActiveFile(), true);
+    const live = first.calls.launches[0].config;
+    options.startResult = false;
+    assert.equal(await first.api.debugActiveFile(), false);
+    const failed = first.calls.launches[1].config;
+    const [retired] = terminalOutputs(first);
+    assert(fs.existsSync(path.join(retired, 'FileApp.dll')));
+    const second = fixture(t, { storage: first.context.globalStorageUri.fsPath });
+    const stats = await second.api.recoveryReady;
+    assert.equal(stats.removed, 1);
+    assert(!fs.existsSync(retired));
+    assert(fs.existsSync(live.program));
+    assert.deepEqual(second.calls.errors, []);
+    // A stale in-memory receipt must not delete a replacement at its original run path.
+    fs.mkdirSync(path.dirname(failed.program), { recursive: true });
+    const replacement = path.join(path.dirname(failed.program), 'unrelated.txt');
+    fs.writeFileSync(replacement, 'preserve replacement');
+    locked = false;
+    options.startResult = true;
+    assert.equal(await first.api.debugActiveFile(), true);
+    assert(fs.existsSync(replacement));
+    assert(fs.existsSync(live.program));
+});
+
+test('background recovery does not hold a fresh file command pending', async t => {
+    const first = fixture(t, { startResult: false, removeOutput: async () => { throw new Error('Locked output'); } });
+    await first.api.recoveryReady;
+    assert.equal(await first.api.debugActiveFile(), false);
+    const [retired] = terminalOutputs(first);
+    let release;
+    const second = fixture(t, { storage: first.context.globalStorageUri.fsPath, removeOutput: async (directory, settings) => {
+        await new Promise(resolve => { release = resolve; });
+        await fs.promises.rm(directory, settings);
+    } });
+    await waitFor(() => release, 'A recovery deletion must be pending');
+    assert.equal(await second.api.debugActiveFile(), true);
+    assert(fs.existsSync(second.calls.launches[0].config.program));
+    assert(fs.existsSync(retired));
+    release();
+    await second.api.recoveryReady;
+    assert(!fs.existsSync(retired));
+    assert(fs.existsSync(second.calls.launches[0].config.program));
+});
+
+test('an unexpected recovery rejection preserves a stable zero-count result without notifying', async t => {
+    const f = fixture(t);
+    await f.api.recoveryReady;
+    const module = { exports: {} };
+    vm.runInNewContext(fs.readFileSync(require.resolve('./runtime.cjs'), 'utf8'), {
+        module, process, AbortController, setTimeout, clearTimeout,
+        require: name => name === './recovery.cjs' ? { createRecovery: () => ({
+            recover: () => Promise.reject(new Error('Unexpected recovery failure')),
+        }) } : require(name),
+    });
+    const api = module.exports.activate(f.context, f.dependencies);
+    assert.deepEqual(JSON.parse(JSON.stringify(await api.recoveryReady)), { scanned: 0, attempted: 0, removed: 0 });
+    assert(f.calls.logs.some(line => line.includes('Unexpected recovery failure')));
+    assert.deepEqual(f.calls.errors, []);
+});
+
+test('a new activation preserves output whose cancelled editor start is still unresolved', async t => {
+    let settle;
+    const first = fixture(t, { startDebugging: () => new Promise(resolve => { settle = resolve; }) });
+    await first.api.recoveryReady;
+    const operation = first.api.debugActiveFile();
+    await waitFor(() => settle, 'The editor start must be pending');
+    const config = first.calls.launches[0].config;
+    first.cancel();
+    assert.equal(await operation, false);
+    const second = fixture(t, { storage: first.context.globalStorageUri.fsPath });
+    assert.equal((await second.api.recoveryReady).removed, 0);
+    assert(fs.existsSync(config.program));
+    assert.deepEqual(terminalOutputs(first), []);
+    settle(false);
+    await waitFor(() => !fs.existsSync(config.__netcoredbgFileAppOutput), 'The declined request may now clean output');
 });
 
 test('a declined debug start permits retry while its notification remains open', { timeout: 2000 }, async t => {

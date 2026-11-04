@@ -20,7 +20,7 @@ INTEGRATION_FILES = (*IDENTITY_FILES, "tasks/packaging/offlinePackagingTasks.ts"
                      "package.json", ".vscodeignore", "README.md")
 FILE_APP_COMMAND = "netcoredbg.debugActiveFile"
 FILE_APP_WHEN = "editorTextFocus && editorLangId == csharp && !inDebugMode"
-FILE_APP_MODULES = ("entry.cjs", "runtime.cjs", "classify.cjs", "web.cjs")
+FILE_APP_MODULES = ("entry.cjs", "runtime.cjs", "classify.cjs", "web.cjs", "recovery.cjs")
 FILE_APP_SNIPPETS = "./.netcoredbg/snippets/fba-csharp.json"
 FILE_APP_ASSETS = ("snippets/fba-csharp.json", "snippets/NOTICE.md", "snippets/examples-LICENSE.txt")
 
