@@ -86,6 +86,8 @@ In the affected **11.7.18002** package, an open **C# file debugging failed** not
 
 ## Implementation and validation
 
+The [stability contract](stability-contract.md) separates existing debugger/editor evidence from required VSCodium qualification and defines repeated-workflow, timing and recovery acceptance. Publishing the contract does not qualify an unmeasured target.
+
 Repository-owned modules live in [`scripts/variant/file-based-apps`](../scripts/variant/file-based-apps). Packaging adds `.netcoredbg/entry.cjs`, `runtime.cjs`, `classify.cjs`, and (starting in `11.7.18004`) `web.cjs`; updates manifest `main` to the wrapper; preserves the original entry in `netcoredbgBuild.upstreamMain`; and registers the command, activation event, and F5 binding. The wrapper registers the command and calls the original upstream activation function, preserving its returned API and other exports. There are no additional upstream JS/TypeScript source replacements for this feature. It uses the existing bundled debugger and language service implementations, and the existing `coreclr` adapter factory remains the sole adapter owner.
 
 The release preflight runs the classifier, runtime, and wrapper tests. VSIX verification checks the entry point, original upstream entry, command/binding, and exact owned module bytes. Existing native and extracted-VSIX project-based debugger gates remain enabled.

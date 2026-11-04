@@ -1,0 +1,299 @@
+{
+  "success": true,
+  "scope": "Windows ARM64 CLI-only phase calibration; not installed-editor qualification",
+  "sdk": "10.0.403",
+  "runtime": "10.0.14",
+  "platform": "win32-arm64",
+  "samples": [
+    {
+      "phase": "sdk_selection",
+      "fixture": "console",
+      "iteration": 0,
+      "cache": "first",
+      "milliseconds": 129.21
+    },
+    {
+      "phase": "classification",
+      "fixture": "console",
+      "iteration": 0,
+      "cache": "first",
+      "milliseconds": 6.97
+    },
+    {
+      "phase": "managed_build",
+      "fixture": "console",
+      "iteration": 0,
+      "cache": "first",
+      "milliseconds": 1982.41
+    },
+    {
+      "phase": "cli_application",
+      "fixture": "console",
+      "iteration": 0,
+      "cache": "first",
+      "milliseconds": 69.96
+    },
+    {
+      "phase": "sdk_selection",
+      "fixture": "console",
+      "iteration": 1,
+      "cache": "warm",
+      "milliseconds": 125.83
+    },
+    {
+      "phase": "classification",
+      "fixture": "console",
+      "iteration": 1,
+      "cache": "warm",
+      "milliseconds": 0.99
+    },
+    {
+      "phase": "managed_build",
+      "fixture": "console",
+      "iteration": 1,
+      "cache": "warm",
+      "milliseconds": 778.19
+    },
+    {
+      "phase": "cli_application",
+      "fixture": "console",
+      "iteration": 1,
+      "cache": "warm",
+      "milliseconds": 65.46
+    },
+    {
+      "phase": "sdk_selection",
+      "fixture": "console",
+      "iteration": 2,
+      "cache": "warm",
+      "milliseconds": 117.92
+    },
+    {
+      "phase": "classification",
+      "fixture": "console",
+      "iteration": 2,
+      "cache": "warm",
+      "milliseconds": 0.46
+    },
+    {
+      "phase": "managed_build",
+      "fixture": "console",
+      "iteration": 2,
+      "cache": "warm",
+      "milliseconds": 735.15
+    },
+    {
+      "phase": "cli_application",
+      "fixture": "console",
+      "iteration": 2,
+      "cache": "warm",
+      "milliseconds": 58.8
+    },
+    {
+      "phase": "sdk_selection",
+      "fixture": "console",
+      "iteration": 3,
+      "cache": "warm",
+      "milliseconds": 107.06
+    },
+    {
+      "phase": "classification",
+      "fixture": "console",
+      "iteration": 3,
+      "cache": "warm",
+      "milliseconds": 0.53
+    },
+    {
+      "phase": "managed_build",
+      "fixture": "console",
+      "iteration": 3,
+      "cache": "warm",
+      "milliseconds": 748.01
+    },
+    {
+      "phase": "cli_application",
+      "fixture": "console",
+      "iteration": 3,
+      "cache": "warm",
+      "milliseconds": 64.64
+    },
+    {
+      "phase": "sdk_selection",
+      "fixture": "web",
+      "iteration": 0,
+      "cache": "first",
+      "milliseconds": 117.31
+    },
+    {
+      "phase": "classification",
+      "fixture": "web",
+      "iteration": 0,
+      "cache": "first",
+      "milliseconds": 0.02
+    },
+    {
+      "phase": "managed_build",
+      "fixture": "web",
+      "iteration": 0,
+      "cache": "first",
+      "milliseconds": 2077.48
+    },
+    {
+      "phase": "cli_application",
+      "fixture": "web",
+      "iteration": 0,
+      "cache": "first",
+      "milliseconds": 313.45
+    },
+    {
+      "phase": "sdk_selection",
+      "fixture": "web",
+      "iteration": 1,
+      "cache": "warm",
+      "milliseconds": 109.37
+    },
+    {
+      "phase": "classification",
+      "fixture": "web",
+      "iteration": 1,
+      "cache": "warm",
+      "milliseconds": 0.02
+    },
+    {
+      "phase": "managed_build",
+      "fixture": "web",
+      "iteration": 1,
+      "cache": "warm",
+      "milliseconds": 926.31
+    },
+    {
+      "phase": "cli_application",
+      "fixture": "web",
+      "iteration": 1,
+      "cache": "warm",
+      "milliseconds": 258.42
+    },
+    {
+      "phase": "sdk_selection",
+      "fixture": "web",
+      "iteration": 2,
+      "cache": "warm",
+      "milliseconds": 134.09
+    },
+    {
+      "phase": "classification",
+      "fixture": "web",
+      "iteration": 2,
+      "cache": "warm",
+      "milliseconds": 0.04
+    },
+    {
+      "phase": "managed_build",
+      "fixture": "web",
+      "iteration": 2,
+      "cache": "warm",
+      "milliseconds": 1068.23
+    },
+    {
+      "phase": "cli_application",
+      "fixture": "web",
+      "iteration": 2,
+      "cache": "warm",
+      "milliseconds": 271.59
+    },
+    {
+      "phase": "sdk_selection",
+      "fixture": "web",
+      "iteration": 3,
+      "cache": "warm",
+      "milliseconds": 129.09
+    },
+    {
+      "phase": "classification",
+      "fixture": "web",
+      "iteration": 3,
+      "cache": "warm",
+      "milliseconds": 0.03
+    },
+    {
+      "phase": "managed_build",
+      "fixture": "web",
+      "iteration": 3,
+      "cache": "warm",
+      "milliseconds": 992.43
+    },
+    {
+      "phase": "cli_application",
+      "fixture": "web",
+      "iteration": 3,
+      "cache": "warm",
+      "milliseconds": 265.79
+    }
+  ],
+  "summary": {
+    "sdk_selection": {
+      "count": 8,
+      "minMs": 107.06,
+      "maxMs": 134.09
+    },
+    "classification": {
+      "count": 8,
+      "minMs": 0.02,
+      "maxMs": 6.97
+    },
+    "managed_build": {
+      "count": 8,
+      "minMs": 735.15,
+      "maxMs": 2077.48
+    },
+    "cli_application": {
+      "count": 8,
+      "minMs": 58.8,
+      "maxMs": 313.45
+    }
+  },
+  "schemaVersion": 1,
+  "date": "2026-11-04",
+  "editorQualified": false,
+  "numericEditorBudgets": null,
+  "conditions": {
+    "cliHome": "isolated",
+    "appData": "isolated",
+    "nugetConfig": "isolated; no package sources",
+    "networkRestore": false,
+    "developmentCertificateGeneration": false,
+    "editorProfiles": 0,
+    "runsPerFixture": 4,
+    "warmRunsPerFixture": 3,
+    "clock": "node:perf_hooks performance.now",
+    "nativeSdkArchitecture": "arm64"
+  },
+  "fixtureSources": {
+    "console": {
+      "source": "Console.WriteLine(\"READY\");\n",
+      "sha256": "0e92794bdf1dd9fd855d543db2c965e1f52be00fbfc3d633eebae9b068f05d33"
+    },
+    "web": {
+      "source": "#:sdk Microsoft.NET.Sdk.Web\n#:property EnableDefaultItems=false\nvar builder = WebApplication.CreateSlimBuilder(args);\nvar app = builder.Build();\napp.MapGet(\"/\", () => \"READY\");\napp.Run();\n",
+      "sha256": "0f660425c70c2e10fc91b19ad0f534e0a36be8b3a61c6fb64874aae4b999da1c"
+    }
+  },
+  "measurementProtocol": {
+    "sdk_selection": "dotnet --version; source cwd",
+    "classification": "actual classifyFile; no project ancestor for Console; explicit SDK marker for Web",
+    "managed_build": "dotnet build source --configuration Debug --output isolated-run-directory -p:AssemblyName=FileApp -p:DebugType=portable -p:Optimize=false -p:PublishAot=false -p:UseSharedCompilation=false --disable-build-servers --nologo -target:Build plus evaluated Web metadata queries",
+    "cli_application": "Console: dotnet FileApp.dll exit; Web: --urls=http://127.0.0.1:0 listening message, HTTP200 READY, then stop owned process"
+  },
+  "provenance": {
+    "repositoryBaseCommit": "0c6f8bb5c0ed1fc5d95a7f4bab4b5c9345777c79",
+    "sourceScope": "local development worktree; not an installed package or qualification run",
+    "osRelease": "10.0.26300",
+    "nodeVersion": "v24.22.1",
+    "nodeArchitecture": "arm64",
+    "harnessSha256": "ca68197d1324d999becc124dd8d48757d11e53e0c0799e2d64a77c1fe85bed26",
+    "modules": {
+      "scripts/variant/file-based-apps/classify.cjs": "e5bc6e1bff60414a423fe93f87528a6b4b048a0bba14005860dae6979b9c3bff",
+      "scripts/variant/file-based-apps/web.cjs": "5b9ab26a6b6ba64e7031e66dc03d29fce3d6265c885b322a921c8c5115b403e9"
+    }
+  }
+}
