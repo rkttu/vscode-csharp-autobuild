@@ -31,7 +31,10 @@ function fixture(t, options = {}) {
         ProgressLocation: { Notification: 15 },
         window: {
             activeTextEditor: { document },
-            createOutputChannel: () => ({ append: value => calls.logs.push(value), appendLine: value => calls.logs.push(value), dispose() {} }),
+            createOutputChannel: () => ({ append: value => calls.logs.push(value), appendLine: value => {
+                calls.logs.push(value);
+                options.appendLine?.(value);
+            }, dispose() {} }),
             showErrorMessage: message => {
                 calls.errors.push(message);
                 return options.showErrorMessage ? options.showErrorMessage(message) : Promise.resolve(undefined);
@@ -59,6 +62,7 @@ function fixture(t, options = {}) {
         vscode,
         env: {},
         ...(options.webSupport ? { webSupport: options.webSupport } : {}),
+        ...(options.removeOutput ? { removeOutput: options.removeOutput } : {}),
         findDotnet: async () => ({ executable: path.join(root, 'dotnet', 'dotnet.exe'), root: path.join(root, 'dotnet') }),
         classifyFile: async input => {
             calls.classifications.push(input);
@@ -89,6 +93,12 @@ function fixture(t, options = {}) {
     const api = activate(context, dependencies);
     return { root, source, document, vscode, context, dependencies, calls, api,
         terminate: config => termination({ configuration: config }), cancel: () => cancellation() };
+}
+
+async function waitFor(predicate, message) {
+    const deadline = Date.now() + 1000;
+    while (!predicate() && Date.now() < deadline) await new Promise(resolve => setImmediate(resolve));
+    assert(predicate(), message);
 }
 
 test('F5 builds the saved captured file with SDK cwd, then launches existing coreclr adapter', async t => {
@@ -257,6 +267,143 @@ test('failed debug launch removes its own output and does not reuse stale bytes'
     assert.match(f.calls.errors[0], /editor did not start the netcoredbg debug session/);
     assert.match(f.calls.errors[0], /Debug Console/);
     assert(f.calls.logs.some(message => message.includes('editor did not start the netcoredbg debug session')));
+});
+
+test('failed cleanup is retried by the next command without removing live session output', async t => {
+    let locked = true;
+    const removals = [];
+    const options = { removeOutput: async (directory, settings) => {
+        removals.push(directory);
+        if (locked) throw Object.assign(new Error('Output remains locked after filesystem retries'), { code: 'EPERM' });
+        await fs.promises.rm(directory, settings);
+    } };
+    const f = fixture(t, options);
+    assert.equal(await f.api.debugActiveFile(), true);
+    const active = f.calls.launches[0].config;
+    options.startResult = false;
+    assert.equal(await f.api.debugActiveFile(), false);
+    const failed = f.calls.launches[1].config;
+    assert(fs.existsSync(failed.program), 'An exhausted deletion attempt leaves output for later recovery');
+    assert(f.calls.logs.some(line => line.includes('Could not clean file-app output')));
+    locked = false;
+    options.startResult = true;
+    assert.equal(await f.api.debugActiveFile(), true);
+    const retried = f.calls.launches[2].config;
+    assert(!fs.existsSync(failed.program), 'The next command must retry the failed cleanup');
+    assert(fs.existsSync(active.program), 'Recovery must preserve an earlier live session');
+    assert(fs.existsSync(retried.program), 'The new session must retain its distinct output');
+    assert.notEqual(retried.program, failed.program);
+    assert.deepEqual(removals, [path.dirname(failed.program), path.dirname(failed.program)]);
+    assert.equal(f.calls.errors.length, 1, 'Cleanup must preserve the original launch failure');
+});
+
+test('overlapping cleanup requests share one deletion and release ownership only after success', async t => {
+    let release;
+    const removals = [];
+    const f = fixture(t, { removeOutput: async (directory, settings) => {
+        removals.push(directory);
+        await new Promise(resolve => { release = resolve; });
+        await fs.promises.rm(directory, settings);
+    } });
+    assert.equal(await f.api.debugActiveFile(), true);
+    const config = f.calls.launches[0].config;
+    f.terminate(config);
+    f.terminate(config);
+    assert.equal(removals.length, 1);
+    assert(fs.existsSync(config.program));
+    release();
+    await waitFor(() => !fs.existsSync(config.__netcoredbgFileAppOutput), 'The shared cleanup must complete');
+    await new Promise(resolve => setImmediate(resolve));
+    f.terminate(config);
+    assert.equal(removals.length, 1, 'Successful cleanup releases ownership');
+});
+
+test('cleanup never submits arbitrary paths to filesystem deletion', async t => {
+    const removals = [];
+    const f = fixture(t, { removeOutput: async directory => { removals.push(directory); } });
+    assert.equal(await f.api.debugActiveFile(), true);
+    const active = f.calls.launches[0].config;
+    const unowned = path.join(f.context.globalStorageUri.fsPath, 'file-based-apps', 'unowned');
+    fs.mkdirSync(unowned, { recursive: true });
+    const sentinel = path.join(unowned, 'keep.txt');
+    fs.writeFileSync(sentinel, 'unowned output');
+    f.terminate({ __netcoredbgFileAppOutput: path.dirname(f.source) });
+    f.terminate({ __netcoredbgFileAppOutput: unowned });
+    await new Promise(resolve => setImmediate(resolve));
+    assert.deepEqual(removals, []);
+    assert(fs.existsSync(f.source));
+    assert(fs.existsSync(sentinel));
+    assert(fs.existsSync(active.program));
+});
+
+test('cleanup logging failure preserves the original result and failed output can still recover', async t => {
+    let locked = true;
+    const options = { startResult: false,
+        appendLine: line => { if (line.includes('Could not clean file-app output')) throw new Error('Output channel disposed'); },
+        removeOutput: async (directory, settings) => {
+            if (locked) throw Object.assign(new Error('Output locked'), { code: 'EPERM' });
+            await fs.promises.rm(directory, settings);
+        },
+    };
+    const f = fixture(t, options);
+    assert.equal(await f.api.debugActiveFile(), false);
+    const failed = f.calls.launches[0].config;
+    assert.equal(f.calls.errors.length, 1, 'A failed cleanup log must not replace the launch error');
+    locked = false;
+    options.startResult = true;
+    assert.equal(await f.api.debugActiveFile(), true);
+    assert(!fs.existsSync(failed.program));
+    assert(fs.existsSync(f.calls.launches[1].config.program));
+});
+
+test('persistent cleanup failures permit fresh launches and retry only one older output per command', async t => {
+    const removals = [];
+    const options = { startResult: false, removeOutput: async directory => {
+        removals.push(directory);
+        throw Object.assign(new Error('Output locked after filesystem retries'), { code: 'EPERM' });
+    } };
+    const f = fixture(t, options);
+    assert.equal(await f.api.debugActiveFile(), false);
+    assert.equal(await f.api.debugActiveFile(), false);
+    const first = f.calls.launches[0].config;
+    const second = f.calls.launches[1].config;
+    options.startResult = true;
+    const before = removals.length;
+    assert.equal(await f.api.debugActiveFile(), true);
+    assert.equal(removals.length, before + 1, 'A command must not sweep the entire failed-output backlog');
+    assert.equal(removals.at(-1), path.dirname(first.program));
+    assert.equal(await f.api.debugActiveFile(), true);
+    assert.equal(removals.length, before + 2);
+    assert.equal(removals.at(-1), path.dirname(second.program), 'A locked output must not starve another failed output');
+    assert.equal(f.calls.errors.length, 2, 'Recovery failure must not become an additional launch error');
+    for (const launch of f.calls.launches) assert(fs.existsSync(launch.config.program));
+});
+
+test('cleanup failure preserves quiet cancellation and the next command recovers its output', async t => {
+    let locked = true;
+    let cancelFirst = true;
+    const f = fixture(t, {
+        removeOutput: async (directory, settings) => {
+            if (locked) throw Object.assign(new Error('Output locked'), { code: 'EPERM' });
+            await fs.promises.rm(directory, settings);
+        },
+        webSupport: {
+            BUILD_METADATA_ARGS: [], parseBuildMetadata: () => ({ isWebServer: true }),
+            prepareWebLaunch: async ({ signal }) => {
+                if (cancelFirst) { cancelFirst = false; f.cancel(); signal.throwIfAborted(); }
+            },
+        },
+    });
+    assert.equal(await f.api.debugActiveFile(), false);
+    const build = f.calls.processes.find(call => call.args[0] === 'build');
+    const failedOutput = build.args[build.args.indexOf('--output') + 1];
+    assert(fs.existsSync(failedOutput));
+    assert.deepEqual(f.calls.errors, []);
+    locked = false;
+    assert.equal(await f.api.debugActiveFile(), true);
+    assert(!fs.existsSync(failedOutput));
+    assert.deepEqual(f.calls.errors, []);
+    assert.equal(f.calls.launches.length, 1);
 });
 
 test('a declined debug start permits retry while its notification remains open', { timeout: 2000 }, async t => {

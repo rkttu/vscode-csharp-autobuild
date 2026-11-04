@@ -83,12 +83,15 @@ function activate(context, dependencies = {}) {
     const webSupport = dependencies.webSupport || require('./web.cjs');
     const environment = dependencies.env || process.env;
     const getDotnet = dependencies.findDotnet || (() => findDotnet(environment));
+    const removeOutput = dependencies.removeOutput || ((directory, options) => fs.promises.rm(directory, options));
     const storage = (context.globalStorageUri || context.storageUri)?.fsPath;
     if (!storage) throw new Error('C# file debugging requires an extension storage directory.');
     const outputBase = path.resolve(storage, 'file-based-apps');
     const output = dependencies.output || vscode.window.createOutputChannel('C# File Debugging');
     const pending = new Map();
     const ownedOutputs = new Set();
+    const failedCleanups = new Set();
+    const cleanupInFlight = new Map();
     const controllers = new Set();
     const packagedTarget = context.extension?.packageJSON?.netcoredbgBuild?.target;
     const expectedArchitecture = packagedTarget ? (packagedTarget.endsWith('-arm64') ? 'arm64' : 'x64') : undefined;
@@ -112,13 +115,36 @@ function activate(context, dependencies = {}) {
     async function cleanup(directory) {
         // Only paths created by this controller may be removed. Never trust a session's field alone.
         if (!ownedOutputs.has(directory)) return;
-        if (!insideDirectory(outputBase, directory)) throw new Error('Refusing to remove a file-app output outside extension storage.');
-        ownedOutputs.delete(directory);
+        // Refuse unsafe paths without rejecting the fire-and-forget termination callback.
+        if (!insideDirectory(outputBase, directory)) return;
+        if (cleanupInFlight.has(directory)) return cleanupInFlight.get(directory);
+        failedCleanups.delete(directory);
+        const operation = (async () => {
+            try {
+                // Node retries transient busy/permission errors with linear backoff, at most three times.
+                await removeOutput(directory, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
+                ownedOutputs.delete(directory);
+            } catch (error) {
+                failedCleanups.add(directory);
+                try {
+                    output.appendLine(`Could not clean file-app output ${directory}: ${error?.message || String(error)}`);
+                } catch {
+                    // Cleanup may finish after the extension's output channel is disposed.
+                }
+            }
+        })();
+        cleanupInFlight.set(directory, operation);
         try {
-            await fs.promises.rm(directory, { recursive: true, force: true });
-        } catch (error) {
-            output.appendLine(`Could not clean file-app output ${directory}: ${error.message}`);
+            await operation;
+        } finally {
+            cleanupInFlight.delete(directory);
         }
+    }
+
+    async function retryFailedCleanup() {
+        // Retry one terminal output per command. Never sweep outputs belonging to live sessions.
+        const directory = failedCleanups.values().next().value;
+        if (directory !== undefined) await cleanup(directory);
     }
 
     const terminated = vscode.debug.onDidTerminateDebugSession(session => {
@@ -269,6 +295,7 @@ function activate(context, dependencies = {}) {
         if (pending.has(source)) return pending.get(source);
         const operation = (async () => {
             try {
+                await retryFailedCleanup();
                 if (document.isDirty && !await document.save()) return false;
                 return debugFile(document.uri, source, document.getText());
             } catch (error) {
