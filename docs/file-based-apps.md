@@ -76,6 +76,8 @@ Console.WriteLine("Standalone file-based app");
 
 The build runs with the source directory as its working directory, Debug configuration, portable symbols, optimization disabled, and managed output. Each launch has an isolated output directory in extension storage, so names and concurrent sessions cannot overwrite one another. The output is removed after its debug session terminates. NuGet directives can require a package restore.
 
+The current development recipe retries temporary-output deletion up to three times for transient filesystem errors. If deletion still fails, **C# File Debugging** records the failure and retains ownership for another attempt; each later file-debug command retries at most one previously failed output. Running sessions keep their output. These retries do not replace the original launch result or error, and do not impose a time limit on an individual filesystem operation. Recovery tracking lasts for the current extension host; cleanup after a crash or reload remains separate work. This cleanup improvement has not yet been assigned a published release version.
+
 This flow launches the source file as a managed app; it does not debug a Native AOT executable. Application output uses the Debug Console. Interactive stdin and Hot Reload are outside this flow. Web-server launch-profile support requires `11.7.18004` or later. F5 continues to use the editor's normal Continue action during an existing debug session. User keyboard-shortcut overrides retain their normal precedence.
 
 ## Retrying after a build error
