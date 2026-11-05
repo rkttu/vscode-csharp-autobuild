@@ -1,0 +1,1944 @@
+{
+  "schema": 1,
+  "date": "2026-11-05",
+  "issue": "https://github.com/rkttu/vscode-csharp-autobuild/issues/18",
+  "kind": "local installed VSCodium Web lifecycle control",
+  "qualification": false,
+  "recordedEnvironment": {
+    "windowsBuild": "26300.9711",
+    "displayVersion": "26H2",
+    "node": "24.22.1 win32 arm64",
+    "python": "3.12.14",
+    "source": "Local registry/API/tool observations; editor native architecture is separately checked by PE header and extension host."
+  },
+  "finalHarnessRun": "run-05",
+  "finalHarnessFreshProfiles": 1,
+  "finalHarnessACycles": 3,
+  "harnessSourceSha256AtSummary": {
+    "scripts/variant/lifecycle/prepare.py": "3db2d6052de758abec398761cd7fdaf8f2fdc98afbd26a8f7bf9e74685d5e06b",
+    "scripts/variant/lifecycle/run.ps1": "b886023440a41383cdb392e042352448c5a48404750cacb5a03a640e62656efd",
+    "scripts/variant/lifecycle/driver.cjs": "ee4e031fa22d822cb6daa22913fb5b29ca23bbcdf73e9b265ec3032531b3428e",
+    "scripts/variant/lifecycle/extension-test.cjs": "0d1e7ce3ff873cd510cceaa27d6f30feb9afdff7b119b7b8917e3e0dddbdbd9c",
+    "scripts/variant/lifecycle/fixtures/web.cs": "63b2baf063ee79f3e02efb771bb35efe30ee5bf51f33c6fd43bded9a36e54ad5",
+    "scripts/variant/test_lifecycle_preparation.py": "889f47feeb03c7482109163dda2394536b9c853ed841a0c1a8ac04b81e041f23"
+  },
+  "summarizerSha256": "6cb0cd748b4402d4b764aff59b04ac70b272e6a6cd04a8d60ff3d4567949e746",
+  "preparationHistory": [
+    {
+      "name": "run-01",
+      "outcome": "preparation failed before editor launch",
+      "cause": "Reusing source ZipInfo objects for output mutated their offsets before the unchanged-payload comparison read them again.",
+      "fix": "copy.copy(info) isolates output metadata; payload preservation regression verifies original and candidate bytes.",
+      "rawTracebackRetained": false,
+      "editorScenarioAttempted": false,
+      "localArtifactDirectory": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-01",
+      "retainedFiles": {
+        "local-lifecycle.vsix": {
+          "sha256": "22bf1cdd6f0f9ca58e0d1106ce22810ebd440e7b748e3e20da7550d25f3a49dc",
+          "bytes": 73335321
+        }
+      }
+    },
+    {
+      "name": "unsafe-name unit case",
+      "outcome": "initial negative test failed",
+      "cause": "Python on Windows normalizes ZIP backslashes before filename-based validation.",
+      "fix": "Validate original ZIP names (orig_filename); construct a raw backslash fixture after ZipInfo initialization.",
+      "editorScenarioAttempted": false
+    }
+  ],
+  "runs": [
+    {
+      "name": "run-02",
+      "localArtifactDirectory": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-02",
+      "success": true,
+      "editorExitCode": 0,
+      "scope": {
+        "installedCandidate": true,
+        "invocation": "command-api",
+        "physicalF5": false,
+        "VSCodium": true,
+        "platform": "win32-arm64",
+        "macOS": false,
+        "qualification": false,
+        "localOnly": true,
+        "published": false,
+        "directWebDebuggee": true,
+        "spawnedGrandchildren": false,
+        "hostReload": false,
+        "injectedTargetRuntime": false
+      },
+      "freshProfiles": 1,
+      "aLaunchesAndStopCycles": 3,
+      "bLaunches": 1,
+      "candidate": {
+        "baseVsixSha256": "0d239dff83d3120786ff3596a046fd0866b045f1d883c86fb83c64a7d808d0c5",
+        "sourceCommit": "e96513627ffc678cfa2d9cac87bf3d30728552ae",
+        "target": "win32-arm64",
+        "ownedModules": {
+          "entry.cjs": "fde5a9f37adf614e8f6a677d040097d5654cea62d35610b93077b83d11b2a50f",
+          "runtime.cjs": "d64d087445f488f20546d07303636c4652a6c3121491a2f7b75ec481c975a16b",
+          "classify.cjs": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+          "web.cjs": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+          "recovery.cjs": "cfed5d0303d6817324f669a3ed392559956356085029dc64ba1c39e841d0d874"
+        },
+        "buildId": "40fdb8f7059a26a5bb4ae4f643ba9fac216e7ba185fbb6a4edf6caee98a3e56b",
+        "sha256": "4c6a65caa8a1fe13d509e8922499c5de7871feb9d49add52165cbf353a0ca1b0",
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-02\\local-lifecycle.vsix",
+        "version": "11.7.18004",
+        "localOnly": true,
+        "published": false,
+        "unchangedEntries": 736,
+        "unchangedPayloadDigest": "5b655a847a8d304972570006e1ecd7f4ac1cc01f855055bf3c35640237e2cdf1"
+      },
+      "editor": {
+        "executable": "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\VSCodium.exe",
+        "cli": "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\bin\\codium.cmd",
+        "version": "1.143.17232",
+        "commit": "c072cf642cbbadabefa22f39c58cc902a8b7427f",
+        "sha256": "61b273b2c0196d7cee4ba84f7412ccc74975f0fcefd3579e69a7b373f79027cd",
+        "machine": "arm64",
+        "apiVersion": "1.143.1"
+      },
+      "sdk": {
+        "executable": "C:\\Program Files\\dotnet\\dotnet.exe",
+        "root": "C:\\Program Files\\dotnet",
+        "version": "10.0.403",
+        "sha256": "8f9714d921c3fa1425611e3f79940715b74a18e2b21a5171bbd58e3775ff8315"
+      },
+      "dependency": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\resources\\ms-dotnettools.vscode-dotnet-runtime-3.2.0.vsix",
+        "sha256": "a4cff5409f66e3827ee2c6a727ae59382290a182a653ca0f9ac97c63536ee541",
+        "version": "3.2.0"
+      },
+      "installedExtension": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-02\\extensions\\dotnetdev-kr-custom.csharp-with-netcoredbg-11.7.18004",
+        "version": "11.7.18004",
+        "displayName": "C# (netcoredbg) LOCAL WEB LIFECYCLE TEST",
+        "metadata": {
+          "installedTimestamp": 1793831646950,
+          "targetPlatform": "undefined",
+          "size": 200466476
+        },
+        "build": {
+          "target": "win32-arm64",
+          "upstreamCsharpCommit": "1c27e135b5dada55a240e4a504bafa759ec578e8",
+          "upstreamCsharpVersion": "11.7.18",
+          "upstreamCsharpTag": "v11.7.18-prerelease",
+          "upstreamPackageVersion": "42.42.42-placeholder",
+          "netcoredbgTag": "3.2.0-1092",
+          "packagingRevision": 4,
+          "releaseTag": "csharp-v11.7.18-netcoredbg-v3.2.0-1092-g9744e1f05186-r4",
+          "versionPolicy": "upstream-patch-revision-v1",
+          "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+          "debuggerArchiveSha256": "cfc272be9e883bcb90c9ed0704731fbb1349faf207d872f71e6bfb83b55869ad",
+          "validationRunId": "41644074504",
+          "validationWorkflowCommit": "ca5d10d97431181d934369c76c28347fac8a05a6",
+          "upstreamMain": "./dist/extension",
+          "localCandidate": true,
+          "lifecycleBuildId": "40fdb8f7059a26a5bb4ae4f643ba9fac216e7ba185fbb6a4edf6caee98a3e56b",
+          "lifecycleSourceCommit": "e96513627ffc678cfa2d9cac87bf3d30728552ae"
+        }
+      },
+      "installedDependency": null,
+      "installedOwnedModules": {
+        "entry.cjs": "fde5a9f37adf614e8f6a677d040097d5654cea62d35610b93077b83d11b2a50f",
+        "runtime.cjs": "d64d087445f488f20546d07303636c4652a6c3121491a2f7b75ec481c975a16b",
+        "classify.cjs": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+        "web.cjs": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+        "recovery.cjs": "cfed5d0303d6817324f669a3ed392559956356085029dc64ba1c39e841d0d874"
+      },
+      "harnessPinnedBeforeLaunch": null,
+      "executedCopiesSha256": {
+        "driver.cjs": "ee4e031fa22d822cb6daa22913fb5b29ca23bbcdf73e9b265ec3032531b3428e",
+        "extension-test.cjs": "b1356e6c99c09d45947a8752803e4138abacabcf8a9932a00121db909297c9b6",
+        "fixtures/web.cs": "63b2baf063ee79f3e02efb771bb35efe30ee5bf51f33c6fd43bded9a36e54ad5"
+      },
+      "checks": [
+        "Normally installed local candidate activates with exact owned module hashes and isolated loaded path",
+        "A source breakpoint binds and evaluates marker=40 through the installed native adapter",
+        "Two independent real Web sessions respond with distinct owned nonces and PIDs",
+        "A cycle 0: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+        "A cycle 1: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+        "A cycle 2: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+        "B final stop releases its exact PID, HTTP port and owned output"
+      ],
+      "phases": [
+        {
+          "label": "verify installed local candidate",
+          "startedAtMilliseconds": 0.8538,
+          "outcome": "passed",
+          "elapsedMilliseconds": 1502.5384
+        },
+        {
+          "label": "A initial installed-command launch and breakpoint",
+          "startedAtMilliseconds": 1517.9501,
+          "outcome": "passed",
+          "elapsedMilliseconds": 5764.3475
+        },
+        {
+          "label": "B independent installed-command launch",
+          "startedAtMilliseconds": 7282.4316,
+          "outcome": "passed",
+          "elapsedMilliseconds": 4193.2995
+        },
+        {
+          "label": "A cycle 0 targeted stop and owned cleanup",
+          "startedAtMilliseconds": 11475.9497,
+          "outcome": "passed",
+          "elapsedMilliseconds": 796.8259
+        },
+        {
+          "label": "B preserved after A cycle 0",
+          "startedAtMilliseconds": 12273.1461,
+          "outcome": "passed",
+          "elapsedMilliseconds": 7.8836
+        },
+        {
+          "label": "A cycle 1 dirty edit and installed-command retry",
+          "startedAtMilliseconds": 12281.2286,
+          "outcome": "passed",
+          "elapsedMilliseconds": 3938.2155
+        },
+        {
+          "label": "A cycle 1 targeted stop and owned cleanup",
+          "startedAtMilliseconds": 16219.5597,
+          "outcome": "passed",
+          "elapsedMilliseconds": 620.9903
+        },
+        {
+          "label": "B preserved after A cycle 1",
+          "startedAtMilliseconds": 16840.6438,
+          "outcome": "passed",
+          "elapsedMilliseconds": 4.1819
+        },
+        {
+          "label": "A cycle 2 dirty edit and installed-command retry",
+          "startedAtMilliseconds": 16844.9879,
+          "outcome": "passed",
+          "elapsedMilliseconds": 3761.6508
+        },
+        {
+          "label": "A cycle 2 targeted stop and owned cleanup",
+          "startedAtMilliseconds": 20606.7536,
+          "outcome": "passed",
+          "elapsedMilliseconds": 649.0244
+        },
+        {
+          "label": "B preserved after A cycle 2",
+          "startedAtMilliseconds": 21256.1288,
+          "outcome": "passed",
+          "elapsedMilliseconds": 3.8218
+        },
+        {
+          "label": "B final targeted stop and owned cleanup",
+          "startedAtMilliseconds": 21261.7857,
+          "outcome": "passed",
+          "elapsedMilliseconds": 687.0494
+        }
+      ],
+      "elapsedMilliseconds": 21949.2601,
+      "launches": [
+        {
+          "label": "A-0",
+          "revision": "initial",
+          "pid": 10704,
+          "sessionId": "376ae230-ff8e-4f9d-8937-06029291f85e",
+          "origin": "http://127.0.0.1:61418",
+          "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-02\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8d7271da074f941624d87464\\run-8HaHh6",
+          "response": {
+            "pid": 10704,
+            "nonce": "ffc15273-ca04-4199-af7f-3d32379f1fd0",
+            "revision": "initial",
+            "value": 42
+          },
+          "afterStopMilliseconds": {
+            "stopPromise": 47.494,
+            "matchingEditorTermination": 762.17,
+            "pidObservedGone": 763.715,
+            "portRebindSucceeded": 765.181,
+            "outputAndQueuesClear": 796.289
+          },
+          "stopPromiseToTerminationMilliseconds": 714.676
+        },
+        {
+          "label": "B",
+          "revision": "initial",
+          "pid": 25448,
+          "sessionId": "0aa38ce4-34a0-4386-bf09-10d8b2c464ac",
+          "origin": "http://127.0.0.1:61419",
+          "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-02\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b82b61fece4efab825881c94\\run-7rIdvh",
+          "response": {
+            "pid": 25448,
+            "nonce": "c533649e-a205-4aef-97ab-a9eaaa780e26",
+            "revision": "initial",
+            "value": 42
+          },
+          "afterStopMilliseconds": {
+            "stopPromise": 33.269,
+            "matchingEditorTermination": 650.441,
+            "pidObservedGone": 651.418,
+            "portRebindSucceeded": 652.316,
+            "outputAndQueuesClear": 686.603
+          },
+          "stopPromiseToTerminationMilliseconds": 617.172
+        },
+        {
+          "label": "A-1",
+          "revision": "retry-1",
+          "pid": 13336,
+          "sessionId": "75bf64b8-bfde-4601-9c41-8a55a73e2ade",
+          "origin": "http://127.0.0.1:61418",
+          "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-02\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8d7271da074f941624d87464\\run-7F1GzY",
+          "response": {
+            "pid": 13336,
+            "nonce": "7de04789-6119-4c98-a468-8eded2770d9f",
+            "revision": "retry-1",
+            "value": 42
+          },
+          "afterStopMilliseconds": {
+            "stopPromise": 43.951,
+            "matchingEditorTermination": 606.059,
+            "pidObservedGone": 619.596,
+            "portRebindSucceeded": 620.488,
+            "outputAndQueuesClear": 620.657
+          },
+          "stopPromiseToTerminationMilliseconds": 562.108
+        },
+        {
+          "label": "A-2",
+          "revision": "retry-2",
+          "pid": 91536,
+          "sessionId": "61f1d7e4-12bc-4ac7-b4ef-a9203312d2b0",
+          "origin": "http://127.0.0.1:61418",
+          "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-02\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8d7271da074f941624d87464\\run-Dictjs",
+          "response": {
+            "pid": 91536,
+            "nonce": "635d14b1-abfa-4dab-aa80-81e5693d27c3",
+            "revision": "retry-2",
+            "value": 42
+          },
+          "afterStopMilliseconds": {
+            "stopPromise": 37.797,
+            "matchingEditorTermination": 629.378,
+            "pidObservedGone": 647.756,
+            "portRebindSucceeded": 648.598,
+            "outputAndQueuesClear": 648.718
+          },
+          "stopPromiseToTerminationMilliseconds": 591.581
+        }
+      ],
+      "unrelatedSessionPreserved": [
+        {
+          "atMilliseconds": 12280.9095,
+          "event": "unrelated-preserved",
+          "detail": {
+            "label": "B",
+            "sessionId": "0aa38ce4-34a0-4386-bf09-10d8b2c464ac",
+            "pid": 25448
+          }
+        },
+        {
+          "atMilliseconds": 16844.6955,
+          "event": "unrelated-preserved",
+          "detail": {
+            "label": "B",
+            "sessionId": "0aa38ce4-34a0-4386-bf09-10d8b2c464ac",
+            "pid": 25448
+          }
+        },
+        {
+          "atMilliseconds": 21259.8822,
+          "event": "unrelated-preserved",
+          "detail": {
+            "label": "B",
+            "sessionId": "0aa38ce4-34a0-4386-bf09-10d8b2c464ac",
+            "pid": 25448
+          }
+        }
+      ],
+      "stopDiagnostics": [
+        {
+          "atMilliseconds": 11542.7863,
+          "event": "adapter-error",
+          "detail": {
+            "label": "A-0",
+            "error": "Error: read error"
+          },
+          "afterStopMilliseconds": 66.692
+        },
+        {
+          "atMilliseconds": 16262.7753,
+          "event": "dap-receive",
+          "detail": {
+            "label": "A-1",
+            "sessionId": "75bf64b8-bfde-4601-9c41-8a55a73e2ade",
+            "message": {
+              "command": "threads",
+              "message": "Failed command 'threads' : 0x80004005",
+              "request_seq": 10,
+              "seq": 122,
+              "success": false,
+              "type": "response"
+            }
+          },
+          "afterStopMilliseconds": 43.172
+        },
+        {
+          "atMilliseconds": 16819.8279,
+          "event": "adapter-error",
+          "detail": {
+            "label": "A-1",
+            "error": "Error: read error"
+          },
+          "afterStopMilliseconds": 600.225
+        },
+        {
+          "atMilliseconds": 20643.3545,
+          "event": "dap-receive",
+          "detail": {
+            "label": "A-2",
+            "sessionId": "61f1d7e4-12bc-4ac7-b4ef-a9203312d2b0",
+            "message": {
+              "command": "threads",
+              "message": "Failed command 'threads' : 0x80004005",
+              "request_seq": 10,
+              "seq": 122,
+              "success": false,
+              "type": "response"
+            }
+          },
+          "afterStopMilliseconds": 36.546
+        },
+        {
+          "atMilliseconds": 20664.777,
+          "event": "adapter-error",
+          "detail": {
+            "label": "A-2",
+            "error": "Error: read error"
+          },
+          "afterStopMilliseconds": 57.969
+        },
+        {
+          "atMilliseconds": 21328.412,
+          "event": "adapter-error",
+          "detail": {
+            "label": "B",
+            "error": "Error: read error"
+          },
+          "afterStopMilliseconds": 66.506
+        }
+      ],
+      "observedCoreRuntimeDirectories": [
+        "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14"
+      ],
+      "observedCoreLibraryModulePaths": [
+        "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Private.CoreLib.dll"
+      ],
+      "rawEvidence": {
+        "result.json": {
+          "sha256": "8fb1636d81dea155978e10e11c00a8b26eda8971f116cc64ab45fe5ca2519845",
+          "bytes": 13447
+        },
+        "expected.json": {
+          "sha256": "4e4c314554a5121126f7474cc96c1686eb81d23d45253dd76b02b11f9d6cfc47",
+          "bytes": 2412
+        },
+        "trace.jsonl": {
+          "sha256": "2132a7917319c9bcaba3f6f08866f3d1e32b8d176d76c0c28aa7fd4acaa1ec65",
+          "bytes": 252806
+        },
+        "launcher-result.json": {
+          "sha256": "b7519b26fc58b2d8d4942df607cd861bb44c3358c51255e9ad64a16e17978fff",
+          "bytes": 403
+        },
+        "attempt.json": {
+          "sha256": "f384bfa6e84ea2528a693fb0d2bd876f5c5699f996ceacd61f5443fbafcf49c8",
+          "bytes": 29
+        },
+        "launch.json": {
+          "sha256": "57623010a9dff07ac7707f532209dcf372c9030b53492e0ad1d23c2071f99c09",
+          "bytes": 1046
+        },
+        "progress/state.json": {
+          "sha256": "b5353c300bf841fa5716417ace7410b2f69102da9770d74bb8d6aeda2bf67d67",
+          "bytes": 4559
+        },
+        "logs/candidate-install.txt": {
+          "sha256": "76b2a1dbc521e7fbd69462ff71ddfb3b80061c4362f8aba130a46cea5a2e3a6e",
+          "bytes": 395
+        },
+        "logs/editor-version.txt": {
+          "sha256": "aff6841c98558e85f0dde480073005e9e8267d1e06817b8165756bbc14ab2ca2",
+          "bytes": 62
+        },
+        "logs/runtime-install.txt": {
+          "sha256": "43b28467ccd9669980ad8eddecc4c8f45ba0e5062fb44cb8d283797c9e566145",
+          "bytes": 422
+        },
+        "logs/sdk-version.txt": {
+          "sha256": "e4e6a678725873a4192c048849cd64d852983991bfcb210a40c3b80cc8fcf2eb",
+          "bytes": 10
+        },
+        "logs/stderr.txt": {
+          "sha256": "cdd5c6f3e64b2fc989892a61bc17dbec83597130697593c69ab1843d6503a252",
+          "bytes": 2014
+        },
+        "logs/stdout.txt": {
+          "sha256": "b3f728088fa14efb1708ef9422591b8e07f587137c7f03467b915d1599f92e59",
+          "bytes": 1338
+        },
+        "profile/logs/20261105T073408/window1/exthost/output_logging_20261105T073410/3-C# File Debugging.log": {
+          "sha256": "5f93f09c02ed63b69e0bb059c941bf2d6c43f1357cc9424026cea0dec097d05b",
+          "bytes": 23544
+        },
+        "profile/logs/20261105T073408/window1/exthost/exthost.log": {
+          "sha256": "03c182e6341389d71f7b594ee2c8f17bc58a14bbbe46790341ca9d09f04e8422",
+          "bytes": 7187
+        },
+        "profile/logs/20261105T073408/window1/exthost/dotnetdev-kr-custom.csharp-with-netcoredbg/C#.log": {
+          "sha256": "0908d2a3dd2933e7c5bc88234f5d696b0dc420bcdb8ecc785c4aebe7bd61f037",
+          "bytes": 46327
+        }
+      },
+      "interpretation": "Behavioral lifecycle assertions passed. Stop-time adapter errors remain recorded; this is not an error-free-log or release-qualification claim."
+    },
+    {
+      "name": "run-03",
+      "localArtifactDirectory": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-03",
+      "success": true,
+      "editorExitCode": 0,
+      "scope": {
+        "installedCandidate": true,
+        "invocation": "command-api",
+        "physicalF5": false,
+        "VSCodium": true,
+        "platform": "win32-arm64",
+        "macOS": false,
+        "qualification": false,
+        "localOnly": true,
+        "published": false,
+        "directWebDebuggee": true,
+        "spawnedGrandchildren": false,
+        "hostReload": false,
+        "injectedTargetRuntime": false
+      },
+      "freshProfiles": 1,
+      "aLaunchesAndStopCycles": 3,
+      "bLaunches": 1,
+      "candidate": {
+        "baseVsixSha256": "0d239dff83d3120786ff3596a046fd0866b045f1d883c86fb83c64a7d808d0c5",
+        "sourceCommit": "e96513627ffc678cfa2d9cac87bf3d30728552ae",
+        "target": "win32-arm64",
+        "ownedModules": {
+          "entry.cjs": "fde5a9f37adf614e8f6a677d040097d5654cea62d35610b93077b83d11b2a50f",
+          "runtime.cjs": "d64d087445f488f20546d07303636c4652a6c3121491a2f7b75ec481c975a16b",
+          "classify.cjs": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+          "web.cjs": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+          "recovery.cjs": "cfed5d0303d6817324f669a3ed392559956356085029dc64ba1c39e841d0d874"
+        },
+        "buildId": "40fdb8f7059a26a5bb4ae4f643ba9fac216e7ba185fbb6a4edf6caee98a3e56b",
+        "sha256": "9187649375bd1e15a31a3694cc13d98617e3b72a70f6adfd33fbfa40f4760fc2",
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-03\\local-lifecycle.vsix",
+        "version": "11.7.18004",
+        "localOnly": true,
+        "published": false,
+        "unchangedEntries": 736,
+        "unchangedPayloadDigest": "5b655a847a8d304972570006e1ecd7f4ac1cc01f855055bf3c35640237e2cdf1"
+      },
+      "editor": {
+        "executable": "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\VSCodium.exe",
+        "cli": "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\bin\\codium.cmd",
+        "version": "1.143.17232",
+        "commit": "c072cf642cbbadabefa22f39c58cc902a8b7427f",
+        "sha256": "61b273b2c0196d7cee4ba84f7412ccc74975f0fcefd3579e69a7b373f79027cd",
+        "machine": "arm64",
+        "apiVersion": "1.143.1"
+      },
+      "sdk": {
+        "executable": "C:\\Program Files\\dotnet\\dotnet.exe",
+        "root": "C:\\Program Files\\dotnet",
+        "version": "10.0.403",
+        "sha256": "8f9714d921c3fa1425611e3f79940715b74a18e2b21a5171bbd58e3775ff8315"
+      },
+      "dependency": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\resources\\ms-dotnettools.vscode-dotnet-runtime-3.2.0.vsix",
+        "sha256": "a4cff5409f66e3827ee2c6a727ae59382290a182a653ca0f9ac97c63536ee541",
+        "version": "3.2.0"
+      },
+      "installedExtension": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-03\\extensions\\dotnetdev-kr-custom.csharp-with-netcoredbg-11.7.18004",
+        "version": "11.7.18004",
+        "displayName": "C# (netcoredbg) LOCAL WEB LIFECYCLE TEST",
+        "metadata": {
+          "installedTimestamp": 1793831801829,
+          "targetPlatform": "undefined",
+          "size": 200466476
+        },
+        "build": {
+          "target": "win32-arm64",
+          "upstreamCsharpCommit": "1c27e135b5dada55a240e4a504bafa759ec578e8",
+          "upstreamCsharpVersion": "11.7.18",
+          "upstreamCsharpTag": "v11.7.18-prerelease",
+          "upstreamPackageVersion": "42.42.42-placeholder",
+          "netcoredbgTag": "3.2.0-1092",
+          "packagingRevision": 4,
+          "releaseTag": "csharp-v11.7.18-netcoredbg-v3.2.0-1092-g9744e1f05186-r4",
+          "versionPolicy": "upstream-patch-revision-v1",
+          "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+          "debuggerArchiveSha256": "cfc272be9e883bcb90c9ed0704731fbb1349faf207d872f71e6bfb83b55869ad",
+          "validationRunId": "41644074504",
+          "validationWorkflowCommit": "ca5d10d97431181d934369c76c28347fac8a05a6",
+          "upstreamMain": "./dist/extension",
+          "localCandidate": true,
+          "lifecycleBuildId": "40fdb8f7059a26a5bb4ae4f643ba9fac216e7ba185fbb6a4edf6caee98a3e56b",
+          "lifecycleSourceCommit": "e96513627ffc678cfa2d9cac87bf3d30728552ae"
+        }
+      },
+      "installedDependency": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-03\\extensions\\ms-dotnettools.vscode-dotnet-runtime-3.2.0",
+        "version": "3.2.0"
+      },
+      "installedOwnedModules": {
+        "entry.cjs": "fde5a9f37adf614e8f6a677d040097d5654cea62d35610b93077b83d11b2a50f",
+        "runtime.cjs": "d64d087445f488f20546d07303636c4652a6c3121491a2f7b75ec481c975a16b",
+        "classify.cjs": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+        "web.cjs": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+        "recovery.cjs": "cfed5d0303d6817324f669a3ed392559956356085029dc64ba1c39e841d0d874"
+      },
+      "harnessPinnedBeforeLaunch": {
+        "prepare.py": "7884552d35022ccf2d408d9c94a165f0752e816ccdbe85d305c949de76c76504",
+        "run.ps1": "fcc1cb890eb7973dff1e63e05202b182d683c29c8a426b2a173d126c13b2ab89",
+        "driver.cjs": "ee4e031fa22d822cb6daa22913fb5b29ca23bbcdf73e9b265ec3032531b3428e",
+        "extension-test.cjs": "d8e54abed2d8feedd70833268b52923b144c9df036c3d78b8dd19fbca1c8a2fd",
+        "fixtures/web.cs": "63b2baf063ee79f3e02efb771bb35efe30ee5bf51f33c6fd43bded9a36e54ad5"
+      },
+      "executedCopiesSha256": {
+        "driver.cjs": "ee4e031fa22d822cb6daa22913fb5b29ca23bbcdf73e9b265ec3032531b3428e",
+        "extension-test.cjs": "d8e54abed2d8feedd70833268b52923b144c9df036c3d78b8dd19fbca1c8a2fd",
+        "fixtures/web.cs": "63b2baf063ee79f3e02efb771bb35efe30ee5bf51f33c6fd43bded9a36e54ad5"
+      },
+      "checks": [
+        "Normally installed local candidate activates with exact owned module hashes and isolated loaded path",
+        "A source breakpoint binds and evaluates marker=40 through the installed native adapter",
+        "Two independent real Web sessions respond with distinct owned nonces and PIDs",
+        "A cycle 0: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+        "A cycle 1: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+        "A cycle 2: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+        "B final stop releases its exact PID, HTTP port and owned output"
+      ],
+      "phases": [
+        {
+          "label": "verify installed local candidate",
+          "startedAtMilliseconds": 0.6873,
+          "outcome": "passed",
+          "elapsedMilliseconds": 1587.8252
+        },
+        {
+          "label": "A initial installed-command launch and breakpoint",
+          "startedAtMilliseconds": 1600.5792,
+          "outcome": "passed",
+          "elapsedMilliseconds": 4583.4085
+        },
+        {
+          "label": "B independent installed-command launch",
+          "startedAtMilliseconds": 6184.0915,
+          "outcome": "passed",
+          "elapsedMilliseconds": 3907.7934
+        },
+        {
+          "label": "A cycle 0 targeted stop and owned cleanup",
+          "startedAtMilliseconds": 10092.0969,
+          "outcome": "passed",
+          "elapsedMilliseconds": 760.6949
+        },
+        {
+          "label": "B preserved after A cycle 0",
+          "startedAtMilliseconds": 10853.1335,
+          "outcome": "passed",
+          "elapsedMilliseconds": 9.5772
+        },
+        {
+          "label": "A cycle 1 dirty edit and installed-command retry",
+          "startedAtMilliseconds": 10862.946,
+          "outcome": "passed",
+          "elapsedMilliseconds": 4012.6263
+        },
+        {
+          "label": "A cycle 1 targeted stop and owned cleanup",
+          "startedAtMilliseconds": 14875.715,
+          "outcome": "passed",
+          "elapsedMilliseconds": 630.6775
+        },
+        {
+          "label": "B preserved after A cycle 1",
+          "startedAtMilliseconds": 15506.5232,
+          "outcome": "passed",
+          "elapsedMilliseconds": 3.9839
+        },
+        {
+          "label": "A cycle 2 dirty edit and installed-command retry",
+          "startedAtMilliseconds": 15511.5729,
+          "outcome": "passed",
+          "elapsedMilliseconds": 3880.6849
+        },
+        {
+          "label": "A cycle 2 targeted stop and owned cleanup",
+          "startedAtMilliseconds": 19392.3655,
+          "outcome": "passed",
+          "elapsedMilliseconds": 724.5903
+        },
+        {
+          "label": "B preserved after A cycle 2",
+          "startedAtMilliseconds": 20117.2151,
+          "outcome": "passed",
+          "elapsedMilliseconds": 4.1185
+        },
+        {
+          "label": "B final targeted stop and owned cleanup",
+          "startedAtMilliseconds": 20123.355,
+          "outcome": "passed",
+          "elapsedMilliseconds": 717.5852
+        }
+      ],
+      "elapsedMilliseconds": 20841.6285,
+      "launches": [
+        {
+          "label": "A-0",
+          "revision": "initial",
+          "pid": 87864,
+          "sessionId": "4121b362-a2df-4f53-bfec-ebe475ac0c15",
+          "origin": "http://127.0.0.1:59182",
+          "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-03\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\da5621e491de5d79f16f07db\\run-RJrph2",
+          "response": {
+            "pid": 87864,
+            "nonce": "412a7615-023f-40b0-9ff7-7fe11377df9b",
+            "revision": "initial",
+            "value": 42
+          },
+          "afterStopMilliseconds": {
+            "stopPromise": 47.206,
+            "matchingEditorTermination": 741.361,
+            "pidObservedGone": 758.852,
+            "portRebindSucceeded": 759.878,
+            "outputAndQueuesClear": 760.091
+          },
+          "stopPromiseToTerminationMilliseconds": 694.155
+        },
+        {
+          "label": "B",
+          "revision": "initial",
+          "pid": 89096,
+          "sessionId": "1d8065b1-3976-471d-b7b2-6aadc91249d0",
+          "origin": "http://127.0.0.1:59183",
+          "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-03\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\520e67b24c8cb0b2a4a89722\\run-0R2mEk",
+          "response": {
+            "pid": 89096,
+            "nonce": "97321752-196d-457a-85da-db11b0430943",
+            "revision": "initial",
+            "value": 42
+          },
+          "afterStopMilliseconds": {
+            "stopPromise": 34.505,
+            "matchingEditorTermination": 679.163,
+            "pidObservedGone": 680.395,
+            "portRebindSucceeded": 681.489,
+            "outputAndQueuesClear": 716.984
+          },
+          "stopPromiseToTerminationMilliseconds": 644.659
+        },
+        {
+          "label": "A-1",
+          "revision": "retry-1",
+          "pid": 43512,
+          "sessionId": "5cf35cae-9d0f-47bf-85a4-fc56773fc29f",
+          "origin": "http://127.0.0.1:59182",
+          "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-03\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\da5621e491de5d79f16f07db\\run-o57zV4",
+          "response": {
+            "pid": 43512,
+            "nonce": "e7a65b96-a572-403d-bd72-f45eb4f3f696",
+            "revision": "retry-1",
+            "value": 42
+          },
+          "afterStopMilliseconds": {
+            "stopPromise": 41.837,
+            "matchingEditorTermination": 602.188,
+            "pidObservedGone": 629.227,
+            "portRebindSucceeded": 630.151,
+            "outputAndQueuesClear": 630.322
+          },
+          "stopPromiseToTerminationMilliseconds": 560.351
+        },
+        {
+          "label": "A-2",
+          "revision": "retry-2",
+          "pid": 61188,
+          "sessionId": "500ab4bd-7c33-4ed3-82a3-0ad695f1d1ee",
+          "origin": "http://127.0.0.1:59182",
+          "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-03\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\da5621e491de5d79f16f07db\\run-kUfIRt",
+          "response": {
+            "pid": 61188,
+            "nonce": "614c3170-8075-4d78-a406-3808b0e9e4cf",
+            "revision": "retry-2",
+            "value": 42
+          },
+          "afterStopMilliseconds": {
+            "stopPromise": 44.386,
+            "matchingEditorTermination": 693.699,
+            "pidObservedGone": 723.015,
+            "portRebindSucceeded": 724.02,
+            "outputAndQueuesClear": 724.19
+          },
+          "stopPromiseToTerminationMilliseconds": 649.313
+        }
+      ],
+      "unrelatedSessionPreserved": [
+        {
+          "atMilliseconds": 10862.4961,
+          "event": "unrelated-preserved",
+          "detail": {
+            "label": "B",
+            "sessionId": "1d8065b1-3976-471d-b7b2-6aadc91249d0",
+            "pid": 89096
+          }
+        },
+        {
+          "atMilliseconds": 15510.4388,
+          "event": "unrelated-preserved",
+          "detail": {
+            "label": "B",
+            "sessionId": "1d8065b1-3976-471d-b7b2-6aadc91249d0",
+            "pid": 89096
+          }
+        },
+        {
+          "atMilliseconds": 20121.193,
+          "event": "unrelated-preserved",
+          "detail": {
+            "label": "B",
+            "sessionId": "1d8065b1-3976-471d-b7b2-6aadc91249d0",
+            "pid": 89096
+          }
+        }
+      ],
+      "stopDiagnostics": [
+        {
+          "atMilliseconds": 10156.7157,
+          "event": "adapter-error",
+          "detail": {
+            "label": "A-0",
+            "error": "Error: read error"
+          },
+          "afterStopMilliseconds": 64.443
+        },
+        {
+          "atMilliseconds": 14916.9591,
+          "event": "dap-receive",
+          "detail": {
+            "label": "A-1",
+            "sessionId": "5cf35cae-9d0f-47bf-85a4-fc56773fc29f",
+            "message": {
+              "command": "threads",
+              "message": "Failed command 'threads' : 0x80004005",
+              "request_seq": 10,
+              "seq": 122,
+              "success": false,
+              "type": "response"
+            }
+          },
+          "afterStopMilliseconds": 41.192
+        },
+        {
+          "atMilliseconds": 14934.8537,
+          "event": "adapter-error",
+          "detail": {
+            "label": "A-1",
+            "error": "Error: read error"
+          },
+          "afterStopMilliseconds": 59.087
+        },
+        {
+          "atMilliseconds": 19435.4458,
+          "event": "dap-receive",
+          "detail": {
+            "label": "A-2",
+            "sessionId": "500ab4bd-7c33-4ed3-82a3-0ad695f1d1ee",
+            "message": {
+              "command": "threads",
+              "message": "Failed command 'threads' : 0x80004005",
+              "request_seq": 10,
+              "seq": 122,
+              "success": false,
+              "type": "response"
+            }
+          },
+          "afterStopMilliseconds": 43.024
+        },
+        {
+          "atMilliseconds": 19453.8818,
+          "event": "adapter-error",
+          "detail": {
+            "label": "A-2",
+            "error": "Error: read error"
+          },
+          "afterStopMilliseconds": 61.46
+        },
+        {
+          "atMilliseconds": 20177.6744,
+          "event": "adapter-error",
+          "detail": {
+            "label": "B",
+            "error": "Error: read error"
+          },
+          "afterStopMilliseconds": 54.227
+        }
+      ],
+      "observedCoreRuntimeDirectories": [
+        "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14"
+      ],
+      "observedCoreLibraryModulePaths": [
+        "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Private.CoreLib.dll"
+      ],
+      "rawEvidence": {
+        "result.json": {
+          "sha256": "58ca81cc420a296744fcdc450c3c85b01f435aa1b3b6ecb8f540780860af317c",
+          "bytes": 14133
+        },
+        "expected.json": {
+          "sha256": "adad9457c72b153915b9411eef7d96fe9590f37427624b176b672b071d65c24f",
+          "bytes": 2878
+        },
+        "trace.jsonl": {
+          "sha256": "76ceb0d0094bbb54a31e5256c86efa1fec86e4f20e4e90b94bb2a1fa2fa72241",
+          "bytes": 250122
+        },
+        "launcher-result.json": {
+          "sha256": "1ceb8e7c536bb3091bd4f304318bf90092e1ad7e6e89f0a63587ada3744cd493",
+          "bytes": 402
+        },
+        "attempt.json": {
+          "sha256": "f384bfa6e84ea2528a693fb0d2bd876f5c5699f996ceacd61f5443fbafcf49c8",
+          "bytes": 29
+        },
+        "launch.json": {
+          "sha256": "8419616d8886111605fd9c56b19d933dd97924985ed4bdc8e64eb16cfc3726ce",
+          "bytes": 1045
+        },
+        "progress/state.json": {
+          "sha256": "a0bd0c67bd050254b66447da8b3bd91f392a0aa8bc28876addb0d96e0c066e81",
+          "bytes": 4556
+        },
+        "logs/candidate-install.txt": {
+          "sha256": "dd346c8a322bc3f1d5f57eee2dd489444dd98fdd391969aba0710a0df7868ab0",
+          "bytes": 395
+        },
+        "logs/editor-version.txt": {
+          "sha256": "aff6841c98558e85f0dde480073005e9e8267d1e06817b8165756bbc14ab2ca2",
+          "bytes": 62
+        },
+        "logs/runtime-install.txt": {
+          "sha256": "fcd0b569e89b9d21c18e3a1604551cbdbe8a029066cf3f216699db5a6f4c8887",
+          "bytes": 422
+        },
+        "logs/sdk-version.txt": {
+          "sha256": "e4e6a678725873a4192c048849cd64d852983991bfcb210a40c3b80cc8fcf2eb",
+          "bytes": 10
+        },
+        "logs/stderr.txt": {
+          "sha256": "9a7b33dd3e3b3e0073550839f41cb92e2911025e89b616ad1c41636f8ee85c95",
+          "bytes": 1924
+        },
+        "logs/stdout.txt": {
+          "sha256": "a3b3ba848364fc1e6e3a481a5c168dbaa20b37e0affd7b8aefb23865388f182c",
+          "bytes": 1338
+        },
+        "profile/logs/20261105T073642/window1/exthost/output_logging_20261105T073643/3-C# File Debugging.log": {
+          "sha256": "8ec0f36cceb387fdd920ffb91193a15d4d1dc6305bf72b869a338971e25b2a6d",
+          "bytes": 23544
+        },
+        "profile/logs/20261105T073642/window1/exthost/exthost.log": {
+          "sha256": "7aaa4204215688bd817cc11cf8cb3faed5d864855db6e5c7df26b9cc2a08c3fd",
+          "bytes": 7187
+        },
+        "profile/logs/20261105T073642/window1/exthost/dotnetdev-kr-custom.csharp-with-netcoredbg/C#.log": {
+          "sha256": "8ede3e9bf4ed2e4dd9560e2f021dca1ae0facb8c6d9edde8218d1cca5f523db7",
+          "bytes": 45616
+        }
+      },
+      "interpretation": "Behavioral lifecycle assertions passed. Stop-time adapter errors remain recorded; this is not an error-free-log or release-qualification claim."
+    },
+    {
+      "name": "run-04",
+      "localArtifactDirectory": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-04",
+      "success": true,
+      "editorExitCode": 0,
+      "scope": {
+        "installedCandidate": true,
+        "invocation": "command-api",
+        "physicalF5": false,
+        "VSCodium": true,
+        "platform": "win32-arm64",
+        "macOS": false,
+        "qualification": false,
+        "localOnly": true,
+        "published": false,
+        "directWebDebuggee": true,
+        "spawnedGrandchildren": false,
+        "hostReload": false,
+        "injectedTargetRuntime": false
+      },
+      "freshProfiles": 1,
+      "aLaunchesAndStopCycles": 3,
+      "bLaunches": 1,
+      "candidate": {
+        "baseVsixSha256": "0d239dff83d3120786ff3596a046fd0866b045f1d883c86fb83c64a7d808d0c5",
+        "sourceCommit": "4d4ca0ac1ff6a1e98872e473b41ce565ed3148a4",
+        "target": "win32-arm64",
+        "ownedModules": {
+          "entry.cjs": "fde5a9f37adf614e8f6a677d040097d5654cea62d35610b93077b83d11b2a50f",
+          "runtime.cjs": "d64d087445f488f20546d07303636c4652a6c3121491a2f7b75ec481c975a16b",
+          "classify.cjs": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+          "web.cjs": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+          "recovery.cjs": "cfed5d0303d6817324f669a3ed392559956356085029dc64ba1c39e841d0d874"
+        },
+        "buildId": "017eae63f14d8f5aa4e67eedf843448c079d006e52e4c372a2f33aec48b8c2f2",
+        "sha256": "0ff0ee030827debb5c45729b476bc3aedb60a5f4c426170652c022ffeae2aa72",
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-04\\local-lifecycle.vsix",
+        "version": "11.7.18004",
+        "localOnly": true,
+        "published": false,
+        "unchangedEntries": 736,
+        "unchangedPayloadDigest": "5b655a847a8d304972570006e1ecd7f4ac1cc01f855055bf3c35640237e2cdf1"
+      },
+      "editor": {
+        "executable": "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\VSCodium.exe",
+        "cli": "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\bin\\codium.cmd",
+        "version": "1.143.17232",
+        "commit": "c072cf642cbbadabefa22f39c58cc902a8b7427f",
+        "sha256": "61b273b2c0196d7cee4ba84f7412ccc74975f0fcefd3579e69a7b373f79027cd",
+        "machine": "arm64",
+        "apiVersion": "1.143.1"
+      },
+      "sdk": {
+        "executable": "C:\\Program Files\\dotnet\\dotnet.exe",
+        "root": "C:\\Program Files\\dotnet",
+        "version": "10.0.403",
+        "sha256": "8f9714d921c3fa1425611e3f79940715b74a18e2b21a5171bbd58e3775ff8315"
+      },
+      "dependency": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\resources\\ms-dotnettools.vscode-dotnet-runtime-3.2.0.vsix",
+        "sha256": "a4cff5409f66e3827ee2c6a727ae59382290a182a653ca0f9ac97c63536ee541",
+        "version": "3.2.0"
+      },
+      "installedExtension": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-04\\extensions\\dotnetdev-kr-custom.csharp-with-netcoredbg-11.7.18004",
+        "version": "11.7.18004",
+        "displayName": "C# (netcoredbg) LOCAL WEB LIFECYCLE TEST",
+        "metadata": {
+          "installedTimestamp": 1793886881627,
+          "targetPlatform": "undefined",
+          "size": 200466476
+        },
+        "build": {
+          "target": "win32-arm64",
+          "upstreamCsharpCommit": "1c27e135b5dada55a240e4a504bafa759ec578e8",
+          "upstreamCsharpVersion": "11.7.18",
+          "upstreamCsharpTag": "v11.7.18-prerelease",
+          "upstreamPackageVersion": "42.42.42-placeholder",
+          "netcoredbgTag": "3.2.0-1092",
+          "packagingRevision": 4,
+          "releaseTag": "csharp-v11.7.18-netcoredbg-v3.2.0-1092-g9744e1f05186-r4",
+          "versionPolicy": "upstream-patch-revision-v1",
+          "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+          "debuggerArchiveSha256": "cfc272be9e883bcb90c9ed0704731fbb1349faf207d872f71e6bfb83b55869ad",
+          "validationRunId": "41644074504",
+          "validationWorkflowCommit": "ca5d10d97431181d934369c76c28347fac8a05a6",
+          "upstreamMain": "./dist/extension",
+          "localCandidate": true,
+          "lifecycleBuildId": "017eae63f14d8f5aa4e67eedf843448c079d006e52e4c372a2f33aec48b8c2f2",
+          "lifecycleSourceCommit": "4d4ca0ac1ff6a1e98872e473b41ce565ed3148a4"
+        }
+      },
+      "installedDependency": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-04\\extensions\\ms-dotnettools.vscode-dotnet-runtime-3.2.0",
+        "version": "3.2.0"
+      },
+      "installedOwnedModules": {
+        "entry.cjs": "fde5a9f37adf614e8f6a677d040097d5654cea62d35610b93077b83d11b2a50f",
+        "runtime.cjs": "d64d087445f488f20546d07303636c4652a6c3121491a2f7b75ec481c975a16b",
+        "classify.cjs": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+        "web.cjs": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+        "recovery.cjs": "cfed5d0303d6817324f669a3ed392559956356085029dc64ba1c39e841d0d874"
+      },
+      "harnessPinnedBeforeLaunch": {
+        "prepare.py": "3db2d6052de758abec398761cd7fdaf8f2fdc98afbd26a8f7bf9e74685d5e06b",
+        "run.ps1": "04b5e649efec7c0f8d488c124f3e28c677501065a1a811abe265c4e5d39215b1",
+        "driver.cjs": "ee4e031fa22d822cb6daa22913fb5b29ca23bbcdf73e9b265ec3032531b3428e",
+        "extension-test.cjs": "0d1e7ce3ff873cd510cceaa27d6f30feb9afdff7b119b7b8917e3e0dddbdbd9c",
+        "fixtures/web.cs": "63b2baf063ee79f3e02efb771bb35efe30ee5bf51f33c6fd43bded9a36e54ad5"
+      },
+      "executedCopiesSha256": {
+        "driver.cjs": "ee4e031fa22d822cb6daa22913fb5b29ca23bbcdf73e9b265ec3032531b3428e",
+        "extension-test.cjs": "0d1e7ce3ff873cd510cceaa27d6f30feb9afdff7b119b7b8917e3e0dddbdbd9c",
+        "fixtures/web.cs": "63b2baf063ee79f3e02efb771bb35efe30ee5bf51f33c6fd43bded9a36e54ad5"
+      },
+      "checks": [
+        "Normally installed local candidate activates with exact owned module hashes and isolated loaded path",
+        "A source breakpoint binds and evaluates marker=40 through the installed native adapter",
+        "Two independent real Web sessions respond with distinct owned nonces and PIDs",
+        "A cycle 0: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+        "A cycle 1: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+        "A cycle 2: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+        "B final stop releases its exact PID, HTTP port and owned output"
+      ],
+      "phases": [
+        {
+          "label": "verify installed local candidate",
+          "startedAtMilliseconds": 0.5113,
+          "outcome": "passed",
+          "elapsedMilliseconds": 1517.571
+        },
+        {
+          "label": "A initial installed-command launch and breakpoint",
+          "startedAtMilliseconds": 1527.4302,
+          "outcome": "passed",
+          "elapsedMilliseconds": 5811.4865
+        },
+        {
+          "label": "B independent installed-command launch",
+          "startedAtMilliseconds": 7339.0455,
+          "outcome": "passed",
+          "elapsedMilliseconds": 4181.682
+        },
+        {
+          "label": "A cycle 0 targeted stop and owned cleanup",
+          "startedAtMilliseconds": 11520.9496,
+          "outcome": "passed",
+          "elapsedMilliseconds": 758.9332
+        },
+        {
+          "label": "B preserved after A cycle 0",
+          "startedAtMilliseconds": 12279.978,
+          "outcome": "passed",
+          "elapsedMilliseconds": 5.8822
+        },
+        {
+          "label": "A cycle 1 dirty edit and installed-command retry",
+          "startedAtMilliseconds": 12286.3159,
+          "outcome": "passed",
+          "elapsedMilliseconds": 4008.1175
+        },
+        {
+          "label": "A cycle 1 targeted stop and owned cleanup",
+          "startedAtMilliseconds": 16294.5613,
+          "outcome": "passed",
+          "elapsedMilliseconds": 640.6492
+        },
+        {
+          "label": "B preserved after A cycle 1",
+          "startedAtMilliseconds": 16935.3077,
+          "outcome": "passed",
+          "elapsedMilliseconds": 4.1504
+        },
+        {
+          "label": "A cycle 2 dirty edit and installed-command retry",
+          "startedAtMilliseconds": 16944.5513,
+          "outcome": "passed",
+          "elapsedMilliseconds": 3970.9462
+        },
+        {
+          "label": "A cycle 2 targeted stop and owned cleanup",
+          "startedAtMilliseconds": 20915.6188,
+          "outcome": "passed",
+          "elapsedMilliseconds": 782.641
+        },
+        {
+          "label": "B preserved after A cycle 2",
+          "startedAtMilliseconds": 21698.4453,
+          "outcome": "passed",
+          "elapsedMilliseconds": 3.2734
+        },
+        {
+          "label": "B final targeted stop and owned cleanup",
+          "startedAtMilliseconds": 21706.6138,
+          "outcome": "passed",
+          "elapsedMilliseconds": 731.9116
+        }
+      ],
+      "elapsedMilliseconds": 22438.9638,
+      "launches": [
+        {
+          "label": "A-0",
+          "revision": "initial",
+          "pid": 71436,
+          "sessionId": "005d2dff-4b60-4316-bb2e-4666d7eede15",
+          "origin": "http://127.0.0.1:64799",
+          "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-04\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\abb274c0a60b6c6c22e36bad\\run-7yCcEl",
+          "response": {
+            "pid": 71436,
+            "nonce": "551e16ff-d4b0-4713-b9bf-8350d481ec04",
+            "revision": "initial",
+            "value": 42
+          },
+          "afterStopMilliseconds": {
+            "stopPromise": 45.783,
+            "matchingEditorTermination": 746.128,
+            "pidObservedGone": 757.362,
+            "portRebindSucceeded": 758.301,
+            "outputAndQueuesClear": 758.491
+          },
+          "stopPromiseToTerminationMilliseconds": 700.345
+        },
+        {
+          "label": "B",
+          "revision": "initial",
+          "pid": 87344,
+          "sessionId": "f0fe15e7-589b-4ed7-b0f2-a60e3bb2b9b0",
+          "origin": "http://127.0.0.1:64800",
+          "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-04\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\d3dd026d5b993b1378b4a249\\run-T2vYym",
+          "response": {
+            "pid": 87344,
+            "nonce": "c9ca9904-4ade-4f82-bde0-d1cca3e183c0",
+            "revision": "initial",
+            "value": 42
+          },
+          "afterStopMilliseconds": {
+            "stopPromise": 43.545,
+            "matchingEditorTermination": 705.697,
+            "pidObservedGone": 730.344,
+            "portRebindSucceeded": 731.312,
+            "outputAndQueuesClear": 731.476
+          },
+          "stopPromiseToTerminationMilliseconds": 662.151
+        },
+        {
+          "label": "A-1",
+          "revision": "retry-1",
+          "pid": 82676,
+          "sessionId": "04e3326e-fd74-4957-9fbc-3918d60d3bbf",
+          "origin": "http://127.0.0.1:64799",
+          "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-04\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\abb274c0a60b6c6c22e36bad\\run-01e5b9",
+          "response": {
+            "pid": 82676,
+            "nonce": "2329dba5-990d-4e70-8a08-d7a1155c0218",
+            "revision": "retry-1",
+            "value": 42
+          },
+          "afterStopMilliseconds": {
+            "stopPromise": 38.89,
+            "matchingEditorTermination": 611.893,
+            "pidObservedGone": 639.279,
+            "portRebindSucceeded": 640.17,
+            "outputAndQueuesClear": 640.327
+          },
+          "stopPromiseToTerminationMilliseconds": 573.003
+        },
+        {
+          "label": "A-2",
+          "revision": "retry-2",
+          "pid": 86504,
+          "sessionId": "38dac6be-fc61-4184-99c3-a28f078a0b57",
+          "origin": "http://127.0.0.1:64799",
+          "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-04\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\abb274c0a60b6c6c22e36bad\\run-nruCeB",
+          "response": {
+            "pid": 86504,
+            "nonce": "3ca77976-17d6-4176-b753-d35a430e4fbc",
+            "revision": "retry-2",
+            "value": 42
+          },
+          "afterStopMilliseconds": {
+            "stopPromise": 38.964,
+            "matchingEditorTermination": 748.241,
+            "pidObservedGone": 749.923,
+            "portRebindSucceeded": 751.727,
+            "outputAndQueuesClear": 782.243
+          },
+          "stopPromiseToTerminationMilliseconds": 709.277
+        }
+      ],
+      "unrelatedSessionPreserved": [
+        {
+          "atMilliseconds": 12285.7858,
+          "event": "unrelated-preserved",
+          "detail": {
+            "label": "B",
+            "sessionId": "f0fe15e7-589b-4ed7-b0f2-a60e3bb2b9b0",
+            "pid": 87344
+          }
+        },
+        {
+          "atMilliseconds": 16939.3743,
+          "event": "unrelated-preserved",
+          "detail": {
+            "label": "B",
+            "sessionId": "f0fe15e7-589b-4ed7-b0f2-a60e3bb2b9b0",
+            "pid": 87344
+          }
+        },
+        {
+          "atMilliseconds": 21701.6337,
+          "event": "unrelated-preserved",
+          "detail": {
+            "label": "B",
+            "sessionId": "f0fe15e7-589b-4ed7-b0f2-a60e3bb2b9b0",
+            "pid": 87344
+          }
+        }
+      ],
+      "stopDiagnostics": [
+        {
+          "atMilliseconds": 11588.2396,
+          "event": "adapter-error",
+          "detail": {
+            "label": "A-0",
+            "error": "Error: read error"
+          },
+          "afterStopMilliseconds": 67.14
+        },
+        {
+          "atMilliseconds": 16332.9868,
+          "event": "dap-receive",
+          "detail": {
+            "label": "A-1",
+            "sessionId": "04e3326e-fd74-4957-9fbc-3918d60d3bbf",
+            "message": {
+              "command": "threads",
+              "message": "Failed command 'threads' : 0x80004005",
+              "request_seq": 10,
+              "seq": 122,
+              "success": false,
+              "type": "response"
+            }
+          },
+          "afterStopMilliseconds": 38.38
+        },
+        {
+          "atMilliseconds": 16350.4792,
+          "event": "adapter-error",
+          "detail": {
+            "label": "A-1",
+            "error": "Error: read error"
+          },
+          "afterStopMilliseconds": 55.872
+        },
+        {
+          "atMilliseconds": 20972.7392,
+          "event": "adapter-error",
+          "detail": {
+            "label": "A-2",
+            "error": "Error: read error"
+          },
+          "afterStopMilliseconds": 57.067
+        },
+        {
+          "atMilliseconds": 21767.1997,
+          "event": "adapter-error",
+          "detail": {
+            "label": "B",
+            "error": "Error: read error"
+          },
+          "afterStopMilliseconds": 60.443
+        }
+      ],
+      "observedCoreRuntimeDirectories": [
+        "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14"
+      ],
+      "observedCoreLibraryModulePaths": [
+        "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Private.CoreLib.dll"
+      ],
+      "rawEvidence": {
+        "result.json": {
+          "sha256": "f6a1b250b9008b6fc7ec54be891ecc30866c1e98317d7b161711a07f021475c5",
+          "bytes": 14133
+        },
+        "expected.json": {
+          "sha256": "be79c7bb05a3a50988337301a41bbdb9ccd0b247c4e541fefd03576111359314",
+          "bytes": 2878
+        },
+        "trace.jsonl": {
+          "sha256": "454a5c2864bfaa7809c974e0134d30c1e5c214736806103eaced901597f0905f",
+          "bytes": 252863
+        },
+        "launcher-result.json": {
+          "sha256": "3544c87e8f1b4c0d9106f31ece10d37b9cec019bab262550c4df54f4d7bdcfc3",
+          "bytes": 403
+        },
+        "attempt.json": {
+          "sha256": "f384bfa6e84ea2528a693fb0d2bd876f5c5699f996ceacd61f5443fbafcf49c8",
+          "bytes": 29
+        },
+        "launch.json": {
+          "sha256": "1a561d9b5c9f319b492a1c54fa18b05388537c1429c5d460d41ee57022fa7cb8",
+          "bytes": 1046
+        },
+        "progress/state.json": {
+          "sha256": "064f7bed52d58d563f5e0bb36995371f03c8518b4bb893ae5c727d9b03ad2afd",
+          "bytes": 4556
+        },
+        "logs/candidate-install.txt": {
+          "sha256": "7aafb0cd515729b1cab51efe97ed55445424e3036fab5f8ee9ae8e4e792e9ecb",
+          "bytes": 395
+        },
+        "logs/editor-version.txt": {
+          "sha256": "aff6841c98558e85f0dde480073005e9e8267d1e06817b8165756bbc14ab2ca2",
+          "bytes": 62
+        },
+        "logs/runtime-install.txt": {
+          "sha256": "6359d4f8eacd2eabd779550d39f363904b640d76c322a6d6503e43aa07b5c266",
+          "bytes": 422
+        },
+        "logs/sdk-version.txt": {
+          "sha256": "e4e6a678725873a4192c048849cd64d852983991bfcb210a40c3b80cc8fcf2eb",
+          "bytes": 10
+        },
+        "logs/stderr.txt": {
+          "sha256": "beb696d24fdf1fec3427faf62e31ac3c51b5c031e469d44637cba162163ef891",
+          "bytes": 1426
+        },
+        "logs/stdout.txt": {
+          "sha256": "96e2653f2742ebe5b676f08d0bad9f6a133a302398f782de2c47f1d940a8054f",
+          "bytes": 1338
+        },
+        "profile/logs/20261105T225443/window1/exthost/output_logging_20261105T225444/3-C# File Debugging.log": {
+          "sha256": "08b2e4230d131524f4928326ed5c9b026644e961c4239bc32770b2550845328f",
+          "bytes": 23544
+        },
+        "profile/logs/20261105T225443/window1/exthost/exthost.log": {
+          "sha256": "2d41a19ff51f65b9786c030ebb6f033f3e1f162d41036545d8bfa512975dc1e8",
+          "bytes": 7187
+        },
+        "profile/logs/20261105T225443/window1/exthost/dotnetdev-kr-custom.csharp-with-netcoredbg/C#.log": {
+          "sha256": "428870c727134c8e16b421e08e5df82392c7a5a1b8eee26034941b610ade88ab",
+          "bytes": 49055
+        }
+      },
+      "interpretation": "Behavioral lifecycle assertions passed. Stop-time adapter errors remain recorded; this is not an error-free-log or release-qualification claim."
+    },
+    {
+      "name": "run-05",
+      "localArtifactDirectory": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-05",
+      "success": true,
+      "editorExitCode": 0,
+      "scope": {
+        "installedCandidate": true,
+        "invocation": "command-api",
+        "physicalF5": false,
+        "VSCodium": true,
+        "platform": "win32-arm64",
+        "macOS": false,
+        "qualification": false,
+        "localOnly": true,
+        "published": false,
+        "directWebDebuggee": true,
+        "spawnedGrandchildren": false,
+        "hostReload": false,
+        "injectedTargetRuntime": false
+      },
+      "freshProfiles": 1,
+      "aLaunchesAndStopCycles": 3,
+      "bLaunches": 1,
+      "candidate": {
+        "baseVsixSha256": "0d239dff83d3120786ff3596a046fd0866b045f1d883c86fb83c64a7d808d0c5",
+        "sourceCommit": "4d4ca0ac1ff6a1e98872e473b41ce565ed3148a4",
+        "target": "win32-arm64",
+        "ownedModules": {
+          "entry.cjs": "fde5a9f37adf614e8f6a677d040097d5654cea62d35610b93077b83d11b2a50f",
+          "runtime.cjs": "d64d087445f488f20546d07303636c4652a6c3121491a2f7b75ec481c975a16b",
+          "classify.cjs": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+          "web.cjs": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+          "recovery.cjs": "cfed5d0303d6817324f669a3ed392559956356085029dc64ba1c39e841d0d874"
+        },
+        "buildId": "017eae63f14d8f5aa4e67eedf843448c079d006e52e4c372a2f33aec48b8c2f2",
+        "sha256": "338d86097df5579fcb6c566431417a7e118ec765d79eed0cf8e4b657581be54d",
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-05\\local-lifecycle.vsix",
+        "version": "11.7.18004",
+        "localOnly": true,
+        "published": false,
+        "unchangedEntries": 736,
+        "unchangedPayloadDigest": "5b655a847a8d304972570006e1ecd7f4ac1cc01f855055bf3c35640237e2cdf1"
+      },
+      "editor": {
+        "executable": "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\VSCodium.exe",
+        "cli": "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\bin\\codium.cmd",
+        "version": "1.143.17232",
+        "commit": "c072cf642cbbadabefa22f39c58cc902a8b7427f",
+        "sha256": "61b273b2c0196d7cee4ba84f7412ccc74975f0fcefd3579e69a7b373f79027cd",
+        "machine": "arm64",
+        "apiVersion": "1.143.1"
+      },
+      "sdk": {
+        "executable": "C:\\Program Files\\dotnet\\dotnet.exe",
+        "root": "C:\\Program Files\\dotnet",
+        "version": "10.0.403",
+        "sha256": "8f9714d921c3fa1425611e3f79940715b74a18e2b21a5171bbd58e3775ff8315"
+      },
+      "dependency": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\resources\\ms-dotnettools.vscode-dotnet-runtime-3.2.0.vsix",
+        "sha256": "a4cff5409f66e3827ee2c6a727ae59382290a182a653ca0f9ac97c63536ee541",
+        "version": "3.2.0"
+      },
+      "installedExtension": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-05\\extensions\\dotnetdev-kr-custom.csharp-with-netcoredbg-11.7.18004",
+        "version": "11.7.18004",
+        "displayName": "C# (netcoredbg) LOCAL WEB LIFECYCLE TEST",
+        "metadata": {
+          "installedTimestamp": 1793887103898,
+          "targetPlatform": "undefined",
+          "size": 200466476
+        },
+        "build": {
+          "target": "win32-arm64",
+          "upstreamCsharpCommit": "1c27e135b5dada55a240e4a504bafa759ec578e8",
+          "upstreamCsharpVersion": "11.7.18",
+          "upstreamCsharpTag": "v11.7.18-prerelease",
+          "upstreamPackageVersion": "42.42.42-placeholder",
+          "netcoredbgTag": "3.2.0-1092",
+          "packagingRevision": 4,
+          "releaseTag": "csharp-v11.7.18-netcoredbg-v3.2.0-1092-g9744e1f05186-r4",
+          "versionPolicy": "upstream-patch-revision-v1",
+          "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+          "debuggerArchiveSha256": "cfc272be9e883bcb90c9ed0704731fbb1349faf207d872f71e6bfb83b55869ad",
+          "validationRunId": "41644074504",
+          "validationWorkflowCommit": "ca5d10d97431181d934369c76c28347fac8a05a6",
+          "upstreamMain": "./dist/extension",
+          "localCandidate": true,
+          "lifecycleBuildId": "017eae63f14d8f5aa4e67eedf843448c079d006e52e4c372a2f33aec48b8c2f2",
+          "lifecycleSourceCommit": "4d4ca0ac1ff6a1e98872e473b41ce565ed3148a4"
+        }
+      },
+      "installedDependency": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-05\\extensions\\ms-dotnettools.vscode-dotnet-runtime-3.2.0",
+        "version": "3.2.0"
+      },
+      "installedOwnedModules": {
+        "entry.cjs": "fde5a9f37adf614e8f6a677d040097d5654cea62d35610b93077b83d11b2a50f",
+        "runtime.cjs": "d64d087445f488f20546d07303636c4652a6c3121491a2f7b75ec481c975a16b",
+        "classify.cjs": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+        "web.cjs": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+        "recovery.cjs": "cfed5d0303d6817324f669a3ed392559956356085029dc64ba1c39e841d0d874"
+      },
+      "harnessPinnedBeforeLaunch": {
+        "prepare.py": "3db2d6052de758abec398761cd7fdaf8f2fdc98afbd26a8f7bf9e74685d5e06b",
+        "run.ps1": "b886023440a41383cdb392e042352448c5a48404750cacb5a03a640e62656efd",
+        "driver.cjs": "ee4e031fa22d822cb6daa22913fb5b29ca23bbcdf73e9b265ec3032531b3428e",
+        "extension-test.cjs": "0d1e7ce3ff873cd510cceaa27d6f30feb9afdff7b119b7b8917e3e0dddbdbd9c",
+        "fixtures/web.cs": "63b2baf063ee79f3e02efb771bb35efe30ee5bf51f33c6fd43bded9a36e54ad5"
+      },
+      "executedCopiesSha256": {
+        "driver.cjs": "ee4e031fa22d822cb6daa22913fb5b29ca23bbcdf73e9b265ec3032531b3428e",
+        "extension-test.cjs": "0d1e7ce3ff873cd510cceaa27d6f30feb9afdff7b119b7b8917e3e0dddbdbd9c",
+        "fixtures/web.cs": "63b2baf063ee79f3e02efb771bb35efe30ee5bf51f33c6fd43bded9a36e54ad5"
+      },
+      "checks": [
+        "Normally installed local candidate activates with exact owned module hashes and isolated loaded path",
+        "A source breakpoint binds and evaluates marker=40 through the installed native adapter",
+        "Two independent real Web sessions respond with distinct owned nonces and PIDs",
+        "A cycle 0: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+        "A cycle 1: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+        "A cycle 2: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+        "B final stop releases its exact PID, HTTP port and owned output"
+      ],
+      "phases": [
+        {
+          "label": "verify installed local candidate",
+          "startedAtMilliseconds": 0.7478,
+          "outcome": "passed",
+          "elapsedMilliseconds": 1318.956
+        },
+        {
+          "label": "A initial installed-command launch and breakpoint",
+          "startedAtMilliseconds": 1326.9175,
+          "outcome": "passed",
+          "elapsedMilliseconds": 4629.6516
+        },
+        {
+          "label": "B independent installed-command launch",
+          "startedAtMilliseconds": 5956.6911,
+          "outcome": "passed",
+          "elapsedMilliseconds": 3960.7662
+        },
+        {
+          "label": "A cycle 0 targeted stop and owned cleanup",
+          "startedAtMilliseconds": 9917.8414,
+          "outcome": "passed",
+          "elapsedMilliseconds": 698.8927
+        },
+        {
+          "label": "B preserved after A cycle 0",
+          "startedAtMilliseconds": 10616.8604,
+          "outcome": "passed",
+          "elapsedMilliseconds": 5.2037
+        },
+        {
+          "label": "A cycle 1 dirty edit and installed-command retry",
+          "startedAtMilliseconds": 10622.2824,
+          "outcome": "passed",
+          "elapsedMilliseconds": 4013.7208
+        },
+        {
+          "label": "A cycle 1 targeted stop and owned cleanup",
+          "startedAtMilliseconds": 14636.1142,
+          "outcome": "passed",
+          "elapsedMilliseconds": 659.8906
+        },
+        {
+          "label": "B preserved after A cycle 1",
+          "startedAtMilliseconds": 15296.1102,
+          "outcome": "passed",
+          "elapsedMilliseconds": 4.0713
+        },
+        {
+          "label": "A cycle 2 dirty edit and installed-command retry",
+          "startedAtMilliseconds": 15301.5321,
+          "outcome": "passed",
+          "elapsedMilliseconds": 3897.9476
+        },
+        {
+          "label": "A cycle 2 targeted stop and owned cleanup",
+          "startedAtMilliseconds": 19199.5669,
+          "outcome": "passed",
+          "elapsedMilliseconds": 720.1088
+        },
+        {
+          "label": "B preserved after A cycle 2",
+          "startedAtMilliseconds": 19919.8229,
+          "outcome": "passed",
+          "elapsedMilliseconds": 3.4155
+        },
+        {
+          "label": "B final targeted stop and owned cleanup",
+          "startedAtMilliseconds": 19927.4603,
+          "outcome": "passed",
+          "elapsedMilliseconds": 639.9687
+        }
+      ],
+      "elapsedMilliseconds": 20568.2601,
+      "launches": [
+        {
+          "label": "A-0",
+          "revision": "initial",
+          "pid": 59684,
+          "sessionId": "397c1967-3dc4-4a0c-8424-306a22b6aa07",
+          "origin": "http://127.0.0.1:52208",
+          "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-05\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\dcb05465c6dc65587d65faf0\\run-ikgo0u",
+          "response": {
+            "pid": 59684,
+            "nonce": "ee84aacd-2598-4375-b6c0-9e699f8dfb40",
+            "revision": "initial",
+            "value": 42
+          },
+          "afterStopMilliseconds": {
+            "stopPromise": 37.211,
+            "matchingEditorTermination": 665.659,
+            "pidObservedGone": 696.707,
+            "portRebindSucceeded": 698.101,
+            "outputAndQueuesClear": 698.342
+          },
+          "stopPromiseToTerminationMilliseconds": 628.449
+        },
+        {
+          "label": "B",
+          "revision": "initial",
+          "pid": 92220,
+          "sessionId": "58573671-4cfe-4ce1-9abb-bda4123fdd18",
+          "origin": "http://127.0.0.1:52209",
+          "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-05\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8fd422532c639075f0e391b1\\run-f9Dkgf",
+          "response": {
+            "pid": 92220,
+            "nonce": "30c2f780-222f-48d9-973d-faae2152cd1c",
+            "revision": "initial",
+            "value": 42
+          },
+          "afterStopMilliseconds": {
+            "stopPromise": 42.805,
+            "matchingEditorTermination": 620.552,
+            "pidObservedGone": 638.112,
+            "portRebindSucceeded": 639.158,
+            "outputAndQueuesClear": 639.356
+          },
+          "stopPromiseToTerminationMilliseconds": 577.748
+        },
+        {
+          "label": "A-1",
+          "revision": "retry-1",
+          "pid": 90128,
+          "sessionId": "63b8eba4-f981-4b8e-9164-881baa0fad5a",
+          "origin": "http://127.0.0.1:52208",
+          "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-05\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\dcb05465c6dc65587d65faf0\\run-lkaIXY",
+          "response": {
+            "pid": 90128,
+            "nonce": "6af823b8-f66b-41ad-a75e-5f5dd6e0a116",
+            "revision": "retry-1",
+            "value": 42
+          },
+          "afterStopMilliseconds": {
+            "stopPromise": 42.589,
+            "matchingEditorTermination": 637.372,
+            "pidObservedGone": 658.586,
+            "portRebindSucceeded": 659.434,
+            "outputAndQueuesClear": 659.579
+          },
+          "stopPromiseToTerminationMilliseconds": 594.782
+        },
+        {
+          "label": "A-2",
+          "revision": "retry-2",
+          "pid": 54084,
+          "sessionId": "ecd81fc1-0ec9-452d-8888-0e03165c8e8b",
+          "origin": "http://127.0.0.1:52208",
+          "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-05\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\dcb05465c6dc65587d65faf0\\run-22rxe0",
+          "response": {
+            "pid": 54084,
+            "nonce": "afef359c-df37-4a0d-9a1a-e84a15ca26ce",
+            "revision": "retry-2",
+            "value": 42
+          },
+          "afterStopMilliseconds": {
+            "stopPromise": 37.754,
+            "matchingEditorTermination": 694.275,
+            "pidObservedGone": 718.436,
+            "portRebindSucceeded": 719.519,
+            "outputAndQueuesClear": 719.697
+          },
+          "stopPromiseToTerminationMilliseconds": 656.522
+        }
+      ],
+      "unrelatedSessionPreserved": [
+        {
+          "atMilliseconds": 10621.9287,
+          "event": "unrelated-preserved",
+          "detail": {
+            "label": "B",
+            "sessionId": "58573671-4cfe-4ce1-9abb-bda4123fdd18",
+            "pid": 92220
+          }
+        },
+        {
+          "atMilliseconds": 15299.7369,
+          "event": "unrelated-preserved",
+          "detail": {
+            "label": "B",
+            "sessionId": "58573671-4cfe-4ce1-9abb-bda4123fdd18",
+            "pid": 92220
+          }
+        },
+        {
+          "atMilliseconds": 19923.0881,
+          "event": "unrelated-preserved",
+          "detail": {
+            "label": "B",
+            "sessionId": "58573671-4cfe-4ce1-9abb-bda4123fdd18",
+            "pid": 92220
+          }
+        }
+      ],
+      "stopDiagnostics": [
+        {
+          "atMilliseconds": 9971.9659,
+          "event": "adapter-error",
+          "detail": {
+            "label": "A-0",
+            "error": "Error: read error"
+          },
+          "afterStopMilliseconds": 53.929
+        },
+        {
+          "atMilliseconds": 14678.3614,
+          "event": "dap-receive",
+          "detail": {
+            "label": "A-1",
+            "sessionId": "63b8eba4-f981-4b8e-9164-881baa0fad5a",
+            "message": {
+              "command": "threads",
+              "message": "Failed command 'threads' : 0x80004005",
+              "request_seq": 10,
+              "seq": 122,
+              "success": false,
+              "type": "response"
+            }
+          },
+          "afterStopMilliseconds": 42.201
+        },
+        {
+          "atMilliseconds": 14695.126,
+          "event": "adapter-error",
+          "detail": {
+            "label": "A-1",
+            "error": "Error: read error"
+          },
+          "afterStopMilliseconds": 58.966
+        },
+        {
+          "atMilliseconds": 19238.1693,
+          "event": "dap-receive",
+          "detail": {
+            "label": "A-2",
+            "sessionId": "ecd81fc1-0ec9-452d-8888-0e03165c8e8b",
+            "message": {
+              "command": "threads",
+              "message": "Failed command 'threads' : 0x80004005",
+              "request_seq": 10,
+              "seq": 122,
+              "success": false,
+              "type": "response"
+            }
+          },
+          "afterStopMilliseconds": 38.556
+        },
+        {
+          "atMilliseconds": 19256.2593,
+          "event": "adapter-error",
+          "detail": {
+            "label": "A-2",
+            "error": "Error: read error"
+          },
+          "afterStopMilliseconds": 56.646
+        },
+        {
+          "atMilliseconds": 19987.5468,
+          "event": "adapter-error",
+          "detail": {
+            "label": "B",
+            "error": "Error: read error"
+          },
+          "afterStopMilliseconds": 59.957
+        }
+      ],
+      "observedCoreRuntimeDirectories": [
+        "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14"
+      ],
+      "observedCoreLibraryModulePaths": [
+        "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Private.CoreLib.dll"
+      ],
+      "rawEvidence": {
+        "result.json": {
+          "sha256": "67e4638c4a856363a0be2000442e9bd1772914ded3d23677565fd5efe66eb70d",
+          "bytes": 14134
+        },
+        "expected.json": {
+          "sha256": "03fc310787bc64da1a59badcd9abf76f9f8fe57c0edb1623f0f6ecacbb66d742",
+          "bytes": 2878
+        },
+        "trace.jsonl": {
+          "sha256": "feef4211c4bbf1f0487ab7fe350e90af6a9281f2aeb0976ad29a1bafcded4925",
+          "bytes": 251447
+        },
+        "launcher-result.json": {
+          "sha256": "073f7de857a3096e36045c816411a20fecca569c12e2498785046dd3867c3478",
+          "bytes": 403
+        },
+        "attempt.json": {
+          "sha256": "f384bfa6e84ea2528a693fb0d2bd876f5c5699f996ceacd61f5443fbafcf49c8",
+          "bytes": 29
+        },
+        "launch.json": {
+          "sha256": "6407bf68e4954698a9b10a50636e7b3757e9c6d20c1c6b3a334db234330eb2bf",
+          "bytes": 1046
+        },
+        "progress/state.json": {
+          "sha256": "2fda9ad9153d8349f2d46401a5aa750f67f6095380aebe5e007e12482d754b0f",
+          "bytes": 4558
+        },
+        "logs/candidate-install.txt": {
+          "sha256": "8373b3db647f2b35ecc8101f159bb1a020d44e64cfb957c084cf378d0b1e5749",
+          "bytes": 395
+        },
+        "logs/editor-version.txt": {
+          "sha256": "aff6841c98558e85f0dde480073005e9e8267d1e06817b8165756bbc14ab2ca2",
+          "bytes": 62
+        },
+        "logs/runtime-install.txt": {
+          "sha256": "2485d2ae8e3c65bac96cf241fe687a7f524e0686f1bcd8c1447d5e3a401c8483",
+          "bytes": 422
+        },
+        "logs/sdk-version.txt": {
+          "sha256": "e4e6a678725873a4192c048849cd64d852983991bfcb210a40c3b80cc8fcf2eb",
+          "bytes": 10
+        },
+        "logs/stderr.txt": {
+          "sha256": "9c25ee3ab621e4f19d82829fcfc413d355e3fcea1733842948a7206b13371402",
+          "bytes": 1924
+        },
+        "logs/stdout.txt": {
+          "sha256": "263946484fccbc32dbb019dd6b8e557161a31e83b84873aba58fe7ebfaa8d1d5",
+          "bytes": 1338
+        },
+        "profile/logs/20261105T225824/window1/exthost/output_logging_20261105T225825/3-C# File Debugging.log": {
+          "sha256": "c8ec4d84869125bf807020516a703905b461954c01b453e2f1c83f0a9bb26fc0",
+          "bytes": 23545
+        },
+        "profile/logs/20261105T225824/window1/exthost/exthost.log": {
+          "sha256": "255bba3fda493832ad653e410e12b549ad2aa4b7ee6b018f1ad32c025da2bbd7",
+          "bytes": 7187
+        },
+        "profile/logs/20261105T225824/window1/exthost/dotnetdev-kr-custom.csharp-with-netcoredbg/C#.log": {
+          "sha256": "ae6c5cedaa55e3d35f70c638528c2b82db7c412b0432dba843e2a6d1dfc16e3e",
+          "bytes": 45616
+        }
+      },
+      "interpretation": "Behavioral lifecycle assertions passed. Stop-time adapter errors remain recorded; this is not an error-free-log or release-qualification claim."
+    }
+  ],
+  "duplicateAttemptCheck": {
+    "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\duplicate-attempt-check.json",
+    "sha256": "a604a62952dbced66e7e926f927f74d78be5211105cc274a07a74987ba375621",
+    "record": {
+      "detail": "This profile has already been attempted; use a fresh work directory and retain its first result",
+      "preservedFiles": 13,
+      "rejected": true,
+      "schema": 1,
+      "success": true,
+      "checkedWork": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-03"
+    }
+  },
+  "dependencyDownload": {
+    "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\resources\\runtime-download.json",
+    "sha256": "07ce4d2cba6ed852cb3ff9d27be01ab6deca6bcf3aedfd2f6d66a08733ef4b53",
+    "record": {
+      "version": "3.2.0",
+      "url": "https://open-vsx.org/api/ms-dotnettools/vscode-dotnet-runtime/3.2.0/file/ms-dotnettools.vscode-dotnet-runtime-3.2.0.vsix",
+      "sha256": "a4cff5409f66e3827ee2c6a727ae59382290a182a653ca0f9ac97c63536ee541",
+      "namespace": "ms-dotnettools",
+      "name": "vscode-dotnet-runtime"
+    }
+  },
+  "reviewFollowupCheck": {
+    "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\review-followup-check.json",
+    "sha256": "7c55a26d0e5aeb238546d4056e18f0a3b2f2c8e84dbcd41aee8a7e3d7de760d6",
+    "record": {
+      "callerProfilePreserved": true,
+      "work": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-05",
+      "schema": 1,
+      "initialStates": {
+        "empty": "NETCOREDBG_LIFECYCLE_ROOT",
+        "absent": "DOTNET_CLI_HOME",
+        "nonempty": "DOTNET_NOLOGO"
+      },
+      "repeatedAttemptRejected": true,
+      "success": true,
+      "originalEvidenceFilesPreserved": 13,
+      "callerEnvironmentRestored": true,
+      "environmentVariableCount": 16
+    }
+  },
+  "reviewFollowupFailure": {
+    "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\run-04\\external-review-check.json",
+    "sha256": "962f53734cbc2ddb4fc75cf4e62db90f9da530e189cddf4a28ad60ac19ef03e7",
+    "record": {
+      "fix": "Pass Language.NullString.Value when the original variable was absent",
+      "cause": "PowerShell null argument was coerced to empty string when calling Environment.SetEnvironmentVariable",
+      "investigation": {
+        "ordinaryNullIsAbsent": false,
+        "ordinaryNullLength": 0,
+        "explicitNullIsAbsent": true,
+        "runtime": "10.0.12"
+      },
+      "schema": 1,
+      "success": false,
+      "editorScenarioPassed": true,
+      "firstError": "Caller environment changed: DOTNET_CLI_HOME",
+      "callerEnvironmentRestored": false,
+      "retryRequiresFreshProfile": true
+    }
+  }
+}
