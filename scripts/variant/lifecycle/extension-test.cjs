@@ -92,17 +92,23 @@ exports.run = async function run() {
     const root = path.resolve(configuredRoot);
     const expected = JSON.parse(fs.readFileSync(path.join(root, 'expected.json'), 'utf8'));
     assert.equal(expected.schema, 1);
+    const scenario = expected.scenario || 'web-lifecycle';
+    assert(['web-lifecycle', 'build-failure-retry'].includes(scenario));
     assert(Number.isInteger(expected.cycles) && expected.cycles >= 2 && expected.cycles <= 10);
     const start = process.hrtime.bigint();
     const result = {
         schema: 1, success: false, expected, editorApiVersion: vscode.version,
-        safetyTimeoutMilliseconds: SAFETY_TIMEOUT_MS, checks: [], phases: [], launches: [], cleanup: [],
+        safetyTimeoutMilliseconds: SAFETY_TIMEOUT_MS, checks: [], phases: [], launches: [], cleanup: [], failedBuildAttempts: [],
         scope: { installedCandidate: true, invocation: 'command-api', physicalF5: false,
             VSCodium: true, platform: `${process.platform}-${process.arch}`, macOS: process.platform === 'darwin',
             qualification: false, localOnly: true, published: false, directWebDebuggee: true,
-            spawnedGrandchildren: false, hostReload: false, injectedTargetRuntime: false },
+            spawnedGrandchildren: false, hostReload: false, injectedTargetRuntime: false,
+            scenario, actualCompilerFailure: scenario === 'build-failure-retry' },
     };
     const launches = [];
+    const failedBuildAttempts = [];
+    // Includes unexpected sessions from an intended failed build for targeted cleanup.
+    const ownedAttempts = [];
     const byToken = new Map();
     const subscriptions = [];
     const breakpoints = [];
@@ -122,11 +128,13 @@ exports.run = async function run() {
     function state() {
         fs.writeFileSync(path.join(root, 'progress/state.json'), JSON.stringify({
             schema: 1, root, elapsedMilliseconds: elapsed(start), firstFailure: result.firstFailure,
-            launches: launches.map(launch => ({
+            launches: ownedAttempts.map(launch => ({
                 label: launch.label, source: launch.source, revision: launch.revision, nonce: launch.nonce,
                 origin: launch.origin, port: launch.port, pid: launch.pid, sessionId: launch.session?.id,
                 program: launch.program, output: launch.output, terminated: launch.terminated,
+                capturedSessions: capturedSessionState(launch),
                 commandPending: launch.commandPending,
+                expectedBuildFailure: launch.expectedBuildFailure,
                 stopRequestedAtMilliseconds: launch.stopRequestedAtMilliseconds,
                 stopPromiseResolvedAtMilliseconds: launch.stopPromiseResolvedAtMilliseconds,
                 terminatedAtMilliseconds: launch.terminatedAtMilliseconds,
@@ -186,10 +194,15 @@ exports.run = async function run() {
     }
 
     function captureSession(session, launch) {
-        if (launch.session) assert.equal(launch.session.id, session.id, 'One launch token must identify exactly one session');
-        // Retain the exact token-matched session even if a later configuration
-        // assertion fails, so failure cleanup can request its targeted stop.
-        launch.session = session;
+        // Retain every exact token-matched session before checking uniqueness.
+        // A broken coalescing path must fail without abandoning its extra session.
+        launch.capturedSessions ||= new Map();
+        if (!launch.capturedSessions.has(session.id)) {
+            launch.capturedSessions.set(session.id, { session, program: session.configuration?.program,
+                output: session.configuration?.__netcoredbgFileAppOutput });
+        }
+        launch.session ||= session;
+        assert.equal(launch.session.id, session.id, 'One launch token must identify exactly one session');
         assert.equal(session.type, 'coreclr');
         assert(within(root, session.configuration.program), 'Debuggee program must be inside this isolated artifact root');
         assert(within(root, session.configuration.__netcoredbgFileAppOutput), 'Owned output must be inside this isolated artifact root');
@@ -197,6 +210,70 @@ exports.run = async function run() {
         launch.program = session.configuration.program;
         launch.output = session.configuration.__netcoredbgFileAppOutput;
         launch.base = path.dirname(path.dirname(launch.output));
+        assert(!launch.expectedBuildFailure, 'The compiler-failed attempt must not create a debug adapter or session');
+    }
+
+    function capturedSessionState(launch) {
+        return [...(launch.capturedSessions?.values() || [])].map(captured => ({
+            sessionId: captured.session.id, primary: captured.session.id === launch.session?.id,
+            program: captured.program, output: captured.output, pid: captured.pid,
+            terminated: captured.terminated, terminatedAtMilliseconds: captured.terminatedAtMilliseconds,
+        }));
+    }
+
+    function outputLog() {
+        const matches = [];
+        function visit(directory) {
+            if (!exists(directory)) return;
+            for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+                const file = path.join(directory, entry.name);
+                if (entry.isDirectory()) visit(file);
+                else if (entry.isFile() && entry.name.endsWith('C# File Debugging.log')) matches.push(file);
+            }
+        }
+        visit(path.join(root, 'profile/logs'));
+        assert(matches.length <= 1, 'One isolated editor must have one unambiguous file-debugging output log');
+        return matches[0];
+    }
+
+    function buildCommands(text, source) {
+        const commands = [];
+        for (const line of text.split(/\r?\n/)) {
+            if (!line.startsWith('dotnet ')) continue;
+            const payload = line.slice('dotnet '.length);
+            const args = [...payload.matchAll(/"(?:\\.|[^"\\])*"/g)].map(match => JSON.parse(match[0]));
+            assert.equal(args.map(value => JSON.stringify(value)).join(' '), payload, 'Build argument log must retain JSON-quoted tokens');
+            if (args[0] !== 'build' || !samePath(args[1], source)) continue;
+            const outputIndex = args.indexOf('--output');
+            assert(outputIndex >= 0 && args[outputIndex + 1]);
+            const output = args[outputIndex + 1];
+            assert(path.isAbsolute(output) && within(root, output), 'Logged build output must be inside the isolated root');
+            commands.push({ args, output });
+        }
+        return commands;
+    }
+
+    function logSnapshot(file) {
+        const text = fs.readFileSync(file, 'utf8');
+        return { path: file, offsetCharacters: text.length,
+            prefixSha256: crypto.createHash('sha256').update(text).digest('hex') };
+    }
+
+    function logTail(snapshot) {
+        const text = fs.readFileSync(snapshot.path, 'utf8');
+        const prefix = text.slice(0, snapshot.offsetCharacters);
+        assert.equal(crypto.createHash('sha256').update(prefix).digest('hex'), snapshot.prefixSha256,
+            'Earlier output log evidence must not be replaced or truncated');
+        return text.slice(snapshot.offsetCharacters);
+    }
+
+    function logEvidence(snapshot, tail, source) {
+        return { ...snapshot, tailCharacters: tail.length,
+            tailSha256: crypto.createHash('sha256').update(tail).digest('hex'),
+            buildCommands: buildCommands(tail, source),
+            compilerDiagnostics: tail.split(/\r?\n/).filter(line => line.includes('CS0103')),
+            failedPhaseDiagnostics: tail.split(/\r?\n/).filter(line => line.startsWith('Phase failed: Building file-based app')),
+            completedPhaseDiagnostics: tail.split(/\r?\n/).filter(line => line.startsWith('Phase completed: Starting netcoredbg')) };
     }
 
     async function ready(launch) {
@@ -215,6 +292,9 @@ exports.run = async function run() {
             assert(Number.isSafeInteger(body.pid) && body.pid > 0);
             if (launch.pid) assert.equal(body.pid, launch.pid, 'HTTP PID must match the adapter process event');
             launch.pid = body.pid;
+            const captured = launch.capturedSessions.get(launch.session.id);
+            if (captured.pid) assert.equal(captured.pid, body.pid);
+            captured.pid = body.pid;
             assert(pidAlive(launch.pid));
             launch.response = body;
             state();
@@ -252,10 +332,11 @@ exports.run = async function run() {
         state();
     }
 
-    async function launchFile(label, source, revision, port, inspectBreakpoint = false, document) {
+    async function launchFile(label, source, revision, port, inspectBreakpoint = false, document, commandInvocations = 1) {
         const nonce = crypto.randomUUID();
         const launch = { label, source, revision, nonce, port, origin: `http://127.0.0.1:${port}`, dap: [] };
         launches.push(launch);
+        ownedAttempts.push(launch);
         byToken.set(nonce, launch);
         fs.writeFileSync(source.replace(/\.cs$/i, '.run.json'), JSON.stringify({ profiles: { LifecycleHttp: {
             commandName: 'Project', applicationUrl: launch.origin, launchBrowser: false,
@@ -264,21 +345,30 @@ exports.run = async function run() {
         const opened = document || await vscode.workspace.openTextDocument(source);
         await vscode.window.showTextDocument(opened);
         launch.commandPending = true;
+        launch.commandInvocations = commandInvocations;
         state();
         try {
-            assert.equal(await vscode.commands.executeCommand(COMMAND), true, `${label} installed command must start debugging`);
+            // Observe every concurrent request before handling a rejection so a
+            // later owned session can still be captured for failure cleanup.
+            const outcomes = await Promise.allSettled(Array.from({ length: commandInvocations }, () => vscode.commands.executeCommand(COMMAND)));
+            const rejected = outcomes.find(outcome => outcome.status === 'rejected');
+            if (rejected) throw rejected.reason;
+            launch.commandResults = outcomes.map(outcome => outcome.value);
+            assert.deepEqual(launch.commandResults, Array(commandInvocations).fill(true), `${label} installed commands must start debugging`);
         } finally {
             launch.commandPending = false;
             state();
         }
         assert.equal(opened.isDirty, false, 'Installed command must save the dirty source before building');
         await until(() => launch.started, `${label} exact owned session start`);
+        assert.equal(launch.capturedSessions.size, 1, 'One launch token must have exactly one captured session');
         assert(exists(launch.program));
         assert(exists(launch.output));
         assert.equal(launch.session.configuration.env.ASPNETCORE_URLS, launch.origin);
         assert.equal(launch.session.configuration.serverReadyAction, undefined);
         assert.equal(launch.session.configuration.checkForDevCert, false);
         assert(!launches.some(previous => previous !== launch && previous.output === launch.output), 'Every launch needs a fresh output directory');
+        assert(!failedBuildAttempts.some(previous => previous.output === launch.output), 'A retry must not reuse failed build output');
         if (inspectBreakpoint) {
             await until(() => launch.dap.some(message => message.event === 'stopped' && message.body?.reason === 'breakpoint'), `${label} source breakpoint`);
             const stopped = launch.dap.find(message => message.event === 'stopped' && message.body?.reason === 'breakpoint');
@@ -297,34 +387,116 @@ exports.run = async function run() {
         return launch;
     }
 
+    async function compilerFailure(source, revision, port, a, b) {
+        let file;
+        // Start the failure window after both earlier successful commands have
+        // reached the persisted log, even if the logger flushes asynchronously.
+        await until(() => {
+            file = outputLog();
+            if (!file) return false;
+            const text = fs.readFileSync(file, 'utf8');
+            return buildCommands(text, source).length === 1 && buildCommands(text, b.source).length === 1 &&
+                text.split(/\r?\n/).filter(line => line.startsWith('Phase completed: Starting netcoredbg')).length === 2;
+        }, 'initial A/B command output log flush');
+        const snapshot = logSnapshot(file);
+        const opened = await vscode.workspace.openTextDocument(source);
+        const content = opened.getText();
+        assert(content.includes('marker += 2;'));
+        const broken = content.replace('marker += 2;', 'marker += __missingLifecycleValue;');
+        const edit = new vscode.WorkspaceEdit();
+        edit.replace(opened.uri, new vscode.Range(opened.positionAt(0), opened.positionAt(content.length)), broken);
+        assert.equal(await vscode.workspace.applyEdit(edit), true);
+        assert.equal(opened.isDirty, true, 'Compiler failure must begin with an unsaved source edit');
+        await vscode.window.showTextDocument(opened);
+        const attempt = { label: 'A-compile-failure', source, revision, port, origin: `http://127.0.0.1:${port}`,
+            nonce: crypto.randomUUID(), expectedBuildFailure: true, dap: [] };
+        failedBuildAttempts.push(attempt);
+        ownedAttempts.push(attempt);
+        byToken.set(attempt.nonce, attempt);
+        fs.writeFileSync(source.replace(/\.cs$/i, '.run.json'), JSON.stringify({ profiles: { LifecycleHttp: {
+            commandName: 'Project', applicationUrl: attempt.origin, launchBrowser: false,
+            environmentVariables: { LIFECYCLE_TOKEN: attempt.nonce, ASPNETCORE_ENVIRONMENT: 'Development' },
+        } } }, null, 2) + '\n');
+        attempt.commandPending = true;
+        attempt.invokedAtMilliseconds = elapsed(start);
+        record('expected-build-failure-request', { label: attempt.label, nonce: attempt.nonce });
+        state();
+        try { attempt.commandResult = await vscode.commands.executeCommand(COMMAND); }
+        finally { attempt.commandPending = false; attempt.returnedAtMilliseconds = elapsed(start); state(); }
+        assert.equal(attempt.commandResult, false, 'The actual compiler error must decline debug launch');
+        assert.equal(opened.isDirty, false, 'The installed command must save the broken source');
+        assert.equal(fs.readFileSync(source, 'utf8'), broken);
+        attempt.sourceSaved = true;
+        assert.equal(attempt.session, undefined, 'The compiler-failed attempt must have no session');
+        let tail;
+        await until(() => {
+            tail = logTail(snapshot);
+            return tail.includes('CS0103') && tail.includes('Phase failed: Building file-based app');
+        }, 'actual compiler error and failed build phase output');
+        attempt.log = logEvidence(snapshot, tail, source);
+        assert.equal(attempt.log.buildCommands.length, 1, 'The failed attempt must execute exactly one actual build');
+        attempt.output = attempt.log.buildCommands[0].output;
+        attempt.program = path.join(attempt.output, 'FileApp.dll');
+        attempt.base = path.dirname(path.dirname(attempt.output));
+        assert(samePath(attempt.base, a.base), 'Failed and successful A output must share the known owned output base');
+        assert.notEqual(attempt.output, a.output);
+        assert(!exists(attempt.output), 'The exact failed output must be gone at the post-return resource check');
+        assert(queueEmpty(attempt.base), 'The failed attempt must leave no terminal recovery queue');
+        attempt.outputRemovedAtMilliseconds = elapsed(start);
+        assert(await canBind(port), 'A compiler failure must leave the A HTTP port free');
+        attempt.portReusableAtMilliseconds = elapsed(start);
+        attempt.noSession = !attempt.session;
+        await stillAlive(b);
+        record('expected-build-failure-confirmed', { label: attempt.label, output: attempt.output, nonce: attempt.nonce,
+            compilerDiagnostics: attempt.log.compilerDiagnostics, commandResult: attempt.commandResult });
+        result.checks.push('Actual CS0103 returns false, saves broken source, starts no session and removes exact failed output while B survives');
+        state();
+        return attempt;
+    }
+
     async function failureCleanup() {
         // Keep evidence when exact API stop or fixture ownership verification fails.
         // Do not issue global Stop, process-tree kill or filesystem cleanup.
-        for (const launch of launches.slice().reverse()) {
-            const cleanup = { label: launch.label, sessionId: launch.session?.id };
-            result.cleanup.push(cleanup);
-            try {
-                if (launch.session && !launch.terminated) {
-                    await bounded(vscode.debug.stopDebugging(launch.session), `failure cleanup exact session ${launch.label}`, 5000);
-                    cleanup.exactSessionStopRequested = true;
+        const visited = new Set();
+        for (const launch of ownedAttempts.slice().reverse()) {
+            const captured = [...(launch.capturedSessions?.values() || [])].reverse();
+            if (!captured.length) captured.push({});
+            for (const owned of captured) {
+                const session = owned.session;
+                if (session && visited.has(session.id)) continue;
+                if (session) visited.add(session.id);
+                const cleanup = { label: launch.label, sessionId: session?.id };
+                result.cleanup.push(cleanup);
+                try {
+                    if (session && !owned.terminated) {
+                        await bounded(vscode.debug.stopDebugging(session), `failure cleanup exact session ${launch.label}/${session.id}`, 5000);
+                        cleanup.exactSessionStopRequested = true;
+                    }
+                } catch (error) { cleanup.sessionStopError = String(error); }
+                // A tracker can receive its process event while Stop is pending.
+                const pid = owned.pid || (session?.id === launch.session?.id ? launch.pid : undefined);
+                cleanup.pid = pid;
+                try {
+                    if (pid && pidAlive(pid)) {
+                        const body = await request(launch.origin);
+                        assert.equal(body.pid, pid);
+                        assert.equal(body.nonce, launch.nonce);
+                        await request(launch.origin, `/shutdown?token=${encodeURIComponent(launch.nonce)}`, { method: 'POST' });
+                        cleanup.verifiedFixtureShutdownRequested = true;
+                    }
+                } catch (error) { cleanup.fixtureShutdownError = String(error); }
+                try {
+                    if (pid) {
+                        await waitUntil(() => !pidAlive(pid), `failure cleanup PID ${pid}`, 5000);
+                        cleanup.pidGone = true;
+                    }
+                } catch (error) { cleanup.pidExitError = String(error); }
+                state();
+                // Include token-owned sessions captured while earlier Stops settled.
+                for (const extra of launch.capturedSessions?.values() || []) {
+                    if (!visited.has(extra.session.id) && !captured.includes(extra)) captured.push(extra);
                 }
-            } catch (error) { cleanup.sessionStopError = String(error); }
-            try {
-                if (launch.pid && pidAlive(launch.pid)) {
-                    const body = await request(launch.origin);
-                    assert.equal(body.pid, launch.pid);
-                    assert.equal(body.nonce, launch.nonce);
-                    await request(launch.origin, `/shutdown?token=${encodeURIComponent(launch.nonce)}`, { method: 'POST' });
-                    cleanup.verifiedFixtureShutdownRequested = true;
-                }
-            } catch (error) { cleanup.fixtureShutdownError = String(error); }
-            try {
-                if (launch.pid) {
-                    await waitUntil(() => !pidAlive(launch.pid), `failure cleanup PID ${launch.pid}`, 5000);
-                    cleanup.pidGone = true;
-                }
-            } catch (error) { cleanup.pidExitError = String(error); }
-            state();
+            }
         }
     }
 
@@ -340,18 +512,26 @@ exports.run = async function run() {
         })));
         subscriptions.push(vscode.debug.onDidTerminateDebugSession(session => observe('editor-terminate', () => {
             const launch = ownedLaunch(session);
-            if (!launch || launch.session?.id !== session.id) return;
-            launch.terminated = true;
-            launch.terminatedAtMilliseconds = elapsed(start);
+            const captured = launch?.capturedSessions?.get(session.id);
+            if (!captured) return;
+            captured.terminated = true;
+            captured.terminatedAtMilliseconds = elapsed(start);
+            if (launch.session?.id === session.id) {
+                launch.terminated = true;
+                launch.terminatedAtMilliseconds = captured.terminatedAtMilliseconds;
+            }
             record('editor-terminate', { label: launch.label, sessionId: session.id,
-                programExists: exists(launch.program), outputExists: exists(launch.output) });
+                programExists: typeof captured.program === 'string' && exists(captured.program),
+                outputExists: typeof captured.output === 'string' && exists(captured.output) });
             state();
         })));
         subscriptions.push(vscode.debug.registerDebugAdapterTrackerFactory('coreclr', {
             createDebugAdapterTracker(session) {
                 const launch = ownedLaunch(session);
                 if (!launch) return undefined;
-                if (!observe('adapter-session', () => { captureSession(session, launch); return true; })) return undefined;
+                observe('adapter-session', () => captureSession(session, launch));
+                // Keep the tracker even if uniqueness validation failed: it can
+                // still identify the extra owned debuggee for targeted cleanup.
                 return {
                     onWillReceiveMessage(message) { observe('dap-send', () => record('dap-send', { label: launch.label, sessionId: session.id, message })); },
                     onDidSendMessage(message) { observe('dap-receive', () => {
@@ -359,8 +539,14 @@ exports.run = async function run() {
                         if (message.event === 'process' && message.body?.isLocalProcess === true) {
                             const pid = message.body.systemProcessId;
                             assert(Number.isSafeInteger(pid) && pid > 0, 'Adapter must report a positive local debuggee PID');
-                            if (launch.pid) assert.equal(launch.pid, pid);
-                            launch.pid = pid;
+                            const captured = launch.capturedSessions.get(session.id);
+                            const earlierPid = captured.pid;
+                            captured.pid = pid;
+                            if (earlierPid) assert.equal(earlierPid, pid);
+                            if (launch.session?.id === session.id) {
+                                if (launch.pid) assert.equal(launch.pid, pid);
+                                launch.pid = pid;
+                            }
                             state();
                         }
                         record('dap-receive', { label: launch.label, sessionId: session.id, message });
@@ -422,19 +608,45 @@ exports.run = async function run() {
             await phase(`A cycle ${cycle} targeted stop and owned cleanup`, () => stop(a));
             await phase(`B preserved after A cycle ${cycle}`, () => stillAlive(b));
             result.checks.push(`A cycle ${cycle}: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives`);
+            const failed = scenario === 'build-failure-retry' && cycle === 0
+                ? await phase('A actual compiler failure and owned cleanup while B survives', () => compilerFailure(aSource, a.revision, aPort, a, b))
+                : undefined;
             if (cycle + 1 < expected.cycles) {
                 const revision = `retry-${cycle + 1}`;
                 await phase(`A cycle ${cycle + 1} dirty edit and installed-command retry`, async () => {
                     const current = await vscode.workspace.openTextDocument(aSource);
                     const content = current.getText();
                     assert(content.includes(`const string revision = "${a.revision}";`));
-                    const replacement = content.replace(`const string revision = "${a.revision}";`, `const string revision = "${revision}";`);
+                    let replacement = content.replace(`const string revision = "${a.revision}";`, `const string revision = "${revision}";`);
+                    if (failed) {
+                        assert(content.includes('marker += __missingLifecycleValue;'));
+                        replacement = replacement.replace('marker += __missingLifecycleValue;', 'marker += 2;');
+                    }
                     const edit = new vscode.WorkspaceEdit();
                     edit.replace(current.uri, new vscode.Range(current.positionAt(0), current.positionAt(content.length)), replacement);
                     assert.equal(await vscode.workspace.applyEdit(edit), true);
                     assert.equal(current.isDirty, true, 'Retry must exercise the installed command\'s source save');
-                    a = await launchFile(`A-${cycle + 1}`, aSource, revision, aPort, false, current);
+                    const snapshot = failed ? logSnapshot(failed.log.path) : undefined;
+                    a = await launchFile(`A-${cycle + 1}`, aSource, revision, aPort, false, current, failed ? 3 : 1);
                     assert.equal(fs.readFileSync(aSource, 'utf8'), current.getText());
+                    if (failed) {
+                        let tail;
+                        await until(() => { tail = logTail(snapshot); return tail.includes('Phase completed: Starting netcoredbg'); },
+                            'corrected coalesced retry command output');
+                        const log = logEvidence(snapshot, tail, aSource);
+                        assert.equal(log.buildCommands.length, 1, 'Three concurrent corrected commands must share exactly one build');
+                        assert.equal(log.completedPhaseDiagnostics.length, 1, 'Three concurrent corrected commands must share one handoff');
+                        assert.equal(log.failedPhaseDiagnostics.length, 0);
+                        assert(samePath(log.buildCommands[0].output, a.output), 'Coalesced build output must identify the one captured session');
+                        assert(!exists(failed.output));
+                        result.coalescedRetry = { label: a.label, commandInvocations: a.commandInvocations,
+                            commandResults: a.commandResults, sessionId: a.session.id, output: a.output,
+                            sessionIds: [...a.capturedSessions.keys()],
+                            log, failedOutput: failed.output, freshOutput: a.output !== failed.output };
+                        await stillAlive(b);
+                        result.checks.push('Dirty compiler correction retries with three concurrent commands sharing one build/session and fresh output while B survives');
+                        record('coalesced-corrected-retry-confirmed', result.coalescedRetry);
+                    }
                 });
             }
         }
@@ -457,6 +669,8 @@ exports.run = async function run() {
             origin: launch.origin, port: launch.port, pid: launch.pid, sessionId: launch.session?.id,
             program: launch.program, output: launch.output, response: launch.response,
             commandPending: launch.commandPending,
+            commandInvocations: launch.commandInvocations, commandResults: launch.commandResults,
+            capturedSessions: capturedSessionState(launch),
             startedAtMilliseconds: launch.startedAtMilliseconds,
             stopRequestedAtMilliseconds: launch.stopRequestedAtMilliseconds,
             stopPromiseResolvedAtMilliseconds: launch.stopPromiseResolvedAtMilliseconds,
@@ -464,6 +678,17 @@ exports.run = async function run() {
             pidGoneAtMilliseconds: launch.pidGoneAtMilliseconds,
             portReusableAtMilliseconds: launch.portReusableAtMilliseconds,
             outputRemovedAtMilliseconds: launch.outputRemovedAtMilliseconds,
+        }));
+        result.failedBuildAttempts = failedBuildAttempts.map(attempt => ({
+            label: attempt.label, source: attempt.source, revision: attempt.revision, nonce: attempt.nonce,
+            origin: attempt.origin, port: attempt.port, expectedBuildFailure: true,
+            commandPending: attempt.commandPending, commandResult: attempt.commandResult,
+            invokedAtMilliseconds: attempt.invokedAtMilliseconds, returnedAtMilliseconds: attempt.returnedAtMilliseconds,
+            sourceSaved: attempt.sourceSaved, sessionId: attempt.session?.id, pid: attempt.pid, terminated: attempt.terminated,
+            capturedSessions: capturedSessionState(attempt),
+            output: attempt.output, program: attempt.program, base: attempt.base,
+            outputRemovedAtMilliseconds: attempt.outputRemovedAtMilliseconds,
+            portReusableAtMilliseconds: attempt.portReusableAtMilliseconds, noSession: attempt.noSession, log: attempt.log,
         }));
         state();
         fs.writeFileSync(path.join(root, 'result.json'), JSON.stringify(result, null, 2) + '\n');

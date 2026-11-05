@@ -117,6 +117,7 @@ def main():
     parser.add_argument("--sdk-version", required=True)
     parser.add_argument("--work-dir", type=Path, required=True)
     parser.add_argument("--cycles", type=int, default=3)
+    parser.add_argument("--scenario", choices=("web-lifecycle", "build-failure-retry"), default="web-lifecycle")
     args = parser.parse_args()
     if not 2 <= args.cycles <= 10:
         parser.error("Use 2..10 cycles to exercise bounded same-file retry")
@@ -163,6 +164,7 @@ def main():
     harness = {name: digest((Path(__file__).parent / name).read_bytes())
                for name in ("prepare.py", "run.ps1", "driver.cjs", "extension-test.cjs", "fixtures/web.cs")}
     expected = {"schema": 1, "extensionId": EXTENSION_ID, "candidate": candidate, "cycles": args.cycles,
+                "scenario": args.scenario,
                 "harness": harness,
                 "editor": {"executable": str(editor), "cli": str(editor_cli), "version": editor_package["version"],
                            "commit": product["commit"], "sha256": digest(editor.read_bytes()), "machine": "arm64"},
