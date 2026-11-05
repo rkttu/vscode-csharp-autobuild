@@ -4,6 +4,7 @@ import importlib.util
 import json
 from pathlib import Path
 import tempfile
+import struct
 import unittest
 import warnings
 import zipfile
@@ -90,6 +91,18 @@ class LifecyclePreparationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "fresh"):
             preparation.fresh_directory(work)
         self.assertEqual(failure.read_text(), 'initial failure')
+
+    def test_pe_machine_reports_truncated_headers_and_reads_native_target(self):
+        executable = self.root / "editor.exe"
+        header = b"MZ" + bytes(0x3C - 2) + struct.pack("<I", 0x40)
+        complete = header + b"PE\0\0" + struct.pack("<H", 0xAA64)
+        for data in (b"MZ", header[:-1], header, header + b"PE\0\0", complete[:-1]):
+            with self.subTest(size=len(data)):
+                executable.write_bytes(data)
+                with self.assertRaisesRegex(ValueError, "Truncated PE"):
+                    preparation.pe_machine(executable)
+        executable.write_bytes(complete)
+        self.assertEqual(preparation.pe_machine(executable), 0xAA64)
 
 
 if __name__ == "__main__":

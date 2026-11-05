@@ -89,14 +89,20 @@ def fresh_directory(directory):
 
 def pe_machine(executable):
     with executable.open("rb") as stream:
+        def read_exact(size):
+            value = stream.read(size)
+            if len(value) != size:
+                raise ValueError("Truncated PE executable")
+            return value
+
         if stream.read(2) != b"MZ":
             raise ValueError("Expected a Windows editor executable")
         stream.seek(0x3C)
-        offset = struct.unpack("<I", stream.read(4))[0]
+        offset = struct.unpack("<I", read_exact(4))[0]
         stream.seek(offset)
-        if stream.read(4) != b"PE\0\0":
+        if read_exact(4) != b"PE\0\0":
             raise ValueError("Invalid PE executable")
-        return struct.unpack("<H", stream.read(2))[0]
+        return struct.unpack("<H", read_exact(2))[0]
 
 
 def main():

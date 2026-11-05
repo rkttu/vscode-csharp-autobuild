@@ -29,6 +29,12 @@ try {
     $attempt.Write($bytes, 0, $bytes.Length)
 } finally { $attempt.Dispose() }
 
+$environmentNames = @('APPDATA', 'LOCALAPPDATA', 'DOTNET_CLI_HOME', 'DOTNET_ROOT', 'NUGET_PACKAGES',
+    'NUGET_HTTP_CACHE_PATH', 'TEMP', 'TMP', 'DOTNET_GENERATE_ASPNET_CERTIFICATE', 'DOTNET_CLI_TELEMETRY_OPTOUT',
+    'DOTNET_CLI_UI_LANGUAGE', 'DOTNET_NOLOGO', 'NETCOREDBG_LIFECYCLE_ROOT', 'PATH', 'ELECTRON_RUN_AS_NODE', 'VSCODE_PORTABLE')
+$previousEnvironment = @{}
+foreach ($name in $environmentNames) { $previousEnvironment[$name] = [Environment]::GetEnvironmentVariable($name, 'Process') }
+try {
 $env:APPDATA = Join-Path $work 'appdata'
 $env:LOCALAPPDATA = Join-Path $work 'localappdata'
 $env:DOTNET_CLI_HOME = Join-Path $work 'dotnet-home'
@@ -45,7 +51,7 @@ $env:NETCOREDBG_LIFECYCLE_ROOT = $work
 $env:PATH = $expected.sdk.root + ';' + $env:PATH
 Remove-Item Env:ELECTRON_RUN_AS_NODE -ErrorAction SilentlyContinue
 Remove-Item Env:VSCODE_PORTABLE -ErrorAction SilentlyContinue
-$profile = Join-Path $work 'profile'
+$editorProfile = Join-Path $work 'profile'
 $extensions = Join-Path $work 'extensions'
 $logs = Join-Path $work 'logs'
 $launcher = @{ schema = 1; success = $false; work = $work; candidateSha256 = $expected.candidate.sha256;
@@ -91,13 +97,13 @@ try {
     if ($LASTEXITCODE -ne 0 -or !$editorVersion.Contains($expected.editor.version) -or !$editorVersion.Contains($expected.editor.commit)) { throw "Editor version differs: $editorVersion" }
     [IO.File]::WriteAllText((Join-Path $logs 'editor-version.txt'), $editorVersion)
     foreach ($item in @(@{name='runtime'; path=$expected.dependency.path}, @{name='candidate'; path=$expected.candidate.path})) {
-        $install = & $expected.editor.cli --locale en --user-data-dir $profile --extensions-dir $extensions --install-extension $item.path --force 2>&1 | Out-String
+        $install = & $expected.editor.cli --locale en --user-data-dir $editorProfile --extensions-dir $extensions --install-extension $item.path --force 2>&1 | Out-String
         $installExit = $LASTEXITCODE
         [IO.File]::WriteAllText((Join-Path $logs ($item.name + '-install.txt')), $install)
         if ($installExit -ne 0) { throw "Installation failed ($($item.name)): $install" }
     }
     $quoted = { param($path) '"' + $path + '"' }
-    $arguments = @('--locale', 'en', '--user-data-dir', (& $quoted $profile), '--extensions-dir', (& $quoted $extensions),
+    $arguments = @('--locale', 'en', '--user-data-dir', (& $quoted $editorProfile), '--extensions-dir', (& $quoted $extensions),
         '--extensionDevelopmentPath', (& $quoted (Join-Path $work 'driver')),
         '--extensionTestsPath', (& $quoted (Join-Path $work 'driver/extension-test.cjs')),
         '--skip-welcome', '--skip-release-notes', '--disable-gpu', '--disable-workspace-trust', '--no-sandbox',
@@ -124,4 +130,11 @@ try {
     throw
 } finally {
     $launcher | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $work 'launcher-result.json')
+}
+} finally {
+    foreach ($name in $environmentNames) {
+        $previousValue = $previousEnvironment[$name]
+        if ($null -eq $previousValue) { $previousValue = [System.Management.Automation.Language.NullString]::Value }
+        [Environment]::SetEnvironmentVariable($name, $previousValue, 'Process')
+    }
 }

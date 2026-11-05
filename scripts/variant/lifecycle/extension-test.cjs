@@ -141,9 +141,10 @@ exports.run = async function run() {
             // the editor's event dispatcher and become a later timeout.
             if (!eventError) {
                 eventError = error;
-                result.firstFailure = { atMilliseconds: elapsed(start), event, error: error.stack || String(error) };
-                result.firstCallbackError = result.firstFailure;
-                record('observer-failure', result.firstFailure);
+                const callbackFailure = { atMilliseconds: elapsed(start), event, error: error.stack || String(error) };
+                result.firstFailure ||= callbackFailure;
+                result.firstCallbackError = callbackFailure;
+                record('observer-failure', callbackFailure);
                 state();
                 rejectObserver(error);
             }

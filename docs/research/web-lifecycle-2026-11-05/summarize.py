@@ -34,7 +34,7 @@ def raw_files(work):
             for file in files if file.is_file()}
 
 
-def summarize_run(work, repo):
+def summarize_run(work, repo, require_current_harness=False, historical=None):
     expected = read_json(work / "expected.json")
     result = read_json(work / "result.json")
     launcher = read_json(work / "launcher-result.json")
@@ -83,11 +83,16 @@ def summarize_run(work, repo):
                        "fixtures/web.cs": sha256(work / "workspace/b.cs")}
     recorded_harness = expected.get("harness")
     if recorded_harness:
-        if recorded_harness != final_sources:
-            raise ValueError("Final source files differ from the run's pinned harness")
         if any(recorded_harness[name] != value for name, value in executed_copies.items()):
             raise ValueError("Executed driver or unchanged B fixture differs from pinned harness")
-    return {
+    elif historical:
+        if executed_copies != historical["executedCopiesSha256"]:
+            raise ValueError("Historical executed copies differ from their retained evidence")
+    else:
+        raise ValueError("An unpinned historical harness needs its previously retained evidence")
+    if require_current_harness and recorded_harness != final_sources:
+        raise ValueError("Final source files differ from the latest run's pinned harness")
+    summary = {
         "name": work.name, "localArtifactDirectory": str(work), "success": True,
         "editorExitCode": launcher["editorExitCode"], "scope": result["scope"],
         "freshProfiles": 1, "aLaunchesAndStopCycles": expected["cycles"], "bLaunches": 1,
@@ -105,6 +110,9 @@ def summarize_run(work, repo):
         "rawEvidence": raw_files(work),
         "interpretation": "Behavioral lifecycle assertions passed. Stop-time adapter errors remain recorded; this is not an error-free-log or release-qualification claim.",
     }
+    if historical and summary != historical:
+        raise ValueError("Historical run evidence changed; retain and investigate the original: " + str(work))
+    return summary
 
 
 def main():
@@ -113,11 +121,20 @@ def main():
     parser.add_argument("--failed-preparation-dir", type=Path)
     parser.add_argument("--duplicate-attempt-check", type=Path)
     parser.add_argument("--dependency-download", type=Path)
+    parser.add_argument("--review-followup-check", type=Path)
+    parser.add_argument("--review-followup-failure", type=Path)
     parser.add_argument("--repo-root", type=Path, default=REPO)
     parser.add_argument("--output", type=Path, default=Path(__file__).with_name("evidence-summary.json"))
     args = parser.parse_args()
     repo = args.repo_root.resolve()
-    runs = [summarize_run(work.resolve(), repo) for work in args.runs]
+    # Earlier controls retain their own harness identity. Only the latest run
+    # must match current source bytes; old rows must remain structurally equal
+    # to the already retained summary, rather than being relabelled.
+    previous = read_json(args.output) if args.output.exists() else {}
+    historical = {run["name"]: run for run in previous.get("runs", [])}
+    runs = [summarize_run(work.resolve(), repo, index == len(args.runs) - 1,
+                          historical.get(work.name) if index < len(args.runs) - 1 else None)
+            for index, work in enumerate(args.runs)]
     summary = {
         "schema": 1, "date": "2026-11-05", "issue": "https://github.com/rkttu/vscode-csharp-autobuild/issues/18",
         "kind": "local installed VSCodium Web lifecycle control", "qualification": False,
@@ -145,7 +162,9 @@ def main():
             file.name: {"sha256": sha256(file), "bytes": file.stat().st_size}
             for file in sorted(failed.iterdir()) if file.is_file()
         }
-    for key, file in (("duplicateAttemptCheck", args.duplicate_attempt_check), ("dependencyDownload", args.dependency_download)):
+    for key, file in (("duplicateAttemptCheck", args.duplicate_attempt_check), ("dependencyDownload", args.dependency_download),
+                      ("reviewFollowupCheck", args.review_followup_check),
+                      ("reviewFollowupFailure", args.review_followup_failure)):
         if file:
             summary[key] = {"path": str(file.resolve()), "sha256": sha256(file), "record": read_json(file)}
     args.output.parent.mkdir(parents=True, exist_ok=True)
