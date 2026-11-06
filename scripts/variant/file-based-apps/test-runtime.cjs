@@ -182,6 +182,32 @@ function activationWithRecoveryIO(overrides) {
     return runtimeModule.exports.activate;
 }
 
+async function retainedTerminalOutput(t, { staging = false } = {}) {
+    const activate = staging ? activationWithRecoveryIO({
+        rename: async (source, destination) => {
+            if (path.basename(path.dirname(destination)) === 'terminal-cleanup-v1') {
+                throw Object.assign(new Error('Final publication is temporarily blocked'), { code: 'EBUSY' });
+            }
+            return fs.promises.rename(source, destination);
+        },
+    }) : undefined;
+    const owner = fixture(t, { ...(activate ? { activate } : {}), startResult: false,
+        removeOutput: async () => { throw Object.assign(new Error('Terminal output is temporarily locked'), { code: 'EBUSY' }); },
+    });
+    await owner.api.recoveryReady;
+    assert.equal(await owner.api.debugActiveFile(), false);
+    const base = path.join(owner.context.globalStorageUri.fsPath, 'file-based-apps');
+    const queue = path.join(base, staging ? 'terminal-cleanup-staging-v1' : 'terminal-cleanup-v1');
+    const [name] = fs.readdirSync(queue);
+    const entry = path.join(queue, name);
+    const output = path.join(entry, 'output');
+    assert(fs.existsSync(path.join(output, 'FileApp.dll')));
+    assert(fs.existsSync(path.join(entry, 'record.json')));
+    owner.dispose();
+    await waitFor(() => owner.calls.disposals.output, 'The terminal writer must drain before the next owner starts');
+    return { owner, base, entry, output };
+}
+
 function preparationFixture(t, options = {}) {
     let elapsed = 0;
     let latest;
@@ -1339,6 +1365,289 @@ test('background recovery does not hold a fresh file command pending', async t =
     await second.api.recoveryReady;
     assert(!fs.existsSync(retired));
     assert(fs.existsSync(second.calls.launches[0].config.program));
+});
+
+test('command recovery retries a previous owner receipt after a busy activation without restarting', async t => {
+    const previous = await retainedTerminalOutput(t);
+    let locked = true;
+    const removals = [];
+    const f = fixture(t, { storage: previous.owner.context.globalStorageUri.fsPath,
+        removeOutput: async (directory, settings) => {
+            removals.push(directory);
+            if (locked) throw Object.assign(new Error('Startup output is busy'), { code: 'EBUSY' });
+            await fs.promises.rm(directory, settings);
+        },
+    });
+    assert.equal((await f.api.recoveryReady).removed, 0);
+    assert.deepEqual(removals, [previous.output]);
+    locked = false;
+    assert.equal(await f.api.debugActiveFile(), true);
+    await waitFor(() => !fs.existsSync(previous.entry), 'The next command must recover the unlocked previous owner output');
+    assert.deepEqual(removals, [previous.output, previous.output]);
+    assert(fs.existsSync(f.calls.launches[0].config.program));
+    assert.deepEqual(f.calls.errors, []);
+});
+
+for (const staging of [false, true]) {
+    test(`command recovery notices a later ${staging ? 'complete staging' : 'ready'} receipt and preserves unrelated paths`, async t => {
+        const f = fixture(t);
+        await f.api.recoveryReady;
+        const later = await retainedTerminalOutput(t, { staging });
+        const name = path.basename(later.entry);
+        const queue = path.join(f.context.globalStorageUri.fsPath, 'file-based-apps',
+            staging ? 'terminal-cleanup-staging-v1' : 'terminal-cleanup-v1');
+        fs.mkdirSync(queue, { recursive: true });
+        const entry = path.join(queue, name);
+        fs.renameSync(later.entry, entry);
+        const base = path.dirname(queue);
+        const guards = [path.join(base, 'unmarked', 'sentinel.txt'),
+            path.join(base, 'a'.repeat(24), 'run-Abc123', 'replacement.txt'), path.join(f.root, 'external-sentinel.txt')];
+        for (const guard of guards) { fs.mkdirSync(path.dirname(guard), { recursive: true }); fs.writeFileSync(guard, 'preserve'); }
+        const incomplete = path.join(base, 'terminal-cleanup-staging-v1', '11111111-1111-4111-8111-111111111111');
+        fs.mkdirSync(incomplete, { recursive: true });
+        const marker = path.join(incomplete, 'record.json');
+        fs.writeFileSync(marker, JSON.stringify({ version: 1, kind: 'netcoredbg-terminal-output', entryId: path.basename(incomplete) }));
+        guards.push(marker);
+        const snapshots = guards.map(guard => fs.readFileSync(guard));
+        assert.equal(await f.api.debugActiveFile(), true);
+        await waitFor(() => !fs.existsSync(entry), 'A receipt arriving after activation must recover on the next command');
+        for (let index = 0; index < guards.length; index++) assert.deepEqual(fs.readFileSync(guards[index]), snapshots[index]);
+        assert(fs.existsSync(f.calls.launches[0].config.program));
+        assert.deepEqual(f.calls.errors, []);
+    });
+}
+
+test('command recovery is background work and concurrent new files share its blocked pass without queuing another', async t => {
+    const previous = await retainedTerminalOutput(t);
+    let unlocked = false;
+    let release;
+    const removals = [];
+    const f = fixture(t, { storage: previous.owner.context.globalStorageUri.fsPath,
+        removeOutput: async (directory, settings) => {
+            removals.push(directory);
+            if (!unlocked) throw Object.assign(new Error('Startup output is busy'), { code: 'EBUSY' });
+            if (directory === previous.output) await new Promise(resolve => { release = resolve; });
+            await fs.promises.rm(directory, settings);
+        },
+    });
+    t.after(() => { f.dispose(); release?.(); });
+    await f.api.recoveryReady;
+    unlocked = true;
+    const first = f.api.debugActiveFile();
+    const duplicate = f.api.debugActiveFile();
+    f.vscode.window.activeTextEditor = { document: { ...f.document, uri: { scheme: 'file', fsPath: path.join(f.root, 'other.cs') } } };
+    assert.equal(await f.api.debugActiveFile(), true);
+    assert.deepEqual(await Promise.all([first, duplicate]), [true, true]);
+    await waitFor(() => release, 'The command must have started another bounded recovery pass');
+    assert.equal(f.calls.launches.length, 2, 'Same-file callers coalesce while the separate file still launches');
+    assert.deepEqual(removals, [previous.output, previous.output]);
+    assert(fs.existsSync(previous.output));
+    release();
+    await waitFor(() => !fs.existsSync(previous.entry), 'The shared background pass must finish');
+    await new Promise(resolve => setImmediate(resolve));
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(removals.length, 2, 'Callers arriving during a pass must not queue a later pass');
+    assert(f.calls.launches.every(launch => fs.existsSync(launch.config.program)));
+});
+
+test('command recovery drains before disposal releases observers and a reentrant provider cannot restart work', async t => {
+    const previous = await retainedTerminalOutput(t);
+    let unlocked = false;
+    let release;
+    let releaseSdk;
+    let f;
+    f = fixture(t, { storage: previous.owner.context.globalStorageUri.fsPath,
+        findDotnet: () => new Promise(resolve => { releaseSdk = resolve; }),
+        removeOutput: async (directory, settings) => {
+            if (!unlocked) throw Object.assign(new Error('Startup output is busy'), { code: 'EBUSY' });
+            f.dispose();
+            releaseSdk({ executable: 'dotnet', root: f.root });
+            await new Promise(resolve => { release = resolve; });
+            await fs.promises.rm(directory, settings);
+        },
+    });
+    t.after(() => { f.dispose(); releaseSdk?.({ executable: 'dotnet', root: f.root }); release?.(); });
+    await f.api.recoveryReady;
+    unlocked = true;
+    const command = f.api.debugActiveFile();
+    await waitFor(() => release, 'The recovery provider must reenter disposal with a registered owner');
+    assert.equal(await command, false);
+    assert.equal(f.calls.disposals.output, 0, 'The background pass must retain diagnostics after foreground work drains');
+    assert.equal(f.calls.disposals.started, 0);
+    assert.equal(f.calls.disposals.terminated, 0);
+    assert.equal(await f.api.debugActiveFile(), false);
+    assert.deepEqual(f.calls.processes, []);
+    assert.deepEqual(f.calls.launches, []);
+    assert.deepEqual(f.calls.errors, []);
+    release();
+    await waitFor(() => f.calls.disposals.output, 'The settled pass must release all disposed resources');
+    assertDisposed(f);
+    assert(!fs.existsSync(previous.entry));
+});
+
+test('command recovery leaves receipts untouched for invalid, untrusted and disposed requests', async t => {
+    const f = fixture(t);
+    await f.api.recoveryReady;
+    const later = await retainedTerminalOutput(t);
+    const queue = path.join(f.context.globalStorageUri.fsPath, 'file-based-apps', 'terminal-cleanup-v1');
+    fs.mkdirSync(queue, { recursive: true });
+    const entry = path.join(queue, path.basename(later.entry));
+    fs.renameSync(later.entry, entry);
+    f.vscode.workspace.isTrusted = false;
+    assert.equal(await f.api.debugActiveFile(), false);
+    f.vscode.workspace.isTrusted = true;
+    for (const document of [undefined, { uri: { scheme: 'untitled', fsPath: 'tool.cs' } },
+        { uri: { scheme: 'file', fsPath: path.join(f.root, 'notes.txt') } }]) {
+        f.vscode.window.activeTextEditor = document ? { document } : undefined;
+        assert.equal(await f.api.debugActiveFile(), false);
+    }
+    f.dispose();
+    assert.equal(await f.api.debugActiveFile(), false);
+    await new Promise(resolve => setImmediate(resolve));
+    assert(fs.existsSync(path.join(entry, 'output', 'FileApp.dll')));
+    assert(fs.existsSync(path.join(entry, 'record.json')));
+    assert.deepEqual(f.calls.processes, []);
+});
+
+test('command recovery does not start accepted activation work after immediate disposal', async t => {
+    const previous = await retainedTerminalOutput(t);
+    const removals = [];
+    const f = fixture(t, { storage: previous.owner.context.globalStorageUri.fsPath,
+        removeOutput: async (directory, settings) => { removals.push(directory); await fs.promises.rm(directory, settings); },
+    });
+    f.dispose();
+    assert.deepEqual(await f.api.recoveryReady, { scanned: 0, attempted: 0, removed: 0 });
+    assert.deepEqual(removals, []);
+    assert(fs.existsSync(path.join(previous.output, 'FileApp.dll')));
+    assert(fs.existsSync(path.join(previous.entry, 'record.json')));
+    assert.equal(await f.api.debugActiveFile(), false);
+    assert.deepEqual(f.calls.processes, []);
+    assertDisposed(f);
+});
+
+test('command recovery chooses a local failed cleanup instead of introducing another global attempt', async t => {
+    let locked = true;
+    const removals = [];
+    const options = { startResult: false, removeOutput: async (directory, settings) => {
+        removals.push(directory);
+        if (locked) throw Object.assign(new Error('Terminal output is busy'), { code: 'EBUSY' });
+        await fs.promises.rm(directory, settings);
+    } };
+    const f = fixture(t, options);
+    await f.api.recoveryReady;
+    assert.equal(await f.api.debugActiveFile(), false);
+    const [retained] = terminalOutputs(f);
+    const completedPasses = f.calls.logs.filter(line => line.startsWith('Terminal output recovery:')).length;
+    options.startResult = true;
+    locked = false;
+    assert.equal(await f.api.debugActiveFile(), true);
+    assert.deepEqual(removals, [retained, retained]);
+    assert(!fs.existsSync(retained));
+    assert.equal(f.calls.logs.filter(line => line.startsWith('Terminal output recovery:')).length, completedPasses,
+        'Selecting one local retry must not also start a global pass');
+    assert(fs.existsSync(f.calls.launches[1].config.program));
+});
+
+test('command recovery does not wait for or duplicate a local retry while a global pass is already active', async t => {
+    const previous = await retainedTerminalOutput(t);
+    let release;
+    let localLocked = true;
+    const removals = [];
+    const options = { storage: previous.owner.context.globalStorageUri.fsPath, startResult: false,
+        removeOutput: async (directory, settings) => {
+            removals.push(directory);
+            if (directory === previous.output) await new Promise(resolve => { release = resolve; });
+            else if (localLocked) throw Object.assign(new Error('Local terminal output is busy'), { code: 'EBUSY' });
+            await fs.promises.rm(directory, settings);
+        },
+    };
+    const f = fixture(t, options);
+    t.after(() => { f.dispose(); release?.(); });
+    await waitFor(() => release, 'The initial foreign receipt recovery must be pending');
+    assert.equal(await f.api.debugActiveFile(), false);
+    const local = terminalOutputs(f).find(directory => directory !== previous.output);
+    assert(local && fs.existsSync(local));
+    localLocked = false;
+    options.startResult = true;
+    assert.equal(await f.api.debugActiveFile(), true);
+    assert.deepEqual(removals, [previous.output, local], 'A foreground command must not compete with an active global pass');
+    assert(fs.existsSync(local));
+    release();
+    await f.api.recoveryReady;
+    assert.equal(await f.api.debugActiveFile(), true);
+    assert.deepEqual(removals, [previous.output, local, local]);
+    assert(!fs.existsSync(local));
+});
+
+test('command recovery does not introduce a pass while terminal session cleanup is in flight', async t => {
+    let release;
+    let gated;
+    const removals = [];
+    const f = fixture(t, { removeOutput: async (directory, settings) => {
+        removals.push(directory);
+        if (!gated) {
+            gated = directory;
+            await new Promise(resolve => { release = resolve; });
+        }
+        await fs.promises.rm(directory, settings);
+    } });
+    t.after(() => { f.dispose(); release?.(); });
+    assert.equal(await f.api.debugActiveFile(), true);
+    await f.api.recoveryReady;
+    f.terminate(f.calls.launches[0].config);
+    await waitFor(() => release, 'The owned terminal cleanup must be blocked');
+    const later = await retainedTerminalOutput(t);
+    const queue = path.join(f.context.globalStorageUri.fsPath, 'file-based-apps', 'terminal-cleanup-v1');
+    const foreign = path.join(queue, path.basename(later.entry));
+    fs.renameSync(later.entry, foreign);
+    assert.equal(await f.api.debugActiveFile(), true);
+    await new Promise(resolve => setImmediate(resolve));
+    assert.deepEqual(removals, [gated], 'A new command must not duplicate an active terminal deletion or begin a foreign one');
+    assert(fs.existsSync(path.join(foreign, 'output', 'FileApp.dll')));
+    release();
+    await waitFor(() => !fs.existsSync(path.dirname(gated)), 'The terminal cleanup must finish');
+    // The kernel can remove the entry before its rmdir completion drains the
+    // owning cleanup Promise. Let that I/O completion settle before the retry.
+    await fs.promises.readdir(queue);
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(await f.api.debugActiveFile(), true);
+    await waitFor(() => !fs.existsSync(foreign), 'A subsequent command can now recover the foreign receipt');
+    assert.deepEqual(f.calls.errors, []);
+});
+
+test('command recovery survives a later rejection and throwing completion diagnostics without changing fresh launches', async t => {
+    const previous = await retainedTerminalOutput(t);
+    const nativeRecovery = require('./recovery.cjs');
+    const runtimeModule = { exports: {} };
+    let passes = 0;
+    vm.runInNewContext(fs.readFileSync(require.resolve('./runtime.cjs'), 'utf8'), {
+        module: runtimeModule, process, AbortController, setTimeout, clearTimeout,
+        require: name => name === './recovery.cjs' ? { createRecovery: settings => {
+            const manager = nativeRecovery.createRecovery(settings);
+            return { ...manager, recover: () => ++passes === 2
+                ? Promise.reject(new Error('Unexpected later recovery rejection')) : manager.recover() };
+        } } : require(name),
+    });
+    let locked = true;
+    const f = fixture(t, { activate: runtimeModule.exports.activate, storage: previous.owner.context.globalStorageUri.fsPath,
+        appendLine: line => { if (line.startsWith('Terminal output recovery:')) throw new Error('Completion diagnostic failed'); },
+        removeOutput: async (directory, settings) => {
+            if (locked) throw Object.assign(new Error('Startup output is busy'), { code: 'EBUSY' });
+            await fs.promises.rm(directory, settings);
+        },
+    });
+    const initial = f.api.recoveryReady;
+    assert.deepEqual(JSON.parse(JSON.stringify(await initial)), { scanned: 1, attempted: 1, removed: 0 });
+    locked = false;
+    assert.equal(await f.api.debugActiveFile(), true);
+    await waitFor(() => f.calls.logs.some(line => line.includes('Unexpected later recovery rejection')),
+        'A rejected background pass must log quietly');
+    assert(fs.existsSync(previous.output));
+    assert.equal(f.api.recoveryReady, initial, 'The initial completion API must keep its original identity');
+    assert.equal(await f.api.debugActiveFile(), true);
+    await waitFor(() => !fs.existsSync(previous.entry), 'A later command must still be able to start a fresh pass');
+    assert.deepEqual(f.calls.errors, []);
+    assert(f.calls.launches.every(launch => fs.existsSync(launch.config.program)));
 });
 
 test('an unexpected recovery rejection preserves a stable zero-count result without notifying', async t => {
