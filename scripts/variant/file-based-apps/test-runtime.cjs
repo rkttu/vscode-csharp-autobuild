@@ -143,7 +143,7 @@ function fixture(t, options = {}) {
             throw new Error(`Unexpected command: ${args.join(' ')}`);
         },
     };
-    const api = activate(context, dependencies);
+    const api = (options.activate || activate)(context, dependencies);
     return { root, source, document, vscode, context, dependencies, calls, api, output,
         startSession, emitStart: session => started?.(session),
         terminate: config => termination?.(sessions.get(config) || sessionFor(config)), cancel: () => cancellation?.(),
@@ -168,6 +168,18 @@ function terminalOutputs(f) {
     const queue = path.join(f.context.globalStorageUri.fsPath, 'file-based-apps', 'terminal-cleanup-v1');
     if (!fs.existsSync(queue)) return [];
     return fs.readdirSync(queue, { withFileTypes: true }).filter(entry => entry.isDirectory()).map(entry => path.join(queue, entry.name, 'output'));
+}
+
+function activationWithRecoveryIO(overrides) {
+    const runtimeModule = { exports: {} };
+    const nativeRecovery = require('./recovery.cjs');
+    vm.runInNewContext(fs.readFileSync(require.resolve('./runtime.cjs'), 'utf8'), {
+        module: runtimeModule, process, AbortController, setTimeout, clearTimeout,
+        require: name => name === './recovery.cjs' ? { createRecovery: settings => nativeRecovery.createRecovery({
+            ...settings, fs: { promises: { ...fs.promises, ...overrides } },
+        }) } : require(name),
+    });
+    return runtimeModule.exports.activate;
 }
 
 function preparationFixture(t, options = {}) {
@@ -370,7 +382,10 @@ test('graceful disposal reentered from a cleanup provider waits for that deletio
         assert.equal(outputDisposedInsideProvider, 0, 'Register cleanup ownership before calling a reentrant provider');
         assert.equal(f.calls.disposals.started, 0);
         assert.equal(f.calls.disposals.terminated, 0);
-        assert(fs.existsSync(config.program));
+        const [queued] = terminalOutputs(f);
+        assert(queued, 'Reentrant disposal must retain the published terminal receipt');
+        assert(fs.existsSync(path.join(queued, 'FileApp.dll')));
+        assert(!fs.existsSync(config.__netcoredbgFileAppOutput));
     } finally { releaseCleanup(); }
     await waitFor(() => f.calls.disposals.output, 'Settled terminal cleanup must complete disposal');
     assert(!fs.existsSync(config.__netcoredbgFileAppOutput));
@@ -882,6 +897,7 @@ test('user build cancellation stays coalesced until child close and permits one 
     const removals = [];
     const f = fixture(t, { removeOutput: async (directory, settings) => {
         assert.equal(childPending, false, 'Cancellation must wait for the writing child to settle before cleanup');
+        assert.deepEqual(terminalOutputs(f), [directory], 'Child closure must precede publication and queued deletion');
         removals.push(directory);
         await fs.promises.rm(directory, settings);
     }, save: async () => { f.document.isDirty = false; return true; } });
@@ -916,7 +932,10 @@ test('user build cancellation stays coalesced until child close and permits one 
     assert.deepEqual(removals, []);
     completeChild();
     assert.deepEqual(await Promise.all(requests), [false, false, false]);
-    assert.deepEqual(removals, [directory]);
+    assert.equal(removals.length, 1);
+    assert.notEqual(removals[0], directory, 'The writing child output is retired before its first deletion');
+    assert(!fs.existsSync(removals[0]));
+    assert.deepEqual(terminalOutputs(f), []);
     assert(!fs.existsSync(directory));
     assert.equal(f.calls.launches.length, 0);
     assert.deepEqual(f.calls.errors, []);
@@ -962,6 +981,168 @@ test('failed debug launch removes its own output and does not reuse stale bytes'
     assert(f.calls.logs.some(message => message.includes('editor did not start the netcoredbg debug session')));
 });
 
+test('first terminal deletion waits behind a published receipt while unrelated live output survives', async t => {
+    let release;
+    let removed;
+    const f = fixture(t, { removeOutput: async (directory, settings) => {
+        removed = directory;
+        await new Promise(resolve => { release = resolve; });
+        await fs.promises.rm(directory, settings);
+    } });
+    t.after(() => release?.());
+    assert.equal(await f.api.debugActiveFile(), true);
+    const live = f.calls.launches[0].config;
+    assert.equal(await f.api.debugActiveFile(), true);
+    const terminal = f.calls.launches[1].config;
+    f.terminate(terminal);
+    await waitFor(() => release, 'The first terminal deletion must reach its provider');
+    const [queued] = terminalOutputs(f);
+    assert(queued, 'A complete terminal receipt must exist before the first deletion begins');
+    assert.equal(removed, queued, 'The first deletion must target only the fixed queued output');
+    const entry = path.dirname(queued);
+    assert.deepEqual(JSON.parse(fs.readFileSync(path.join(entry, 'record.json'), 'utf8')), {
+        version: 1, kind: 'netcoredbg-terminal-output', entryId: path.basename(entry),
+    });
+    assert(fs.existsSync(path.join(queued, 'FileApp.dll')));
+    assert(!fs.existsSync(terminal.__netcoredbgFileAppOutput));
+    assert(fs.existsSync(live.program));
+    release();
+    await waitFor(() => !fs.existsSync(queued), 'The first deletion must complete from its published receipt');
+    await waitFor(() => terminalOutputs(f).length === 0, 'The completed terminal receipt must be removed');
+    assert(fs.existsSync(live.program));
+});
+
+test('a partial first deletion is recoverable by a fresh activation and late owner cleanup preserves replacements', async t => {
+    let release;
+    let firstDeletion;
+    let removals = 0;
+    const options = { removeOutput: async (directory, settings) => {
+        removals++;
+        firstDeletion = directory;
+        await fs.promises.unlink(path.join(directory, 'FileApp.dll'));
+        await new Promise(resolve => { release = resolve; });
+        await fs.promises.rm(directory, settings);
+    } };
+    const first = fixture(t, options);
+    t.after(() => release?.());
+    await first.api.recoveryReady;
+    assert.equal(await first.api.debugActiveFile(), true);
+    const live = first.calls.launches[0].config;
+    options.startResult = false;
+    const declined = first.api.debugActiveFile();
+    await waitFor(() => release, 'The first recursive deletion must be paused after a partial removal');
+    const original = first.calls.launches[1].config.__netcoredbgFileAppOutput;
+    const [queued] = terminalOutputs(first);
+    assert(queued, 'Interruption during the first deletion must already have a terminal receipt');
+    assert.equal(firstDeletion, queued);
+    assert(!fs.existsSync(path.join(queued, 'FileApp.dll')));
+    assert(fs.existsSync(path.join(queued, 'FileApp.pdb')));
+    assert(!fs.existsSync(original));
+    fs.mkdirSync(original);
+    const replacement = path.join(original, 'unrelated.txt');
+    fs.writeFileSync(replacement, 'preserve replacement');
+
+    const second = fixture(t, { storage: first.context.globalStorageUri.fsPath });
+    assert.equal((await second.api.recoveryReady).removed, 1);
+    assert(!fs.existsSync(queued));
+    assert(fs.existsSync(live.program));
+    assert.equal(fs.readFileSync(replacement, 'utf8'), 'preserve replacement');
+    assert.equal(await second.api.debugActiveFile(), true);
+    const newLive = second.calls.launches[0].config;
+    release();
+    assert.equal(await declined, false);
+    assert.equal(removals, 1, 'Late owner cleanup must not target the replacement original run');
+    assert.deepEqual(terminalOutputs(first), []);
+    assert.equal(first.calls.errors.length, 1, 'Only the original declined launch is a user-facing failure');
+    assert(!first.calls.logs.some(line => line.includes('Could not clean file-app output')));
+    assert.equal(fs.readFileSync(replacement, 'utf8'), 'preserve replacement');
+    assert(fs.existsSync(live.program));
+    assert(fs.existsSync(newLive.program));
+});
+
+test('an existing output with unavailable journal identity is retained and retried without direct deletion', async t => {
+    let unavailable = true;
+    const controlledActivate = activationWithRecoveryIO({ lstat: async (target, options) => {
+        const stat = await fs.promises.lstat(target, options);
+        if (unavailable && options?.bigint) Object.assign(stat, { ino: 0n, birthtimeNs: 0n, birthtimeMs: 0n });
+        return stat;
+    } });
+    const removals = [];
+    const options = { activate: controlledActivate, startResult: false,
+        removeOutput: async (directory, settings) => { removals.push(directory); await fs.promises.rm(directory, settings); } };
+    const f = fixture(t, options);
+    assert.equal(await f.api.debugActiveFile(), false);
+    const retained = f.calls.launches[0].config;
+    assert(fs.existsSync(retained.program), 'Unpublishable existing output must remain available for a safe retry');
+    assert.deepEqual(removals, [], 'A failed ownership journal must never fall back to deleting the original path');
+    assert.deepEqual(terminalOutputs(f), []);
+    assert(f.calls.logs.some(line => /Could not clean file-app output/.test(line)));
+    assert(f.calls.logs.some(line => /publish.*terminal|terminal.*publish/i.test(line)));
+    unavailable = false;
+    options.startResult = true;
+    assert.equal(await f.api.debugActiveFile(), true);
+    assert.equal(removals.length, 1, 'The next command retries one retained terminal output');
+    assert(!fs.existsSync(retained.__netcoredbgFileAppOutput));
+    assert.deepEqual(terminalOutputs(f), []);
+    assert(fs.existsSync(f.calls.launches[1].config.program));
+    assert.equal(f.calls.errors.length, 1, 'Cleanup diagnostics must preserve the original declined launch error');
+});
+
+test('an incomplete tracked publication is retained when its original disappears before the move', async t => {
+    let checks = 0;
+    let removedOriginal;
+    const controlledActivate = activationWithRecoveryIO({ lstat: async (target, options) => {
+        if (!options?.bigint && /^run-[A-Za-z0-9]{6}$/.test(path.basename(target)) && ++checks === 2) {
+            removedOriginal = target;
+            await fs.promises.rm(target, { recursive: true });
+        }
+        return fs.promises.lstat(target, options);
+    } });
+    const removals = [];
+    const options = { activate: controlledActivate, startResult: false,
+        removeOutput: async directory => { removals.push(directory); } };
+    const f = fixture(t, options);
+    assert.equal(await f.api.debugActiveFile(), false);
+    assert.equal(removedOriginal, f.calls.launches[0].config.__netcoredbgFileAppOutput);
+    assert(!fs.existsSync(removedOriginal));
+    const staging = path.join(f.context.globalStorageUri.fsPath, 'file-based-apps', 'terminal-cleanup-staging-v1');
+    const [entryId] = fs.readdirSync(staging);
+    assert(entryId, 'The interrupted publication must retain its tracked staging receipt');
+    const marker = path.join(staging, entryId, 'record.json');
+    assert.equal(JSON.parse(fs.readFileSync(marker, 'utf8')).entryId, entryId);
+    assert(f.calls.logs.some(line => /publication is incomplete/.test(line)), 'An absent original must not silently complete a tracked publication');
+    assert.deepEqual(removals, []);
+    const failures = () => f.calls.logs.filter(line => line.includes('Could not clean file-app output')).length;
+    assert.equal(failures(), 1);
+    options.startResult = true;
+    assert.equal(await f.api.debugActiveFile(), true);
+    assert.equal(failures(), 2, 'The next command must retain and retry this incomplete owned publication');
+    assert(fs.existsSync(marker));
+    assert.deepEqual(removals, []);
+    assert(fs.existsSync(f.calls.launches[1].config.program));
+    assert.equal(f.calls.errors.length, 1);
+});
+
+test('an already absent terminal output needs no deletion or journal and releases ownership', async t => {
+    const removals = [];
+    const f = fixture(t, { removeOutput: async (directory, settings) => {
+        removals.push(directory);
+        await fs.promises.rm(directory, settings);
+    } });
+    await f.api.recoveryReady;
+    assert.equal(await f.api.debugActiveFile(), true);
+    const config = f.calls.launches[0].config;
+    fs.rmSync(config.__netcoredbgFileAppOutput, { recursive: true });
+    f.terminate(config);
+    // Graceful disposal gives an observable drain boundary for the asynchronous termination callback.
+    f.dispose();
+    await waitFor(() => f.calls.disposals.output, 'Absent output cleanup must finish rather than retain disposal forever');
+    assert.deepEqual(removals, [], 'An exact ENOENT must not invoke a deletion provider');
+    assert.deepEqual(terminalOutputs(f), []);
+    assert(!f.calls.logs.some(line => line.includes('Could not clean file-app output')));
+    assertDisposed(f);
+});
+
 test('failed cleanup is retried by the next command without removing live session output', async t => {
     let locked = true;
     const removals = [];
@@ -987,7 +1168,7 @@ test('failed cleanup is retried by the next command without removing live sessio
     assert(fs.existsSync(active.program), 'Recovery must preserve an earlier live session');
     assert(fs.existsSync(retried.program), 'The new session must retain its distinct output');
     assert.notEqual(retried.program, failed.program);
-    assert.deepEqual(removals, [path.dirname(failed.program), retired]);
+    assert.deepEqual(removals, [retired, retired], 'The initial deletion and retry must share the same published output');
     assert.equal(f.calls.errors.length, 1, 'Cleanup must preserve the original launch failure');
 });
 
@@ -1005,9 +1186,12 @@ test('overlapping cleanup requests share one deletion and release ownership only
     f.terminate(config);
     await waitFor(() => release, 'The shared deletion must enter its provider');
     assert.equal(removals.length, 1);
-    assert(fs.existsSync(config.program));
+    assert.deepEqual(terminalOutputs(f), [removals[0]]);
+    assert(fs.existsSync(path.join(removals[0], 'FileApp.dll')));
+    assert(!fs.existsSync(config.__netcoredbgFileAppOutput));
     release();
-    await waitFor(() => !fs.existsSync(config.__netcoredbgFileAppOutput), 'The shared cleanup must complete');
+    await waitFor(() => !fs.existsSync(removals[0]), 'The shared queued cleanup must complete');
+    await waitFor(() => terminalOutputs(f).length === 0, 'Successful shared cleanup must remove its journal');
     await new Promise(resolve => setImmediate(resolve));
     f.terminate(config);
     await new Promise(resolve => setImmediate(resolve));

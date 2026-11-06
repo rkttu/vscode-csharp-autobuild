@@ -162,11 +162,24 @@ function activate(context, dependencies = {}) {
         // Establish drain ownership before a provider can reenter disposal.
         const operation = Promise.resolve().then(async () => {
             try {
-                // Node retries transient busy/permission errors with linear backoff, at most three times.
-                if (recovery.has(directory)) {
-                    if (!await recovery.remove(directory)) throw new Error('Terminal output recovery did not confirm deletion');
+                // Publish terminal ownership before the first recursive deletion. If this host
+                // exits during that deletion, a fresh activation can recover the exact queued
+                // output without inferring safety from a dead PID or an unmarked run path.
+                if (!recovery.has(directory) && !await recovery.preserve(directory)) {
+                    if (recovery.has(directory)) {
+                        throw new Error('Terminal output recovery publication is incomplete; retained for retry');
+                    }
+                    try {
+                        await fs.promises.lstat(directory);
+                    } catch (error) {
+                        if (error.code !== 'ENOENT') throw error;
+                        ownedOutputs.delete(directory);
+                        return; // Only confirmed absence can complete without a terminal receipt.
+                    }
+                    throw new Error('Could not publish terminal output recovery; existing output is retained for retry');
                 }
-                else await removeOutput(directory, { recursive: true, force: true, maxRetries: 3, retryDelay: 50 });
+                // The recovery module applies bounded filesystem retries to its fixed output child.
+                if (!await recovery.remove(directory)) throw new Error('Terminal output recovery did not confirm deletion');
                 ownedOutputs.delete(directory);
             } catch (error) {
                 try { await recovery.preserve(directory); }
