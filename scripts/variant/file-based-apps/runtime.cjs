@@ -107,9 +107,28 @@ function activate(context, dependencies = {}) {
     const cleanupInFlight = new Map();
     const launches = new Map();
     const controllers = new Set();
+    const pendingStarts = new Set();
+    let disposed = false;
+    let resourcesReleased = false;
+    let recoveryPending = true;
     const cleanupLog = message => {
         try { output.appendLine(message); } catch { /* Cleanup may outlive the output channel. */ }
     };
+    const disposeResource = resource => {
+        try { resource.dispose(); }
+        catch (error) { cleanupLog(`Could not dispose file-app resource: ${error?.message || String(error)}`); }
+    };
+    function releaseDisposedResources() {
+        // Graceful disposal can outlive the foreground command. Keep observing
+        // exact owned launches until their outcome/termination is known.
+        if (!disposed || resourcesReleased || pending.size || controllers.size || pendingStarts.size ||
+            launches.size || cleanupInFlight.size || recoveryPending) return;
+        resourcesReleased = true;
+        disposeResource(startedSession);
+        disposeResource(terminated);
+        if (configurationTracker) disposeResource(configurationTracker);
+        disposeResource(output);
+    }
     const recovery = require('./recovery.cjs').createRecovery({
         baseDirectory: outputBase, removeOutput, isOwned: directory => ownedOutputs.has(directory), log: cleanupLog,
     });
@@ -117,6 +136,7 @@ function activate(context, dependencies = {}) {
     const expectedArchitecture = packagedTarget ? (packagedTarget.endsWith('-arm64') ? 'arm64' : 'x64') : undefined;
 
     function showError(message) {
+        if (disposed) return;
         // The notification promise settles on dismissal, which must not hold a file's pending operation.
         const failed = error => {
             try {
@@ -139,7 +159,8 @@ function activate(context, dependencies = {}) {
         if (!insideDirectory(outputBase, directory)) return;
         if (cleanupInFlight.has(directory)) return cleanupInFlight.get(directory);
         failedCleanups.delete(directory);
-        const operation = (async () => {
+        // Establish drain ownership before a provider can reenter disposal.
+        const operation = Promise.resolve().then(async () => {
             try {
                 // Node retries transient busy/permission errors with linear backoff, at most three times.
                 if (recovery.has(directory)) {
@@ -153,12 +174,13 @@ function activate(context, dependencies = {}) {
                 failedCleanups.add(directory);
                 cleanupLog(`Could not clean file-app output ${directory}: ${error?.message || String(error)}`);
             }
-        })();
+        });
         cleanupInFlight.set(directory, operation);
         try {
             await operation;
         } finally {
             cleanupInFlight.delete(directory);
+            releaseDisposedResources();
         }
     }
 
@@ -181,25 +203,66 @@ function activate(context, dependencies = {}) {
         await cleanup(launch.directory);
     }
 
+    async function requestCancelledStop(launch, session) {
+        try {
+            await vscode.debug.stopDebugging(session);
+            // Acknowledgement is not termination, even after configuration.
+        } catch (error) {
+            if (launch.terminal) return;
+            const message = `Could not stop the cancelled C# debug session "${session.name}": ${error?.message || String(error)}. Stop that session manually; its output has been preserved. See the C# File Debugging output.`;
+            cleanupLog(`${message}\nSession: ${session.id}\nOutput: ${launch.directory}`);
+            showError(message);
+        }
+    }
+
     function stopCancelledSession(launch) {
         if (!launch.session || launch.terminal) return;
         if (!launch.stopPromise) {
-            // Schedule after assigning the promise so reentrant events cannot request a second stop.
+            const session = launch.session;
+            // Assign before invoking the API so reentrant events cannot add Stops.
             launch.stopPromise = Promise.resolve().then(async () => {
-                if (launch.terminal) return;
-                try {
-                    await vscode.debug.stopDebugging(launch.session);
-                    // The editor can resolve stop before emitting termination. Keep output until that event.
-                } catch (error) {
-                    if (launch.terminal) return;
-                    const message = `Could not stop the cancelled C# debug session "${launch.session.name}": ${error?.message || String(error)}. Stop that session manually; its output has been preserved. See the C# File Debugging output.`;
-                    try { output.appendLine(`${message}\nSession: ${launch.session.id}\nOutput: ${launch.directory}`); } catch { /* The output channel may already be disposed. */ }
-                    showError(message);
-                }
+                if (launch.terminal || !matchesLaunch(session, launch)) return;
+                // Readiness can arrive between queueing and actual dispatch.
+                launch.stoppedBeforeConfiguration = !launch.configuredSessions.has(session.id);
+                await requestCancelledStop(launch, session);
             });
         }
         return launch.stopPromise;
     }
+
+    function stopAfterConfiguration(launch, session) {
+        if (!launch.cancelled || launch.terminal || !launch.stoppedBeforeConfiguration ||
+            !launch.stopPromise || launch.configurationStopPromise) return;
+        // An early Stop can be acknowledged before the adapter finishes
+        // configuration. Permit one serialized exact-session follow-up only.
+        launch.configurationStopPromise = launch.stopPromise.then(async () => {
+            if (launch.terminal || !launch.cancelled || !matchesLaunch(session, launch)) return;
+            cleanupLog(`Retrying cancelled C# session Stop after adapter configuration: ${session.id}`);
+            await requestCancelledStop(launch, session);
+        });
+    }
+
+    const configurationTracker = vscode.debug.registerDebugAdapterTrackerFactory?.('coreclr', {
+        createDebugAdapterTracker(session) {
+            const launch = launches.get(session.configuration?.__netcoredbgFileAppOutput);
+            if (!launch || !matchesLaunch(session, launch)) return undefined;
+            const requests = new Set();
+            return {
+                onWillReceiveMessage(message) {
+                    if (message.type === 'request' && message.command === 'configurationDone' && Number.isSafeInteger(message.seq)) {
+                        requests.add(message.seq);
+                    }
+                },
+                onDidSendMessage(message) {
+                    if (message.type !== 'response' || message.command !== 'configurationDone' ||
+                        !requests.delete(message.request_seq) || message.success !== true) return;
+                    if (launch.terminal || launches.get(launch.directory) !== launch || !matchesLaunch(session, launch)) return;
+                    launch.configuredSessions.add(session.id);
+                    stopAfterConfiguration(launch, session);
+                },
+            };
+        },
+    });
 
     const startedSession = vscode.debug.onDidStartDebugSession(session => {
         const launch = launches.get(session.configuration?.__netcoredbgFileAppOutput);
@@ -214,8 +277,9 @@ function activate(context, dependencies = {}) {
 
     async function startFileDebugging(folder, config, signal) {
         const launch = { directory: config.__netcoredbgFileAppOutput, program: config.program,
-            cancelled: false, terminal: false, session: undefined, stopPromise: undefined };
+            cancelled: false, terminal: false, session: undefined, stopPromise: undefined, configuredSessions: new Set() };
         launches.set(launch.directory, launch);
+        pendingStarts.add(launch);
         let abort;
         const cancelled = new Promise((_resolve, reject) => {
             abort = () => {
@@ -237,6 +301,9 @@ function activate(context, dependencies = {}) {
             if (!launch.session) await finishLaunch(launch);
             signal.throwIfAborted();
             throw error;
+        }).finally(() => {
+            pendingStarts.delete(launch);
+            releaseDisposedResources();
         });
         try {
             // Cancellation releases the command; the original start remains observed in the background.
@@ -420,17 +487,19 @@ function activate(context, dependencies = {}) {
             });
         } catch (error) {
             if (error.name !== 'AbortError') {
-                output.appendLine(error.stack || error.message || String(error));
+                cleanupLog(error.stack || error.message || String(error));
                 showError(`C# file debugging failed: ${error.message || error}. See the C# File Debugging output.`);
             }
             return false;
         } finally {
             controllers.delete(controller);
             if (generated && !launchOwnsOutput) await cleanup(generated);
+            releaseDisposedResources();
         }
     }
 
     async function command() {
+        if (disposed) return false;
         if (vscode.workspace.isTrusted === false) {
             showError('Trust this workspace before building or debugging a C# file.');
             return false;
@@ -442,32 +511,52 @@ function activate(context, dependencies = {}) {
         }
         const source = path.resolve(document.uri.fsPath);
         if (pending.has(source)) return pending.get(source);
-        const operation = (async () => {
+        // Register pending ownership before invoking callbacks that can dispose
+        // this activation reentrantly, including save and cleanup providers.
+        const operation = Promise.resolve().then(async () => {
             try {
+                if (disposed) return false;
                 await retryFailedCleanup();
+                if (disposed) return false;
                 if (document.isDirty && !await document.save()) return false;
+                if (disposed) return false;
                 return debugFile(document.uri, source, document.getText());
             } catch (error) {
+                cleanupLog(error.stack || error.message || String(error));
                 showError(`C# file debugging failed: ${error.message || error}.`);
                 return false;
             }
-        })();
+        });
         pending.set(source, operation);
         try {
             return await operation;
         } finally {
             pending.delete(source);
+            releaseDisposedResources();
         }
     }
 
     const registered = vscode.commands.registerCommand(COMMAND, command);
-    context.subscriptions.push(registered, startedSession, terminated, output, {
-        dispose() { for (const controller of controllers) controller.abort(); },
+    context.subscriptions.push({
+        dispose() {
+            if (disposed) return;
+            disposed = true;
+            disposeResource(registered);
+            for (const controller of controllers) controller.abort();
+            for (const launch of launches.values()) {
+                launch.cancelled = true;
+                void stopCancelledSession(launch);
+            }
+            releaseDisposedResources();
+        },
     });
     // Scan only published terminal receipts, without holding activation or a new file command pending.
     const recoveryReady = recovery.recover().catch(error => {
         cleanupLog(`Could not recover terminal file-app outputs: ${error?.message || String(error)}`);
         return { scanned: 0, attempted: 0, removed: 0 };
+    }).finally(() => {
+        recoveryPending = false;
+        releaseDisposedResources();
     });
     return { debugActiveFile: command, recoveryReady };
 }

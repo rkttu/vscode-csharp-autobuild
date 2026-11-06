@@ -20,10 +20,32 @@ function fixture(t, options = {}) {
     fs.mkdirSync(sourceDirectory);
     const source = path.join(sourceDirectory, 'tool.cs');
     fs.writeFileSync(source, 'int answer = 40;\nanswer += 2;\nConsole.WriteLine(answer);\n');
-    const calls = { commands: [], launches: [], stops: [], processes: [], classifications: [], errors: [], saves: 0, logs: [] };
+    const calls = { commands: [], launches: [], stops: [], processes: [], classifications: [], errors: [], saves: 0, logs: [],
+        disposals: { command: 0, started: 0, terminated: 0, tracker: 0, output: 0 } };
+    function disposable(kind, action) {
+        let disposed = false;
+        return { dispose() {
+            if (disposed) return;
+            disposed = true;
+            calls.disposals[kind]++;
+            action?.();
+        } };
+    }
+    const output = {
+        append(value) { assert.equal(calls.disposals.output, 0, 'Disposed output must not receive stream data'); calls.logs.push(value); },
+        appendLine(value) {
+            assert.equal(calls.disposals.output, 0, 'Disposed output must not receive diagnostics');
+            calls.logs.push(value);
+            options.appendLine?.(value);
+        },
+        ...disposable('output', () => options.disposeOutput?.()),
+    };
     let termination;
     let started;
     let cancellation;
+    let trackerFactory;
+    let nextConfiguration = 0;
+    const trackers = new Map();
     const sessions = new Map();
     let nextSession = 0;
     const sessionFor = (config, overrides = {}) => ({
@@ -32,6 +54,7 @@ function fixture(t, options = {}) {
     const startSession = (config, overrides) => {
         const session = sessionFor(config, overrides);
         sessions.set(config, session);
+        if (session.type === 'coreclr' && trackerFactory) trackers.set(session.id, trackerFactory.createDebugAdapterTracker(session));
         started?.(session);
         return session;
     };
@@ -39,16 +62,13 @@ function fixture(t, options = {}) {
         uri: { scheme: 'file', fsPath: source },
         isDirty: Boolean(options.dirty),
         getText: () => fs.readFileSync(source, 'utf8'),
-        save: async () => { calls.saves++; return options.saveResult !== false; },
+        save: async () => { calls.saves++; return options.save ? options.save() : options.saveResult !== false; },
     };
     const vscode = {
         ProgressLocation: { Notification: 15 },
         window: {
             activeTextEditor: { document },
-            createOutputChannel: () => ({ append: value => calls.logs.push(value), appendLine: value => {
-                calls.logs.push(value);
-                options.appendLine?.(value);
-            }, dispose() {} }),
+            createOutputChannel: () => output,
             showErrorMessage: message => {
                 calls.errors.push(message);
                 return options.showErrorMessage ? options.showErrorMessage(message) : Promise.resolve(undefined);
@@ -60,12 +80,17 @@ function fixture(t, options = {}) {
         },
         workspace: { isTrusted: options.trusted !== false, getWorkspaceFolder: () => options.noWorkspace ? undefined : { name: 'workspace' } },
         commands: {
-            registerCommand: (command, callback) => { assert.equal(command, COMMAND); calls.handler = callback; return { dispose() {} }; },
+            registerCommand: (command, callback) => { assert.equal(command, COMMAND); calls.handler = callback;
+                return disposable('command', () => { calls.handler = undefined; }); },
             executeCommand: async command => { calls.commands.push(command); return true; },
         },
         debug: {
-            onDidStartDebugSession: callback => { started = callback; return { dispose() { started = undefined; } }; },
-            onDidTerminateDebugSession: callback => { termination = callback; return { dispose() {} }; },
+            registerDebugAdapterTrackerFactory: (type, factory) => {
+                assert.equal(type, 'coreclr'); trackerFactory = factory;
+                return disposable('tracker', () => { trackerFactory = undefined; });
+            },
+            onDidStartDebugSession: callback => { started = callback; return disposable('started', () => { started = undefined; }); },
+            onDidTerminateDebugSession: callback => { termination = callback; return disposable('terminated', () => { termination = undefined; }); },
             startDebugging: async (folder, config) => {
                 calls.launches.push({ folder, config });
                 if (options.startDebugging) return options.startDebugging(folder, config);
@@ -77,10 +102,11 @@ function fixture(t, options = {}) {
                 assert(session, 'Stopping all editor sessions is forbidden');
                 calls.stops.push(session);
                 if (options.stopDebugging) return options.stopDebugging(session);
-                termination(session);
+                termination?.(session);
             },
         },
     };
+    if (options.noTrackerAPI) delete vscode.debug.registerDebugAdapterTrackerFactory;
     const context = { globalStorageUri: { fsPath: options.storage || path.join(root, 'storage') }, subscriptions: [], extension: { packageJSON: { netcoredbgBuild: { target: 'win32-arm64' } } } };
     const dependencies = {
         vscode,
@@ -118,9 +144,18 @@ function fixture(t, options = {}) {
         },
     };
     const api = activate(context, dependencies);
-    return { root, source, document, vscode, context, dependencies, calls, api,
+    return { root, source, document, vscode, context, dependencies, calls, api, output,
         startSession, emitStart: session => started?.(session),
-        terminate: config => termination(sessions.get(config) || sessionFor(config)), cancel: () => cancellation?.() };
+        terminate: config => termination?.(sessions.get(config) || sessionFor(config)), cancel: () => cancellation?.(),
+        tracker: session => trackers.get(session.id),
+        session: config => sessions.get(config),
+        configuration: (session, success = true) => {
+            const tracker = trackers.get(session.id);
+            const seq = ++nextConfiguration;
+            tracker?.onWillReceiveMessage?.({ type: 'request', command: 'configurationDone', seq });
+            tracker?.onDidSendMessage?.({ type: 'response', command: 'configurationDone', request_seq: seq, success });
+        },
+        dispose: () => { for (const subscription of context.subscriptions) subscription.dispose(); } };
 }
 
 async function waitFor(predicate, message) {
@@ -146,6 +181,340 @@ function preparationFixture(t, options = {}) {
     return { ...f, advance: ms => { elapsed += ms; }, timers,
         expire: () => { assert(latest, 'A preparation deadline must be armed'); elapsed += 100; latest.callback(); } };
 }
+
+function assertDisposed(f, tracker = 1) {
+    assert.deepEqual(f.calls.disposals, { command: 1, started: 1, terminated: 1, tracker, output: 1 });
+}
+
+test('graceful disposal prevents a pending save from starting SDK work and rejects future commands', async t => {
+    let resolveSave;
+    const f = fixture(t, { dirty: true, save: () => new Promise(resolve => { resolveSave = resolve; }) });
+    const operation = f.api.debugActiveFile();
+    await waitFor(() => resolveSave, 'The source save must be pending');
+    f.dispose();
+    f.dispose();
+    resolveSave(true);
+    assert.equal(await operation, false);
+    assert.equal(await f.api.debugActiveFile(), false);
+    assert.equal(f.calls.handler, undefined, 'The command registration must be removed immediately');
+    assert.deepEqual(f.calls.classifications, []);
+    assert.deepEqual(f.calls.processes, []);
+    assert.deepEqual(f.calls.launches, []);
+    assert.deepEqual(f.calls.errors, []);
+    await waitFor(() => f.calls.disposals.output, 'An idle disposed owner must release its resources');
+    assertDisposed(f);
+});
+
+test('graceful disposal suppresses a pending save rejection instead of notifying after teardown', async t => {
+    let rejectSave;
+    const f = fixture(t, { dirty: true, save: () => new Promise((_resolve, reject) => { rejectSave = reject; }) });
+    const operation = f.api.debugActiveFile();
+    await waitFor(() => rejectSave, 'The source save must be pending');
+    f.dispose();
+    rejectSave(new Error('Save provider failed after disposal'));
+    assert.equal(await operation, false);
+    assert.deepEqual(f.calls.errors, []);
+    assert.deepEqual(f.calls.processes, []);
+    await waitFor(() => f.calls.disposals.output, 'Background recovery must also drain before final release');
+    assertDisposed(f);
+});
+
+test('graceful disposal waits for an in-flight classification and keeps its original failure quiet', async t => {
+    let rejectClassification;
+    const f = fixture(t, { classify: () => new Promise((_resolve, reject) => { rejectClassification = reject; }) });
+    const operation = f.api.debugActiveFile();
+    await waitFor(() => rejectClassification, 'Classification must be pending');
+    f.dispose();
+    assert.equal(f.calls.disposals.output, 0, 'Diagnostics must remain available while preparation settles');
+    rejectClassification(new Error('Project evaluation failed during disposal'));
+    assert.equal(await operation, false);
+    assert(f.calls.logs.some(line => line.includes('Project evaluation failed during disposal')));
+    assert.deepEqual(f.calls.errors, []);
+    assert.deepEqual(f.calls.launches, []);
+    await waitFor(() => f.calls.disposals.output, 'The settled owner must also wait for recovery');
+    assertDisposed(f);
+});
+
+test('graceful disposal after a cleanup retry cannot proceed to saving or building', async t => {
+    let releaseCleanup;
+    let first = true;
+    const f = fixture(t, { dirty: true, buildError: new Error('Compiler failure'),
+        removeOutput: async (directory, settings) => {
+            if (first) { first = false; throw Object.assign(new Error('Output is busy'), { code: 'EBUSY' }); }
+            await new Promise(resolve => { releaseCleanup = resolve; });
+            await fs.promises.rm(directory, settings);
+        } });
+    assert.equal(await f.api.debugActiveFile(), false);
+    const processCount = f.calls.processes.length;
+    const saveCount = f.calls.saves;
+    const errorCount = f.calls.errors.length;
+    const operation = f.api.debugActiveFile();
+    await waitFor(() => releaseCleanup, 'The retained terminal output must be retrying cleanup');
+    f.dispose();
+    assert.equal(f.calls.disposals.output, 0, 'Cleanup diagnostics must outlive the disposal request');
+    releaseCleanup();
+    assert.equal(await operation, false);
+    assert.equal(f.calls.saves, saveCount);
+    assert.equal(f.calls.processes.length, processCount);
+    assert.equal(f.calls.errors.length, errorCount);
+    assert.deepEqual(terminalOutputs(f), []);
+    await waitFor(() => f.calls.disposals.output, 'Cleanup and background recovery must both settle');
+    assertDisposed(f);
+});
+
+for (const outcomeBeforeEvent of [false, true]) {
+    test(`graceful disposal captures a late exact session and waits for start outcome and termination (${outcomeBeforeEvent ? 'outcome first' : 'event first'})`, async t => {
+        let resolveStart;
+        let resolveStop;
+        const f = fixture(t, { startDebugging: () => new Promise(resolve => { resolveStart = resolve; }),
+            stopDebugging: () => new Promise(resolve => { resolveStop = resolve; }) });
+        const operation = f.api.debugActiveFile();
+        await waitFor(() => resolveStart, 'The editor start request must be pending');
+        const config = f.calls.launches[0].config;
+        f.dispose();
+        assert.equal(await operation, false);
+        if (outcomeBeforeEvent) { resolveStart(true); await new Promise(resolve => setImmediate(resolve)); }
+        const unrelated = { ...config, program: path.join(path.dirname(config.program), 'Other.dll') };
+        f.startSession(unrelated);
+        assert.deepEqual(f.calls.stops, [], 'A nonmatching session must not be stopped during disposal');
+        const session = f.startSession(config);
+        await waitFor(() => resolveStop, 'The late owned session must receive targeted Stop');
+        assert.deepEqual(f.calls.stops, [session]);
+        assert.equal(f.calls.disposals.started, 0, 'A pending owned launch still needs lifecycle listeners');
+        resolveStop();
+        await new Promise(resolve => setImmediate(resolve));
+        assert(fs.existsSync(config.program), 'Resolved Stop alone must preserve output until termination');
+        assert.equal(f.calls.disposals.output, 0);
+        f.terminate(config);
+        await waitFor(() => !fs.existsSync(config.__netcoredbgFileAppOutput), 'Matching termination must release owned output');
+        if (!outcomeBeforeEvent) {
+            assert.equal(f.calls.disposals.output, 0, 'The original editor start outcome must remain observed');
+            resolveStart(true);
+        }
+        await waitFor(() => f.calls.disposals.output, 'Terminal owned work must release retained listeners and output');
+        assertDisposed(f);
+        f.dispose();
+        assert.deepEqual(f.calls.stops, [session], 'Repeated disposal must not request Stop twice');
+        assert.deepEqual(f.calls.errors, []);
+    });
+}
+
+test('graceful disposal stops active owned sessions once and preserves unrelated output', async t => {
+    const f = fixture(t);
+    assert.equal(await f.api.debugActiveFile(), true);
+    const config = f.calls.launches[0].config;
+    const unrelatedDirectory = path.join(f.root, 'unrelated-output');
+    fs.mkdirSync(unrelatedDirectory);
+    const sentinel = path.join(unrelatedDirectory, 'keep.txt');
+    fs.writeFileSync(sentinel, 'unrelated');
+    const unrelated = f.startSession({ type: 'coreclr', name: 'Other', program: sentinel,
+        __netcoredbgFileAppOutput: unrelatedDirectory });
+    f.dispose();
+    f.dispose();
+    await waitFor(() => !fs.existsSync(config.__netcoredbgFileAppOutput), 'Active owned output must be cleaned after Stop termination');
+    await waitFor(() => f.calls.disposals.output, 'All terminal owned work must release the owner');
+    assert.equal(f.calls.stops.length, 1);
+    assert.equal(f.calls.stops[0].configuration, config);
+    assert.notEqual(f.calls.stops[0].id, unrelated.id);
+    assert.equal(fs.readFileSync(sentinel, 'utf8'), 'unrelated');
+    assertDisposed(f);
+});
+
+test('graceful disposal retains uncertain output after Stop rejection without error UI or repeated Stop', async t => {
+    const f = fixture(t, { stopDebugging: async () => { throw new Error('Adapter refused disposal disconnect'); } });
+    assert.equal(await f.api.debugActiveFile(), true);
+    const config = f.calls.launches[0].config;
+    f.dispose();
+    await waitFor(() => f.calls.logs.some(line => line.includes('Adapter refused disposal disconnect')), 'Stop failure must remain in diagnostics');
+    f.dispose();
+    assert.equal(f.calls.stops.length, 1);
+    assert.deepEqual(f.calls.errors, []);
+    assert(fs.existsSync(config.program));
+    assert.deepEqual(terminalOutputs(f), [], 'An uncertain live session must not become an eligible terminal receipt');
+    assert.equal(f.calls.disposals.output, 0, 'Unknown live work must retain its lifecycle observers');
+    f.terminate(config);
+    await waitFor(() => f.calls.disposals.output, 'A later confirmed termination permits final release');
+    assert(!fs.existsSync(config.__netcoredbgFileAppOutput));
+    assertDisposed(f);
+});
+
+test('graceful disposal leaves terminal cleanup failures recoverable and releases resources once', async t => {
+    const f = fixture(t, { removeOutput: async () => { throw Object.assign(new Error('Still busy'), { code: 'EBUSY' }); },
+        disposeOutput: () => { throw new Error('Output disposal failed'); } });
+    assert.equal(await f.api.debugActiveFile(), true);
+    f.dispose();
+    await waitFor(() => f.calls.disposals.output, 'Terminal failed cleanup must not keep the owner alive forever');
+    assert.equal(terminalOutputs(f).length, 1);
+    assert(fs.existsSync(path.join(terminalOutputs(f)[0], 'FileApp.dll')));
+    assert.equal(await f.api.debugActiveFile(), false);
+    assert.deepEqual(f.calls.errors, []);
+    f.dispose();
+    assertDisposed(f);
+});
+
+test('graceful disposal reentered from a cleanup provider waits for that deletion to settle', async t => {
+    let releaseCleanup;
+    let outputDisposedInsideProvider;
+    const f = fixture(t, { removeOutput: async (directory, settings) => {
+        f.dispose();
+        outputDisposedInsideProvider = f.calls.disposals.output;
+        await new Promise(resolve => { releaseCleanup = resolve; });
+        await fs.promises.rm(directory, settings);
+    } });
+    await f.api.recoveryReady;
+    assert.equal(await f.api.debugActiveFile(), true);
+    const config = f.calls.launches[0].config;
+    f.terminate(config);
+    await waitFor(() => releaseCleanup, 'The termination deletion must reach its provider');
+    try {
+        assert.equal(outputDisposedInsideProvider, 0, 'Register cleanup ownership before calling a reentrant provider');
+        assert.equal(f.calls.disposals.started, 0);
+        assert.equal(f.calls.disposals.terminated, 0);
+        assert(fs.existsSync(config.program));
+    } finally { releaseCleanup(); }
+    await waitFor(() => f.calls.disposals.output, 'Settled terminal cleanup must complete disposal');
+    assert(!fs.existsSync(config.__netcoredbgFileAppOutput));
+    assert.deepEqual(f.calls.stops, [], 'A session already confirmed terminal needs no Stop');
+    assertDisposed(f);
+});
+
+for (const firstStopSettled of [false, true]) {
+    test(`adapter configuration success retries one early exact Stop and serializes attempts (${firstStopSettled ? 'early acknowledgement' : 'first Stop pending'})`, async t => {
+        let releaseFirst;
+        let releaseSecond;
+        let first;
+        const f = fixture(t, { stopDebugging: () => {
+            if (f.calls.stops.length === 1) {
+                first = new Promise(resolve => { releaseFirst = resolve; });
+                return first;
+            }
+            return new Promise(resolve => { releaseSecond = resolve; });
+        } });
+        assert.equal(await f.api.debugActiveFile(), true);
+        const config = f.calls.launches[0].config;
+        const session = f.session(config);
+        f.dispose();
+        await waitFor(() => releaseFirst, 'An early exact Stop must be requested');
+        if (firstStopSettled) { releaseFirst(); await first; await new Promise(resolve => setImmediate(resolve)); }
+        f.configuration(session);
+        f.configuration(session); // Duplicate successful ready events must not multiply Stops.
+        if (!firstStopSettled) {
+            await new Promise(resolve => setImmediate(resolve));
+            assert.equal(f.calls.stops.length, 1, 'The second Stop must wait for the first to settle');
+            releaseFirst();
+        }
+        await waitFor(() => releaseSecond, 'Configuration completion must trigger one follow-up Stop');
+        assert.deepEqual(f.calls.stops, [session, session]);
+        f.configuration(session);
+        releaseSecond();
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(f.calls.stops.length, 2);
+        assert(fs.existsSync(config.program), 'Both Stop acknowledgements still require matching termination');
+        assert.equal(f.calls.disposals.tracker, 0, 'The configuration tracker must live with uncertain work');
+        f.terminate(config);
+        await waitFor(() => f.calls.disposals.output, 'Matching termination must complete disposal');
+        assert(!fs.existsSync(config.__netcoredbgFileAppOutput));
+        assert.deepEqual(f.calls.errors, []);
+        assertDisposed(f);
+    });
+}
+
+for (const beforeDispose of [false, true]) {
+    test(`adapter configuration ready before actual Stop dispatch needs no retry (${beforeDispose ? 'ready before disposal' : 'ready before Stop microtask'})`, async t => {
+        const f = fixture(t, { stopDebugging: async () => {} });
+        assert.equal(await f.api.debugActiveFile(), true);
+        const config = f.calls.launches[0].config;
+        const session = f.session(config);
+        if (beforeDispose) f.configuration(session);
+        f.dispose();
+        if (!beforeDispose) f.configuration(session);
+        await waitFor(() => f.calls.stops.length, 'Disposal must request exact Stop');
+        f.configuration(session);
+        await new Promise(resolve => setImmediate(resolve));
+        assert.deepEqual(f.calls.stops, [session], 'A ready-first Stop requires only one request');
+        assert(fs.existsSync(config.program));
+        f.terminate(config);
+        await waitFor(() => f.calls.disposals.output, 'Confirmed termination must release the tracker');
+        assertDisposed(f);
+    });
+}
+
+test('adapter configuration ignores unrelated, failed and uncorrelated responses', async t => {
+    const f = fixture(t, { stopDebugging: async () => {} });
+    assert.equal(await f.api.debugActiveFile(), true);
+    const config = f.calls.launches[0].config;
+    const session = f.session(config);
+    f.dispose();
+    await waitFor(() => f.calls.stops.length, 'The first early Stop must be acknowledged');
+    const unrelated = f.startSession({ ...config, program: path.join(path.dirname(config.program), 'Other.dll') });
+    f.configuration(unrelated);
+    const tracker = f.tracker(session);
+    tracker?.onDidSendMessage?.({ type: 'response', command: 'configurationDone', request_seq: 9999, success: true });
+    f.configuration(session, false);
+    await new Promise(resolve => setImmediate(resolve));
+    assert.deepEqual(f.calls.stops, [session], 'Only the successful matching readiness response can request a retry');
+    f.configuration(session);
+    await waitFor(() => f.calls.stops.length === 2, 'A later valid ready response must request the exact follow-up Stop');
+    assert.deepEqual(f.calls.stops, [session, session]);
+    // Restore the primary fixture lookup after creating an unrelated config.
+    f.emitStart(session);
+    f.terminate(config);
+    await waitFor(() => f.calls.disposals.output, 'The owned session must release after actual termination');
+    assertDisposed(f);
+});
+
+test('adapter configuration retry failures preserve uncertain output and remain quiet after disposal', async t => {
+    const f = fixture(t, { stopDebugging: async () => { throw new Error('Native Stop failed'); } });
+    assert.equal(await f.api.debugActiveFile(), true);
+    const config = f.calls.launches[0].config;
+    const session = f.session(config);
+    f.dispose();
+    await waitFor(() => f.calls.stops.length === 1, 'The early Stop must run');
+    f.configuration(session);
+    await waitFor(() => f.calls.stops.length === 2, 'Successful configuration permits the single follow-up attempt');
+    f.configuration(session);
+    await new Promise(resolve => setImmediate(resolve));
+    assert.deepEqual(f.calls.stops, [session, session]);
+    assert.deepEqual(f.calls.errors, []);
+    assert(fs.existsSync(config.program));
+    assert.deepEqual(terminalOutputs(f), []);
+    assert.equal(f.calls.disposals.output, 0);
+    assert.equal(f.calls.disposals.tracker, 0);
+    assert(f.calls.logs.some(line => line.includes('Native Stop failed')));
+    f.terminate(config);
+    await waitFor(() => f.calls.disposals.output, 'A later terminal event permits cleanup after failed Stops');
+    assertDisposed(f);
+});
+
+test('adapter configuration arriving after termination cannot restart Stop or cleanup', async t => {
+    const f = fixture(t, { stopDebugging: async () => {} });
+    assert.equal(await f.api.debugActiveFile(), true);
+    const config = f.calls.launches[0].config;
+    const session = f.session(config);
+    f.dispose();
+    await waitFor(() => f.calls.stops.length === 1, 'The early Stop must be requested');
+    f.terminate(config);
+    await waitFor(() => f.calls.disposals.output, 'Termination must release the owner');
+    f.configuration(session);
+    await new Promise(resolve => setImmediate(resolve));
+    assert.deepEqual(f.calls.stops, [session]);
+    assertDisposed(f);
+});
+
+test('adapter configuration API absence preserves conservative Stop and termination behavior', async t => {
+    const f = fixture(t, { noTrackerAPI: true, stopDebugging: async () => {} });
+    assert.equal(await f.api.debugActiveFile(), true);
+    const config = f.calls.launches[0].config;
+    const session = f.session(config);
+    f.dispose();
+    await waitFor(() => f.calls.stops.length === 1, 'An exact Stop remains available without tracker support');
+    assert(fs.existsSync(config.program));
+    assert.equal(f.calls.disposals.output, 0);
+    f.terminate(config);
+    await waitFor(() => f.calls.disposals.output, 'Matching termination still releases owned resources');
+    assert.deepEqual(f.calls.stops, [session]);
+    assertDisposed(f, 0);
+});
 
 test('one preparation deadline bounds cumulative ancestor and multi-target evaluations', async t => {
     const f = preparationFixture(t, { classify: input => classifyWithMsbuild({ ...input, fs: {
@@ -543,12 +912,14 @@ test('overlapping cleanup requests share one deletion and release ownership only
     const config = f.calls.launches[0].config;
     f.terminate(config);
     f.terminate(config);
+    await waitFor(() => release, 'The shared deletion must enter its provider');
     assert.equal(removals.length, 1);
     assert(fs.existsSync(config.program));
     release();
     await waitFor(() => !fs.existsSync(config.__netcoredbgFileAppOutput), 'The shared cleanup must complete');
     await new Promise(resolve => setImmediate(resolve));
     f.terminate(config);
+    await new Promise(resolve => setImmediate(resolve));
     assert.equal(removals.length, 1, 'Successful cleanup releases ownership');
 });
 
