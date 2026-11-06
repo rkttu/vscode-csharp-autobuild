@@ -57,6 +57,8 @@ Identical final test bytes run 11 focused cases against the old and final runtim
 
 Raw historical attempts remain retained. An early baseline fixture left an SDK gate pending when the old runtime failed as expected; its exact owned test child was verified and terminated, and teardown was added. An initial after run exposed an observation race: the filesystem entry was absent before the owning cleanup Promise had drained. The test now lets that I/O completion settle before issuing the next command. These preparatory failures and source hashes remain in `tests/implementation-summary.json`; final outputs are `focused-before-final.txt`, `focused-after-final.txt` and `full-after.txt`.
 
+The preparatory test-child ownership check and termination are recorded in the execution transcript; no separate CIM/PID termination snapshot was retained. The compact summary binds the raw failed run and its description, rather than an independent termination-proof file. This limit does not apply to the final native or installed controls and their separately retained process evidence.
+
 Final runtime SHA-256 is `ac75a8bdffef7a0106e30038cf47da42de0ae63e3ee130cc3c8cdf8d2e61d952`; final runtime-test SHA-256 is `d31cfa4c3e515c43972bc2d166ef566327cf0ee39a34e373f71fcca9cd84ba14`.
 
 ## Scope
