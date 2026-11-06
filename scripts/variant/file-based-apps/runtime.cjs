@@ -111,6 +111,8 @@ function activate(context, dependencies = {}) {
     let disposed = false;
     let resourcesReleased = false;
     let recoveryInFlight;
+    let resolveDisposal;
+    const disposalReady = new Promise(resolve => { resolveDisposal = resolve; });
     const cleanupLog = message => {
         try { output.appendLine(message); } catch { /* Cleanup may outlive the output channel. */ }
     };
@@ -128,6 +130,7 @@ function activate(context, dependencies = {}) {
         disposeResource(terminated);
         if (configurationTracker) disposeResource(configurationTracker);
         disposeResource(output);
+        resolveDisposal();
     }
     const recovery = require('./recovery.cjs').createRecovery({
         baseDirectory: outputBase, removeOutput, isOwned: directory => ownedOutputs.has(directory), log: cleanupLog,
@@ -284,6 +287,8 @@ function activate(context, dependencies = {}) {
             const launch = launches.get(session.configuration?.__netcoredbgFileAppOutput);
             if (!launch || !matchesLaunch(session, launch)) return undefined;
             const requests = new Set();
+            let exitedCode;
+            let restartObserved = false;
             return {
                 onWillReceiveMessage(message) {
                     if (message.type === 'request' && message.command === 'configurationDone' && Number.isSafeInteger(message.seq)) {
@@ -291,6 +296,34 @@ function activate(context, dependencies = {}) {
                     }
                 },
                 onDidSendMessage(message) {
+                    if (message.type === 'event' && ['exited', 'terminated'].includes(message.event)) {
+                        // During editor shutdown the main-thread termination event may no
+                        // longer arrive. Only this exact captured session's explicit debuggee
+                        // exit followed by a non-restarting termination can substitute for it.
+                        if (!disposed || !launch.cancelled || !launch.session || launch.terminal ||
+                            launches.get(launch.directory) !== launch || !ownedOutputs.has(launch.directory) ||
+                            !matchesLaunch(session, launch)) {
+                            exitedCode = undefined;
+                            return;
+                        }
+                        if (message.event === 'exited') {
+                            const code = message.body?.exitCode;
+                            exitedCode = !restartObserved && message.body && typeof message.body === 'object' && !Array.isArray(message.body) &&
+                                Number.isInteger(code) && code >= -2147483648 && code <= 2147483647 ? code : undefined;
+                            return;
+                        }
+                        const body = message.body;
+                        const validBody = body === undefined || body !== null && typeof body === 'object' && !Array.isArray(body);
+                        if (validBody && body && 'restart' in body) restartObserved = true;
+                        const code = exitedCode;
+                        exitedCode = undefined;
+                        if (!validBody || restartObserved || code === undefined) return;
+                        // finishLaunch marks terminal and removes the live launch before any
+                        // await, so duplicate DAP events and a racing API event share cleanup.
+                        void finishLaunch(launch);
+                        cleanupLog(`Confirmed disposed C# session termination from paired DAP exited/terminated: ${session.id} (exitCode=${code})`);
+                        return;
+                    }
                     if (message.type !== 'response' || message.command !== 'configurationDone' ||
                         !requests.delete(message.request_seq) || message.success !== true) return;
                     if (launch.terminal || launches.get(launch.directory) !== launch || !matchesLaunch(session, launch)) return;
@@ -574,9 +607,8 @@ function activate(context, dependencies = {}) {
     }
 
     const registered = vscode.commands.registerCommand(COMMAND, command);
-    context.subscriptions.push({
-        dispose() {
-            if (disposed) return;
+    function dispose() {
+        if (!disposed) {
             disposed = true;
             disposeResource(registered);
             for (const controller of controllers) controller.abort();
@@ -585,11 +617,13 @@ function activate(context, dependencies = {}) {
                 void stopCancelledSession(launch);
             }
             releaseDisposedResources();
-        },
-    });
+        }
+        return disposalReady;
+    }
+    context.subscriptions.push({ dispose });
     // Recover validated terminal receipts without holding activation or a file command pending.
     const recoveryReady = startRecovery();
-    return { debugActiveFile: command, recoveryReady };
+    return { debugActiveFile: command, recoveryReady, dispose, disposalReady };
 }
 
 module.exports = { activate, COMMAND, findDotnet, runProcess, requireFileAppSdk, sdkArchitecture };
