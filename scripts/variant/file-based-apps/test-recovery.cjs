@@ -61,7 +61,14 @@ function fixture(t) {
         const directory = path.join(base, READY);
         return fs.existsSync(directory) ? fs.readdirSync(directory) : [];
     }
-    return { root, base, owned, removals, logs, run, manager, ready, readyNames };
+    function staged(options = {}) {
+        const entry = ready(options);
+        const directory = path.join(base, STAGING, entry.entryId);
+        fs.mkdirSync(path.dirname(directory), { recursive: true });
+        fs.renameSync(entry.directory, directory);
+        return { ...entry, directory, output: path.join(directory, 'output'), marker: path.join(directory, 'record.json') };
+    }
+    return { root, base, owned, removals, logs, run, manager, ready, staged, readyNames };
 }
 
 function linkDirectory(target, link) {
@@ -336,7 +343,7 @@ test('a record directory cannot authorize deletion', async t => {
     assert(fs.existsSync(path.join(entry.output, 'sentinel')));
 });
 
-test('publication failure preserves staging for this host to resume while a new host ignores it', async t => {
+test('publication failure leaves complete staging recoverable by a new host and idempotent for its owner', async t => {
     const f = fixture(t);
     const original = f.run();
     let fail = true;
@@ -353,13 +360,227 @@ test('publication failure preserves staging for this host to resume while a new 
     const [id] = fs.readdirSync(path.join(f.base, STAGING));
     const stagedOutput = path.join(f.base, STAGING, id, 'output');
     assert(fs.existsSync(path.join(stagedOutput, 'FileApp.dll')));
-    assert.equal((await f.manager().recover()).removed, 0);
-    assert(fs.existsSync(stagedOutput));
+    assert.equal((await f.manager().recover()).removed, 1);
+    assert(!fs.existsSync(stagedOutput));
     assert.equal(await manager.remove(original), true);
     assert.equal(manager.has(original), false);
     assert.equal(fs.existsSync(stagedOutput), false);
     assert.deepEqual(f.readyNames(), []);
 });
+
+test('complete staging recovery removes a valid terminal payload while unmarked output survives', async t => {
+    const f = fixture(t);
+    const entry = f.staged();
+    const unmarked = f.run(false);
+    assert.deepEqual(await f.manager({ isOwned: () => false }).recover(), { scanned: 1, attempted: 1, removed: 1 });
+    assert(!fs.existsSync(entry.directory));
+    assert.deepEqual(f.readyNames(), []);
+    assert(fs.existsSync(path.join(unmarked, 'FileApp.dll')));
+});
+
+test('complete staging recovery lets a paused original owner finish without touching its replacement', async t => {
+    const f = fixture(t);
+    const original = f.run();
+    let reached;
+    const waiting = new Promise(resolve => { reached = resolve; });
+    let release;
+    const gate = new Promise(resolve => { release = resolve; });
+    const owner = f.manager({ fs: { promises: { ...fs.promises, rename: async (from, to) => {
+        if (path.dirname(to) === path.join(f.base, READY)) { reached(); await gate; }
+        return fs.promises.rename(from, to);
+    } } } });
+    const pending = owner.preserve(original);
+    void pending.catch(() => {});
+    try {
+        await waiting;
+        const [id] = fs.readdirSync(path.join(f.base, STAGING));
+        assert(fs.existsSync(path.join(f.base, STAGING, id, 'output', 'FileApp.dll')));
+        fs.mkdirSync(original);
+        fs.writeFileSync(path.join(original, 'replacement'), 'keep replacement');
+        assert.equal((await f.manager().recover()).removed, 1);
+        release();
+        assert.equal(await pending, true);
+        assert.equal(await owner.remove(original), true);
+        assert.equal(owner.has(original), false);
+        assert.equal(fs.readFileSync(path.join(original, 'replacement'), 'utf8'), 'keep replacement');
+        assert.deepEqual(f.readyNames(), []);
+    } finally { release(); await pending.catch(() => {}); }
+});
+
+test('complete staging recovery reconciles a late ready rename error after another host consumes the entry', async t => {
+    const f = fixture(t);
+    const original = f.run();
+    let owner;
+    owner = f.manager({ fs: { promises: { ...fs.promises, rename: async (from, to) => {
+        await fs.promises.rename(from, to);
+        if (path.dirname(to) === path.join(f.base, READY)) {
+            assert.equal((await f.manager().recover()).removed, 1);
+            fs.mkdirSync(original);
+            fs.writeFileSync(path.join(original, 'replacement'), 'keep after late error');
+            throw Object.assign(new Error('late publication completion error'), { code: 'EPERM' });
+        }
+    } } } });
+    assert.equal(await owner.preserve(original), true);
+    assert.equal(await owner.remove(original), true);
+    assert.equal(fs.readFileSync(path.join(original, 'replacement'), 'utf8'), 'keep after late error');
+    assert.equal(owner.has(original), false);
+});
+
+test('complete staging recovery confirms a late source move without reopening a replacement', async t => {
+    const f = fixture(t);
+    const original = f.run();
+    let fail = true;
+    const owner = f.manager({ fs: { promises: { ...fs.promises, rename: async (from, to) => {
+        await fs.promises.rename(from, to);
+        if (from === original && fail) { fail = false; throw new Error('late source completion'); }
+    } } } });
+    await assert.rejects(owner.preserve(original), /late source completion/);
+    fs.mkdirSync(original);
+    fs.writeFileSync(path.join(original, 'replacement'), 'preserve late source replacement');
+    assert.equal(await owner.remove(original), true);
+    assert.equal(owner.has(original), false);
+    assert.equal(fs.readFileSync(path.join(original, 'replacement'), 'utf8'), 'preserve late source replacement');
+    assert.deepEqual(f.readyNames(), []);
+});
+
+test('complete staging recovery retains ambiguous source-move ownership after another host consumes it', async t => {
+    const f = fixture(t);
+    const original = f.run();
+    const failure = new Error('unconfirmed source completion');
+    const owner = f.manager({ fs: { promises: { ...fs.promises, rename: async (from, to) => {
+        await fs.promises.rename(from, to);
+        if (from === original) {
+            assert.equal((await f.manager().recover()).removed, 1);
+            fs.mkdirSync(original);
+            fs.writeFileSync(path.join(original, 'replacement'), 'preserve ambiguous replacement');
+            throw failure;
+        }
+    } } } });
+    await assert.rejects(owner.preserve(original), error => error === failure);
+    await assert.rejects(owner.remove(original), /missing staged output/);
+    assert.equal(owner.has(original), true, 'An unconfirmed source move may retain bookkeeping but cannot reclaim its old path');
+    assert.equal(fs.readFileSync(path.join(original, 'replacement'), 'utf8'), 'preserve ambiguous replacement');
+    assert.equal(f.removals.length, 1, 'Only the other host may delete the already-complete terminal payload');
+});
+
+test('complete staging recovery shares the 32 entry scan budget with the ready queue', async t => {
+    const f = fixture(t);
+    for (let index = 0; index < 31; index++) fs.mkdirSync(path.join(f.base, READY, `unknown-${index}`), { recursive: true });
+    const entry = f.staged();
+    assert.deepEqual(await f.manager().recover(), { scanned: 32, attempted: 1, removed: 1 });
+    assert(!fs.existsSync(entry.directory));
+    assert.equal(f.readyNames().length, 31);
+});
+
+test('complete staging recovery charges a failed promotion as its one attempt and preserves every payload', async t => {
+    const f = fixture(t);
+    const first = f.staged();
+    const second = f.staged();
+    let moves = 0;
+    const manager = f.manager({ fs: { promises: { ...fs.promises, rename: async (from, to) => {
+        moves++;
+        throw Object.assign(new Error('publication busy'), { code: 'EPERM' });
+    } } } });
+    assert.deepEqual(await manager.recover(), { scanned: 1, attempted: 1, removed: 0 });
+    assert.equal(moves, 1);
+    assert(fs.existsSync(path.join(first.output, 'sentinel')));
+    assert(fs.existsSync(path.join(second.output, 'sentinel')));
+    assert.equal(f.removals.length, 0);
+});
+
+test('complete staging recovery permits concurrent promoters and removers without losing terminal data', async t => {
+    const f = fixture(t);
+    const entry = f.staged();
+    let arrivals = 0;
+    let release;
+    const gate = new Promise(resolve => { release = resolve; });
+    const io = { promises: { ...fs.promises, rename: async (from, to) => {
+        if (from === entry.directory) { if (++arrivals === 2) release(); await gate; }
+        return fs.promises.rename(from, to);
+    } } };
+    const results = await Promise.all([f.manager({ fs: io }).recover(), f.manager({ fs: io }).recover()]);
+    assert(results.every(result => result.attempted === 1), JSON.stringify(results));
+    assert(results.some(result => result.removed === 1));
+    assert(!fs.existsSync(entry.directory));
+    assert.deepEqual(f.readyNames(), []);
+});
+
+test('staging eligibility preserves record-only, output-only, malformed and extra-content entries', async t => {
+    const f = fixture(t);
+    const recordOnly = f.staged();
+    fs.rmSync(recordOnly.output, { recursive: true });
+    const outputOnly = f.staged();
+    fs.unlinkSync(outputOnly.marker);
+    const malformed = f.staged({ record: '{broken' });
+    const extra = f.staged();
+    fs.writeFileSync(path.join(extra.directory, '.record-incomplete.tmp'), 'partial');
+    assert.deepEqual(await f.manager().recover(), { scanned: 4, attempted: 0, removed: 0 });
+    assert(fs.existsSync(recordOnly.marker));
+    for (const entry of [outputOnly, malformed, extra]) assert(fs.existsSync(path.join(entry.output, 'sentinel')));
+    assert.equal(f.removals.length, 0);
+});
+
+test('staging eligibility refuses an entry duplicated in ready instead of overwriting either payload', async t => {
+    const f = fixture(t);
+    const staged = f.staged();
+    const ready = f.ready({ entryId: staged.entryId, record: '{invalid ready' });
+    const result = await f.manager().recover();
+    assert.equal(result.attempted, 0);
+    assert.equal(result.removed, 0);
+    assert(fs.existsSync(path.join(staged.output, 'sentinel')));
+    assert(fs.existsSync(path.join(ready.output, 'sentinel')));
+    assert.equal(fs.readFileSync(ready.marker, 'utf8'), '{invalid ready');
+    assert.equal(f.removals.length, 0);
+});
+
+test('staging eligibility preserves both valid entries when their UUID occurs in both queues', async t => {
+    const f = fixture(t);
+    const staged = f.staged();
+    const ready = f.ready({ entryId: staged.entryId });
+    assert.deepEqual(await f.manager().recover(), { scanned: 2, attempted: 0, removed: 0 });
+    assert(fs.existsSync(path.join(staged.output, 'sentinel')));
+    assert(fs.existsSync(path.join(ready.output, 'sentinel')));
+    assert.equal(f.removals.length, 0);
+});
+
+test('staging eligibility retains the original error when publication reconciliation also fails', async t => {
+    const f = fixture(t);
+    const original = f.run();
+    const failure = new Error('first publication failure');
+    let fail = true;
+    let reconciling = false;
+    const owner = f.manager({ fs: { promises: { ...fs.promises,
+        rename: async (from, to) => {
+            if (path.dirname(to) === path.join(f.base, READY) && fail) { reconciling = true; throw failure; }
+            return fs.promises.rename(from, to);
+        },
+        lstat: async (...args) => {
+            if (reconciling) throw new Error('later reconciliation I/O failure');
+            return fs.promises.lstat(...args);
+        },
+    } } });
+    await assert.rejects(owner.preserve(original), error => error === failure);
+    assert.equal(owner.has(original), true);
+    reconciling = false; fail = false;
+    assert.equal(await owner.remove(original), true);
+    assert.deepEqual(f.readyNames(), []);
+});
+
+for (const redirected of ['queue', 'entry', 'output']) {
+    test(`staging eligibility refuses a redirected ${redirected} and preserves an external sentinel`, async t => {
+        const f = fixture(t);
+        const entry = f.staged();
+        const target = redirected === 'queue' ? path.join(f.base, STAGING) : redirected === 'entry' ? entry.directory : entry.output;
+        const outside = path.join(f.root, 'outside-staging');
+        fs.renameSync(target, outside);
+        linkDirectory(outside, target);
+        assert.equal((await f.manager().recover()).attempted, 0);
+        const payload = redirected === 'queue' ? path.join(outside, entry.entryId, 'output', 'sentinel') :
+            redirected === 'entry' ? path.join(outside, 'output', 'sentinel') : path.join(outside, 'sentinel');
+        assert.equal(fs.readFileSync(payload, 'utf8'), 'terminal');
+        assert.equal(f.removals.length, 0);
+    });
+}
 
 test('source move failure retains the original and same-host retry resumes staging', async t => {
     const f = fixture(t);
@@ -405,7 +626,7 @@ test('a completed ready rename with a late failure can be recognized by the same
         await fs.promises.rename(from, to);
         if (path.dirname(to) === path.join(f.base, READY) && fail) { fail = false; throw new Error('late rename failure'); }
     } } } });
-    await assert.rejects(manager.preserve(original), /late rename failure/);
+    assert.equal(await manager.preserve(original), true, 'A completed publication is recognized even if its rename reported a late failure');
     assert.equal(manager.has(original), true);
     assert.equal(await manager.remove(original), true);
     assert.deepEqual(f.readyNames(), []);

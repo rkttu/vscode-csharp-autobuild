@@ -12,7 +12,7 @@ const MAX_RECORD_BYTES = 4096;
 
 function createRecovery({ baseDirectory, removeOutput, isOwned, log = () => {}, fs = nativeFs }) {
     // The caller establishes terminal state. Ownership, host exit, PID or age alone cannot establish it.
-    // Only fully published terminal entries are recoverable after this host loses its in-memory map.
+    // A complete staged receipt and real output also establish a terminal payload after host loss.
     const io = fs.promises || fs;
     const base = path.resolve(baseDirectory);
     const tracked = new Map();
@@ -109,6 +109,8 @@ function createRecovery({ baseDirectory, removeOutput, isOwned, log = () => {}, 
         const entry = path.join(parent, entryId);
         const physical = await io.realpath(parent);
         if (!await realDirectory(entry, path.join(physical, entryId))) return undefined;
+        const other = await queueDirectory(parentName === READY ? STAGING : READY);
+        if (other && await statOrMissing(path.join(other, entryId))) throw unsafe('entry exists in both terminal queues');
         await entryContents(entry, new Set(['record.json', 'output']));
         await recordFor(entry, entryId);
         const output = path.join(entry, 'output');
@@ -121,7 +123,7 @@ function createRecovery({ baseDirectory, removeOutput, isOwned, log = () => {}, 
             await recordFor(state.staging, state.entryId);
             return;
         }
-        // Staging is not scanned. Publish a complete marker before moving any output into it.
+        // A record alone is not recoverable. Complete it before moving terminal output into staging.
         const temporary = path.join(state.staging, `.record-${crypto.randomUUID()}.tmp`);
         state.temporary = temporary;
         const handle = await io.open(temporary, 'wx', 0o600);
@@ -136,12 +138,29 @@ function createRecovery({ baseDirectory, removeOutput, isOwned, log = () => {}, 
     }
     async function resume(state) {
         if (state.ready) return true;
+        try { return await resumePublication(state); }
+        catch (error) {
+            // Another host can publish and consume the terminal payload while this owner
+            // awaits its final rename. Retire its old pathname once the source move is known.
+            try { if (await publishedOrConsumed(state)) return true; }
+            catch { /* Keep the original publication failure when reconciliation cannot establish safety. */ }
+            throw error;
+        }
+    }
+    async function publishedOrConsumed(state) {
+        if (!state.sourceMoved || await statOrMissing(state.staging)) return false;
+        await inspectEntry(READY, state.entryId); // Validate a surviving publication; absence is idempotent.
+        state.ready = true;
+        return true;
+    }
+    async function resumePublication(state) {
         const stagingParent = await queueDirectory(STAGING);
         const readyParent = await queueDirectory(READY, true);
         if (!stagingParent || !readyParent) throw unsafe('missing queue directory');
         if (!await realDirectory(state.staging, path.join(await io.realpath(stagingParent), state.entryId))) {
             // A rename can have completed even if an injected/late I/O failure obscured its result.
             if (await inspectEntry(READY, state.entryId)) { state.ready = true; return true; }
+            if (state.sourceMoved) { state.ready = true; return true; }
             throw unsafe('missing staged output');
         }
         if (state.temporary) {
@@ -154,12 +173,15 @@ function createRecovery({ baseDirectory, removeOutput, isOwned, log = () => {}, 
         await writeRecord(state);
         const output = path.join(state.staging, 'output');
         const outputExists = await realDirectory(output, path.join(await io.realpath(stagingParent), state.entryId, 'output'));
-        if (!outputExists) {
+        if (!outputExists && !state.sourceMoved) {
             if (!await ownedSource(state.original)) return false;
             if (await sourceIdentity(state.original) !== state.sourceIdentity) throw unsafe('original output was replaced');
             await io.rename(state.original, output);
-        } else if (await statOrMissing(state.original)) {
-            throw unsafe('both original and staged output exist');
+            state.sourceMoved = true;
+        } else if (outputExists && !state.sourceMoved) {
+            // Recognize a completed source rename whose callback reported a late error.
+            if (await sourceIdentity(output) !== state.sourceIdentity) throw unsafe('staged output was replaced');
+            state.sourceMoved = true;
         }
         await inspectEntry(STAGING, state.entryId);
         const ready = path.join(readyParent, state.entryId);
@@ -186,7 +208,7 @@ function createRecovery({ baseDirectory, removeOutput, isOwned, log = () => {}, 
         const entryId = crypto.randomUUID();
         const staging = path.join(stagingParent, entryId);
         await io.mkdir(staging);
-        const state = { original: key, sourceIdentity: identity, entryId, staging, ready: false, temporary: undefined };
+        const state = { original: key, sourceIdentity: identity, entryId, staging, sourceMoved: false, ready: false, temporary: undefined };
         tracked.set(key, state);
         return resume(state);
     }
@@ -221,28 +243,45 @@ function createRecovery({ baseDirectory, removeOutput, isOwned, log = () => {}, 
         tracked.delete(key);
         return true;
     }
+    async function promote(entryId, inspection) {
+        const readyParent = await queueDirectory(READY, true);
+        if (!readyParent) throw unsafe('missing ready queue');
+        const ready = path.join(readyParent, entryId);
+        if (await statOrMissing(ready) && await statOrMissing(inspection.entry)) throw unsafe('entry exists in both terminal queues');
+        try { await io.rename(inspection.entry, ready); }
+        catch (error) {
+            if (await statOrMissing(inspection.entry)) throw error;
+            // A concurrent promoter may already have completed both publication and removal.
+            try { return await inspectEntry(READY, entryId); }
+            catch (cause) { if (await statOrMissing(ready)) throw cause; return undefined; }
+        }
+        return inspectEntry(READY, entryId);
+    }
     function recover() {
         if (recovering) return recovering;
         const operation = (async () => {
             const result = { scanned: 0, attempted: 0, removed: 0 };
             try {
-                const parent = await queueDirectory(READY);
-                if (!parent) return result;
-                const directory = await io.opendir(parent);
-                // for-await closes the directory when the bounded pass breaks early.
-                for await (const entry of directory) {
-                    result.scanned++;
-                    if (UUID.test(entry.name)) {
-                        try {
-                            const inspection = await inspectEntry(READY, entry.name);
-                            if (inspection) {
-                                result.attempted++;
-                                await removeEntry(entry.name, inspection);
-                                result.removed++;
-                            }
-                        } catch (error) { report(error); }
+                for (const parentName of [READY, STAGING]) {
+                    const parent = await queueDirectory(parentName);
+                    if (!parent) continue;
+                    const directory = await io.opendir(parent);
+                    // for-await closes each handle on the shared bounded pass's early return.
+                    for await (const entry of directory) {
+                        result.scanned++;
+                        if (UUID.test(entry.name)) {
+                            try {
+                                let inspection = await inspectEntry(parentName, entry.name);
+                                // A staged record without output cannot prove that its source moved.
+                                if (inspection && (parentName === READY || inspection.outputExists)) {
+                                    result.attempted++;
+                                    if (parentName === STAGING) inspection = await promote(entry.name, inspection);
+                                    if (inspection) { await removeEntry(entry.name, inspection); result.removed++; }
+                                }
+                            } catch (error) { report(error); }
+                        }
+                        if (result.scanned >= 32 || result.attempted >= 1) return result;
                     }
-                    if (result.scanned >= 32 || result.attempted >= 1) break;
                 }
             } catch (error) { report(error); }
             return result;
