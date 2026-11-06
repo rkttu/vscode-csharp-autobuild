@@ -1,0 +1,41 @@
+<Project>
+  <!-- An in-process, bounded test barrier: no Exec task or detached child. -->
+  <UsingTask TaskName="LifecycleCancelBarrier" TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)/Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Marker ParameterType="System.String" Required="true" />
+      <Release ParameterType="System.String" Required="true" />
+      <Nonce ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        System.Guid parsed;
+        if (!System.Guid.TryParse(Nonce, out parsed)) {
+            Log.LogError("Expected a unique lifecycle test nonce.");
+            return false;
+        }
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Marker));
+        var json = "{\"schema\":1,\"pid\":" +
+            System.Diagnostics.Process.GetCurrentProcess().Id.ToString(System.Globalization.CultureInfo.InvariantCulture) +
+            ",\"nonce\":\"" + Nonce + "\"}";
+        System.IO.File.WriteAllText(Marker + ".tmp", json);
+        System.IO.File.Move(Marker + ".tmp", Marker);
+        var elapsed = System.Diagnostics.Stopwatch.StartNew();
+        while (!System.IO.File.Exists(Release)) {
+            if (elapsed.ElapsedMilliseconds > 150000) {
+                Log.LogError("Lifecycle test barrier exceeded its safety limit.");
+                return false;
+            }
+            System.Threading.Thread.Sleep(25);
+        }
+      ]]></Code>
+    </Task>
+  </UsingTask>
+  <!-- The public command owns AssemblyName=FileApp. Language-service design-time
+       builds also import this file, and must never enter or claim the barrier. -->
+  <Target Name="WaitForLifecycleCancel" BeforeTargets="CoreCompile"
+          Condition="'$(LifecycleCancelEnabled)' == 'true' and '$(AssemblyName)' == 'FileApp' and '$(DesignTimeBuild)' != 'true'">
+    <LifecycleCancelBarrier Marker="$(LifecycleCancelMarker)" Release="$(LifecycleCancelRelease)"
+                            Nonce="$(LifecycleCancelNonce)" />
+  </Target>
+</Project>

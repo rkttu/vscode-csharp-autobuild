@@ -1,6 +1,7 @@
 param(
     [Parameter(Mandatory = $true)][string]$WorkDir,
-    [ValidateRange(60, 900)][int]$DeadlineSeconds = 300
+    [ValidateRange(60, 900)][int]$DeadlineSeconds = 300,
+    [switch]$ShowWindow
 )
 $ErrorActionPreference = 'Stop'
 $work = (Resolve-Path -LiteralPath $WorkDir).Path
@@ -21,8 +22,10 @@ foreach ($driverFile in @('driver.cjs', 'extension-test.cjs')) {
     Assert-Hash (Join-Path $work ('driver/' + $driverFile)) $expected.harness.$driverFile
 }
 foreach ($fixture in @('a.cs', 'b.cs')) {
-    Assert-Hash (Join-Path $work ('workspace/' + $fixture)) $expected.harness.'fixtures/web.cs'
+    $fixtureHash = if ($fixture -eq 'a.cs' -and $expected.harness.'prepared/a.cs') { $expected.harness.'prepared/a.cs' } else { $expected.harness.'fixtures/web.cs' }
+    Assert-Hash (Join-Path $work ('workspace/' + $fixture)) $fixtureHash
 }
+if ($expected.nativeCancellation) { Assert-Hash $expected.nativeCancellation.target $expected.harness.'fixtures/cancel-build.targets' }
 $attempt = [IO.File]::Open((Join-Path $work 'attempt.json'), [IO.FileMode]::CreateNew, [IO.FileAccess]::Write)
 try {
     $bytes = [Text.Encoding]::UTF8.GetBytes('{"schema":1,"attempted":true}')
@@ -55,6 +58,7 @@ $editorProfile = Join-Path $work 'profile'
 $extensions = Join-Path $work 'extensions'
 $logs = Join-Path $work 'logs'
 $launcher = @{ schema = 1; success = $false; work = $work; candidateSha256 = $expected.candidate.sha256;
+    visibleWindowRequested = [bool]$ShowWindow;
     scope = 'normally installed local candidate and dependency; isolated VSCodium command API control, not qualification' }
 $process = $null
 
@@ -108,10 +112,12 @@ try {
         '--extensionTestsPath', (& $quoted (Join-Path $work 'driver/extension-test.cjs')),
         '--skip-welcome', '--skip-release-notes', '--disable-gpu', '--disable-workspace-trust', '--no-sandbox',
         (& $quoted (Join-Path $work 'workspace')))
-    $process = Start-Process -FilePath $expected.editor.executable -ArgumentList $arguments -WindowStyle Hidden -PassThru `
+    # Explicit opt-in is needed when an operator will exercise native UI input.
+    $windowStyle = if ($ShowWindow) { 'Normal' } else { 'Hidden' }
+    $process = Start-Process -FilePath $expected.editor.executable -ArgumentList $arguments -WindowStyle $windowStyle -PassThru `
         -RedirectStandardOutput (Join-Path $logs 'stdout.txt') -RedirectStandardError (Join-Path $logs 'stderr.txt')
     $launcher.pid = $process.Id
-    @{ pid=$process.Id; arguments=$arguments; work=$work; freshProfile=$true } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $work 'launch.json')
+    @{ pid=$process.Id; arguments=$arguments; work=$work; freshProfile=$true; visibleWindowRequested=[bool]$ShowWindow } | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $work 'launch.json')
     if (!$process.WaitForExit($DeadlineSeconds * 1000)) {
         $launcher.fixtureShutdown = @(Request-OwnedFixtureShutdown)
         $ownedEditor = Get-CimInstance Win32_Process -Filter ("ProcessId=" + $process.Id)

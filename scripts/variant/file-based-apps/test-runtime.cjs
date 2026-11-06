@@ -844,6 +844,97 @@ test('repeated F5 during classification coalesces the same file build', async t 
     assert.equal(f.calls.launches.length, 1);
 });
 
+test('concurrent dirty-file commands share a cancelled save and permit a corrected retry', async t => {
+    let completeSave;
+    const progress = [];
+    const options = { dirty: true, reportProgress: value => progress.push(value),
+        save: () => new Promise(resolve => { completeSave = resolve; }) };
+    const f = fixture(t, options);
+    t.after(() => completeSave?.(false));
+    const requests = Array.from({ length: 3 }, () => f.api.debugActiveFile());
+    await waitFor(() => completeSave, 'The shared dirty source save must be pending');
+    assert.equal(f.calls.saves, 1);
+    assert.equal(f.calls.classifications.length, 0);
+    assert.equal(f.calls.processes.length, 0);
+    assert.deepEqual(progress, [], 'Progress cancellation has not begun while save is pending');
+    completeSave(false);
+    assert.deepEqual(await Promise.all(requests), [false, false, false]);
+    assert.deepEqual(f.calls.errors, []);
+    assert.equal(f.calls.launches.length, 0);
+    assert.equal(f.calls.classifications.length, 0);
+    assert.equal(f.calls.processes.length, 0);
+
+    fs.writeFileSync(f.source, 'Console.WriteLine("corrected after save cancellation");\n');
+    options.save = async () => { f.document.isDirty = false; return true; };
+    assert.deepEqual(await Promise.all(Array.from({ length: 3 }, () => f.api.debugActiveFile())), [true, true, true]);
+    assert.equal(f.calls.saves, 2, 'The retry must perform exactly one new save');
+    assert.equal(f.calls.classifications.length, 1);
+    assert.equal(f.calls.processes.filter(call => call.args[0] === 'build').length, 1);
+    assert.equal(f.calls.launches.length, 1);
+    assert.equal(f.document.isDirty, false);
+    assert.deepEqual(f.calls.errors, []);
+});
+
+test('user build cancellation stays coalesced until child close and permits one dirty concurrent retry', async t => {
+    let completeChild;
+    let childPending = false;
+    let firstBuild = true;
+    const removals = [];
+    const f = fixture(t, { removeOutput: async (directory, settings) => {
+        assert.equal(childPending, false, 'Cancellation must wait for the writing child to settle before cleanup');
+        removals.push(directory);
+        await fs.promises.rm(directory, settings);
+    }, save: async () => { f.document.isDirty = false; return true; } });
+    const run = f.dependencies.runDotnet;
+    f.dependencies.runDotnet = async (args, settings) => {
+        const result = await run(args, settings);
+        if (args[0] !== 'build' || !firstBuild) return result;
+        firstBuild = false;
+        childPending = true;
+        return new Promise((_resolve, reject) => {
+            completeChild = () => {
+                childPending = false;
+                reject(Object.assign(new Error('Direct child closed after cancellation'), { name: 'AbortError' }));
+            };
+        });
+    };
+    t.after(() => { completeChild?.(); f.dispose(); });
+    const first = f.api.debugActiveFile();
+    await waitFor(() => completeChild, 'The first build child must be pending');
+    const cancelledBuild = f.calls.processes.find(call => call.args[0] === 'build');
+    const directory = cancelledBuild.args[cancelledBuild.args.indexOf('--output') + 1];
+    f.cancel();
+    assert.equal(cancelledBuild.settings.signal.reason.name, 'AbortError');
+    const requests = [first, f.api.debugActiveFile(), f.api.debugActiveFile()];
+    let settled = 0;
+    for (const request of requests) void request.then(() => { settled++; });
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(settled, 0, 'Repeated commands must keep sharing the cancelled child until close');
+    assert.equal(f.calls.classifications.length, 1);
+    assert.equal(f.calls.processes.filter(call => call.args[0] === 'build').length, 1);
+    assert(fs.existsSync(path.join(directory, 'FileApp.dll')));
+    assert.deepEqual(removals, []);
+    completeChild();
+    assert.deepEqual(await Promise.all(requests), [false, false, false]);
+    assert.deepEqual(removals, [directory]);
+    assert(!fs.existsSync(directory));
+    assert.equal(f.calls.launches.length, 0);
+    assert.deepEqual(f.calls.errors, []);
+    assert(f.calls.logs.some(line => /Phase cancelled: Building file-based app/.test(line)));
+
+    fs.writeFileSync(f.source, 'Console.WriteLine("dirty retry after build cancellation");\n');
+    f.document.isDirty = true;
+    assert.deepEqual(await Promise.all(Array.from({ length: 3 }, () => f.api.debugActiveFile())), [true, true, true]);
+    assert.equal(f.calls.saves, 1);
+    assert.equal(f.document.isDirty, false);
+    assert.equal(f.calls.classifications.length, 2);
+    assert.equal(f.calls.processes.filter(call => call.args[0] === 'build').length, 2);
+    assert.equal(f.calls.launches.length, 1);
+    assert.notEqual(f.calls.launches[0].config.__netcoredbgFileAppOutput, directory);
+    assert(fs.existsSync(f.calls.launches[0].config.program));
+    assert.deepEqual(f.calls.errors, []);
+});
+
 test('separate sessions have distinct output directories; only owned output is removed on termination', async t => {
     const f = fixture(t);
     assert.equal(await f.api.debugActiveFile(), true);
