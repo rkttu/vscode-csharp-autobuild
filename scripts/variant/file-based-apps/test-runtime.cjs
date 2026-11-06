@@ -1084,6 +1084,47 @@ test('Web SDK build metadata applies HTTP run.json without certificate commands 
     assert(build.args.includes('-getItem:FrameworkReference'));
 });
 
+test('an invalid HTTP profile root fails after build and permits corrected coalesced retry with its notification open', { timeout: 5000 }, async t => {
+    let dismiss;
+    const notification = new Promise(resolve => { dismiss = resolve; });
+    const f = fixture(t, { web: true, showErrorMessage: () => notification });
+    t.after(() => dismiss());
+    const original = fs.readFileSync(f.source);
+    const profilePath = f.source.replace(/\.cs$/i, '.run.json');
+    const profile = { profiles: { Http: { commandName: 'Project', applicationUrl: 'http://127.0.0.1:5123',
+        launchBrowser: false, environmentVariables: { DOTNET_ROOT: path.join(f.root, 'incorrect-sdk-root') } } } };
+    fs.writeFileSync(profilePath, JSON.stringify(profile));
+    assert.equal(await f.api.debugActiveFile(), false);
+    assert.deepEqual(fs.readFileSync(f.source), original, 'The failure must originate only in the launch profile');
+    assert.equal(f.calls.launches.length, 0, 'A profile rejection must never call the debug start API');
+    const builds = f.calls.processes.filter(call => call.args[0] === 'build');
+    assert.equal(builds.length, 1);
+    const failedOutput = builds[0].args[builds[0].args.indexOf('--output') + 1];
+    assert(!fs.existsSync(failedOutput));
+    assert.deepEqual(terminalOutputs(f), []);
+    assert(f.calls.logs.some(line => line.startsWith('Phase completed: Building file-based app')));
+    assert(f.calls.logs.some(line => line.startsWith('Phase failed: Preparing web launch settings')));
+    assert(!f.calls.logs.some(line => line.startsWith('Phase started: Starting netcoredbg')));
+    assert.equal(f.calls.errors.length, 1);
+    assert.match(f.calls.errors[0], /The web launch profile DOTNET_ROOT does not identify the selected dotnet installation/);
+    assert(!f.calls.processes.some(call => call.args[0] === 'dev-certs'), 'Explicit HTTP profiles cannot enter certificate setup');
+
+    delete profile.profiles.Http.environmentVariables.DOTNET_ROOT;
+    fs.writeFileSync(profilePath, JSON.stringify(profile));
+    fs.writeFileSync(f.source, 'Console.WriteLine("corrected profile retry");\n');
+    f.document.isDirty = true;
+    assert.deepEqual(await Promise.all(Array.from({ length: 3 }, () => f.api.debugActiveFile())), [true, true, true]);
+    assert.equal(f.calls.saves, 1);
+    assert.equal(f.calls.processes.filter(call => call.args[0] === 'build').length, 2);
+    assert.equal(f.calls.launches.length, 1);
+    assert.notEqual(f.calls.launches[0].config.__netcoredbgFileAppOutput, failedOutput);
+    assert.equal(f.calls.launches[0].config.env.DOTNET_ROOT, path.join(f.root, 'dotnet'));
+    assert.equal(f.calls.launches[0].config.env.ASPNETCORE_URLS, 'http://127.0.0.1:5123');
+    assert.equal(f.calls.errors.length, 1, 'The earlier undismissed notification must not obstruct or duplicate retry');
+    f.terminate(f.calls.launches[0].config);
+    await waitFor(() => !fs.existsSync(f.calls.launches[0].config.__netcoredbgFileAppOutput), 'Retry output must clean after matching termination');
+});
+
 test('failed Web builds never enter certificate or browser preparation', async t => {
     let prepared = 0;
     const f = fixture(t, { web: true, buildError: new Error('CS1002'), webSupport: {
