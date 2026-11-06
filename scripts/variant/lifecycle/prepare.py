@@ -7,6 +7,7 @@ from pathlib import Path, PurePosixPath
 import struct
 import subprocess
 import sys
+import uuid
 import xml.etree.ElementTree as ET
 import zipfile
 
@@ -117,7 +118,7 @@ def main():
     parser.add_argument("--sdk-version", required=True)
     parser.add_argument("--work-dir", type=Path, required=True)
     parser.add_argument("--cycles", type=int, default=3)
-    parser.add_argument("--scenario", choices=("web-lifecycle", "build-failure-retry"), default="web-lifecycle")
+    parser.add_argument("--scenario", choices=("web-lifecycle", "build-failure-retry", "native-build-cancel"), default="web-lifecycle")
     args = parser.parse_args()
     if not 2 <= args.cycles <= 10:
         parser.error("Use 2..10 cycles to exercise bounded same-file retry")
@@ -153,6 +154,22 @@ def main():
     fixture = (Path(__file__).parent / "fixtures/web.cs").read_bytes()
     for name in ("a.cs", "b.cs"):
         (work / "workspace" / name).write_bytes(fixture)
+    native_cancellation = None
+    if args.scenario == "native-build-cancel":
+        nonce = str(uuid.uuid4())
+        target = work / "workspace/cancel-build.targets"
+        target.write_bytes((Path(__file__).parent / "fixtures/cancel-build.targets").read_bytes())
+        native_cancellation = {"target": str(target), "marker": str(work / "progress/sdk-build-ready.json"),
+                               "release": str(work / "progress/release-sdk-build"), "nonce": nonce,
+                               "windowTitle": "FBA cancellation " + nonce}
+        directives = "\n".join((
+            "#:property LifecycleCancelEnabled=false",
+            "#:property CustomAfterMicrosoftCommonTargets=" + target.as_posix(),
+            "#:property LifecycleCancelMarker=" + Path(native_cancellation["marker"]).as_posix(),
+            "#:property LifecycleCancelRelease=" + Path(native_cancellation["release"]).as_posix(),
+            "#:property LifecycleCancelNonce=" + nonce,
+        )) + "\n"
+        (work / "workspace/a.cs").write_bytes(directives.encode() + fixture)
     (work / "workspace/global.json").write_text(json.dumps({"sdk": {"version": args.sdk_version, "rollForward": "disable"}}))
     nuget = '<configuration><packageSources><clear /></packageSources></configuration>\n'
     for name in ("workspace/NuGet.Config", "appdata/NuGet/NuGet.Config"):
@@ -160,9 +177,14 @@ def main():
     settings = {"extensions.autoUpdate": False, "extensions.autoCheckUpdates": False, "update.mode": "none",
                 "telemetry.telemetryLevel": "off", "extensions.ignoreRecommendations": True,
                 "dotnetAcquisitionExtension.existingDotnetPath": [{"extensionId": EXTENSION_ID, "path": str(dotnet)}]}
+    if native_cancellation:
+        settings["window.title"] = native_cancellation["windowTitle"]
     (work / "profile/User/settings.json").write_text(json.dumps(settings, indent=2))
     harness = {name: digest((Path(__file__).parent / name).read_bytes())
                for name in ("prepare.py", "run.ps1", "driver.cjs", "extension-test.cjs", "fixtures/web.cs")}
+    if native_cancellation:
+        harness["fixtures/cancel-build.targets"] = digest(target.read_bytes())
+        harness["prepared/a.cs"] = digest((work / "workspace/a.cs").read_bytes())
     expected = {"schema": 1, "extensionId": EXTENSION_ID, "candidate": candidate, "cycles": args.cycles,
                 "scenario": args.scenario,
                 "harness": harness,
@@ -173,6 +195,8 @@ def main():
                 "dependency": {"path": str(runtime), "sha256": args.runtime_sha256.lower(), "version": "3.2.0"},
                 "scope": {"localOnly": True, "published": False, "qualification": False, "physicalF5": False,
                           "macOS": False, "invocation": "command-api", "freshProfiles": 1}}
+    if native_cancellation:
+        expected["nativeCancellation"] = native_cancellation
     (work / "expected.json").write_text(json.dumps(expected, indent=2) + "\n")
     print(json.dumps({"workDir": str(work), "candidateSha256": candidate["sha256"], "buildId": candidate["buildId"]}))
 

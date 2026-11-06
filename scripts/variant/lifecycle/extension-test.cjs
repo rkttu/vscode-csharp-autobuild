@@ -93,20 +93,39 @@ exports.run = async function run() {
     const expected = JSON.parse(fs.readFileSync(path.join(root, 'expected.json'), 'utf8'));
     assert.equal(expected.schema, 1);
     const scenario = expected.scenario || 'web-lifecycle';
-    assert(['web-lifecycle', 'build-failure-retry'].includes(scenario));
+    assert(['web-lifecycle', 'build-failure-retry', 'native-build-cancel'].includes(scenario));
     assert(Number.isInteger(expected.cycles) && expected.cycles >= 2 && expected.cycles <= 10);
     const start = process.hrtime.bigint();
     const result = {
         schema: 1, success: false, expected, editorApiVersion: vscode.version,
         safetyTimeoutMilliseconds: SAFETY_TIMEOUT_MS, checks: [], phases: [], launches: [], cleanup: [], failedBuildAttempts: [],
+        cancelledBuildAttempts: [],
         scope: { installedCandidate: true, invocation: 'command-api', physicalF5: false,
             VSCodium: true, platform: `${process.platform}-${process.arch}`, macOS: process.platform === 'darwin',
             qualification: false, localOnly: true, published: false, directWebDebuggee: true,
             spawnedGrandchildren: false, hostReload: false, injectedTargetRuntime: false,
-            scenario, actualCompilerFailure: scenario === 'build-failure-retry' },
+            scenario, actualCompilerFailure: scenario === 'build-failure-retry',
+            actualProgressCancelUi: scenario === 'native-build-cancel', injectedCancellationToken: false },
     };
     const launches = [];
     const failedBuildAttempts = [];
+    const cancelledBuildAttempts = [];
+    const nativeCancellation = scenario === 'native-build-cancel' ? expected.nativeCancellation : undefined;
+    if (nativeCancellation) {
+        assert.equal(typeof nativeCancellation.nonce, 'string');
+        assert(nativeCancellation.nonce.length > 0);
+        assert.equal(typeof nativeCancellation.windowTitle, 'string');
+        assert(nativeCancellation.windowTitle.length > 0);
+        for (const name of ['marker', 'release', 'target']) {
+            assert(path.isAbsolute(nativeCancellation[name]) && within(root, nativeCancellation[name]),
+                `Native build ${name} must be an exact path inside the isolated root`);
+        }
+        assert(exists(nativeCancellation.target));
+        for (const file of [nativeCancellation.marker, nativeCancellation.release,
+            path.join(root, 'needs-ui-cancel.json'), path.join(root, 'ui-cancel-action.json')]) {
+            assert(!exists(file), 'Native cancellation evidence must begin with fresh marker, release and UI receipt paths');
+        }
+    } else assert.notEqual(scenario, 'native-build-cancel', 'Native cancellation needs an explicit isolated fixture identity');
     // Includes unexpected sessions from an intended failed build for targeted cleanup.
     const ownedAttempts = [];
     const byToken = new Map();
@@ -135,6 +154,8 @@ exports.run = async function run() {
                 capturedSessions: capturedSessionState(launch),
                 commandPending: launch.commandPending,
                 expectedBuildFailure: launch.expectedBuildFailure,
+                expectedBuildCancellation: launch.expectedBuildCancellation,
+                buildPid: launch.buildPid,
                 stopRequestedAtMilliseconds: launch.stopRequestedAtMilliseconds,
                 stopPromiseResolvedAtMilliseconds: launch.stopPromiseResolvedAtMilliseconds,
                 terminatedAtMilliseconds: launch.terminatedAtMilliseconds,
@@ -211,6 +232,7 @@ exports.run = async function run() {
         launch.output = session.configuration.__netcoredbgFileAppOutput;
         launch.base = path.dirname(path.dirname(launch.output));
         assert(!launch.expectedBuildFailure, 'The compiler-failed attempt must not create a debug adapter or session');
+        assert(!launch.expectedBuildCancellation, 'The cancelled build attempt must not create a debug adapter or session');
     }
 
     function capturedSessionState(launch) {
@@ -273,6 +295,7 @@ exports.run = async function run() {
             buildCommands: buildCommands(tail, source),
             compilerDiagnostics: tail.split(/\r?\n/).filter(line => line.includes('CS0103')),
             failedPhaseDiagnostics: tail.split(/\r?\n/).filter(line => line.startsWith('Phase failed: Building file-based app')),
+            cancelledPhaseDiagnostics: tail.split(/\r?\n/).filter(line => line.startsWith('Phase cancelled: Building file-based app')),
             completedPhaseDiagnostics: tail.split(/\r?\n/).filter(line => line.startsWith('Phase completed: Starting netcoredbg')) };
     }
 
@@ -369,6 +392,7 @@ exports.run = async function run() {
         assert.equal(launch.session.configuration.checkForDevCert, false);
         assert(!launches.some(previous => previous !== launch && previous.output === launch.output), 'Every launch needs a fresh output directory');
         assert(!failedBuildAttempts.some(previous => previous.output === launch.output), 'A retry must not reuse failed build output');
+        assert(!cancelledBuildAttempts.some(previous => previous.output === launch.output), 'A retry must not reuse cancelled build output');
         if (inspectBreakpoint) {
             await until(() => launch.dap.some(message => message.event === 'stopped' && message.body?.reason === 'breakpoint'), `${label} source breakpoint`);
             const stopped = launch.dap.find(message => message.event === 'stopped' && message.body?.reason === 'breakpoint');
@@ -454,9 +478,164 @@ exports.run = async function run() {
         return attempt;
     }
 
+    function readCancellationMarker() {
+        const marker = JSON.parse(fs.readFileSync(nativeCancellation.marker, 'utf8').replace(/^\uFEFF/, ''));
+        assert.equal(marker.schema, 1);
+        assert.equal(marker.nonce, nativeCancellation.nonce, 'Build readiness must belong to this exact isolated fixture');
+        assert(Number.isSafeInteger(marker.pid) && marker.pid > 0, 'Build readiness must report its in-process SDK PID');
+        return marker;
+    }
+
+    async function nativeBuildCancellation(source, revision, port, a, b) {
+        let file;
+        await until(() => {
+            file = outputLog();
+            if (!file) return false;
+            const text = fs.readFileSync(file, 'utf8');
+            return buildCommands(text, source).length === 1 && buildCommands(text, b.source).length === 1 &&
+                text.split(/\r?\n/).filter(line => line.startsWith('Phase completed: Starting netcoredbg')).length === 2;
+        }, 'initial A/B command output before native cancellation');
+        const snapshot = logSnapshot(file);
+        const opened = await vscode.workspace.openTextDocument(source);
+        const content = opened.getText();
+        const disabled = '#:property LifecycleCancelEnabled=false';
+        const enabled = '#:property LifecycleCancelEnabled=true';
+        assert.equal(content.split(disabled).length, 2, 'Only A must contain one disabled cancellation fixture gate');
+        const replacement = content.replace(disabled, enabled);
+        const edit = new vscode.WorkspaceEdit();
+        edit.replace(opened.uri, new vscode.Range(opened.positionAt(0), opened.positionAt(content.length)), replacement);
+        assert.equal(await vscode.workspace.applyEdit(edit), true);
+        assert.equal(opened.isDirty, true, 'Native build cancellation must begin with an unsaved source edit');
+        await vscode.window.showTextDocument(opened);
+        const attempt = { label: 'A-build-cancel', source, revision, port, origin: `http://127.0.0.1:${port}`,
+            nonce: crypto.randomUUID(), expectedBuildCancellation: true, commandInvocations: 3, dap: [] };
+        cancelledBuildAttempts.push(attempt);
+        ownedAttempts.push(attempt);
+        byToken.set(attempt.nonce, attempt);
+        fs.writeFileSync(source.replace(/\.cs$/i, '.run.json'), JSON.stringify({ profiles: { LifecycleHttp: {
+            commandName: 'Project', applicationUrl: attempt.origin, launchBrowser: false,
+            environmentVariables: { LIFECYCLE_TOKEN: attempt.nonce, ASPNETCORE_ENVIRONMENT: 'Development' },
+        } } }, null, 2) + '\n');
+        attempt.commandPending = true;
+        attempt.invokedAtMilliseconds = elapsed(start);
+        record('native-build-cancel-request', { label: attempt.label, nonce: attempt.nonce, fixtureNonce: nativeCancellation.nonce });
+        state();
+        let commandsSettled = false;
+        const commands = Promise.allSettled(Array.from({ length: attempt.commandInvocations }, () => vscode.commands.executeCommand(COMMAND)))
+            .finally(() => {
+                commandsSettled = true;
+                attempt.commandPending = false;
+                attempt.returnedAtMilliseconds = elapsed(start);
+                state();
+            });
+        attempt.commandOperation = commands;
+        await until(() => {
+            assert(!commandsSettled, 'The native build commands must remain pending until the actual readiness marker');
+            return exists(nativeCancellation.marker);
+        }, 'nonce-owned in-process native SDK build readiness marker');
+        attempt.marker = readCancellationMarker();
+        attempt.buildPid = attempt.marker.pid;
+        assert(pidAlive(attempt.buildPid), 'The SDK build PID must still be alive at the cancellation barrier');
+        attempt.buildReadyAtMilliseconds = elapsed(start);
+        assert.equal(opened.isDirty, false, 'The public command must save A before the actual SDK build');
+        assert.equal(fs.readFileSync(source, 'utf8'), replacement);
+        attempt.sourceSaved = true;
+        let tail;
+        await until(() => {
+            assert(!commandsSettled, 'The SDK build must stay pending before UI cancellation is requested');
+            tail = logTail(snapshot);
+            return buildCommands(tail, source).length > 0;
+        }, 'actual cancellation-attempt build command output');
+        const building = buildCommands(tail, source);
+        assert.equal(building.length, 1, 'Three concurrent cancellation commands must share one actual build');
+        attempt.output = building[0].output;
+        attempt.program = path.join(attempt.output, 'FileApp.dll');
+        attempt.base = path.dirname(path.dirname(attempt.output));
+        assert(samePath(attempt.base, a.base));
+        assert.notEqual(attempt.output, a.output);
+        assert(exists(attempt.output), 'The live build must retain its owned output at the barrier');
+        assert.equal(attempt.session, undefined);
+        await stillAlive(b);
+        assert(!commandsSettled && pidAlive(attempt.buildPid), 'The SDK build must still be waiting for actual UI Cancel');
+        const requestFile = path.join(root, 'needs-ui-cancel.json');
+        const uiRequest = { schema: 1, nonce: nativeCancellation.nonce, pid: attempt.buildPid,
+            source, port, output: attempt.output, windowTitle: nativeCancellation.windowTitle };
+        fs.writeFileSync(requestFile, JSON.stringify(uiRequest, null, 2) + '\n', { flag: 'wx' });
+        attempt.uiRequestedAtMilliseconds = elapsed(start);
+        record('needs-ui-cancel', uiRequest);
+        state();
+
+        const outcomes = await commands;
+        const rejected = outcomes.find(outcome => outcome.status === 'rejected');
+        if (rejected) throw rejected.reason;
+        attempt.commandResults = outcomes.map(outcome => outcome.value);
+        assert.deepEqual(attempt.commandResults, [false, false, false], 'Actual progress cancellation must decline all three callers');
+        const receiptFile = path.join(root, 'ui-cancel-action.json');
+        await until(() => exists(receiptFile), 'actual editor Cancel UI action receipt');
+        attempt.uiAction = JSON.parse(fs.readFileSync(receiptFile, 'utf8').replace(/^\uFEFF/, ''));
+        assert.equal(attempt.uiAction.schema, 1);
+        assert.equal(attempt.uiAction.nonce, nativeCancellation.nonce);
+        assert.equal(attempt.uiAction.windowTitle, nativeCancellation.windowTitle);
+        assert.equal(attempt.uiAction.action, 'click-cancel');
+        assert(!exists(nativeCancellation.release), 'A successful cancellation must not rely on releasing the fixture barrier');
+        assert.equal(attempt.session, undefined, 'Cancellation must prevent A debugger handoff');
+        await until(() => !pidAlive(attempt.buildPid), 'cancelled direct SDK build PID exit');
+        attempt.buildPidGoneObservedAtMilliseconds = elapsed(start);
+        record('direct-sdk-pid-gone-observed', { label: attempt.label, pid: attempt.buildPid });
+        await until(() => {
+            tail = logTail(snapshot);
+            return tail.includes('Phase cancelled: Building file-based app');
+        }, 'cancelled native build phase diagnostics');
+        attempt.log = logEvidence(snapshot, tail, source);
+        assert.equal(attempt.log.buildCommands.length, 1);
+        assert.equal(attempt.log.cancelledPhaseDiagnostics.length, 1);
+        assert.equal(attempt.log.failedPhaseDiagnostics.length, 0);
+        assert.equal(attempt.log.completedPhaseDiagnostics.length, 0);
+        assert(!tail.includes('Phase timed out:'), 'Expected UI cancellation must stay distinct from a timeout');
+        assert(!exists(attempt.output), 'The exact cancelled output must be gone at the post-return resource observation');
+        assert(queueEmpty(attempt.base));
+        attempt.outputRemovedAtMilliseconds = elapsed(start);
+        assert(await canBind(port), 'The cancelled A build must leave its HTTP port reusable');
+        attempt.portReusableAtMilliseconds = elapsed(start);
+        attempt.noSession = !attempt.session;
+        await stillAlive(b);
+        record('native-build-cancel-confirmed', { label: attempt.label, commandResults: attempt.commandResults,
+            buildPid: attempt.buildPid, output: attempt.output, uiAction: attempt.uiAction });
+        result.checks.push('Actual progress Cancel during one real SDK build returns false for three callers, starts no A session, releases the direct build PID/output/port and preserves B');
+        state();
+        return attempt;
+    }
+
     async function failureCleanup() {
         // Keep evidence when exact API stop or fixture ownership verification fails.
         // Do not issue global Stop, process-tree kill or filesystem cleanup.
+        // Release only this exact nonce/PID-verified in-process fixture barrier;
+        // this is failure safety, never a substitute for the successful Cancel UI.
+        if (nativeCancellation) {
+            const attempt = cancelledBuildAttempts.at(-1);
+            const cleanup = { label: 'native-cancellation-fixture-barrier' };
+            result.cleanup.push(cleanup);
+            try {
+                if (attempt?.buildPid && exists(nativeCancellation.marker)) {
+                    const marker = readCancellationMarker();
+                    assert.equal(marker.pid, attempt.buildPid);
+                    if (pidAlive(marker.pid)) {
+                        fs.writeFileSync(nativeCancellation.release, nativeCancellation.nonce + '\n', { flag: 'wx' });
+                        cleanup.verifiedFixtureBarrierReleased = true;
+                        cleanup.pid = marker.pid;
+                        await waitUntil(() => !pidAlive(marker.pid), 'failure cleanup direct SDK build PID', 10000);
+                        cleanup.pidGone = true;
+                    }
+                }
+            } catch (error) { cleanup.fixtureBarrierError = String(error); }
+            try {
+                for (const pending of cancelledBuildAttempts.filter(item => item.commandPending && item.commandOperation)) {
+                    const outcomes = await bounded(pending.commandOperation, 'failure cleanup pending cancelled-build command outcomes', 15000);
+                    cleanup.pendingCommandOutcomes = outcomes.map(outcome => ({ status: outcome.status,
+                        ...(outcome.status === 'fulfilled' ? { value: outcome.value } : { error: String(outcome.reason) }) }));
+                }
+            } catch (error) { cleanup.pendingCommandError = String(error); }
+        }
         const visited = new Set();
         for (const launch of ownedAttempts.slice().reverse()) {
             const captured = [...(launch.capturedSessions?.values() || [])].reverse();
@@ -610,7 +789,9 @@ exports.run = async function run() {
             result.checks.push(`A cycle ${cycle}: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives`);
             const failed = scenario === 'build-failure-retry' && cycle === 0
                 ? await phase('A actual compiler failure and owned cleanup while B survives', () => compilerFailure(aSource, a.revision, aPort, a, b))
-                : undefined;
+                : scenario === 'native-build-cancel' && cycle === 0
+                    ? await phase('A actual progress Cancel during native build while B survives', () => nativeBuildCancellation(aSource, a.revision, aPort, a, b))
+                    : undefined;
             if (cycle + 1 < expected.cycles) {
                 const revision = `retry-${cycle + 1}`;
                 await phase(`A cycle ${cycle + 1} dirty edit and installed-command retry`, async () => {
@@ -618,9 +799,12 @@ exports.run = async function run() {
                     const content = current.getText();
                     assert(content.includes(`const string revision = "${a.revision}";`));
                     let replacement = content.replace(`const string revision = "${a.revision}";`, `const string revision = "${revision}";`);
-                    if (failed) {
+                    if (failed?.expectedBuildFailure) {
                         assert(content.includes('marker += __missingLifecycleValue;'));
                         replacement = replacement.replace('marker += __missingLifecycleValue;', 'marker += 2;');
+                    } else if (failed?.expectedBuildCancellation) {
+                        assert(content.includes('#:property LifecycleCancelEnabled=true'));
+                        replacement = replacement.replace('#:property LifecycleCancelEnabled=true', '#:property LifecycleCancelEnabled=false');
                     }
                     const edit = new vscode.WorkspaceEdit();
                     edit.replace(current.uri, new vscode.Range(current.positionAt(0), current.positionAt(content.length)), replacement);
@@ -637,6 +821,7 @@ exports.run = async function run() {
                         assert.equal(log.buildCommands.length, 1, 'Three concurrent corrected commands must share exactly one build');
                         assert.equal(log.completedPhaseDiagnostics.length, 1, 'Three concurrent corrected commands must share one handoff');
                         assert.equal(log.failedPhaseDiagnostics.length, 0);
+                        assert.equal(log.cancelledPhaseDiagnostics.length, 0);
                         assert(samePath(log.buildCommands[0].output, a.output), 'Coalesced build output must identify the one captured session');
                         assert(!exists(failed.output));
                         result.coalescedRetry = { label: a.label, commandInvocations: a.commandInvocations,
@@ -644,7 +829,9 @@ exports.run = async function run() {
                             sessionIds: [...a.capturedSessions.keys()],
                             log, failedOutput: failed.output, freshOutput: a.output !== failed.output };
                         await stillAlive(b);
-                        result.checks.push('Dirty compiler correction retries with three concurrent commands sharing one build/session and fresh output while B survives');
+                        result.checks.push(failed.expectedBuildCancellation
+                            ? 'Dirty retry after native build cancellation shares one saved build/session and fresh output across three callers while B survives'
+                            : 'Dirty compiler correction retries with three concurrent commands sharing one build/session and fresh output while B survives');
                         record('coalesced-corrected-retry-confirmed', result.coalescedRetry);
                     }
                 });
@@ -686,6 +873,19 @@ exports.run = async function run() {
             invokedAtMilliseconds: attempt.invokedAtMilliseconds, returnedAtMilliseconds: attempt.returnedAtMilliseconds,
             sourceSaved: attempt.sourceSaved, sessionId: attempt.session?.id, pid: attempt.pid, terminated: attempt.terminated,
             capturedSessions: capturedSessionState(attempt),
+            output: attempt.output, program: attempt.program, base: attempt.base,
+            outputRemovedAtMilliseconds: attempt.outputRemovedAtMilliseconds,
+            portReusableAtMilliseconds: attempt.portReusableAtMilliseconds, noSession: attempt.noSession, log: attempt.log,
+        }));
+        result.cancelledBuildAttempts = cancelledBuildAttempts.map(attempt => ({
+            label: attempt.label, source: attempt.source, revision: attempt.revision, nonce: attempt.nonce,
+            origin: attempt.origin, port: attempt.port, expectedBuildCancellation: true,
+            commandPending: attempt.commandPending, commandInvocations: attempt.commandInvocations, commandResults: attempt.commandResults,
+            invokedAtMilliseconds: attempt.invokedAtMilliseconds, returnedAtMilliseconds: attempt.returnedAtMilliseconds,
+            sourceSaved: attempt.sourceSaved, sessionId: attempt.session?.id, capturedSessions: capturedSessionState(attempt),
+            marker: attempt.marker, buildPid: attempt.buildPid, buildReadyAtMilliseconds: attempt.buildReadyAtMilliseconds,
+            buildPidGoneObservedAtMilliseconds: attempt.buildPidGoneObservedAtMilliseconds,
+            uiRequestedAtMilliseconds: attempt.uiRequestedAtMilliseconds, uiAction: attempt.uiAction,
             output: attempt.output, program: attempt.program, base: attempt.base,
             outputRemovedAtMilliseconds: attempt.outputRemovedAtMilliseconds,
             portReusableAtMilliseconds: attempt.portReusableAtMilliseconds, noSession: attempt.noSession, log: attempt.log,
