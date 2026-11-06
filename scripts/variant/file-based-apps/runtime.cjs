@@ -110,7 +110,7 @@ function activate(context, dependencies = {}) {
     const pendingStarts = new Set();
     let disposed = false;
     let resourcesReleased = false;
-    let recoveryPending = true;
+    let recoveryInFlight;
     const cleanupLog = message => {
         try { output.appendLine(message); } catch { /* Cleanup may outlive the output channel. */ }
     };
@@ -122,7 +122,7 @@ function activate(context, dependencies = {}) {
         // Graceful disposal can outlive the foreground command. Keep observing
         // exact owned launches until their outcome/termination is known.
         if (!disposed || resourcesReleased || pending.size || controllers.size || pendingStarts.size ||
-            launches.size || cleanupInFlight.size || recoveryPending) return;
+            launches.size || cleanupInFlight.size || recoveryInFlight) return;
         resourcesReleased = true;
         disposeResource(startedSession);
         disposeResource(terminated);
@@ -132,6 +132,25 @@ function activate(context, dependencies = {}) {
     const recovery = require('./recovery.cjs').createRecovery({
         baseDirectory: outputBase, removeOutput, isOwned: directory => ownedOutputs.has(directory), log: cleanupLog,
     });
+    function startRecovery() {
+        if (disposed) return Promise.resolve({ scanned: 0, attempted: 0, removed: 0 });
+        if (recoveryInFlight) return recoveryInFlight;
+        // Register drain ownership before I/O or a provider can reenter disposal.
+        // A command arriving during this pass shares it without queuing a later pass.
+        const operation = Promise.resolve().then(() => disposed
+            ? { scanned: 0, attempted: 0, removed: 0 } : recovery.recover()).catch(error => {
+            cleanupLog(`Could not recover terminal file-app outputs: ${error?.message || String(error)}`);
+            return { scanned: 0, attempted: 0, removed: 0 };
+        }).then(result => {
+            cleanupLog(`Terminal output recovery: scanned=${result.scanned}, attempted=${result.attempted}, removed=${result.removed}`);
+            return result;
+        }).finally(() => {
+            recoveryInFlight = undefined;
+            releaseDisposedResources();
+        });
+        recoveryInFlight = operation;
+        return operation;
+    }
     const packagedTarget = context.extension?.packageJSON?.netcoredbgBuild?.target;
     const expectedArchitecture = packagedTarget ? (packagedTarget.endsWith('-arm64') ? 'arm64' : 'x64') : undefined;
 
@@ -198,9 +217,14 @@ function activate(context, dependencies = {}) {
     }
 
     async function retryFailedCleanup() {
-        // Retry one terminal output per command. Never sweep outputs belonging to live sessions.
+        // Do not compete with an existing pass or await it in the foreground.
+        // Independent session termination still performs its own idempotent cleanup.
+        if (recoveryInFlight || cleanupInFlight.size) return;
+        // Select either one same-host retry (which can resume incomplete publication)
+        // or one background recovery pass. Do not add both attempts to a command.
         const directory = failedCleanups.values().next().value;
         if (directory !== undefined) await cleanup(directory);
+        else void startRecovery();
     }
 
     function matchesLaunch(session, launch) {
@@ -563,14 +587,8 @@ function activate(context, dependencies = {}) {
             releaseDisposedResources();
         },
     });
-    // Scan only published terminal receipts, without holding activation or a new file command pending.
-    const recoveryReady = recovery.recover().catch(error => {
-        cleanupLog(`Could not recover terminal file-app outputs: ${error?.message || String(error)}`);
-        return { scanned: 0, attempted: 0, removed: 0 };
-    }).finally(() => {
-        recoveryPending = false;
-        releaseDisposedResources();
-    });
+    // Recover validated terminal receipts without holding activation or a file command pending.
+    const recoveryReady = startRecovery();
     return { debugActiveFile: command, recoveryReady };
 }
 
