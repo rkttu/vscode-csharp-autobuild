@@ -148,6 +148,7 @@ function fixture(t, options = {}) {
         startSession, emitStart: session => started?.(session),
         terminate: config => termination?.(sessions.get(config) || sessionFor(config)), cancel: () => cancellation?.(),
         tracker: session => trackers.get(session.id),
+        createTracker: session => trackerFactory?.createDebugAdapterTracker(session),
         session: config => sessions.get(config),
         configuration: (session, success = true) => {
             const tracker = trackers.get(session.id);
@@ -224,6 +225,35 @@ function assertDisposed(f, tracker = 1) {
     assert.deepEqual(f.calls.disposals, { command: 1, started: 1, terminated: 1, tracker, output: 1 });
 }
 
+function observeDisposal(f) {
+    const state = { settled: false };
+    assert.equal(typeof f.api.dispose, 'function', 'Runtime must expose the shutdown bridge');
+    state.promise = f.api.dispose();
+    assert.equal(state.promise, f.api.disposalReady, 'All shutdown callers must share the drain boundary');
+    assert.equal(f.api.dispose(), state.promise, 'Repeated disposal must retain Promise identity');
+    state.promise.then(() => { state.settled = true; });
+    return state;
+}
+
+test('runtime drain resolves only after final resources release and survives reentrant throwing disposal', async t => {
+    let f, reentrant, outputCallbackCompleted = false;
+    f = fixture(t, { disposeOutput() {
+        reentrant = f.api.dispose();
+        outputCallbackCompleted = true;
+        throw new Error('Output dispose failed after release');
+    } });
+    await f.api.recoveryReady;
+    let resolved = false;
+    f.api.disposalReady?.then(() => { resolved = true; });
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(resolved, false, 'Readiness must not resolve merely because activation is idle');
+    const disposal = observeDisposal(f);
+    assert.equal(reentrant, disposal.promise);
+    await disposal.promise;
+    assert.equal(outputCallbackCompleted, true);
+    assertDisposed(f);
+});
+
 test('graceful disposal prevents a pending save from starting SDK work and rejects future commands', async t => {
     let resolveSave;
     const f = fixture(t, { dirty: true, save: () => new Promise(resolve => { resolveSave = resolve; }) });
@@ -231,6 +261,9 @@ test('graceful disposal prevents a pending save from starting SDK work and rejec
     await waitFor(() => resolveSave, 'The source save must be pending');
     f.dispose();
     f.dispose();
+    const disposal = observeDisposal(f);
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(disposal.settled, false, 'The editor shutdown bridge must wait for the save provider');
     resolveSave(true);
     assert.equal(await operation, false);
     assert.equal(await f.api.debugActiveFile(), false);
@@ -240,6 +273,7 @@ test('graceful disposal prevents a pending save from starting SDK work and rejec
     assert.deepEqual(f.calls.launches, []);
     assert.deepEqual(f.calls.errors, []);
     await waitFor(() => f.calls.disposals.output, 'An idle disposed owner must release its resources');
+    await disposal.promise;
     assertDisposed(f);
 });
 
@@ -310,6 +344,7 @@ for (const outcomeBeforeEvent of [false, true]) {
         await waitFor(() => resolveStart, 'The editor start request must be pending');
         const config = f.calls.launches[0].config;
         f.dispose();
+        const disposal = observeDisposal(f);
         assert.equal(await operation, false);
         if (outcomeBeforeEvent) { resolveStart(true); await new Promise(resolve => setImmediate(resolve)); }
         const unrelated = { ...config, program: path.join(path.dirname(config.program), 'Other.dll') };
@@ -323,13 +358,16 @@ for (const outcomeBeforeEvent of [false, true]) {
         await new Promise(resolve => setImmediate(resolve));
         assert(fs.existsSync(config.program), 'Resolved Stop alone must preserve output until termination');
         assert.equal(f.calls.disposals.output, 0);
+        assert.equal(disposal.settled, false, 'Stop acknowledgement is not the runtime drain boundary');
         f.terminate(config);
         await waitFor(() => !fs.existsSync(config.__netcoredbgFileAppOutput), 'Matching termination must release owned output');
         if (!outcomeBeforeEvent) {
             assert.equal(f.calls.disposals.output, 0, 'The original editor start outcome must remain observed');
+            assert.equal(disposal.settled, false);
             resolveStart(true);
         }
         await waitFor(() => f.calls.disposals.output, 'Terminal owned work must release retained listeners and output');
+        await disposal.promise;
         assertDisposed(f);
         f.dispose();
         assert.deepEqual(f.calls.stops, [session], 'Repeated disposal must not request Stop twice');
@@ -349,8 +387,10 @@ test('graceful disposal stops active owned sessions once and preserves unrelated
         __netcoredbgFileAppOutput: unrelatedDirectory });
     f.dispose();
     f.dispose();
+    const disposal = observeDisposal(f);
     await waitFor(() => !fs.existsSync(config.__netcoredbgFileAppOutput), 'Active owned output must be cleaned after Stop termination');
     await waitFor(() => f.calls.disposals.output, 'All terminal owned work must release the owner');
+    await disposal.promise;
     assert.equal(f.calls.stops.length, 1);
     assert.equal(f.calls.stops[0].configuration, config);
     assert.notEqual(f.calls.stops[0].id, unrelated.id);
@@ -364,6 +404,9 @@ test('graceful disposal retains uncertain output after Stop rejection without er
     const config = f.calls.launches[0].config;
     f.dispose();
     await waitFor(() => f.calls.logs.some(line => line.includes('Adapter refused disposal disconnect')), 'Stop failure must remain in diagnostics');
+    const disposal = observeDisposal(f);
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(disposal.settled, false, 'Uncertain session ownership must not be reported as drained');
     f.dispose();
     assert.equal(f.calls.stops.length, 1);
     assert.deepEqual(f.calls.errors, []);
@@ -372,6 +415,7 @@ test('graceful disposal retains uncertain output after Stop rejection without er
     assert.equal(f.calls.disposals.output, 0, 'Unknown live work must retain its lifecycle observers');
     f.terminate(config);
     await waitFor(() => f.calls.disposals.output, 'A later confirmed termination permits final release');
+    await disposal.promise;
     assert(!fs.existsSync(config.__netcoredbgFileAppOutput));
     assertDisposed(f);
 });
@@ -404,6 +448,9 @@ test('graceful disposal reentered from a cleanup provider waits for that deletio
     const config = f.calls.launches[0].config;
     f.terminate(config);
     await waitFor(() => releaseCleanup, 'The termination deletion must reach its provider');
+    const disposal = observeDisposal(f);
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(disposal.settled, false, 'Reentrant disposal must wait for the registered deletion');
     try {
         assert.equal(outputDisposedInsideProvider, 0, 'Register cleanup ownership before calling a reentrant provider');
         assert.equal(f.calls.disposals.started, 0);
@@ -414,6 +461,7 @@ test('graceful disposal reentered from a cleanup provider waits for that deletio
         assert(!fs.existsSync(config.__netcoredbgFileAppOutput));
     } finally { releaseCleanup(); }
     await waitFor(() => f.calls.disposals.output, 'Settled terminal cleanup must complete disposal');
+    await disposal.promise;
     assert(!fs.existsSync(config.__netcoredbgFileAppOutput));
     assert.deepEqual(f.calls.stops, [], 'A session already confirmed terminal needs no Stop');
     assertDisposed(f);
@@ -556,6 +604,243 @@ test('adapter configuration API absence preserves conservative Stop and terminat
     assert.deepEqual(f.calls.stops, [session]);
     assertDisposed(f, 0);
 });
+
+function dapExit(tracker, code = 0) {
+    tracker.onDidSendMessage({ type: 'event', event: 'exited', body: { exitCode: code } });
+}
+
+function dapTermination(tracker, body = {}) {
+    tracker.onDidSendMessage({ type: 'event', event: 'terminated', body });
+}
+
+async function assertUncertainDAP(f, config, disposal) {
+    await new Promise(resolve => setImmediate(resolve));
+    assert(fs.existsSync(config.program), 'Unconfirmed debuggee output must remain untouched');
+    assert.deepEqual(terminalOutputs(f), [], 'Unconfirmed output must not become a terminal receipt');
+    assert.equal(f.calls.disposals.tracker, 0);
+    assert.equal(f.calls.disposals.output, 0);
+    if (disposal) assert.equal(disposal.settled, false);
+    assert(!f.calls.logs.some(line => line.includes('Confirmed disposed C# session termination from paired DAP')));
+}
+
+for (const code of [0, -1, -2147483648, 2147483647]) {
+    test(`disposed exact session drains from DAP debuggee exit then non-restarting termination (${code})`, async t => {
+        const f = fixture(t, { stopDebugging: async () => {} });
+        assert.equal(await f.api.debugActiveFile(), true);
+        const config = f.calls.launches[0].config;
+        const session = f.session(config), tracker = f.tracker(session);
+        const disposal = observeDisposal(f);
+        dapExit(tracker, code);
+        await assertUncertainDAP(f, config, disposal);
+        if (code === -1) tracker.onDidSendMessage({ type: 'event', event: 'terminated' });
+        else dapTermination(tracker);
+        await waitFor(() => f.calls.disposals.output, 'The trusted DAP pair must complete owned cleanup without an API event');
+        await disposal.promise;
+        assert(!fs.existsSync(config.__netcoredbgFileAppOutput));
+        assert.equal(f.calls.logs.filter(line => line.includes('Confirmed disposed C# session termination from paired DAP')).length, 1);
+        assert(f.calls.logs.some(line => line.includes(`${session.id} (exitCode=${code})`)));
+        assert.deepEqual(f.calls.errors, []);
+        assertDisposed(f);
+    });
+}
+
+for (const [name, messages] of [
+    ['termination alone', tracker => dapTermination(tracker)],
+    ['reverse order', tracker => { dapTermination(tracker); dapExit(tracker); }],
+    ['adapter exit and disconnect acknowledgement', tracker => {
+        tracker.onExit?.(0);
+        tracker.onDidSendMessage({ type: 'response', command: 'disconnect', success: true });
+    }],
+    ['a response carrying an exited event field', tracker => {
+        tracker.onDidSendMessage({ type: 'response', event: 'exited', body: { exitCode: 0 } });
+        dapTermination(tracker);
+    }],
+]) {
+    test(`disposed session preserves output for ${name}`, async t => {
+        const f = fixture(t, { stopDebugging: async () => {} });
+        await f.api.debugActiveFile();
+        const config = f.calls.launches[0].config, tracker = f.tracker(f.session(config));
+        const disposal = observeDisposal(f);
+        messages(tracker);
+        await assertUncertainDAP(f, config, disposal);
+        f.terminate(config);
+        await disposal.promise;
+        assertDisposed(f);
+    });
+}
+
+test('malformed or missing DAP debuggee exit codes cannot combine with termination', async t => {
+    const f = fixture(t, { stopDebugging: async () => {} });
+    await f.api.debugActiveFile();
+    const config = f.calls.launches[0].config, tracker = f.tracker(f.session(config));
+    const disposal = observeDisposal(f);
+    for (const body of [undefined, null, {}, [], { exitCode: '0' }, { exitCode: 0.5 }, { exitCode: NaN },
+        { exitCode: Infinity }, { exitCode: -2147483649 }, { exitCode: 2147483648 }]) {
+        dapExit(tracker); // A malformed later exit must invalidate an earlier candidate too.
+        tracker.onDidSendMessage({ type: 'event', event: 'exited', body });
+        dapTermination(tracker);
+        await assertUncertainDAP(f, config, disposal);
+    }
+    f.terminate(config);
+    await disposal.promise;
+});
+
+test('malformed DAP termination clears a pending exit and a later termination cannot reuse it', async t => {
+    const f = fixture(t, { stopDebugging: async () => {} });
+    await f.api.debugActiveFile();
+    const config = f.calls.launches[0].config, tracker = f.tracker(f.session(config));
+    const disposal = observeDisposal(f);
+    for (const body of [null, 'terminated', [], 0, false]) {
+        dapExit(tracker);
+        dapTermination(tracker, body);
+        dapTermination(tracker);
+        await assertUncertainDAP(f, config, disposal);
+    }
+    f.terminate(config);
+    await disposal.promise;
+});
+
+for (const restart of [true, false, null, {}]) {
+    test(`an explicit DAP restart permanently blocks the shutdown fallback (${JSON.stringify(restart)})`, async t => {
+        const f = fixture(t, { stopDebugging: async () => {} });
+        await f.api.debugActiveFile();
+        const config = f.calls.launches[0].config, tracker = f.tracker(f.session(config));
+        const disposal = observeDisposal(f);
+        dapExit(tracker);
+        dapTermination(tracker, { restart });
+        dapExit(tracker);
+        dapTermination(tracker);
+        await assertUncertainDAP(f, config, disposal);
+        f.terminate(config);
+        await disposal.promise;
+    });
+}
+
+test('normal sessions ignore a DAP pair and disposal cannot reuse a pre-disposal exit', async t => {
+    const f = fixture(t, { stopDebugging: async () => {} });
+    await f.api.debugActiveFile();
+    const config = f.calls.launches[0].config, tracker = f.tracker(f.session(config));
+    dapExit(tracker);
+    dapTermination(tracker);
+    await assertUncertainDAP(f, config);
+    dapExit(tracker);
+    const disposal = observeDisposal(f);
+    dapTermination(tracker);
+    await assertUncertainDAP(f, config, disposal);
+    f.terminate(config);
+    await disposal.promise;
+});
+
+test('a cancelled start still requires the API event unless its owner is disposing', async t => {
+    let resolveStart;
+    const f = fixture(t, { startDebugging: () => new Promise(resolve => { resolveStart = resolve; }),
+        stopDebugging: async () => {} });
+    t.after(() => { resolveStart?.(true); f.dispose(); });
+    const operation = f.api.debugActiveFile();
+    await waitFor(() => resolveStart, 'The editor start must still be pending');
+    const config = f.calls.launches[0].config;
+    const session = f.startSession(config), tracker = f.tracker(session);
+    f.cancel();
+    assert.equal(await operation, false);
+    dapExit(tracker);
+    dapTermination(tracker);
+    await assertUncertainDAP(f, config);
+    const disposal = observeDisposal(f);
+    dapTermination(tracker);
+    await assertUncertainDAP(f, config, disposal);
+    f.terminate(config);
+    resolveStart(true);
+    await disposal.promise;
+});
+
+test('exit and termination from separate trackers cannot form a shutdown confirmation', async t => {
+    const f = fixture(t, { stopDebugging: async () => {} });
+    await f.api.debugActiveFile();
+    const config = f.calls.launches[0].config, session = f.session(config);
+    const first = f.tracker(session), second = f.createTracker(session);
+    const disposal = observeDisposal(f);
+    dapExit(first);
+    dapTermination(second);
+    await assertUncertainDAP(f, config, disposal);
+    f.terminate(config);
+    await disposal.promise;
+});
+
+test('a tracker without the exact captured session cannot release output before or after capture', async t => {
+    let tracker;
+    const f = fixture(t, { startDebugging: async (_folder, config) => {
+        tracker = f.createTracker({ id: 'uncaptured-session', type: 'coreclr', configuration: config });
+        return true;
+    }, stopDebugging: async () => {} });
+    await f.api.debugActiveFile();
+    const config = f.calls.launches[0].config;
+    const disposal = observeDisposal(f);
+    dapExit(tracker);
+    dapTermination(tracker);
+    await assertUncertainDAP(f, config, disposal);
+    const captured = f.startSession(config);
+    assert.equal(f.createTracker({ ...captured, id: 'other-session' }), undefined);
+    assert.equal(f.createTracker({ ...captured, type: 'other' }), undefined);
+    dapExit(tracker);
+    dapTermination(tracker);
+    await assertUncertainDAP(f, config, disposal);
+    f.terminate(config);
+    await disposal.promise;
+});
+
+for (const property of ['program', '__netcoredbgFileAppOutput', 'type']) {
+    test(`a captured session whose ${property} no longer matches cannot use the DAP fallback`, async t => {
+        const f = fixture(t, { stopDebugging: async () => {} });
+        await f.api.debugActiveFile();
+        const config = f.calls.launches[0].config, session = f.session(config), tracker = f.tracker(session);
+        const disposal = observeDisposal(f);
+        const original = config[property];
+        config[property] = `${original}-unrelated`;
+        dapExit(tracker);
+        dapTermination(tracker);
+        config[property] = original;
+        await assertUncertainDAP(f, config, disposal);
+        dapTermination(tracker);
+        await assertUncertainDAP(f, config, disposal);
+        f.terminate(config);
+        await disposal.promise;
+    });
+}
+
+for (const apiFirst of [false, true]) {
+    test(`DAP duplicates and API termination share one cleanup (${apiFirst ? 'API first' : 'DAP first'})`, async t => {
+        let releaseCleanup, rejectStop;
+        let removals = 0;
+        const f = fixture(t, { stopDebugging: () => new Promise((_resolve, reject) => { rejectStop = reject; }),
+            removeOutput: async (directory, settings) => {
+                removals++;
+                await new Promise(resolve => { releaseCleanup = resolve; });
+                await fs.promises.rm(directory, settings);
+            } });
+        t.after(() => { releaseCleanup?.(); rejectStop?.(new Error('Stop failed after terminal confirmation')); });
+        await f.api.debugActiveFile();
+        const config = f.calls.launches[0].config, tracker = f.tracker(f.session(config));
+        const disposal = observeDisposal(f);
+        await waitFor(() => rejectStop, 'The exact session Stop must be pending');
+        if (apiFirst) f.terminate(config);
+        dapExit(tracker);
+        dapTermination(tracker);
+        await waitFor(() => releaseCleanup, 'One confirmed terminal deletion must reach the provider');
+        dapExit(tracker);
+        dapTermination(tracker);
+        f.terminate(config);
+        rejectStop(new Error('Stop failed after terminal confirmation'));
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(disposal.settled, false, 'The receipt deletion must finish before shutdown is drained');
+        assert.equal(removals, 1);
+        assert.equal(f.calls.logs.filter(line => line.includes('Confirmed disposed C# session termination from paired DAP')).length, apiFirst ? 0 : 1);
+        releaseCleanup();
+        await disposal.promise;
+        assert.deepEqual(f.calls.errors, []);
+        assert(!f.calls.logs.some(line => line.includes('Stop failed after terminal confirmation')));
+        assertDisposed(f);
+    });
+}
 
 test('one preparation deadline bounds cumulative ancestor and multi-target evaluations', async t => {
     const f = preparationFixture(t, { classify: input => classifyWithMsbuild({ ...input, fs: {
@@ -1471,7 +1756,9 @@ test('command recovery drains before disposal releases observers and a reentrant
     unlocked = true;
     const command = f.api.debugActiveFile();
     await waitFor(() => release, 'The recovery provider must reenter disposal with a registered owner');
+    const disposal = observeDisposal(f);
     assert.equal(await command, false);
+    assert.equal(disposal.settled, false, 'Draining the foreground command must not finish background recovery');
     assert.equal(f.calls.disposals.output, 0, 'The background pass must retain diagnostics after foreground work drains');
     assert.equal(f.calls.disposals.started, 0);
     assert.equal(f.calls.disposals.terminated, 0);
@@ -1481,6 +1768,7 @@ test('command recovery drains before disposal releases observers and a reentrant
     assert.deepEqual(f.calls.errors, []);
     release();
     await waitFor(() => f.calls.disposals.output, 'The settled pass must release all disposed resources');
+    await disposal.promise;
     assertDisposed(f);
     assert(!fs.existsSync(previous.entry));
 });
