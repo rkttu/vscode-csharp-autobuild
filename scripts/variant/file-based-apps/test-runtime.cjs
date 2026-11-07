@@ -1329,6 +1329,55 @@ test('old SDK and incompatible SDK architecture stop before compilation', async 
     }
 });
 
+test('failed SDK selection allocates no output and permits one corrected concurrent retry with its notification open', { timeout: 5000 }, async t => {
+    let unavailable = true;
+    let dismiss;
+    const notification = new Promise(resolve => { dismiss = resolve; });
+    t.after(() => dismiss());
+    const f = fixture(t, { showErrorMessage: () => notification,
+        classify: input => classifyWithMsbuild(input),
+        runDotnet: async args => {
+            if (args[0] === '--version') return unavailable
+                ? { exitCode: 145, stderr: 'A compatible .NET SDK was not found. Requested SDK version: 99.0.100' }
+                : { stdout: '10.0.402\n' };
+            if (args[0] === '--info') return { stdout: 'Host:\n  Architecture: arm64\n' };
+            assert.equal(args[0], 'build');
+            const output = args[args.indexOf('--output') + 1];
+            fs.writeFileSync(path.join(output, 'FileApp.dll'), 'corrected SDK DLL');
+            fs.writeFileSync(path.join(output, 'FileApp.pdb'), 'corrected SDK PDB');
+            return { stdout: JSON.stringify({ Properties: { OutputType: 'Exe', TargetFrameworkIdentifier: '.NETCoreApp' },
+                Items: { FrameworkReference: [] } }) };
+        } });
+    fs.writeFileSync(f.source, '#:sdk Microsoft.NET.Sdk\nConsole.WriteLine("SDK selection");\n');
+    const original = fs.readFileSync(f.source);
+    assert.equal(await f.api.debugActiveFile(), false);
+    assert.deepEqual(f.calls.processes.map(call => call.args), [['--version']]);
+    assert.equal(f.calls.launches.length, 0);
+    assert.deepEqual(fs.readFileSync(f.source), original);
+    const outputBase = path.join(f.context.globalStorageUri.fsPath, 'file-based-apps');
+    assert.deepEqual(fs.existsSync(outputBase) ? fs.readdirSync(outputBase) : [], [], 'SDK rejection must allocate no output or receipt');
+    assert(f.calls.logs.some(line => line.startsWith('Phase failed: Checking .NET SDK')));
+    assert(!f.calls.logs.some(line => line.startsWith('Phase started: Preparing build output')));
+    assert(!f.calls.logs.some(line => line.startsWith('Phase started: Starting netcoredbg')));
+    assert.equal(f.calls.errors.length, 1);
+    assert.match(f.calls.errors[0], /99\.0\.100/);
+
+    unavailable = false;
+    fs.writeFileSync(f.source, '#:sdk Microsoft.NET.Sdk\nConsole.WriteLine("corrected SDK retry");\n');
+    f.document.isDirty = true;
+    assert.deepEqual(await Promise.all(Array.from({ length: 3 }, () => f.api.debugActiveFile())), [true, true, true]);
+    assert.equal(f.calls.saves, 1);
+    assert.equal(f.calls.processes.filter(call => call.args[0] === '--version').length, 2);
+    assert.equal(f.calls.processes.filter(call => call.args[0] === 'build').length, 1);
+    assert.equal(f.calls.launches.length, 1);
+    assert.equal(f.calls.errors.length, 1, 'The undismissed SDK failure notification must not obstruct or duplicate retry');
+    const output = f.calls.launches[0].config.__netcoredbgFileAppOutput;
+    f.terminate(f.calls.launches[0].config);
+    await f.api.dispose();
+    assert(!fs.existsSync(output), 'Corrected SDK retry output must clean after matching termination and drain');
+    assert.deepEqual(terminalOutputs(f), []);
+});
+
 test('a valid symlink or junction DOTNET_ROOT is compared by its physical directory', async t => {
     const f = fixture(t);
     const actualRoot = path.join(f.root, 'dotnet');
