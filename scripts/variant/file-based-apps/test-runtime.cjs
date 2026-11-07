@@ -5,7 +5,7 @@ const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
-const { activate, COMMAND, requireFileAppSdk, sdkArchitecture, runProcess } = require('./runtime.cjs');
+const { activate, COMMAND, requireFileAppSdk, sdkArchitecture, runProcess, createOutputDirectory } = require('./runtime.cjs');
 const { classifyFile: classifyWithMsbuild } = require('./classify.cjs');
 const vm = require('node:vm');
 
@@ -170,6 +170,155 @@ function terminalOutputs(f) {
     if (!fs.existsSync(queue)) return [];
     return fs.readdirSync(queue, { withFileTypes: true }).filter(entry => entry.isDirectory()).map(entry => path.join(queue, entry.name, 'output'));
 }
+
+function activationWithOutputIO(overrides) {
+    const runtimeModule = { exports: {} };
+    vm.runInNewContext(fs.readFileSync(require.resolve('./runtime.cjs'), 'utf8'), {
+        module: runtimeModule, process: { platform: 'win32', env: process.env }, AbortController, setTimeout, clearTimeout,
+        require: name => name === 'node:fs' ? { ...fs, promises: { ...fs.promises, ...overrides } } : require(name),
+    });
+    return runtimeModule.exports.activate;
+}
+
+test('output allocation retains ordinary mkdtemp behavior without entering the Windows fallback', async () => {
+    const directory = path.join('output', 'run-Ab12Cd');
+    const calls = [];
+    const result = await createOutputDirectory('output', { platform: 'win32', io: {
+        async mkdtemp(prefix) { calls.push(prefix); return directory; },
+        async mkdir() { assert.fail('Ordinary allocation must not invoke mkdir'); },
+    }, randomInt() { assert.fail('Ordinary allocation must not draw another name'); },
+    log() { assert.fail('Ordinary allocation must not report fallback'); } });
+    assert.equal(result, directory);
+    assert.deepEqual(calls, [path.join('output', 'run-')]);
+});
+
+for (const [platform, code] of [['win32', 'EACCES'], ['linux', 'ENAMETOOLONG'], ['darwin', 'ENAMETOOLONG']]) {
+    test(`output allocation preserves ${platform} ${code} instead of masking the original error`, async () => {
+        const error = Object.assign(new Error('Original allocation failed'), { code });
+        await assert.rejects(createOutputDirectory('output', { platform, io: {
+            async mkdtemp() { throw error; },
+            async mkdir() { assert.fail('This failure must not enter the Windows fallback'); },
+        } }), actual => actual === error);
+    });
+}
+
+test('Windows output fallback exclusively creates a six-alphanumeric sibling without touching a collision', async t => {
+    const f = fixture(t);
+    const parent = path.join(f.root, 'output-parent');
+    fs.mkdirSync(parent);
+    const collision = path.join(parent, 'run-AAAAAA');
+    fs.mkdirSync(collision);
+    const sentinel = path.join(collision, 'unrelated.txt');
+    fs.writeFileSync(sentinel, 'preserve');
+    const created = [], logs = [];
+    let randomCalls = 0;
+    const directory = await createOutputDirectory(parent, { platform: 'win32', io: {
+        async mkdtemp() { throw Object.assign(new Error('Windows temporary path rejected'), { code: 'ENAMETOOLONG' }); },
+        async mkdir(candidate, settings) {
+            assert.deepEqual(settings, { mode: 0o700 });
+            created.push(candidate);
+            return fs.promises.mkdir(candidate, settings);
+        },
+    }, randomInt(maximum) { assert.equal(maximum, 62); return randomCalls++ < 6 ? 0 : 1; }, log: line => logs.push(line) });
+    assert.equal(directory, path.join(parent, 'run-BBBBBB'));
+    assert.match(path.basename(directory), /^run-[A-Za-z0-9]{6}$/);
+    assert.equal(path.dirname(directory), parent);
+    assert.deepEqual(created, [collision, directory]);
+    assert.equal(fs.readFileSync(sentinel, 'utf8'), 'preserve');
+    assert(fs.statSync(directory).isDirectory());
+    if (process.platform !== 'win32') assert.equal(fs.statSync(directory).mode & 0o777, 0o700);
+    assert.deepEqual(logs, [`Created Windows file-app output after mkdtemp ENAMETOOLONG: ${directory}`]);
+});
+
+test('Windows output fallback bounds collisions and never accepts an existing path', async () => {
+    const collision = Object.assign(new Error('Every candidate already exists'), { code: 'EEXIST' });
+    let attempts = 0, randomCalls = 0;
+    await assert.rejects(createOutputDirectory('output', { platform: 'win32', io: {
+        async mkdtemp() { throw Object.assign(new Error('Temporary path rejected'), { code: 'ENAMETOOLONG' }); },
+        async mkdir(candidate, settings) {
+            assert.equal(candidate, path.join('output', 'run-AAAAAA'));
+            assert.deepEqual(settings, { mode: 0o700 });
+            attempts++;
+            throw collision;
+        },
+    }, randomInt() { randomCalls++; return 0; }, log() { assert.fail('An existing path must never be reported as created'); } }),
+    actual => actual === collision);
+    assert.equal(attempts, 8);
+    assert.equal(randomCalls, 48);
+});
+
+test('Windows output fallback propagates a noncollision mkdir error without retrying', async () => {
+    const denied = Object.assign(new Error('Creation denied'), { code: 'EACCES' });
+    let attempts = 0;
+    await assert.rejects(createOutputDirectory('output', { platform: 'win32', io: {
+        async mkdtemp() { throw Object.assign(new Error('Temporary path rejected'), { code: 'ENAMETOOLONG' }); },
+        async mkdir() { attempts++; throw denied; },
+    }, randomInt: () => 0 }), actual => actual === denied);
+    assert.equal(attempts, 1);
+});
+
+test('a fallback diagnostic failure cannot abandon a newly created output', async () => {
+    const directory = await createOutputDirectory('output', { platform: 'win32', io: {
+        async mkdtemp() { throw Object.assign(new Error('Temporary path rejected'), { code: 'ENAMETOOLONG' }); },
+        async mkdir() {},
+    }, randomInt: () => 0, log() { throw new Error('Logger unavailable'); } });
+    assert.equal(directory, path.join('output', 'run-AAAAAA'));
+});
+
+test('disposal reentered after fallback creation retains ownership until aborted output cleanup', { timeout: 5000 }, async t => {
+    let f, created;
+    const activateWithFallback = activationWithOutputIO({
+        async mkdtemp() { throw Object.assign(new Error('Temporary path rejected'), { code: 'ENAMETOOLONG' }); },
+        async mkdir(directory, settings) {
+            const result = await fs.promises.mkdir(directory, settings);
+            if (!settings?.recursive) created = directory;
+            return result;
+        },
+    });
+    f = fixture(t, { activate: activateWithFallback, appendLine(line) {
+        if (line.startsWith('Created Windows file-app output after mkdtemp ENAMETOOLONG:')) f.dispose();
+    } });
+    assert.equal(await f.api.debugActiveFile(), false);
+    await f.api.disposalReady;
+    assert(created && !fs.existsSync(created), 'The successfully created fallback output must be owned and cleaned');
+    assert(!f.calls.processes.some(call => call.args[0] === 'build'));
+    assert.deepEqual(f.calls.launches, []);
+    assert.deepEqual(f.calls.errors, []);
+    assert.deepEqual(terminalOutputs(f), []);
+    assertDisposed(f);
+});
+
+test('Windows long storage allocates, launches and journals terminal output without namespace paths', {
+    skip: process.platform !== 'win32', timeout: 10000,
+}, async t => {
+    const storageRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'netcoredbg-long-output-'));
+    t.after(() => {
+        assert.equal(path.dirname(path.resolve(storageRoot)), path.resolve(os.tmpdir()));
+        assert(path.basename(storageRoot).startsWith('netcoredbg-long-output-'));
+        fs.rmSync(storageRoot, { recursive: true, force: true });
+    });
+    const parentLength = 237;
+    const storageLength = parentLength - path.join('file-based-apps', '0'.repeat(24)).length - 1;
+    const padding = storageLength - storageRoot.length - 1;
+    assert(padding > 0 && padding <= 255, 'The native probe needs one bounded long storage component');
+    const storage = path.join(storageRoot, 's'.repeat(padding));
+    const f = fixture(t, { storage });
+    assert.equal(await f.api.debugActiveFile(), true,
+        `The real Windows filesystem must permit the long output through allocation and handoff.\n${f.calls.logs.join('\n')}`);
+    const config = f.calls.launches[0].config;
+    assert.equal(path.dirname(config.__netcoredbgFileAppOutput).length, parentLength);
+    assert.match(path.basename(config.__netcoredbgFileAppOutput), /^run-[A-Za-z0-9]{6}$/);
+    assert(!config.program.startsWith('\\\\?\\'), 'Stored output and debugger paths must retain ordinary spellings');
+    assert(fs.existsSync(config.program));
+    f.terminate(config);
+    await f.api.dispose();
+    assert(!fs.existsSync(config.__netcoredbgFileAppOutput), 'The existing v1 journal must accept and clean the long owned output');
+    const base = path.join(storage, 'file-based-apps');
+    for (const name of ['terminal-cleanup-v1', 'terminal-cleanup-staging-v1']) {
+        const queue = path.join(base, name);
+        assert(!fs.existsSync(queue) || fs.readdirSync(queue).length === 0);
+    }
+});
 
 function activationWithRecoveryIO(overrides) {
     const runtimeModule = { exports: {} };
