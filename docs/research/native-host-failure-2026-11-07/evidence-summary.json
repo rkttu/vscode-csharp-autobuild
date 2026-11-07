@@ -1,0 +1,2500 @@
+{
+  "schema": 1,
+  "kind": "installed real .NET host startup failure and corrected same-file retry",
+  "issue": "https://github.com/rkttu/vscode-csharp-autobuild/issues/18",
+  "qualification": false,
+  "productChange": false,
+  "primaryRun": {
+    "name": "n01",
+    "localArtifactDirectory": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01",
+    "success": true,
+    "editorExitCode": 0,
+    "scope": {
+      "installedCandidate": true,
+      "invocation": "command-api",
+      "physicalF5": false,
+      "VSCodium": true,
+      "platform": "win32-arm64",
+      "macOS": false,
+      "qualification": false,
+      "localOnly": true,
+      "published": false,
+      "directWebDebuggee": true,
+      "spawnedGrandchildren": false,
+      "hostReload": false,
+      "injectedTargetRuntime": false,
+      "scenario": "native-host-failure-retry",
+      "actualCompilerFailure": false,
+      "actualWebProfileFailure": false,
+      "actualSdkSelectionFailure": false,
+      "actualNativeHostFailure": true,
+      "injectedEditorRejection": false,
+      "nativeAdapterFailure": false,
+      "actualProgressCancelUi": false,
+      "injectedCancellationToken": false
+    },
+    "freshProfiles": 1,
+    "aLaunchesAndStopCycles": 3,
+    "bLaunches": 1,
+    "candidate": {
+      "baseVsixSha256": "0d239dff83d3120786ff3596a046fd0866b045f1d883c86fb83c64a7d808d0c5",
+      "sourceCommit": "c712ede7edb303d42b95d083a724315adf44aa3d",
+      "target": "win32-arm64",
+      "ownedModules": {
+        "entry.cjs": "8cb28056b4f634d1897302f2b97303e140e9c11c233b2f771c32f7845aab44e3",
+        "runtime.cjs": "fd72cad8a4c27ff707dec3c243db2b9cb7cae47fb64ce738a02e14731aebc1d8",
+        "classify.cjs": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+        "web.cjs": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+        "recovery.cjs": "099f74d6d25c0fad95b0f56e3adaebe43a3f211991b6ef436f92ceed6be199d4"
+      },
+      "buildId": "eacc103bd794dc8305aea1fbe75f6c6ba0a604449989085498e6f9989bc855c5",
+      "sha256": "57fc69b677d757f1b52ff96a62117e3b78b2747f0f6bd615a78e9b6c99036838",
+      "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\local-lifecycle.vsix",
+      "version": "11.7.18004",
+      "localOnly": true,
+      "published": false,
+      "unchangedEntries": 736,
+      "unchangedPayloadDigest": "5b655a847a8d304972570006e1ecd7f4ac1cc01f855055bf3c35640237e2cdf1"
+    },
+    "editor": {
+      "executable": "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\VSCodium.exe",
+      "cli": "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\bin\\codium.cmd",
+      "version": "1.143.17232",
+      "commit": "c072cf642cbbadabefa22f39c58cc902a8b7427f",
+      "sha256": "61b273b2c0196d7cee4ba84f7412ccc74975f0fcefd3579e69a7b373f79027cd",
+      "machine": "arm64",
+      "apiVersion": "1.143.1"
+    },
+    "sdk": {
+      "executable": "C:\\Program Files\\dotnet\\dotnet.exe",
+      "root": "C:\\Program Files\\dotnet",
+      "version": "10.0.403",
+      "sha256": "8f9714d921c3fa1425611e3f79940715b74a18e2b21a5171bbd58e3775ff8315"
+    },
+    "dependency": {
+      "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\resources\\ms-dotnettools.vscode-dotnet-runtime-3.2.0.vsix",
+      "sha256": "a4cff5409f66e3827ee2c6a727ae59382290a182a653ca0f9ac97c63536ee541",
+      "version": "3.2.0"
+    },
+    "installedExtension": {
+      "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\extensions\\dotnetdev-kr-custom.csharp-with-netcoredbg-11.7.18004",
+      "version": "11.7.18004",
+      "displayName": "C# (netcoredbg) LOCAL WEB LIFECYCLE TEST",
+      "metadata": {
+        "installedTimestamp": 1794062529792,
+        "targetPlatform": "undefined",
+        "size": 200481597
+      },
+      "build": {
+        "target": "win32-arm64",
+        "upstreamCsharpCommit": "1c27e135b5dada55a240e4a504bafa759ec578e8",
+        "upstreamCsharpVersion": "11.7.18",
+        "upstreamCsharpTag": "v11.7.18-prerelease",
+        "upstreamPackageVersion": "42.42.42-placeholder",
+        "netcoredbgTag": "3.2.0-1092",
+        "packagingRevision": 4,
+        "releaseTag": "csharp-v11.7.18-netcoredbg-v3.2.0-1092-g9744e1f05186-r4",
+        "versionPolicy": "upstream-patch-revision-v1",
+        "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+        "debuggerArchiveSha256": "cfc272be9e883bcb90c9ed0704731fbb1349faf207d872f71e6bfb83b55869ad",
+        "validationRunId": "41644074504",
+        "validationWorkflowCommit": "ca5d10d97431181d934369c76c28347fac8a05a6",
+        "upstreamMain": "./dist/extension",
+        "localCandidate": true,
+        "lifecycleBuildId": "eacc103bd794dc8305aea1fbe75f6c6ba0a604449989085498e6f9989bc855c5",
+        "lifecycleSourceCommit": "c712ede7edb303d42b95d083a724315adf44aa3d"
+      }
+    },
+    "installedDependency": {
+      "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\extensions\\ms-dotnettools.vscode-dotnet-runtime-3.2.0",
+      "version": "3.2.0"
+    },
+    "installedOwnedModules": {
+      "entry.cjs": "8cb28056b4f634d1897302f2b97303e140e9c11c233b2f771c32f7845aab44e3",
+      "runtime.cjs": "fd72cad8a4c27ff707dec3c243db2b9cb7cae47fb64ce738a02e14731aebc1d8",
+      "classify.cjs": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+      "web.cjs": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+      "recovery.cjs": "099f74d6d25c0fad95b0f56e3adaebe43a3f211991b6ef436f92ceed6be199d4"
+    },
+    "harnessPinnedBeforeLaunch": {
+      "prepare.py": "b8f1e88b77ce6544606bb556388fadf4075f23fe0123f19d5cc6468132e194f9",
+      "run.ps1": "8439683fa5efd13d16f055e50407cdb9a575f2af7a073bfe6951147cc9941aa6",
+      "driver.cjs": "8c76ce1ed4411968b253dd7f8a5cd27950a5e8d03dc29c1e79c805283e9d1703",
+      "extension-test.cjs": "c0726265c7e49048f9d19bf84974573868d752f1f3a0769d0a28a02ea6b5c8cb",
+      "fixtures/web.cs": "4d865a4bfb51e53379d0c73b306ad27ef7c925e192d2de3e9201f7acc4fd2cb6"
+    },
+    "executedCopiesSha256": {
+      "driver.cjs": "8c76ce1ed4411968b253dd7f8a5cd27950a5e8d03dc29c1e79c805283e9d1703",
+      "extension-test.cjs": "c0726265c7e49048f9d19bf84974573868d752f1f3a0769d0a28a02ea6b5c8cb",
+      "fixtures/web.cs": "4d865a4bfb51e53379d0c73b306ad27ef7c925e192d2de3e9201f7acc4fd2cb6"
+    },
+    "checks": [
+      "Normally installed local candidate activates with exact owned module hashes and isolated loaded path",
+      "A source breakpoint binds and evaluates marker=40 through the installed native adapter",
+      "Two independent real Web sessions respond with distinct owned nonces and PIDs",
+      "A cycle 0: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+      "Three installed commands share one real build and adapter; the .NET host rejects the per-file roll-forward value, the exact session terminates and output/queues clear while B survives",
+      "Corrected per-file roll-forward profile and dirty revision retry share one saved real build/session and fresh token/output across three callers while B survives",
+      "A cycle 1: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+      "A cycle 2: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+      "B final stop releases its exact PID, HTTP port and owned output"
+    ],
+    "phases": [
+      {
+        "label": "verify installed local candidate",
+        "startedAtMilliseconds": 1.3324,
+        "outcome": "passed",
+        "elapsedMilliseconds": 1801.6033
+      },
+      {
+        "label": "A initial installed-command launch and breakpoint",
+        "startedAtMilliseconds": 1813.0047,
+        "outcome": "passed",
+        "elapsedMilliseconds": 5424.9812
+      },
+      {
+        "label": "B independent installed-command launch",
+        "startedAtMilliseconds": 7238.1539,
+        "outcome": "passed",
+        "elapsedMilliseconds": 6169.6756
+      },
+      {
+        "label": "A cycle 0 targeted stop and owned cleanup",
+        "startedAtMilliseconds": 13408.0686,
+        "outcome": "passed",
+        "elapsedMilliseconds": 1027.6117
+      },
+      {
+        "label": "B preserved after A cycle 0",
+        "startedAtMilliseconds": 14435.8213,
+        "outcome": "passed",
+        "elapsedMilliseconds": 7.739
+      },
+      {
+        "label": "A actual native host startup failure after successful real build while B survives",
+        "startedAtMilliseconds": 14443.8601,
+        "outcome": "passed",
+        "elapsedMilliseconds": 10091.636
+      },
+      {
+        "label": "A cycle 1 dirty edit and installed-command retry",
+        "startedAtMilliseconds": 24535.6601,
+        "outcome": "passed",
+        "elapsedMilliseconds": 4381.4139
+      },
+      {
+        "label": "A cycle 1 targeted stop and owned cleanup",
+        "startedAtMilliseconds": 28917.2755,
+        "outcome": "passed",
+        "elapsedMilliseconds": 812.2861
+      },
+      {
+        "label": "B preserved after A cycle 1",
+        "startedAtMilliseconds": 29729.6858,
+        "outcome": "passed",
+        "elapsedMilliseconds": 3.0399
+      },
+      {
+        "label": "A cycle 2 dirty edit and installed-command retry",
+        "startedAtMilliseconds": 29735.4837,
+        "outcome": "passed",
+        "elapsedMilliseconds": 4426.9211
+      },
+      {
+        "label": "A cycle 2 targeted stop and owned cleanup",
+        "startedAtMilliseconds": 34162.5642,
+        "outcome": "passed",
+        "elapsedMilliseconds": 782.3483
+      },
+      {
+        "label": "B preserved after A cycle 2",
+        "startedAtMilliseconds": 34945.038,
+        "outcome": "passed",
+        "elapsedMilliseconds": 3.8763
+      },
+      {
+        "label": "B final targeted stop and owned cleanup",
+        "startedAtMilliseconds": 34952.4246,
+        "outcome": "passed",
+        "elapsedMilliseconds": 805.8
+      }
+    ],
+    "elapsedMilliseconds": 35758.7243,
+    "launches": [
+      {
+        "label": "A-0",
+        "revision": "initial",
+        "pid": 94852,
+        "sessionId": "58185a87-af83-4726-85d3-68f7595ed354",
+        "origin": "http://127.0.0.1:62372",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-98Kx68",
+        "response": {
+          "pid": 94852,
+          "nonce": "3883d180-57a5-4c4d-9a65-6fc59503b07a",
+          "revision": "initial",
+          "value": 42
+        },
+        "afterStopMilliseconds": {
+          "stopPromise": 48.637,
+          "matchingEditorTermination": 991.267,
+          "pidObservedGone": 994.241,
+          "portRebindSucceeded": 995.326,
+          "outputAndQueuesClear": 1027.01
+        },
+        "stopPromiseToTerminationMilliseconds": 942.63
+      },
+      {
+        "label": "B",
+        "revision": "initial",
+        "pid": 88600,
+        "sessionId": "44ac01ff-a642-4452-a491-05758af65dc1",
+        "origin": "http://127.0.0.1:62373",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\c91f62ef4e47a1d9a6ee66c0\\run-6iXaT0",
+        "response": {
+          "pid": 88600,
+          "nonce": "80813cca-8968-4048-9a0f-10e03fd163ac",
+          "revision": "initial",
+          "value": 42
+        },
+        "afterStopMilliseconds": {
+          "stopPromise": 42.565,
+          "matchingEditorTermination": 782.366,
+          "pidObservedGone": 804.148,
+          "portRebindSucceeded": 805.065,
+          "outputAndQueuesClear": 805.363
+        },
+        "stopPromiseToTerminationMilliseconds": 739.802
+      },
+      {
+        "label": "A-1",
+        "revision": "retry-1",
+        "pid": 11492,
+        "sessionId": "9518caa7-907e-4b03-b3c6-a6e65f5071d4",
+        "origin": "http://127.0.0.1:62372",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-uz5IiI",
+        "response": {
+          "pid": 11492,
+          "nonce": "d67d9539-fa10-4fa5-b2ff-18715235d9c1",
+          "revision": "retry-1",
+          "value": 42
+        },
+        "afterStopMilliseconds": {
+          "stopPromise": 40.666,
+          "matchingEditorTermination": 782.582,
+          "pidObservedGone": 810.713,
+          "portRebindSucceeded": 811.7,
+          "outputAndQueuesClear": 811.96
+        },
+        "stopPromiseToTerminationMilliseconds": 741.915
+      },
+      {
+        "label": "A-2",
+        "revision": "retry-2",
+        "pid": 89376,
+        "sessionId": "75c38e90-aa8a-4763-be0c-07b7b9f8ea9a",
+        "origin": "http://127.0.0.1:62372",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-7EtXHQ",
+        "response": {
+          "pid": 89376,
+          "nonce": "28255a4b-6295-4502-a6b8-9bfe39194f91",
+          "revision": "retry-2",
+          "value": 42
+        },
+        "afterStopMilliseconds": {
+          "stopPromise": 35.957,
+          "matchingEditorTermination": 742.421,
+          "pidObservedGone": 744.739,
+          "portRebindSucceeded": 745.919,
+          "outputAndQueuesClear": 781.933
+        },
+        "stopPromiseToTerminationMilliseconds": 706.465
+      }
+    ],
+    "unrelatedSessionPreserved": [
+      {
+        "atMilliseconds": 14443.4206,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "44ac01ff-a642-4452-a491-05758af65dc1",
+          "pid": 88600
+        }
+      },
+      {
+        "atMilliseconds": 14486.1211,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "44ac01ff-a642-4452-a491-05758af65dc1",
+          "pid": 88600
+        }
+      },
+      {
+        "atMilliseconds": 24531.9057,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "44ac01ff-a642-4452-a491-05758af65dc1",
+          "pid": 88600
+        }
+      },
+      {
+        "atMilliseconds": 28916.8394,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "44ac01ff-a642-4452-a491-05758af65dc1",
+          "pid": 88600
+        }
+      },
+      {
+        "atMilliseconds": 29732.6653,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "44ac01ff-a642-4452-a491-05758af65dc1",
+          "pid": 88600
+        }
+      },
+      {
+        "atMilliseconds": 34948.851,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "44ac01ff-a642-4452-a491-05758af65dc1",
+          "pid": 88600
+        }
+      }
+    ],
+    "stopDiagnostics": [
+      {
+        "atMilliseconds": 13476.197,
+        "event": "adapter-error",
+        "detail": {
+          "label": "A-0",
+          "error": "Error: read error"
+        },
+        "afterStopMilliseconds": 67.899
+      },
+      {
+        "atMilliseconds": 23239.5194,
+        "event": "dap-receive",
+        "detail": {
+          "label": "A-native-host-failure",
+          "sessionId": "fa3eb4c8-ce6a-4224-9909-35ae335a870d",
+          "message": {
+            "command": "configurationDone",
+            "message": "Failed command 'configurationDone' : 0x80004005",
+            "request_seq": 5,
+            "seq": 13,
+            "success": false,
+            "type": "response"
+          }
+        },
+        "afterStopMilliseconds": null
+      },
+      {
+        "atMilliseconds": 23244.4939,
+        "event": "adapter-error",
+        "detail": {
+          "label": "A-native-host-failure",
+          "error": "Error: read error"
+        },
+        "afterStopMilliseconds": null
+      },
+      {
+        "atMilliseconds": 28975.8186,
+        "event": "adapter-error",
+        "detail": {
+          "label": "A-1",
+          "error": "Error: read error"
+        },
+        "afterStopMilliseconds": 58.49
+      },
+      {
+        "atMilliseconds": 34215.4937,
+        "event": "adapter-error",
+        "detail": {
+          "label": "A-2",
+          "error": "Error: read error"
+        },
+        "afterStopMilliseconds": 52.807
+      },
+      {
+        "atMilliseconds": 35023.2179,
+        "event": "adapter-error",
+        "detail": {
+          "label": "B",
+          "error": "Error: read error"
+        },
+        "afterStopMilliseconds": 70.66
+      }
+    ],
+    "observedCoreRuntimeDirectories": [
+      "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14"
+    ],
+    "observedCoreLibraryModulePaths": [
+      "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Private.CoreLib.dll"
+    ],
+    "rawEvidence": {
+      "result.json": {
+        "sha256": "06c725e1148d168390d67c7f2665aca0867426d7ae7087d02af06eb5ab7116fe",
+        "bytes": 68240
+      },
+      "expected.json": {
+        "sha256": "9598daf986206318ddeaf344e5ccab89f0a52e5d00b2467cf1df5023ed1f4050",
+        "bytes": 2925
+      },
+      "trace.jsonl": {
+        "sha256": "6d9c8142998385654c9190c52b682e26974657f6b3a531a2cba3df40c7feca8d",
+        "bytes": 286033
+      },
+      "launcher-result.json": {
+        "sha256": "9b29ff3524b6c7417ca87a3342ce90a559fc894022163e3ee300d8196a0a4c6d",
+        "bytes": 442
+      },
+      "attempt.json": {
+        "sha256": "f384bfa6e84ea2528a693fb0d2bd876f5c5699f996ceacd61f5443fbafcf49c8",
+        "bytes": 29
+      },
+      "launch.json": {
+        "sha256": "98d37b492295cc80113642e584b95877c5e04596847b56eadaaace4d2a15047e",
+        "bytes": 1100
+      },
+      "progress/state.json": {
+        "sha256": "dd6b7408ae68c47d51f8f2d33b338362cc395d1fd6388da3a2a985681d2f0fe5",
+        "bytes": 9424
+      },
+      "logs/candidate-install.txt": {
+        "sha256": "2f4e4b968e30ab38bdfaf2a004f53cca1b9d980e53c1d613e7ead2b60c046604",
+        "bytes": 395
+      },
+      "logs/editor-version.txt": {
+        "sha256": "aff6841c98558e85f0dde480073005e9e8267d1e06817b8165756bbc14ab2ca2",
+        "bytes": 62
+      },
+      "logs/runtime-install.txt": {
+        "sha256": "17d81acda588041af91ad436fbfbbdf23efa54ede6c59e797894dfe3472b3a94",
+        "bytes": 422
+      },
+      "logs/sdk-version.txt": {
+        "sha256": "e4e6a678725873a4192c048849cd64d852983991bfcb210a40c3b80cc8fcf2eb",
+        "bytes": 10
+      },
+      "logs/stderr.txt": {
+        "sha256": "de30a7cc660fa9a03efd3040805ccf75d4480bb917200abb8c3301aec4eeb077",
+        "bytes": 838
+      },
+      "logs/stdout.txt": {
+        "sha256": "8d28ec9089df57b9ff1be52da94d22f91aac5f1ca90d5a17ec51cf45d107702c",
+        "bytes": 1341
+      },
+      "profile/logs/20261107T234211/window1/exthost/output_logging_20261107T234213/3-C# File Debugging.log": {
+        "sha256": "9d2dfd405a85ab0f7abc2ee4e28ef13a1844ff8bf2e88548021cb1c7e0ba961c",
+        "bytes": 29940
+      },
+      "profile/logs/20261107T234211/window1/exthost/exthost.log": {
+        "sha256": "34c8e9e86b14283909320083e66b15e37359dec2a36fce607807322c7795ad04",
+        "bytes": 7190
+      },
+      "profile/logs/20261107T234211/window1/exthost/dotnetdev-kr-custom.csharp-with-netcoredbg/C#.log": {
+        "sha256": "11aad3d9e302c4cecb36dcd3460c7730160e7f84d6dc6a1a2f5b1b6c12dedf65",
+        "bytes": 58124
+      }
+    },
+    "interpretation": "Behavioral lifecycle assertions passed. Stop-time adapter errors remain recorded; this is not an error-free-log or release-qualification claim."
+  },
+  "primaryIdentity": {
+    "baseCommit": "c712ede7edb303d42b95d083a724315adf44aa3d",
+    "productModulesUnchanged": true,
+    "currentOwnedModules": {
+      "classify.cjs": {
+        "sha256": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+        "bytes": 11396
+      },
+      "entry.cjs": {
+        "sha256": "8cb28056b4f634d1897302f2b97303e140e9c11c233b2f771c32f7845aab44e3",
+        "bytes": 2759
+      },
+      "recovery.cjs": {
+        "sha256": "099f74d6d25c0fad95b0f56e3adaebe43a3f211991b6ef436f92ceed6be199d4",
+        "bytes": 16057
+      },
+      "runtime.cjs": {
+        "sha256": "fd72cad8a4c27ff707dec3c243db2b9cb7cae47fb64ce738a02e14731aebc1d8",
+        "bytes": 35296
+      },
+      "web.cjs": {
+        "sha256": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+        "bytes": 17865
+      }
+    }
+  },
+  "nativeHostFailure": {
+    "attempt": {
+      "label": "A-native-host-failure",
+      "source": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\workspace\\a.cs",
+      "revision": "initial",
+      "port": 62372,
+      "origin": "http://127.0.0.1:62372",
+      "nonce": "44da0dd6-64d5-485c-acf1-e6924723f5b5",
+      "expectedNativeHostFailure": true,
+      "invalidRollForward": "LIFECYCLE_INVALID_ROLL_FORWARD",
+      "dap": [
+        {
+          "body": {
+            "capabilities": {
+              "exceptionBreakpointFilters": [
+                {
+                  "filter": "all",
+                  "label": "all"
+                },
+                {
+                  "filter": "user-unhandled",
+                  "label": "user-unhandled"
+                }
+              ],
+              "supportTerminateDebuggee": true,
+              "supportsCancelRequest": true,
+              "supportsConditionalBreakpoints": true,
+              "supportsConfigurationDoneRequest": true,
+              "supportsExceptionFilterOptions": true,
+              "supportsExceptionInfoRequest": true,
+              "supportsExceptionOptions": false,
+              "supportsFunctionBreakpoints": true,
+              "supportsSetExpression": true,
+              "supportsSetVariable": true,
+              "supportsTerminateRequest": true
+            }
+          },
+          "event": "capabilities",
+          "seq": 1,
+          "type": "event"
+        },
+        {
+          "body": {
+            "exceptionBreakpointFilters": [
+              {
+                "filter": "all",
+                "label": "all"
+              },
+              {
+                "filter": "user-unhandled",
+                "label": "user-unhandled"
+              }
+            ],
+            "supportTerminateDebuggee": true,
+            "supportsCancelRequest": true,
+            "supportsConditionalBreakpoints": true,
+            "supportsConfigurationDoneRequest": true,
+            "supportsExceptionFilterOptions": true,
+            "supportsExceptionInfoRequest": true,
+            "supportsExceptionOptions": false,
+            "supportsFunctionBreakpoints": true,
+            "supportsSetExpression": true,
+            "supportsSetVariable": true,
+            "supportsTerminateRequest": true
+          },
+          "command": "initialize",
+          "request_seq": 1,
+          "seq": 2,
+          "success": true,
+          "type": "response"
+        },
+        {
+          "body": {},
+          "event": "initialized",
+          "seq": 3,
+          "type": "event"
+        },
+        {
+          "body": {},
+          "command": "launch",
+          "request_seq": 2,
+          "seq": 4,
+          "success": true,
+          "type": "response"
+        },
+        {
+          "body": {
+            "breakpoints": []
+          },
+          "command": "setFunctionBreakpoints",
+          "request_seq": 3,
+          "seq": 5,
+          "success": true,
+          "type": "response"
+        },
+        {
+          "body": {},
+          "command": "setExceptionBreakpoints",
+          "request_seq": 4,
+          "seq": 6,
+          "success": true,
+          "type": "response"
+        },
+        {
+          "seq": 7,
+          "event": "output",
+          "type": "event",
+          "body": {
+            "category": "stderr",
+            "output": "Unrecognized roll forward setting value 'LIFECYCLE_INVALID_ROLL_FORWARD'."
+          }
+        },
+        {
+          "seq": 8,
+          "event": "output",
+          "type": "event",
+          "body": {
+            "category": "stderr",
+            "output": "\r\n"
+          }
+        },
+        {
+          "seq": 9,
+          "event": "output",
+          "type": "event",
+          "body": {
+            "category": "stderr",
+            "output": "Invalid value for environment variable 'DOTNET_ROLL_FORWARD'."
+          }
+        },
+        {
+          "seq": 10,
+          "event": "output",
+          "type": "event",
+          "body": {
+            "category": "stderr",
+            "output": "\r\n"
+          }
+        },
+        {
+          "seq": 11,
+          "event": "output",
+          "type": "event",
+          "body": {
+            "category": "stderr",
+            "output": "Invalid runtimeconfig.json [d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-1VaDGU\\FileApp.runtimeconfig.json] [d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-1VaDGU\\FileApp.runtimeconfig.dev.json]"
+          }
+        },
+        {
+          "seq": 12,
+          "event": "output",
+          "type": "event",
+          "body": {
+            "category": "stderr",
+            "output": "\r\n"
+          }
+        },
+        {
+          "command": "configurationDone",
+          "message": "Failed command 'configurationDone' : 0x80004005",
+          "request_seq": 5,
+          "seq": 13,
+          "success": false,
+          "type": "response"
+        },
+        {
+          "body": {},
+          "command": "disconnect",
+          "request_seq": 6,
+          "seq": 14,
+          "success": true,
+          "type": "response"
+        }
+      ],
+      "dapRequests": [
+        {
+          "sessionId": "fa3eb4c8-ce6a-4224-9909-35ae335a870d",
+          "message": {
+            "command": "initialize",
+            "arguments": {
+              "clientID": "vscode",
+              "clientName": "VSCodium",
+              "adapterID": "coreclr",
+              "pathFormat": "path",
+              "linesStartAt1": true,
+              "columnsStartAt1": true,
+              "supportsVariableType": true,
+              "supportsVariablePaging": true,
+              "supportsRunInTerminalRequest": true,
+              "locale": "en",
+              "supportsProgressReporting": true,
+              "supportsInvalidatedEvent": true,
+              "supportsMemoryReferences": true,
+              "supportsArgsCanBeInterpretedByShell": true,
+              "supportsMemoryEvent": true,
+              "supportsStartDebuggingRequest": true,
+              "supportsANSIStyling": true
+            },
+            "type": "request",
+            "seq": 1
+          }
+        },
+        {
+          "sessionId": "fa3eb4c8-ce6a-4224-9909-35ae335a870d",
+          "message": {
+            "command": "launch",
+            "arguments": {
+              "name": "C#: a.cs",
+              "type": "coreclr",
+              "request": "launch",
+              "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-1VaDGU\\FileApp.dll",
+              "cwd": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\workspace",
+              "console": "internalConsole",
+              "stopAtEntry": false,
+              "justMyCode": true,
+              "targetArchitecture": "arm64",
+              "args": [],
+              "checkForDevCert": false,
+              "env": {
+                "ASPNETCORE_URLS": "http://127.0.0.1:62372",
+                "LIFECYCLE_TOKEN": "44da0dd6-64d5-485c-acf1-e6924723f5b5",
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "DOTNET_ROLL_FORWARD": "LIFECYCLE_INVALID_ROLL_FORWARD",
+                "DOTNET_LAUNCH_PROFILE": "LifecycleHttp",
+                "DOTNET_ROOT": "C:\\Program Files\\dotnet"
+              },
+              "__netcoredbgFileAppOutput": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-1VaDGU",
+              "requireExactSource": true,
+              "enableStepFiltering": true,
+              "logging": {
+                "exceptions": true,
+                "moduleLoad": true,
+                "programOutput": true,
+                "browserStdOut": true,
+                "elapsedTiming": false,
+                "threadExit": false,
+                "processExit": true,
+                "engineLogging": false,
+                "diagnosticsLog": {
+                  "protocolMessages": false,
+                  "dispatcherMessages": "none",
+                  "debugEngineAPITracing": "none",
+                  "debugRuntimeEventTracing": false,
+                  "expressionEvaluationTracing": false,
+                  "startDebuggingTracing": false
+                },
+                "consoleUsageMessage": true
+              },
+              "suppressJITOptimizations": false,
+              "symbolOptions": {
+                "searchPaths": [],
+                "searchMicrosoftSymbolServer": false,
+                "searchNuGetOrgSymbolServer": false,
+                "cachePath": "",
+                "moduleFilter": {
+                  "mode": "loadAllButExcluded",
+                  "excludedModules": [],
+                  "includedModules": [],
+                  "includeSymbolsNextToModules": true,
+                  "includeSymbolsOnDemand": true
+                }
+              },
+              "expressionEvaluationOptions": {
+                "allowImplicitFuncEval": true,
+                "allowToString": true,
+                "allowFastEvaluate": true,
+                "showRawValues": false
+              },
+              "terminateChildProcesses": false,
+              "internalConsoleOptions": "openOnSessionStart",
+              "__sessionId": "fa3eb4c8-ce6a-4224-9909-35ae335a870d"
+            },
+            "type": "request",
+            "seq": 2
+          }
+        },
+        {
+          "sessionId": "fa3eb4c8-ce6a-4224-9909-35ae335a870d",
+          "message": {
+            "command": "setFunctionBreakpoints",
+            "arguments": {
+              "breakpoints": []
+            },
+            "type": "request",
+            "seq": 3
+          }
+        },
+        {
+          "sessionId": "fa3eb4c8-ce6a-4224-9909-35ae335a870d",
+          "message": {
+            "command": "setExceptionBreakpoints",
+            "arguments": {
+              "filters": [],
+              "filterOptions": []
+            },
+            "type": "request",
+            "seq": 4
+          }
+        },
+        {
+          "sessionId": "fa3eb4c8-ce6a-4224-9909-35ae335a870d",
+          "message": {
+            "command": "configurationDone",
+            "type": "request",
+            "seq": 5
+          }
+        },
+        {
+          "sessionId": "fa3eb4c8-ce6a-4224-9909-35ae335a870d",
+          "message": {
+            "command": "disconnect",
+            "arguments": {
+              "restart": false
+            },
+            "type": "request",
+            "seq": 6
+          }
+        },
+        {
+          "sessionId": "fa3eb4c8-ce6a-4224-9909-35ae335a870d",
+          "message": {
+            "command": "threads",
+            "type": "request",
+            "seq": 7
+          }
+        }
+      ],
+      "adapterExits": [
+        {
+          "label": "A-native-host-failure",
+          "sessionId": "fa3eb4c8-ce6a-4224-9909-35ae335a870d",
+          "code": 0,
+          "atMilliseconds": 23245.501
+        }
+      ],
+      "adapterCreationCount": 1,
+      "editorStartCount": 1,
+      "commandInvocations": 3,
+      "expectedBase": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps",
+      "previousOutput": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-98Kx68",
+      "sourceSnapshot": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\workspace\\a.cs",
+        "size": 969,
+        "sha256": "4d865a4bfb51e53379d0c73b306ad27ef7c925e192d2de3e9201f7acc4fd2cb6",
+        "base64": "IzpzZGsgTWljcm9zb2Z0Lk5FVC5TZGsuV2ViDQojOnByb3BlcnR5IFRhcmdldEZyYW1ld29yaz1uZXQxMC4wDQoNCnZhciBtYXJrZXIgPSA0MDsNCm1hcmtlciArPSAyOw0KY29uc3Qgc3RyaW5nIHJldmlzaW9uID0gImluaXRpYWwiOw0KdmFyIG5vbmNlID0gRW52aXJvbm1lbnQuR2V0RW52aXJvbm1lbnRWYXJpYWJsZSgiTElGRUNZQ0xFX1RPS0VOIikNCiAgICA/PyB0aHJvdyBuZXcgSW52YWxpZE9wZXJhdGlvbkV4Y2VwdGlvbigiTWlzc2luZyBvd25lZCBsaWZlY3ljbGUgdG9rZW4uIik7DQp2YXIgYnVpbGRlciA9IFdlYkFwcGxpY2F0aW9uLkNyZWF0ZVNsaW1CdWlsZGVyKGFyZ3MpOw0KdmFyIGFwcCA9IGJ1aWxkZXIuQnVpbGQoKTsNCg0KYXBwLk1hcEdldCgiL3Byb2JlIiwgKCkgPT4gUmVzdWx0cy5Kc29uKG5ldw0Kew0KICAgIHBpZCA9IEVudmlyb25tZW50LlByb2Nlc3NJZCwNCiAgICBub25jZSwNCiAgICByZXZpc2lvbiwNCiAgICB2YWx1ZSA9IG1hcmtlcg0KfSkpOw0KDQovLyBUaGlzIGVuZHBvaW50IHBlcm1pdHMgYSBmYWlsZWQgdGVzdCB0byByZWxlYXNlIG9ubHkgaXRzIG93biB2ZXJpZmllZCBzZXJ2ZXIuDQovLyBJdCBpcyBhIGZpeHR1cmUgZmFjaWxpdHksIG5vdCBhIHByb2R1Y3Rpb24gZGVidWdnZXIgY2xlYW51cCBtZWNoYW5pc20uDQphcHAuTWFwUG9zdCgiL3NodXRkb3duIiwgKEh0dHBDb250ZXh0IGNvbnRleHQsIElIb3N0QXBwbGljYXRpb25MaWZldGltZSBsaWZldGltZSkgPT4NCnsNCiAgICBpZiAoY29udGV4dC5SZXF1ZXN0LlF1ZXJ5WyJ0b2tlbiJdLlRvU3RyaW5nKCkgIT0gbm9uY2UpDQogICAgICAgIHJldHVybiBSZXN1bHRzLlVuYXV0aG9yaXplZCgpOw0KICAgIGxpZmV0aW1lLlN0b3BBcHBsaWNhdGlvbigpOw0KICAgIHJldHVybiBSZXN1bHRzLk9rKG5ldyB7IHBpZCA9IEVudmlyb25tZW50LlByb2Nlc3NJZCwgbm9uY2UgfSk7DQp9KTsNCg0KYXBwLlJ1bigpOw0K"
+      },
+      "sourceWasDirty": false,
+      "ambientDotnetRootBefore": "C:\\Program Files\\dotnet",
+      "ambientRollForwardBefore": null,
+      "profileSnapshot": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\workspace\\a.run.json",
+        "size": 385,
+        "sha256": "bfc5e241ac540cb04a0bc2f1383dd8228b3eb0db29d084b8f392ec0396eef458",
+        "base64": "ewogICJwcm9maWxlcyI6IHsKICAgICJMaWZlY3ljbGVIdHRwIjogewogICAgICAiY29tbWFuZE5hbWUiOiAiUHJvamVjdCIsCiAgICAgICJhcHBsaWNhdGlvblVybCI6ICJodHRwOi8vMTI3LjAuMC4xOjYyMzcyIiwKICAgICAgImxhdW5jaEJyb3dzZXIiOiBmYWxzZSwKICAgICAgImVudmlyb25tZW50VmFyaWFibGVzIjogewogICAgICAgICJMSUZFQ1lDTEVfVE9LRU4iOiAiNDRkYTBkZDYtNjRkNS00ODVjLWFjZjEtZTY5MjQ3MjNmNWI1IiwKICAgICAgICAiQVNQTkVUQ09SRV9FTlZJUk9OTUVOVCI6ICJEZXZlbG9wbWVudCIsCiAgICAgICAgIkRPVE5FVF9ST0xMX0ZPUldBUkQiOiAiTElGRUNZQ0xFX0lOVkFMSURfUk9MTF9GT1JXQVJEIgogICAgICB9CiAgICB9CiAgfQp9Cg=="
+      },
+      "bBefore": {
+        "sessionId": "44ac01ff-a642-4452-a491-05758af65dc1",
+        "pid": 88600,
+        "nonce": "80813cca-8968-4048-9a0f-10e03fd163ac",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\c91f62ef4e47a1d9a6ee66c0\\run-6iXaT0",
+        "response": {
+          "pid": 88600,
+          "nonce": "80813cca-8968-4048-9a0f-10e03fd163ac",
+          "revision": "initial",
+          "value": 42
+        }
+      },
+      "commandPending": false,
+      "invokedAtMilliseconds": 14501.9469,
+      "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-1VaDGU\\FileApp.dll",
+      "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-1VaDGU",
+      "base": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps",
+      "builtArtifacts": [
+        {
+          "path": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-1VaDGU\\FileApp.dll",
+          "size": 9728,
+          "sha256": "09eb1f235cda4ceac85622981e5f6316a9e7d2fcfc75681e22a1cfbb819c40fd"
+        },
+        {
+          "path": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-1VaDGU\\FileApp.pdb",
+          "size": 23192,
+          "sha256": "95284241f230b113b8f2f6e5391fc6aadadd9963dd86b7cc70b519b3b0d00f26"
+        },
+        {
+          "path": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-1VaDGU\\FileApp.runtimeconfig.json",
+          "size": 714,
+          "sha256": "806ff24bcad95d6dd93def73d880f580c05052fb8792e44b03ecfa5ccc2ab581"
+        }
+      ],
+      "runtimeConfigSnapshot": {
+        "path": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-1VaDGU\\FileApp.runtimeconfig.json",
+        "size": 714,
+        "sha256": "806ff24bcad95d6dd93def73d880f580c05052fb8792e44b03ecfa5ccc2ab581",
+        "base64": "ew0KICAicnVudGltZU9wdGlvbnMiOiB7DQogICAgInRmbSI6ICJuZXQxMC4wIiwNCiAgICAiZnJhbWV3b3JrcyI6IFsNCiAgICAgIHsNCiAgICAgICAgIm5hbWUiOiAiTWljcm9zb2Z0Lk5FVENvcmUuQXBwIiwNCiAgICAgICAgInZlcnNpb24iOiAiMTAuMC4wIg0KICAgICAgfSwNCiAgICAgIHsNCiAgICAgICAgIm5hbWUiOiAiTWljcm9zb2Z0LkFzcE5ldENvcmUuQXBwIiwNCiAgICAgICAgInZlcnNpb24iOiAiMTAuMC4wIg0KICAgICAgfQ0KICAgIF0sDQogICAgImNvbmZpZ1Byb3BlcnRpZXMiOiB7DQogICAgICAiRW50cnlQb2ludEZpbGVQYXRoIjogImQ6XFxQcm9qZWN0c1xcdnNjb2RlLWNzaGFycC1hdXRvYnVpbGRcXHZhbGlkYXRpb24tYXJ0aWZhY3RzXFxuYXRpdmUtaG9zdC1mYWlsdXJlLTIwMjYtMTEtMDdcXG4wMVxcd29ya3NwYWNlXFxhLmNzIiwNCiAgICAgICJFbnRyeVBvaW50RmlsZURpcmVjdG9yeVBhdGgiOiAiZDpcXFByb2plY3RzXFx2c2NvZGUtY3NoYXJwLWF1dG9idWlsZFxcdmFsaWRhdGlvbi1hcnRpZmFjdHNcXG5hdGl2ZS1ob3N0LWZhaWx1cmUtMjAyNi0xMS0wN1xcbjAxXFx3b3Jrc3BhY2UiLA0KICAgICAgIlN5c3RlbS5HQy5TZXJ2ZXIiOiB0cnVlLA0KICAgICAgIlN5c3RlbS5SdW50aW1lLlNlcmlhbGl6YXRpb24uRW5hYmxlVW5zYWZlQmluYXJ5Rm9ybWF0dGVyU2VyaWFsaXphdGlvbiI6IGZhbHNlDQogICAgfQ0KICB9DQp9"
+      },
+      "capturedConfiguration": {
+        "name": "C#: a.cs",
+        "type": "coreclr",
+        "request": "launch",
+        "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-1VaDGU\\FileApp.dll",
+        "cwd": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\workspace",
+        "console": "internalConsole",
+        "stopAtEntry": false,
+        "justMyCode": true,
+        "targetArchitecture": "arm64",
+        "args": [],
+        "checkForDevCert": false,
+        "env": {
+          "ASPNETCORE_URLS": "http://127.0.0.1:62372",
+          "LIFECYCLE_TOKEN": "44da0dd6-64d5-485c-acf1-e6924723f5b5",
+          "ASPNETCORE_ENVIRONMENT": "Development",
+          "DOTNET_ROLL_FORWARD": "LIFECYCLE_INVALID_ROLL_FORWARD",
+          "DOTNET_LAUNCH_PROFILE": "LifecycleHttp",
+          "DOTNET_ROOT": "C:\\Program Files\\dotnet"
+        },
+        "__netcoredbgFileAppOutput": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-1VaDGU",
+        "requireExactSource": true,
+        "enableStepFiltering": true,
+        "logging": {
+          "exceptions": true,
+          "moduleLoad": true,
+          "programOutput": true,
+          "browserStdOut": true,
+          "elapsedTiming": false,
+          "threadExit": false,
+          "processExit": true,
+          "engineLogging": false,
+          "diagnosticsLog": {
+            "protocolMessages": false,
+            "dispatcherMessages": "none",
+            "debugEngineAPITracing": "none",
+            "debugRuntimeEventTracing": false,
+            "expressionEvaluationTracing": false,
+            "startDebuggingTracing": false
+          },
+          "consoleUsageMessage": true
+        },
+        "suppressJITOptimizations": false,
+        "symbolOptions": {
+          "searchPaths": [],
+          "searchMicrosoftSymbolServer": false,
+          "searchNuGetOrgSymbolServer": false,
+          "cachePath": "",
+          "moduleFilter": {
+            "mode": "loadAllButExcluded",
+            "excludedModules": [],
+            "includedModules": [],
+            "includeSymbolsNextToModules": true,
+            "includeSymbolsOnDemand": true
+          }
+        },
+        "expressionEvaluationOptions": {
+          "allowImplicitFuncEval": true,
+          "allowToString": true,
+          "allowFastEvaluate": true,
+          "showRawValues": false
+        },
+        "terminateChildProcesses": false,
+        "internalConsoleOptions": "openOnSessionStart"
+      },
+      "started": true,
+      "startedAtMilliseconds": 18217.028,
+      "commandResults": [
+        true,
+        true,
+        true
+      ],
+      "returnedAtMilliseconds": 18217.8158,
+      "sourceAfterSnapshot": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\workspace\\a.cs",
+        "size": 969,
+        "sha256": "4d865a4bfb51e53379d0c73b306ad27ef7c925e192d2de3e9201f7acc4fd2cb6",
+        "base64": "IzpzZGsgTWljcm9zb2Z0Lk5FVC5TZGsuV2ViDQojOnByb3BlcnR5IFRhcmdldEZyYW1ld29yaz1uZXQxMC4wDQoNCnZhciBtYXJrZXIgPSA0MDsNCm1hcmtlciArPSAyOw0KY29uc3Qgc3RyaW5nIHJldmlzaW9uID0gImluaXRpYWwiOw0KdmFyIG5vbmNlID0gRW52aXJvbm1lbnQuR2V0RW52aXJvbm1lbnRWYXJpYWJsZSgiTElGRUNZQ0xFX1RPS0VOIikNCiAgICA/PyB0aHJvdyBuZXcgSW52YWxpZE9wZXJhdGlvbkV4Y2VwdGlvbigiTWlzc2luZyBvd25lZCBsaWZlY3ljbGUgdG9rZW4uIik7DQp2YXIgYnVpbGRlciA9IFdlYkFwcGxpY2F0aW9uLkNyZWF0ZVNsaW1CdWlsZGVyKGFyZ3MpOw0KdmFyIGFwcCA9IGJ1aWxkZXIuQnVpbGQoKTsNCg0KYXBwLk1hcEdldCgiL3Byb2JlIiwgKCkgPT4gUmVzdWx0cy5Kc29uKG5ldw0Kew0KICAgIHBpZCA9IEVudmlyb25tZW50LlByb2Nlc3NJZCwNCiAgICBub25jZSwNCiAgICByZXZpc2lvbiwNCiAgICB2YWx1ZSA9IG1hcmtlcg0KfSkpOw0KDQovLyBUaGlzIGVuZHBvaW50IHBlcm1pdHMgYSBmYWlsZWQgdGVzdCB0byByZWxlYXNlIG9ubHkgaXRzIG93biB2ZXJpZmllZCBzZXJ2ZXIuDQovLyBJdCBpcyBhIGZpeHR1cmUgZmFjaWxpdHksIG5vdCBhIHByb2R1Y3Rpb24gZGVidWdnZXIgY2xlYW51cCBtZWNoYW5pc20uDQphcHAuTWFwUG9zdCgiL3NodXRkb3duIiwgKEh0dHBDb250ZXh0IGNvbnRleHQsIElIb3N0QXBwbGljYXRpb25MaWZldGltZSBsaWZldGltZSkgPT4NCnsNCiAgICBpZiAoY29udGV4dC5SZXF1ZXN0LlF1ZXJ5WyJ0b2tlbiJdLlRvU3RyaW5nKCkgIT0gbm9uY2UpDQogICAgICAgIHJldHVybiBSZXN1bHRzLlVuYXV0aG9yaXplZCgpOw0KICAgIGxpZmV0aW1lLlN0b3BBcHBsaWNhdGlvbigpOw0KICAgIHJldHVybiBSZXN1bHRzLk9rKG5ldyB7IHBpZCA9IEVudmlyb25tZW50LlByb2Nlc3NJZCwgbm9uY2UgfSk7DQp9KTsNCg0KYXBwLlJ1bigpOw0K"
+      },
+      "profileAfterSnapshot": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\workspace\\a.run.json",
+        "size": 385,
+        "sha256": "bfc5e241ac540cb04a0bc2f1383dd8228b3eb0db29d084b8f392ec0396eef458",
+        "base64": "ewogICJwcm9maWxlcyI6IHsKICAgICJMaWZlY3ljbGVIdHRwIjogewogICAgICAiY29tbWFuZE5hbWUiOiAiUHJvamVjdCIsCiAgICAgICJhcHBsaWNhdGlvblVybCI6ICJodHRwOi8vMTI3LjAuMC4xOjYyMzcyIiwKICAgICAgImxhdW5jaEJyb3dzZXIiOiBmYWxzZSwKICAgICAgImVudmlyb25tZW50VmFyaWFibGVzIjogewogICAgICAgICJMSUZFQ1lDTEVfVE9LRU4iOiAiNDRkYTBkZDYtNjRkNS00ODVjLWFjZjEtZTY5MjQ3MjNmNWI1IiwKICAgICAgICAiQVNQTkVUQ09SRV9FTlZJUk9OTUVOVCI6ICJEZXZlbG9wbWVudCIsCiAgICAgICAgIkRPVE5FVF9ST0xMX0ZPUldBUkQiOiAiTElGRUNZQ0xFX0lOVkFMSURfUk9MTF9GT1JXQVJEIgogICAgICB9CiAgICB9CiAgfQp9Cg=="
+      },
+      "ambientDotnetRootAfter": "C:\\Program Files\\dotnet",
+      "ambientRollForwardAfter": null,
+      "initializeResponse": {
+        "request": {
+          "sessionId": "fa3eb4c8-ce6a-4224-9909-35ae335a870d",
+          "message": {
+            "command": "initialize",
+            "arguments": {
+              "clientID": "vscode",
+              "clientName": "VSCodium",
+              "adapterID": "coreclr",
+              "pathFormat": "path",
+              "linesStartAt1": true,
+              "columnsStartAt1": true,
+              "supportsVariableType": true,
+              "supportsVariablePaging": true,
+              "supportsRunInTerminalRequest": true,
+              "locale": "en",
+              "supportsProgressReporting": true,
+              "supportsInvalidatedEvent": true,
+              "supportsMemoryReferences": true,
+              "supportsArgsCanBeInterpretedByShell": true,
+              "supportsMemoryEvent": true,
+              "supportsStartDebuggingRequest": true,
+              "supportsANSIStyling": true
+            },
+            "type": "request",
+            "seq": 1
+          }
+        },
+        "response": {
+          "body": {
+            "exceptionBreakpointFilters": [
+              {
+                "filter": "all",
+                "label": "all"
+              },
+              {
+                "filter": "user-unhandled",
+                "label": "user-unhandled"
+              }
+            ],
+            "supportTerminateDebuggee": true,
+            "supportsCancelRequest": true,
+            "supportsConditionalBreakpoints": true,
+            "supportsConfigurationDoneRequest": true,
+            "supportsExceptionFilterOptions": true,
+            "supportsExceptionInfoRequest": true,
+            "supportsExceptionOptions": false,
+            "supportsFunctionBreakpoints": true,
+            "supportsSetExpression": true,
+            "supportsSetVariable": true,
+            "supportsTerminateRequest": true
+          },
+          "command": "initialize",
+          "request_seq": 1,
+          "seq": 2,
+          "success": true,
+          "type": "response"
+        }
+      },
+      "configurationDoneFailure": {
+        "request": {
+          "sessionId": "fa3eb4c8-ce6a-4224-9909-35ae335a870d",
+          "message": {
+            "command": "configurationDone",
+            "type": "request",
+            "seq": 5
+          }
+        },
+        "response": {
+          "command": "configurationDone",
+          "message": "Failed command 'configurationDone' : 0x80004005",
+          "request_seq": 5,
+          "seq": 13,
+          "success": false,
+          "type": "response"
+        }
+      },
+      "nativeLaunchRequest": {
+        "sessionId": "fa3eb4c8-ce6a-4224-9909-35ae335a870d",
+        "message": {
+          "command": "launch",
+          "arguments": {
+            "name": "C#: a.cs",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-1VaDGU\\FileApp.dll",
+            "cwd": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\workspace",
+            "console": "internalConsole",
+            "stopAtEntry": false,
+            "justMyCode": true,
+            "targetArchitecture": "arm64",
+            "args": [],
+            "checkForDevCert": false,
+            "env": {
+              "ASPNETCORE_URLS": "http://127.0.0.1:62372",
+              "LIFECYCLE_TOKEN": "44da0dd6-64d5-485c-acf1-e6924723f5b5",
+              "ASPNETCORE_ENVIRONMENT": "Development",
+              "DOTNET_ROLL_FORWARD": "LIFECYCLE_INVALID_ROLL_FORWARD",
+              "DOTNET_LAUNCH_PROFILE": "LifecycleHttp",
+              "DOTNET_ROOT": "C:\\Program Files\\dotnet"
+            },
+            "__netcoredbgFileAppOutput": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-1VaDGU",
+            "requireExactSource": true,
+            "enableStepFiltering": true,
+            "logging": {
+              "exceptions": true,
+              "moduleLoad": true,
+              "programOutput": true,
+              "browserStdOut": true,
+              "elapsedTiming": false,
+              "threadExit": false,
+              "processExit": true,
+              "engineLogging": false,
+              "diagnosticsLog": {
+                "protocolMessages": false,
+                "dispatcherMessages": "none",
+                "debugEngineAPITracing": "none",
+                "debugRuntimeEventTracing": false,
+                "expressionEvaluationTracing": false,
+                "startDebuggingTracing": false
+              },
+              "consoleUsageMessage": true
+            },
+            "suppressJITOptimizations": false,
+            "symbolOptions": {
+              "searchPaths": [],
+              "searchMicrosoftSymbolServer": false,
+              "searchNuGetOrgSymbolServer": false,
+              "cachePath": "",
+              "moduleFilter": {
+                "mode": "loadAllButExcluded",
+                "excludedModules": [],
+                "includedModules": [],
+                "includeSymbolsNextToModules": true,
+                "includeSymbolsOnDemand": true
+              }
+            },
+            "expressionEvaluationOptions": {
+              "allowImplicitFuncEval": true,
+              "allowToString": true,
+              "allowFastEvaluate": true,
+              "showRawValues": false
+            },
+            "terminateChildProcesses": false,
+            "internalConsoleOptions": "openOnSessionStart",
+            "__sessionId": "fa3eb4c8-ce6a-4224-9909-35ae335a870d"
+          },
+          "type": "request",
+          "seq": 2
+        }
+      },
+      "hostDiagnostics": [
+        {
+          "seq": 9,
+          "event": "output",
+          "type": "event",
+          "body": {
+            "category": "stderr",
+            "output": "Invalid value for environment variable 'DOTNET_ROLL_FORWARD'."
+          }
+        }
+      ],
+      "processEvents": [],
+      "terminated": true,
+      "terminatedAtMilliseconds": 24503.8167,
+      "terminationObservedWithoutTestStop": true,
+      "log": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\logs\\20261107T234211\\window1\\exthost\\output_logging_20261107T234213\\3-C# File Debugging.log",
+        "offsetCharacters": 12012,
+        "prefixSha256": "48ddcdcf318f7d9f64107bad8b3f78ed5aec1f714a996e8811e8cbddb1a668e2",
+        "tailCharacters": 5976,
+        "tailSha256": "9ab558ca02377468e099e718631ddcd1cca3377028271bf19139a6eb4a7a451d",
+        "buildCommands": [
+          {
+            "args": [
+              "build",
+              "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\workspace\\a.cs",
+              "--configuration",
+              "Debug",
+              "--output",
+              "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-1VaDGU",
+              "-p:AssemblyName=FileApp",
+              "-p:DebugType=portable",
+              "-p:Optimize=false",
+              "-p:PublishAot=false",
+              "-p:UseSharedCompilation=false",
+              "--disable-build-servers",
+              "--nologo",
+              "-target:Build",
+              "-getProperty:UsingMicrosoftNETSdkWeb,UsingMicrosoftNETSdkRazor,UsingMicrosoftNETSdkWorker,OutputType,TargetFrameworkIdentifier,TargetPlatformIdentifier",
+              "-getItem:FrameworkReference"
+            ],
+            "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-1VaDGU"
+          }
+        ],
+        "compilerDiagnostics": [],
+        "failedPhaseDiagnostics": [],
+        "cancelledPhaseDiagnostics": [],
+        "buildCompletedPhaseDiagnostics": [
+          "Phase completed: Building file-based app (2702 ms; total 3226 ms)"
+        ],
+        "webPreparationFailedPhaseDiagnostics": [],
+        "webProfileRootDiagnostics": [],
+        "completedPhaseDiagnostics": [
+          "Phase completed: Starting netcoredbg (486 ms; total 3715 ms)"
+        ],
+        "webPreparationCompletedPhaseDiagnostics": [
+          "Phase completed: Preparing web launch settings (2 ms; total 3228 ms)"
+        ],
+        "handoffFailedPhaseDiagnostics": []
+      },
+      "outputRemovedAtMilliseconds": 24525.8122,
+      "outputAbsent": true,
+      "terminalQueuesEmpty": true,
+      "portReusableAtMilliseconds": 24527.1329,
+      "bAfter": {
+        "sessionId": "44ac01ff-a642-4452-a491-05758af65dc1",
+        "pid": 88600,
+        "nonce": "80813cca-8968-4048-9a0f-10e03fd163ac",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\c91f62ef4e47a1d9a6ee66c0\\run-6iXaT0",
+        "response": {
+          "pid": 88600,
+          "nonce": "80813cca-8968-4048-9a0f-10e03fd163ac",
+          "revision": "initial",
+          "value": 42
+        }
+      },
+      "sessionId": "fa3eb4c8-ce6a-4224-9909-35ae335a870d",
+      "capturedSessions": [
+        {
+          "sessionId": "fa3eb4c8-ce6a-4224-9909-35ae335a870d",
+          "primary": true,
+          "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-1VaDGU\\FileApp.dll",
+          "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-1VaDGU",
+          "terminated": true,
+          "terminatedAtMilliseconds": 24503.8167
+        }
+      ]
+    },
+    "coalescedRetry": {
+      "label": "A-1",
+      "commandInvocations": 3,
+      "commandResults": [
+        true,
+        true,
+        true
+      ],
+      "sessionId": "9518caa7-907e-4b03-b3c6-a6e65f5071d4",
+      "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-uz5IiI",
+      "sessionIds": [
+        "9518caa7-907e-4b03-b3c6-a6e65f5071d4"
+      ],
+      "log": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\logs\\20261107T234211\\window1\\exthost\\output_logging_20261107T234213\\3-C# File Debugging.log",
+        "offsetCharacters": 17988,
+        "prefixSha256": "f873b652a5e58824ef19c1a4da829d6b3a0df1113cefa6a607d96a78d5209b82",
+        "tailCharacters": 5976,
+        "tailSha256": "da8bc28a863a2012b0e094f678bda5fd52495aa66b8e4fe85bf48f0a93605ec3",
+        "buildCommands": [
+          {
+            "args": [
+              "build",
+              "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\workspace\\a.cs",
+              "--configuration",
+              "Debug",
+              "--output",
+              "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-uz5IiI",
+              "-p:AssemblyName=FileApp",
+              "-p:DebugType=portable",
+              "-p:Optimize=false",
+              "-p:PublishAot=false",
+              "-p:UseSharedCompilation=false",
+              "--disable-build-servers",
+              "--nologo",
+              "-target:Build",
+              "-getProperty:UsingMicrosoftNETSdkWeb,UsingMicrosoftNETSdkRazor,UsingMicrosoftNETSdkWorker,OutputType,TargetFrameworkIdentifier,TargetPlatformIdentifier",
+              "-getItem:FrameworkReference"
+            ],
+            "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-uz5IiI"
+          }
+        ],
+        "compilerDiagnostics": [],
+        "failedPhaseDiagnostics": [],
+        "cancelledPhaseDiagnostics": [],
+        "buildCompletedPhaseDiagnostics": [
+          "Phase completed: Building file-based app (2737 ms; total 3190 ms)"
+        ],
+        "webPreparationFailedPhaseDiagnostics": [],
+        "webProfileRootDiagnostics": [],
+        "completedPhaseDiagnostics": [
+          "Phase completed: Starting netcoredbg (505 ms; total 3697 ms)"
+        ]
+      },
+      "failedOutput": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\b65b9d7cc15763fa275ee9a0\\run-1VaDGU",
+      "freshOutput": true,
+      "profileSnapshot": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\workspace\\a.run.json",
+        "size": 320,
+        "sha256": "945b73aa12eb98f454ac61190abca3fa194a890276f4ce26693d3f25b70015df",
+        "base64": "ewogICJwcm9maWxlcyI6IHsKICAgICJMaWZlY3ljbGVIdHRwIjogewogICAgICAiY29tbWFuZE5hbWUiOiAiUHJvamVjdCIsCiAgICAgICJhcHBsaWNhdGlvblVybCI6ICJodHRwOi8vMTI3LjAuMC4xOjYyMzcyIiwKICAgICAgImxhdW5jaEJyb3dzZXIiOiBmYWxzZSwKICAgICAgImVudmlyb25tZW50VmFyaWFibGVzIjogewogICAgICAgICJMSUZFQ1lDTEVfVE9LRU4iOiAiZDY3ZDk1MzktZmExMC00ZmE1LWIyZmYtMTg3MTUyMzVkOWMxIiwKICAgICAgICAiQVNQTkVUQ09SRV9FTlZJUk9OTUVOVCI6ICJEZXZlbG9wbWVudCIKICAgICAgfQogICAgfQogIH0KfQo="
+      },
+      "sourceSnapshot": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\n01\\workspace\\a.cs",
+        "size": 969,
+        "sha256": "2a57f8a4b62b880b64e12cde7fb76ed3d0a3188e93c10300d0971f36a352ba47",
+        "base64": "IzpzZGsgTWljcm9zb2Z0Lk5FVC5TZGsuV2ViDQojOnByb3BlcnR5IFRhcmdldEZyYW1ld29yaz1uZXQxMC4wDQoNCnZhciBtYXJrZXIgPSA0MDsNCm1hcmtlciArPSAyOw0KY29uc3Qgc3RyaW5nIHJldmlzaW9uID0gInJldHJ5LTEiOw0KdmFyIG5vbmNlID0gRW52aXJvbm1lbnQuR2V0RW52aXJvbm1lbnRWYXJpYWJsZSgiTElGRUNZQ0xFX1RPS0VOIikNCiAgICA/PyB0aHJvdyBuZXcgSW52YWxpZE9wZXJhdGlvbkV4Y2VwdGlvbigiTWlzc2luZyBvd25lZCBsaWZlY3ljbGUgdG9rZW4uIik7DQp2YXIgYnVpbGRlciA9IFdlYkFwcGxpY2F0aW9uLkNyZWF0ZVNsaW1CdWlsZGVyKGFyZ3MpOw0KdmFyIGFwcCA9IGJ1aWxkZXIuQnVpbGQoKTsNCg0KYXBwLk1hcEdldCgiL3Byb2JlIiwgKCkgPT4gUmVzdWx0cy5Kc29uKG5ldw0Kew0KICAgIHBpZCA9IEVudmlyb25tZW50LlByb2Nlc3NJZCwNCiAgICBub25jZSwNCiAgICByZXZpc2lvbiwNCiAgICB2YWx1ZSA9IG1hcmtlcg0KfSkpOw0KDQovLyBUaGlzIGVuZHBvaW50IHBlcm1pdHMgYSBmYWlsZWQgdGVzdCB0byByZWxlYXNlIG9ubHkgaXRzIG93biB2ZXJpZmllZCBzZXJ2ZXIuDQovLyBJdCBpcyBhIGZpeHR1cmUgZmFjaWxpdHksIG5vdCBhIHByb2R1Y3Rpb24gZGVidWdnZXIgY2xlYW51cCBtZWNoYW5pc20uDQphcHAuTWFwUG9zdCgiL3NodXRkb3duIiwgKEh0dHBDb250ZXh0IGNvbnRleHQsIElIb3N0QXBwbGljYXRpb25MaWZldGltZSBsaWZldGltZSkgPT4NCnsNCiAgICBpZiAoY29udGV4dC5SZXF1ZXN0LlF1ZXJ5WyJ0b2tlbiJdLlRvU3RyaW5nKCkgIT0gbm9uY2UpDQogICAgICAgIHJldHVybiBSZXN1bHRzLlVuYXV0aG9yaXplZCgpOw0KICAgIGxpZmV0aW1lLlN0b3BBcHBsaWNhdGlvbigpOw0KICAgIHJldHVybiBSZXN1bHRzLk9rKG5ldyB7IHBpZCA9IEVudmlyb25tZW50LlByb2Nlc3NJZCwgbm9uY2UgfSk7DQp9KTsNCg0KYXBwLlJ1bigpOw0K"
+      },
+      "correctedRollForwardProfile": true,
+      "failedNonce": "44da0dd6-64d5-485c-acf1-e6924723f5b5",
+      "nonce": "d67d9539-fa10-4fa5-b2ff-18715235d9c1",
+      "freshToken": true,
+      "nativeLaunchEnvironment": {
+        "ASPNETCORE_URLS": "http://127.0.0.1:62372",
+        "LIFECYCLE_TOKEN": "d67d9539-fa10-4fa5-b2ff-18715235d9c1",
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DOTNET_LAUNCH_PROFILE": "LifecycleHttp",
+        "DOTNET_ROOT": "C:\\Program Files\\dotnet"
+      }
+    },
+    "bPreservedAfterFailure": [
+      {
+        "atMilliseconds": 24531.9057,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "44ac01ff-a642-4452-a491-05758af65dc1",
+          "pid": 88600
+        }
+      }
+    ],
+    "bPreservedAfterRetry": [
+      {
+        "atMilliseconds": 28916.8394,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "44ac01ff-a642-4452-a491-05758af65dc1",
+          "pid": 88600
+        }
+      }
+    ],
+    "validatedOutputLogs": {
+      "profile/logs/20261107T234211/window1/exthost/output_logging_20261107T234213/3-C# File Debugging.log": {
+        "sha256": "9d2dfd405a85ab0f7abc2ee4e28ef13a1844ff8bf2e88548021cb1c7e0ba961c",
+        "bytes": 29940
+      }
+    },
+    "mechanism": "A deliberately invalid per-file DOTNET_ROLL_FORWARD reaches the real .NET host through the normal installed adapter; healthy initialize precedes a correlated native configurationDone failure.",
+    "apiObservation": {
+      "commandResults": [
+        true,
+        true,
+        true
+      ],
+      "nativeLaunchResponse": {
+        "body": {},
+        "command": "launch",
+        "request_seq": 2,
+        "seq": 4,
+        "success": true,
+        "type": "response"
+      },
+      "nativeStartupSucceeded": false
+    },
+    "artifactObservation": "DLL/PDB/runtimeconfig path, size and hashes are captured before normal owned cleanup; only runtimeconfig bytes are retained.",
+    "sampling": "Exact editor termination, output/queue cleanup and port reuse are observed. B preservation is sampled at discrete checkpoints. Missing process events do not prove global process absence or a failed-host PID exit."
+  },
+  "compilerRegression": {
+    "name": "c01",
+    "localArtifactDirectory": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01",
+    "success": true,
+    "editorExitCode": 0,
+    "scope": {
+      "installedCandidate": true,
+      "invocation": "command-api",
+      "physicalF5": false,
+      "VSCodium": true,
+      "platform": "win32-arm64",
+      "macOS": false,
+      "qualification": false,
+      "localOnly": true,
+      "published": false,
+      "directWebDebuggee": true,
+      "spawnedGrandchildren": false,
+      "hostReload": false,
+      "injectedTargetRuntime": false,
+      "scenario": "build-failure-retry",
+      "actualCompilerFailure": true,
+      "actualWebProfileFailure": false,
+      "actualSdkSelectionFailure": false,
+      "actualNativeHostFailure": false,
+      "injectedEditorRejection": false,
+      "nativeAdapterFailure": false,
+      "actualProgressCancelUi": false,
+      "injectedCancellationToken": false
+    },
+    "freshProfiles": 1,
+    "aLaunchesAndStopCycles": 3,
+    "bLaunches": 1,
+    "candidate": {
+      "baseVsixSha256": "0d239dff83d3120786ff3596a046fd0866b045f1d883c86fb83c64a7d808d0c5",
+      "sourceCommit": "c712ede7edb303d42b95d083a724315adf44aa3d",
+      "target": "win32-arm64",
+      "ownedModules": {
+        "entry.cjs": "8cb28056b4f634d1897302f2b97303e140e9c11c233b2f771c32f7845aab44e3",
+        "runtime.cjs": "fd72cad8a4c27ff707dec3c243db2b9cb7cae47fb64ce738a02e14731aebc1d8",
+        "classify.cjs": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+        "web.cjs": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+        "recovery.cjs": "099f74d6d25c0fad95b0f56e3adaebe43a3f211991b6ef436f92ceed6be199d4"
+      },
+      "buildId": "eacc103bd794dc8305aea1fbe75f6c6ba0a604449989085498e6f9989bc855c5",
+      "sha256": "9440eaf20caaf2743a87da4011f0f3fa2e56cf65aa5cc4b5f4dfbbfafd6e331a",
+      "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\local-lifecycle.vsix",
+      "version": "11.7.18004",
+      "localOnly": true,
+      "published": false,
+      "unchangedEntries": 736,
+      "unchangedPayloadDigest": "5b655a847a8d304972570006e1ecd7f4ac1cc01f855055bf3c35640237e2cdf1"
+    },
+    "editor": {
+      "executable": "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\VSCodium.exe",
+      "cli": "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\bin\\codium.cmd",
+      "version": "1.143.17232",
+      "commit": "c072cf642cbbadabefa22f39c58cc902a8b7427f",
+      "sha256": "61b273b2c0196d7cee4ba84f7412ccc74975f0fcefd3579e69a7b373f79027cd",
+      "machine": "arm64",
+      "apiVersion": "1.143.1"
+    },
+    "sdk": {
+      "executable": "C:\\Program Files\\dotnet\\dotnet.exe",
+      "root": "C:\\Program Files\\dotnet",
+      "version": "10.0.403",
+      "sha256": "8f9714d921c3fa1425611e3f79940715b74a18e2b21a5171bbd58e3775ff8315"
+    },
+    "dependency": {
+      "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\resources\\ms-dotnettools.vscode-dotnet-runtime-3.2.0.vsix",
+      "sha256": "a4cff5409f66e3827ee2c6a727ae59382290a182a653ca0f9ac97c63536ee541",
+      "version": "3.2.0"
+    },
+    "installedExtension": {
+      "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\extensions\\dotnetdev-kr-custom.csharp-with-netcoredbg-11.7.18004",
+      "version": "11.7.18004",
+      "displayName": "C# (netcoredbg) LOCAL WEB LIFECYCLE TEST",
+      "metadata": {
+        "installedTimestamp": 1794062609843,
+        "targetPlatform": "undefined",
+        "size": 200481597
+      },
+      "build": {
+        "target": "win32-arm64",
+        "upstreamCsharpCommit": "1c27e135b5dada55a240e4a504bafa759ec578e8",
+        "upstreamCsharpVersion": "11.7.18",
+        "upstreamCsharpTag": "v11.7.18-prerelease",
+        "upstreamPackageVersion": "42.42.42-placeholder",
+        "netcoredbgTag": "3.2.0-1092",
+        "packagingRevision": 4,
+        "releaseTag": "csharp-v11.7.18-netcoredbg-v3.2.0-1092-g9744e1f05186-r4",
+        "versionPolicy": "upstream-patch-revision-v1",
+        "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+        "debuggerArchiveSha256": "cfc272be9e883bcb90c9ed0704731fbb1349faf207d872f71e6bfb83b55869ad",
+        "validationRunId": "41644074504",
+        "validationWorkflowCommit": "ca5d10d97431181d934369c76c28347fac8a05a6",
+        "upstreamMain": "./dist/extension",
+        "localCandidate": true,
+        "lifecycleBuildId": "eacc103bd794dc8305aea1fbe75f6c6ba0a604449989085498e6f9989bc855c5",
+        "lifecycleSourceCommit": "c712ede7edb303d42b95d083a724315adf44aa3d"
+      }
+    },
+    "installedDependency": {
+      "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\extensions\\ms-dotnettools.vscode-dotnet-runtime-3.2.0",
+      "version": "3.2.0"
+    },
+    "installedOwnedModules": {
+      "entry.cjs": "8cb28056b4f634d1897302f2b97303e140e9c11c233b2f771c32f7845aab44e3",
+      "runtime.cjs": "fd72cad8a4c27ff707dec3c243db2b9cb7cae47fb64ce738a02e14731aebc1d8",
+      "classify.cjs": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+      "web.cjs": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+      "recovery.cjs": "099f74d6d25c0fad95b0f56e3adaebe43a3f211991b6ef436f92ceed6be199d4"
+    },
+    "harnessPinnedBeforeLaunch": {
+      "prepare.py": "b8f1e88b77ce6544606bb556388fadf4075f23fe0123f19d5cc6468132e194f9",
+      "run.ps1": "8439683fa5efd13d16f055e50407cdb9a575f2af7a073bfe6951147cc9941aa6",
+      "driver.cjs": "8c76ce1ed4411968b253dd7f8a5cd27950a5e8d03dc29c1e79c805283e9d1703",
+      "extension-test.cjs": "c0726265c7e49048f9d19bf84974573868d752f1f3a0769d0a28a02ea6b5c8cb",
+      "fixtures/web.cs": "4d865a4bfb51e53379d0c73b306ad27ef7c925e192d2de3e9201f7acc4fd2cb6"
+    },
+    "executedCopiesSha256": {
+      "driver.cjs": "8c76ce1ed4411968b253dd7f8a5cd27950a5e8d03dc29c1e79c805283e9d1703",
+      "extension-test.cjs": "c0726265c7e49048f9d19bf84974573868d752f1f3a0769d0a28a02ea6b5c8cb",
+      "fixtures/web.cs": "4d865a4bfb51e53379d0c73b306ad27ef7c925e192d2de3e9201f7acc4fd2cb6"
+    },
+    "checks": [
+      "Normally installed local candidate activates with exact owned module hashes and isolated loaded path",
+      "A source breakpoint binds and evaluates marker=40 through the installed native adapter",
+      "Two independent real Web sessions respond with distinct owned nonces and PIDs",
+      "A cycle 0: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+      "Actual CS0103 returns false, saves broken source, starts no session and removes exact failed output while B survives",
+      "Dirty compiler correction retries with three concurrent commands sharing one build/session and fresh output while B survives",
+      "A cycle 1: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+      "A cycle 2: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+      "B final stop releases its exact PID, HTTP port and owned output"
+    ],
+    "phases": [
+      {
+        "label": "verify installed local candidate",
+        "startedAtMilliseconds": 0.5823,
+        "outcome": "passed",
+        "elapsedMilliseconds": 1871.9495
+      },
+      {
+        "label": "A initial installed-command launch and breakpoint",
+        "startedAtMilliseconds": 1882.2773,
+        "outcome": "passed",
+        "elapsedMilliseconds": 5358.4894
+      },
+      {
+        "label": "B independent installed-command launch",
+        "startedAtMilliseconds": 7241.1686,
+        "outcome": "passed",
+        "elapsedMilliseconds": 4770.0264
+      },
+      {
+        "label": "A cycle 0 targeted stop and owned cleanup",
+        "startedAtMilliseconds": 12011.3523,
+        "outcome": "passed",
+        "elapsedMilliseconds": 922.9632
+      },
+      {
+        "label": "B preserved after A cycle 0",
+        "startedAtMilliseconds": 12934.7042,
+        "outcome": "passed",
+        "elapsedMilliseconds": 6.7922
+      },
+      {
+        "label": "A actual compiler failure and owned cleanup while B survives",
+        "startedAtMilliseconds": 12942.9566,
+        "outcome": "passed",
+        "elapsedMilliseconds": 3395.461
+      },
+      {
+        "label": "A cycle 1 dirty edit and installed-command retry",
+        "startedAtMilliseconds": 16338.628,
+        "outcome": "passed",
+        "elapsedMilliseconds": 4858.3237
+      },
+      {
+        "label": "A cycle 1 targeted stop and owned cleanup",
+        "startedAtMilliseconds": 21198.5884,
+        "outcome": "passed",
+        "elapsedMilliseconds": 862.4043
+      },
+      {
+        "label": "B preserved after A cycle 1",
+        "startedAtMilliseconds": 22061.2158,
+        "outcome": "passed",
+        "elapsedMilliseconds": 2.8704
+      },
+      {
+        "label": "A cycle 2 dirty edit and installed-command retry",
+        "startedAtMilliseconds": 22066.7639,
+        "outcome": "passed",
+        "elapsedMilliseconds": 4639.5869
+      },
+      {
+        "label": "A cycle 2 targeted stop and owned cleanup",
+        "startedAtMilliseconds": 26706.507,
+        "outcome": "passed",
+        "elapsedMilliseconds": 851.5596
+      },
+      {
+        "label": "B preserved after A cycle 2",
+        "startedAtMilliseconds": 27558.2776,
+        "outcome": "passed",
+        "elapsedMilliseconds": 4.2058
+      },
+      {
+        "label": "B final targeted stop and owned cleanup",
+        "startedAtMilliseconds": 27565.595,
+        "outcome": "passed",
+        "elapsedMilliseconds": 843.6433
+      }
+    ],
+    "elapsedMilliseconds": 28409.7334,
+    "launches": [
+      {
+        "label": "A-0",
+        "revision": "initial",
+        "pid": 77928,
+        "sessionId": "88116b63-d123-492f-b7bd-4f822b4537bb",
+        "origin": "http://127.0.0.1:54819",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\4c0a6b0c57aaa260fbdc034b\\run-dFpvGS",
+        "response": {
+          "pid": 77928,
+          "nonce": "a0dfcff4-04b5-4eea-98ce-dd1835847010",
+          "revision": "initial",
+          "value": 42
+        },
+        "afterStopMilliseconds": {
+          "stopPromise": 39.766,
+          "matchingEditorTermination": 885.277,
+          "pidObservedGone": 886.755,
+          "portRebindSucceeded": 887.857,
+          "outputAndQueuesClear": 922.4
+        },
+        "stopPromiseToTerminationMilliseconds": 845.512
+      },
+      {
+        "label": "B",
+        "revision": "initial",
+        "pid": 47040,
+        "sessionId": "f427dfb3-49f4-4740-a409-64add83e69e6",
+        "origin": "http://127.0.0.1:54820",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\a9b214162aa0c02e7a4ee9f2\\run-TxFjEu",
+        "response": {
+          "pid": 47040,
+          "nonce": "335755b6-f988-4b35-8060-375a19ad3a47",
+          "revision": "initial",
+          "value": 42
+        },
+        "afterStopMilliseconds": {
+          "stopPromise": 42.766,
+          "matchingEditorTermination": 815.16,
+          "pidObservedGone": 841.849,
+          "portRebindSucceeded": 842.854,
+          "outputAndQueuesClear": 843.154
+        },
+        "stopPromiseToTerminationMilliseconds": 772.395
+      },
+      {
+        "label": "A-1",
+        "revision": "retry-1",
+        "pid": 81496,
+        "sessionId": "cd9b7f70-9b31-4a97-9e84-4f7302767a96",
+        "origin": "http://127.0.0.1:54819",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\4c0a6b0c57aaa260fbdc034b\\run-fHVI8a",
+        "response": {
+          "pid": 81496,
+          "nonce": "fcfbc1e1-4e49-4df4-89ce-20c4db3a2e1c",
+          "revision": "retry-1",
+          "value": 42
+        },
+        "afterStopMilliseconds": {
+          "stopPromise": 43.656,
+          "matchingEditorTermination": 816.332,
+          "pidObservedGone": 824.266,
+          "portRebindSucceeded": 825.166,
+          "outputAndQueuesClear": 861.966
+        },
+        "stopPromiseToTerminationMilliseconds": 772.676
+      },
+      {
+        "label": "A-2",
+        "revision": "retry-2",
+        "pid": 95428,
+        "sessionId": "61faddda-bb79-45fe-90af-288259e35f60",
+        "origin": "http://127.0.0.1:54819",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\4c0a6b0c57aaa260fbdc034b\\run-qKvaoi",
+        "response": {
+          "pid": 95428,
+          "nonce": "aa1646a8-257b-4e1f-97e6-52fd594d060a",
+          "revision": "retry-2",
+          "value": 42
+        },
+        "afterStopMilliseconds": {
+          "stopPromise": 43.528,
+          "matchingEditorTermination": 816.232,
+          "pidObservedGone": 817.339,
+          "portRebindSucceeded": 818.497,
+          "outputAndQueuesClear": 851.144
+        },
+        "stopPromiseToTerminationMilliseconds": 772.705
+      }
+    ],
+    "unrelatedSessionPreserved": [
+      {
+        "atMilliseconds": 12941.3831,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "f427dfb3-49f4-4740-a409-64add83e69e6",
+          "pid": 47040
+        }
+      },
+      {
+        "atMilliseconds": 16335.6558,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "f427dfb3-49f4-4740-a409-64add83e69e6",
+          "pid": 47040
+        }
+      },
+      {
+        "atMilliseconds": 21196.6648,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "f427dfb3-49f4-4740-a409-64add83e69e6",
+          "pid": 47040
+        }
+      },
+      {
+        "atMilliseconds": 22063.8595,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "f427dfb3-49f4-4740-a409-64add83e69e6",
+          "pid": 47040
+        }
+      },
+      {
+        "atMilliseconds": 27562.3582,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "f427dfb3-49f4-4740-a409-64add83e69e6",
+          "pid": 47040
+        }
+      }
+    ],
+    "stopDiagnostics": [
+      {
+        "atMilliseconds": 12871.572,
+        "event": "adapter-error",
+        "detail": {
+          "label": "A-0",
+          "error": "Error: read error"
+        },
+        "afterStopMilliseconds": 860.016
+      },
+      {
+        "atMilliseconds": 21249.4512,
+        "event": "adapter-error",
+        "detail": {
+          "label": "A-1",
+          "error": "Error: read error"
+        },
+        "afterStopMilliseconds": 50.759
+      },
+      {
+        "atMilliseconds": 26776.0014,
+        "event": "adapter-error",
+        "detail": {
+          "label": "A-2",
+          "error": "Error: read error"
+        },
+        "afterStopMilliseconds": 69.431
+      },
+      {
+        "atMilliseconds": 27628.6825,
+        "event": "adapter-error",
+        "detail": {
+          "label": "B",
+          "error": "Error: read error"
+        },
+        "afterStopMilliseconds": 62.942
+      }
+    ],
+    "observedCoreRuntimeDirectories": [
+      "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14"
+    ],
+    "observedCoreLibraryModulePaths": [
+      "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Private.CoreLib.dll"
+    ],
+    "rawEvidence": {
+      "result.json": {
+        "sha256": "57e8de0b7c1c09fc91dbb3fe67c75e4f4888584e436855e0844726426db505b0",
+        "bytes": 25914
+      },
+      "expected.json": {
+        "sha256": "add5cd74eab200542aa926d451cb6b285907834ec24a9ad901facff08a3e873c",
+        "bytes": 2919
+      },
+      "trace.jsonl": {
+        "sha256": "e0a68ade17dd8093c23e0d05e51dded9a725b2697f399b18302de2e937f5ab74",
+        "bytes": 262768
+      },
+      "launcher-result.json": {
+        "sha256": "6cc0995e553c131e63bcb1821b576dc23c895e0a4b5310d1eeeb8fd789bfcdbe",
+        "bytes": 442
+      },
+      "attempt.json": {
+        "sha256": "f384bfa6e84ea2528a693fb0d2bd876f5c5699f996ceacd61f5443fbafcf49c8",
+        "bytes": 29
+      },
+      "launch.json": {
+        "sha256": "fe26d76add12237a13919bbbe6f1bfcce7d82ce3aefb4aa9ade06d0b84ec7497",
+        "bytes": 1100
+      },
+      "progress/state.json": {
+        "sha256": "b70d3122b9bf5a6bcd2e195477876ff4a106e8f7ff67bef494ffc96911aa15a9",
+        "bytes": 8573
+      },
+      "logs/candidate-install.txt": {
+        "sha256": "02d8b3b5168d692db60bf6d3fc26d69febacb3fda093f6ebbf8e065eced9c552",
+        "bytes": 395
+      },
+      "logs/editor-version.txt": {
+        "sha256": "aff6841c98558e85f0dde480073005e9e8267d1e06817b8165756bbc14ab2ca2",
+        "bytes": 62
+      },
+      "logs/runtime-install.txt": {
+        "sha256": "f1acc9402ca514805b1dfb28050c95abfe9bf4abd6dcb77e9b93d461bef80060",
+        "bytes": 422
+      },
+      "logs/sdk-version.txt": {
+        "sha256": "e4e6a678725873a4192c048849cd64d852983991bfcb210a40c3b80cc8fcf2eb",
+        "bytes": 10
+      },
+      "logs/stderr.txt": {
+        "sha256": "e5019c2dbd6bd58cf2da0e1db240d1d0cf4583ac42708a042bea3ab7d7c5a7ba",
+        "bytes": 748
+      },
+      "logs/stdout.txt": {
+        "sha256": "ece0476ee7f983cd9185f39c0e8ef6368ad91df31ea915d67647c09a5a13491c",
+        "bytes": 1341
+      },
+      "profile/logs/20261107T234330/window1/exthost/output_logging_20261107T234331/3-C# File Debugging.log": {
+        "sha256": "5cfc66d3008892ff281b9e5a4e697b6ec03a833837d6daca2f3ea7eb1a6d6d7c",
+        "bytes": 31279
+      },
+      "profile/logs/20261107T234330/window1/exthost/exthost.log": {
+        "sha256": "27d870754462f1352b7be6273265e5f4cbdd66865f9790a24722a35039a3d60e",
+        "bytes": 7190
+      },
+      "profile/logs/20261107T234330/window1/exthost/dotnetdev-kr-custom.csharp-with-netcoredbg/C#.log": {
+        "sha256": "a8acee51da6069622cd55c840e9cfe48f2646b50aa2cedc92d33682bea931cfd",
+        "bytes": 52924
+      }
+    },
+    "interpretation": "Behavioral lifecycle assertions passed. Stop-time adapter errors remain recorded; this is not an error-free-log or release-qualification claim.",
+    "validatedOutputLogs": {
+      "profile/logs/20261107T234330/window1/exthost/output_logging_20261107T234331/3-C# File Debugging.log": {
+        "sha256": "5cfc66d3008892ff281b9e5a4e697b6ec03a833837d6daca2f3ea7eb1a6d6d7c",
+        "bytes": 31279
+      }
+    },
+    "scenario": "build-failure-retry",
+    "failedBuildAttempts": [
+      {
+        "label": "A-compile-failure",
+        "source": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\workspace\\a.cs",
+        "revision": "initial",
+        "nonce": "66470db5-7cc3-473d-9ff6-c0f637f1be19",
+        "origin": "http://127.0.0.1:54819",
+        "port": 54819,
+        "expectedBuildFailure": true,
+        "commandPending": false,
+        "commandResult": false,
+        "invokedAtMilliseconds": 12988.6123,
+        "returnedAtMilliseconds": 16328.634,
+        "sourceSaved": true,
+        "capturedSessions": [],
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\4c0a6b0c57aaa260fbdc034b\\run-mIzeyh",
+        "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\4c0a6b0c57aaa260fbdc034b\\run-mIzeyh\\FileApp.dll",
+        "base": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps",
+        "outputRemovedAtMilliseconds": 16329.9825,
+        "portReusableAtMilliseconds": 16331.3039,
+        "noSession": true,
+        "log": {
+          "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\logs\\20261107T234330\\window1\\exthost\\output_logging_20261107T234331\\3-C# File Debugging.log",
+          "offsetCharacters": 12012,
+          "prefixSha256": "b68d20de82edeca57e345a7faba57f7bd31bf863beec9323ecd442333f6cd6bc",
+          "tailCharacters": 7315,
+          "tailSha256": "a9191b3b0165f7b3037212df674d71f575058aa2a390c3955efa532527aed522",
+          "buildCommands": [
+            {
+              "args": [
+                "build",
+                "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\workspace\\a.cs",
+                "--configuration",
+                "Debug",
+                "--output",
+                "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\4c0a6b0c57aaa260fbdc034b\\run-mIzeyh",
+                "-p:AssemblyName=FileApp",
+                "-p:DebugType=portable",
+                "-p:Optimize=false",
+                "-p:PublishAot=false",
+                "-p:UseSharedCompilation=false",
+                "--disable-build-servers",
+                "--nologo",
+                "-target:Build",
+                "-getProperty:UsingMicrosoftNETSdkWeb,UsingMicrosoftNETSdkRazor,UsingMicrosoftNETSdkWorker,OutputType,TargetFrameworkIdentifier,TargetPlatformIdentifier",
+                "-getItem:FrameworkReference"
+              ],
+              "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\4c0a6b0c57aaa260fbdc034b\\run-mIzeyh"
+            }
+          ],
+          "compilerDiagnostics": [
+            "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\workspace\\a.cs(5,11): error CS0103: The name '__missingLifecycleValue' does not exist in the current context [d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\workspace\\a.cs.csproj]",
+            "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\workspace\\a.cs(5,11): error CS0103: The name '__missingLifecycleValue' does not exist in the current context [d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\workspace\\a.cs.csproj]"
+          ],
+          "failedPhaseDiagnostics": [
+            "Phase failed: Building file-based app (2675 ms; total 3256 ms)"
+          ],
+          "cancelledPhaseDiagnostics": [],
+          "buildCompletedPhaseDiagnostics": [],
+          "webPreparationFailedPhaseDiagnostics": [],
+          "webProfileRootDiagnostics": [],
+          "completedPhaseDiagnostics": []
+        }
+      }
+    ],
+    "coalescedRetry": {
+      "label": "A-1",
+      "commandInvocations": 3,
+      "commandResults": [
+        true,
+        true,
+        true
+      ],
+      "sessionId": "cd9b7f70-9b31-4a97-9e84-4f7302767a96",
+      "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\4c0a6b0c57aaa260fbdc034b\\run-fHVI8a",
+      "sessionIds": [
+        "cd9b7f70-9b31-4a97-9e84-4f7302767a96"
+      ],
+      "log": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\logs\\20261107T234330\\window1\\exthost\\output_logging_20261107T234331\\3-C# File Debugging.log",
+        "offsetCharacters": 19327,
+        "prefixSha256": "01dc3b568a981fd305f6c4e6bd1f7c6118db69a6f78c382c8366649345233125",
+        "tailCharacters": 5976,
+        "tailSha256": "16923cbfd596c6dc53330bfa8c868ac23fcc478c6c1762708aaa4ff622165c10",
+        "buildCommands": [
+          {
+            "args": [
+              "build",
+              "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\workspace\\a.cs",
+              "--configuration",
+              "Debug",
+              "--output",
+              "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\4c0a6b0c57aaa260fbdc034b\\run-fHVI8a",
+              "-p:AssemblyName=FileApp",
+              "-p:DebugType=portable",
+              "-p:Optimize=false",
+              "-p:PublishAot=false",
+              "-p:UseSharedCompilation=false",
+              "--disable-build-servers",
+              "--nologo",
+              "-target:Build",
+              "-getProperty:UsingMicrosoftNETSdkWeb,UsingMicrosoftNETSdkRazor,UsingMicrosoftNETSdkWorker,OutputType,TargetFrameworkIdentifier,TargetPlatformIdentifier",
+              "-getItem:FrameworkReference"
+            ],
+            "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\4c0a6b0c57aaa260fbdc034b\\run-fHVI8a"
+          }
+        ],
+        "compilerDiagnostics": [],
+        "failedPhaseDiagnostics": [],
+        "cancelledPhaseDiagnostics": [],
+        "buildCompletedPhaseDiagnostics": [
+          "Phase completed: Building file-based app (3073 ms; total 3570 ms)"
+        ],
+        "webPreparationFailedPhaseDiagnostics": [],
+        "webProfileRootDiagnostics": [],
+        "completedPhaseDiagnostics": [
+          "Phase completed: Starting netcoredbg (473 ms; total 4047 ms)"
+        ]
+      },
+      "failedOutput": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\4c0a6b0c57aaa260fbdc034b\\run-mIzeyh",
+      "freshOutput": true
+    },
+    "successfulCommandControls": [
+      {
+        "label": "A-0",
+        "commandInvocations": 1,
+        "commandResults": [
+          true
+        ],
+        "capturedSessions": [
+          {
+            "sessionId": "88116b63-d123-492f-b7bd-4f822b4537bb",
+            "primary": true,
+            "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\4c0a6b0c57aaa260fbdc034b\\run-dFpvGS\\FileApp.dll",
+            "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\4c0a6b0c57aaa260fbdc034b\\run-dFpvGS",
+            "pid": 77928,
+            "terminated": true,
+            "terminatedAtMilliseconds": 12896.8327
+          }
+        ]
+      },
+      {
+        "label": "B",
+        "commandInvocations": 1,
+        "commandResults": [
+          true
+        ],
+        "capturedSessions": [
+          {
+            "sessionId": "f427dfb3-49f4-4740-a409-64add83e69e6",
+            "primary": true,
+            "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\a9b214162aa0c02e7a4ee9f2\\run-TxFjEu\\FileApp.dll",
+            "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\a9b214162aa0c02e7a4ee9f2\\run-TxFjEu",
+            "pid": 47040,
+            "terminated": true,
+            "terminatedAtMilliseconds": 28380.9009
+          }
+        ]
+      },
+      {
+        "label": "A-1",
+        "commandInvocations": 3,
+        "commandResults": [
+          true,
+          true,
+          true
+        ],
+        "capturedSessions": [
+          {
+            "sessionId": "cd9b7f70-9b31-4a97-9e84-4f7302767a96",
+            "primary": true,
+            "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\4c0a6b0c57aaa260fbdc034b\\run-fHVI8a\\FileApp.dll",
+            "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\4c0a6b0c57aaa260fbdc034b\\run-fHVI8a",
+            "pid": 81496,
+            "terminated": true,
+            "terminatedAtMilliseconds": 22015.024
+          }
+        ]
+      },
+      {
+        "label": "A-2",
+        "commandInvocations": 1,
+        "commandResults": [
+          true
+        ],
+        "capturedSessions": [
+          {
+            "sessionId": "61faddda-bb79-45fe-90af-288259e35f60",
+            "primary": true,
+            "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\4c0a6b0c57aaa260fbdc034b\\run-qKvaoi\\FileApp.dll",
+            "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\4c0a6b0c57aaa260fbdc034b\\run-qKvaoi",
+            "pid": 95428,
+            "terminated": true,
+            "terminatedAtMilliseconds": 27522.8032
+          }
+        ]
+      }
+    ]
+  },
+  "compilerRegressionIdentity": {
+    "baseCommit": "c712ede7edb303d42b95d083a724315adf44aa3d",
+    "productModulesUnchanged": true,
+    "currentOwnedModules": {
+      "classify.cjs": {
+        "sha256": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+        "bytes": 11396
+      },
+      "entry.cjs": {
+        "sha256": "8cb28056b4f634d1897302f2b97303e140e9c11c233b2f771c32f7845aab44e3",
+        "bytes": 2759
+      },
+      "recovery.cjs": {
+        "sha256": "099f74d6d25c0fad95b0f56e3adaebe43a3f211991b6ef436f92ceed6be199d4",
+        "bytes": 16057
+      },
+      "runtime.cjs": {
+        "sha256": "fd72cad8a4c27ff707dec3c243db2b9cb7cae47fb64ce738a02e14731aebc1d8",
+        "bytes": 35296
+      },
+      "web.cjs": {
+        "sha256": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+        "bytes": 17865
+      }
+    }
+  },
+  "verification": {
+    "directory": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\tests",
+    "manifest": {
+      "frozenUtc": "2026-11-07T14:42:25.220363Z",
+      "source": [
+        {
+          "path": "scripts/variant/README.md",
+          "sha256": "587795ba946e08b5136cd787f9cecccd203c355fef92a33ad9059b5fb1702364",
+          "size": 7030
+        },
+        {
+          "path": "scripts/variant/discover.py",
+          "sha256": "f6ec3280da861c3035c123fecdb31cadd2bd49e63e6f621fe1511401b1cce2fd",
+          "size": 6356
+        },
+        {
+          "path": "scripts/variant/file-based-apps/classify.cjs",
+          "sha256": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+          "size": 11396
+        },
+        {
+          "path": "scripts/variant/file-based-apps/entry.cjs",
+          "sha256": "8cb28056b4f634d1897302f2b97303e140e9c11c233b2f771c32f7845aab44e3",
+          "size": 2759
+        },
+        {
+          "path": "scripts/variant/file-based-apps/recovery.cjs",
+          "sha256": "099f74d6d25c0fad95b0f56e3adaebe43a3f211991b6ef436f92ceed6be199d4",
+          "size": 16057
+        },
+        {
+          "path": "scripts/variant/file-based-apps/runtime.cjs",
+          "sha256": "fd72cad8a4c27ff707dec3c243db2b9cb7cae47fb64ce738a02e14731aebc1d8",
+          "size": 35296
+        },
+        {
+          "path": "scripts/variant/file-based-apps/snippets/NOTICE.md",
+          "sha256": "96833ce44b134d8367244dd671675fa3e208fe16fea9522b694f38f705772d9e",
+          "size": 1712
+        },
+        {
+          "path": "scripts/variant/file-based-apps/snippets/examples-LICENSE.txt",
+          "sha256": "eb4ae5fdc87dc6f5763a900f96f0c45c12f88a075a65bb0e334f20f9fe15a56e",
+          "size": 1079
+        },
+        {
+          "path": "scripts/variant/file-based-apps/snippets/fba-csharp.json",
+          "sha256": "0d06e525714fb3fdce6617307a83b0484d5a58b8027297f4ef80918601c01ca5",
+          "size": 8195
+        },
+        {
+          "path": "scripts/variant/file-based-apps/test-classify.cjs",
+          "sha256": "2d62f3049ccab8ab9bbd3151485667fa5871c5013313278dc26990b5c734c18d",
+          "size": 10894
+        },
+        {
+          "path": "scripts/variant/file-based-apps/test-entry.cjs",
+          "sha256": "83550e4469728fdd7265f157a1e421ff51c6ef321c93e25d116a8c7e21f1a275",
+          "size": 9409
+        },
+        {
+          "path": "scripts/variant/file-based-apps/test-recovery.cjs",
+          "sha256": "f26a5aa152ccbb0ea2c217e3ecd4d115f9dbe06bed9fa08b1e0e4c9b3e0caa96",
+          "size": 42140
+        },
+        {
+          "path": "scripts/variant/file-based-apps/test-runtime.cjs",
+          "sha256": "3870743a1ef06f185ca023cc9693bb2585e121f8a29564767653963c13e77f0b",
+          "size": 137674
+        },
+        {
+          "path": "scripts/variant/file-based-apps/test-web.cjs",
+          "sha256": "b61a730f1f168e31f83ac1dd17abe59b6dd1a8aca1fe64b3d56eab78761eb24d",
+          "size": 18074
+        },
+        {
+          "path": "scripts/variant/file-based-apps/web.cjs",
+          "sha256": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+          "size": 17865
+        },
+        {
+          "path": "scripts/variant/lifecycle/active-reload/driver.cjs",
+          "sha256": "cf8339f0c6394e2d789ab371afdc7b1150e5f954b30b7e85bb4813f5418f597e",
+          "size": 504
+        },
+        {
+          "path": "scripts/variant/lifecycle/active-reload/extension-test.cjs",
+          "sha256": "3fa7600ac5e759c25d910d78c532347028c309fd340feb56608ec0f9deb187e2",
+          "size": 15752
+        },
+        {
+          "path": "scripts/variant/lifecycle/active-reload/prepare.py",
+          "sha256": "31317f7878ef7eb37a93f5d8d6e0690e0880feb8b2d7a9f7cf761fce2e98bbda",
+          "size": 2579
+        },
+        {
+          "path": "scripts/variant/lifecycle/active-reload/run.ps1",
+          "sha256": "b9554c4600745de0afe5eb5a7c22574625da54df36233115a7f4f8461e84e5cf",
+          "size": 11070
+        },
+        {
+          "path": "scripts/variant/lifecycle/command-recovery/extension-test.cjs",
+          "sha256": "b12256bbf6a5661e3f0d03406995864b211c895e497d5a4eeff253e105ffd6d7",
+          "size": 25267
+        },
+        {
+          "path": "scripts/variant/lifecycle/command-recovery/prepare.py",
+          "sha256": "777ca95ba9e48b589904eadded2c087f04636f90b17bbfdc1ac1615d7a32d8de",
+          "size": 1678
+        },
+        {
+          "path": "scripts/variant/lifecycle/command-recovery/run.ps1",
+          "sha256": "2ecf41ca5c1669b9a4fde395b46ac66d97e190853d00aa4aaa74e911c624b273",
+          "size": 11918
+        },
+        {
+          "path": "scripts/variant/lifecycle/driver.cjs",
+          "sha256": "8c76ce1ed4411968b253dd7f8a5cd27950a5e8d03dc29c1e79c805283e9d1703",
+          "size": 189
+        },
+        {
+          "path": "scripts/variant/lifecycle/extension-test.cjs",
+          "sha256": "c0726265c7e49048f9d19bf84974573868d752f1f3a0769d0a28a02ea6b5c8cb",
+          "size": 113813
+        },
+        {
+          "path": "scripts/variant/lifecycle/fixtures/cancel-build.targets",
+          "sha256": "ff4717c55ab6c466cb17c443037822150c7141f1dc4583851d31e92892d4587c",
+          "size": 2139
+        },
+        {
+          "path": "scripts/variant/lifecycle/fixtures/web.cs",
+          "sha256": "4d865a4bfb51e53379d0c73b306ad27ef7c925e192d2de3e9201f7acc4fd2cb6",
+          "size": 969
+        },
+        {
+          "path": "scripts/variant/lifecycle/interrupted-cleanup/extension-test.cjs",
+          "sha256": "469547819dc7e40684e7bea510c5cb887e61343e3994f54e2c11ded664fc5dc8",
+          "size": 16104
+        },
+        {
+          "path": "scripts/variant/lifecycle/interrupted-cleanup/prepare.py",
+          "sha256": "840797994b602be31bc14a362d88fe6cab27d37a8a346739f9af5a9e394357a3",
+          "size": 1493
+        },
+        {
+          "path": "scripts/variant/lifecycle/interrupted-cleanup/run.ps1",
+          "sha256": "aa0b97218ab6920be1b0066dce6a933a418c20deef6dc630bb104a0ff4a363ad",
+          "size": 10616
+        },
+        {
+          "path": "scripts/variant/lifecycle/interrupted-publication/extension-test.cjs",
+          "sha256": "cfc3552cea9a66ff54d31e1fc1aa55eafabbc01dbfb82e4c03563074eadfee63",
+          "size": 18830
+        },
+        {
+          "path": "scripts/variant/lifecycle/interrupted-publication/prepare.py",
+          "sha256": "c818e260a9b67a94a34d13d7c4c1a2c1ee18736ba79d12f333122deb2e3c9dbd",
+          "size": 1519
+        },
+        {
+          "path": "scripts/variant/lifecycle/interrupted-publication/run.ps1",
+          "sha256": "83874dedbeb88bbaa1bcb56792c527dff0de2d08f12551e4fcbe25fff2509b28",
+          "size": 12523
+        },
+        {
+          "path": "scripts/variant/lifecycle/prepare.py",
+          "sha256": "b8f1e88b77ce6544606bb556388fadf4075f23fe0123f19d5cc6468132e194f9",
+          "size": 12834
+        },
+        {
+          "path": "scripts/variant/lifecycle/run.ps1",
+          "sha256": "8439683fa5efd13d16f055e50407cdb9a575f2af7a073bfe6951147cc9941aa6",
+          "size": 10355
+        },
+        {
+          "path": "scripts/variant/overlay.py",
+          "sha256": "93103f90b1e2dc8aaa92119c689feb64236cb3ec72ff806b9893fd8eddb7a8e2",
+          "size": 19313
+        },
+        {
+          "path": "scripts/variant/publish.py",
+          "sha256": "bfcb5c15301133948e391084c40706485550f8b5539c02990f61d32775828b13",
+          "size": 9508
+        },
+        {
+          "path": "scripts/variant/resume.py",
+          "sha256": "ee6a30f379d63166efc2150204f57a269f9e0e2b280710879b73b90d53339b5a",
+          "size": 2078
+        },
+        {
+          "path": "scripts/variant/test-factory.cjs",
+          "sha256": "772981f4256d7aa1f53cc085d03ac68b228a992dbc98486d2fb54dd2d5ec9479",
+          "size": 4653
+        },
+        {
+          "path": "scripts/variant/test-packaging.cjs",
+          "sha256": "a6749de5db2d0747d88926b92be7476cb5cc3ed5a017615a532af06bbe31d61e",
+          "size": 4098
+        },
+        {
+          "path": "scripts/variant/test_discovery.py",
+          "sha256": "b377d3dfe6eab5831902ce7efc90af784668721481ae8562a4bcbb764f64b12a",
+          "size": 5800
+        },
+        {
+          "path": "scripts/variant/test_file_app_packaging.py",
+          "sha256": "54a28b543e0ad4ba20eb2eb4272e71032e0216129bc7d17fb0fa5ee3d6fc5100",
+          "size": 3714
+        },
+        {
+          "path": "scripts/variant/test_lifecycle_preparation.py",
+          "sha256": "1d757e0601449bfcb74f052d763285bbd7f4d4248a6b6ce151badf238fffdc20",
+          "size": 5855
+        },
+        {
+          "path": "scripts/variant/test_publication.py",
+          "sha256": "92fee610ef0ce2e16a77e6015fd2c0990976caf9e059812beeec96471e239248",
+          "size": 11381
+        },
+        {
+          "path": "scripts/variant/test_versioning.py",
+          "sha256": "4ad9f50802a03d8cc784911306a34164cb457c9c86307703f635cfcc6012c50c",
+          "size": 2021
+        },
+        {
+          "path": "scripts/variant/verify-vsix.py",
+          "sha256": "b9881de49446cf730fb90668f08a9f6bbb326bd2974b265bf0d96c5b1ccaa7ee",
+          "size": 10494
+        },
+        {
+          "path": "scripts/variant/versioning.py",
+          "sha256": "a18fae3c2f9056924eb8265f92de338a91c2b5b10c297fe7022a9c7e77ccd281",
+          "size": 1977
+        }
+      ],
+      "commit": "c712ede7edb303d42b95d083a724315adf44aa3d",
+      "worktree": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-host-failure-2026-11-07\\worktree",
+      "node": {
+        "path": "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "sha256": "f8044a7ac78a0feee5085882d680127526658109d1125e61900872e4c5a8db0b",
+        "size": 81949488
+      },
+      "python": {
+        "path": "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "sha256": "ef9e93f6ef033c190bf3cab9dd9f7206ba431332deee6be7ba8d36a5e54e186c",
+        "size": 107312
+      },
+      "runs": [
+        {
+          "log": "node.log",
+          "argv": [
+            "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+            "--unhandled-rejections=strict",
+            "--test",
+            "scripts/variant/file-based-apps/test-classify.cjs",
+            "scripts/variant/file-based-apps/test-entry.cjs",
+            "scripts/variant/file-based-apps/test-recovery.cjs",
+            "scripts/variant/file-based-apps/test-runtime.cjs",
+            "scripts/variant/file-based-apps/test-web.cjs"
+          ],
+          "result": {
+            "exitCode": 0,
+            "startedUtc": "2026-11-07T14:42:25.451652Z",
+            "completedUtc": "2026-11-07T14:42:31.035466Z",
+            "logSha256": "0ec55cea871876f799faaeb7d8e80394b5aa9fe5723b810993a0638dd0a4332d"
+          }
+        },
+        {
+          "log": "python.log",
+          "argv": [
+            "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "scripts/variant",
+            "-p",
+            "test_*.py",
+            "-v"
+          ],
+          "result": {
+            "exitCode": 0,
+            "startedUtc": "2026-11-07T14:42:31.037473Z",
+            "completedUtc": "2026-11-07T14:42:33.674585Z",
+            "logSha256": "23462625f0b85d131bb0cd31aaf16059a590aab2d05773df6a90e0a4ff7c0867"
+          }
+        }
+      ],
+      "commands": {
+        "node": [
+          "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "--unhandled-rejections=strict",
+          "--test",
+          "scripts/variant/file-based-apps/test-classify.cjs",
+          "scripts/variant/file-based-apps/test-entry.cjs",
+          "scripts/variant/file-based-apps/test-recovery.cjs",
+          "scripts/variant/file-based-apps/test-runtime.cjs",
+          "scripts/variant/file-based-apps/test-web.cjs"
+        ],
+        "python": [
+          "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "scripts/variant",
+          "-p",
+          "test_*.py",
+          "-v"
+        ]
+      },
+      "finalSourceVerifiedUtc": "2026-11-07T14:42:33.682611Z"
+    },
+    "manifestFile": {
+      "sha256": "27656c06bdbb1360648910ddb7360f8ed0c96491c57239fdc99f53d3db2d6d84",
+      "bytes": 11418
+    },
+    "runs": [
+      {
+        "record": {
+          "log": "node.log",
+          "argv": [
+            "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+            "--unhandled-rejections=strict",
+            "--test",
+            "scripts/variant/file-based-apps/test-classify.cjs",
+            "scripts/variant/file-based-apps/test-entry.cjs",
+            "scripts/variant/file-based-apps/test-recovery.cjs",
+            "scripts/variant/file-based-apps/test-runtime.cjs",
+            "scripts/variant/file-based-apps/test-web.cjs"
+          ],
+          "result": {
+            "exitCode": 0,
+            "startedUtc": "2026-11-07T14:42:25.451652Z",
+            "completedUtc": "2026-11-07T14:42:31.035466Z",
+            "logSha256": "0ec55cea871876f799faaeb7d8e80394b5aa9fe5723b810993a0638dd0a4332d"
+          }
+        },
+        "counts": {
+          "tests": 228,
+          "pass": 228,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "rawLog": {
+          "sha256": "0ec55cea871876f799faaeb7d8e80394b5aa9fe5723b810993a0638dd0a4332d",
+          "bytes": 22053
+        },
+        "rawResult": {
+          "sha256": "98bc1e85858c4d279061ec437a0f2d00ae88bd29127205fd5a38a4b9c9e421f8",
+          "bytes": 205
+        }
+      },
+      {
+        "record": {
+          "log": "python.log",
+          "argv": [
+            "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "scripts/variant",
+            "-p",
+            "test_*.py",
+            "-v"
+          ],
+          "result": {
+            "exitCode": 0,
+            "startedUtc": "2026-11-07T14:42:31.037473Z",
+            "completedUtc": "2026-11-07T14:42:33.674585Z",
+            "logSha256": "23462625f0b85d131bb0cd31aaf16059a590aab2d05773df6a90e0a4ff7c0867"
+          }
+        },
+        "counts": {
+          "tests": 39,
+          "result": "OK"
+        },
+        "rawLog": {
+          "sha256": "23462625f0b85d131bb0cd31aaf16059a590aab2d05773df6a90e0a4ff7c0867",
+          "bytes": 5694
+        },
+        "rawResult": {
+          "sha256": "8856b7e8a987f6f8b1134081297b56dac5314a3ce418289c6df5aec9818ea538",
+          "bytes": 205
+        }
+      }
+    ],
+    "sourceObservation": "Every pre-run source byte copy, hash and final verification timestamp is retained; current bytes and historical copies are rechecked against every manifest entry."
+  },
+  "unexpectedFailures": [],
+  "collectors": {
+    "docs\\research\\native-host-failure-2026-11-07\\summarize.py": {
+      "sha256": "3b8ba904307be4ab039c37f6852a93d07b85ab0d216774a86e5532c1e60d3897",
+      "bytes": 24955
+    },
+    "docs\\research\\debug-handoff-declined-2026-11-07\\summarize.py": {
+      "sha256": "82ea012762566d2006575b4cdac772742702969457a555c6d78daef52fa354d5",
+      "bytes": 31486
+    },
+    "docs\\research\\build-failure-retry-2026-11-05\\summarize.py": {
+      "sha256": "690f25544a8ec068d5125ae51e31de73e07c72cd59dcd197dba1654c0b52df40",
+      "bytes": 7688
+    },
+    "docs\\research\\web-lifecycle-2026-11-05\\summarize.py": {
+      "sha256": "f6bacf47766121737b2bfd5bd0be7b09744d70a41758d9346a36a320b581b734",
+      "bytes": 11207
+    }
+  },
+  "limits": [
+    "A deliberately invalid per-file DOTNET_ROLL_FORWARD causes a real .NET host startup failure; no native adapter executable failure or injected editor rejection is claimed.",
+    "Command API only; no physical F5/menu or macOS qualification.",
+    "Missing DAP process events do not establish global OS-process absence or independently prove a failed host PID exited.",
+    "B liveness and resource absence are checked at discrete checkpoints.",
+    "No certificate/trust/UI cancellation, active-host-loss, descendant-process or release qualification is added."
+  ]
+}

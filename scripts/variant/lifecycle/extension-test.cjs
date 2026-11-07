@@ -93,13 +93,13 @@ exports.run = async function run() {
     const expected = JSON.parse(fs.readFileSync(path.join(root, 'expected.json'), 'utf8'));
     assert.equal(expected.schema, 1);
     const scenario = expected.scenario || 'web-lifecycle';
-    assert(['web-lifecycle', 'build-failure-retry', 'native-build-cancel', 'web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry'].includes(scenario));
+    assert(['web-lifecycle', 'build-failure-retry', 'native-build-cancel', 'web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry', 'native-host-failure-retry'].includes(scenario));
     assert(Number.isInteger(expected.cycles) && expected.cycles >= 2 && expected.cycles <= 10);
     const start = process.hrtime.bigint();
     const result = {
         schema: 1, success: false, expected, editorApiVersion: vscode.version,
         safetyTimeoutMilliseconds: SAFETY_TIMEOUT_MS, checks: [], phases: [], launches: [], cleanup: [], failedBuildAttempts: [],
-        cancelledBuildAttempts: [], failedWebProfileAttempts: [], failedSdkSelectionAttempts: [], failedHandoffAttempts: [],
+        cancelledBuildAttempts: [], failedWebProfileAttempts: [], failedSdkSelectionAttempts: [], failedHandoffAttempts: [], failedNativeHostAttempts: [],
         scope: { installedCandidate: true, invocation: 'command-api', physicalF5: false,
             VSCodium: true, platform: `${process.platform}-${process.arch}`, macOS: process.platform === 'darwin',
             qualification: false, localOnly: true, published: false, directWebDebuggee: true,
@@ -107,6 +107,7 @@ exports.run = async function run() {
             scenario, actualCompilerFailure: scenario === 'build-failure-retry',
             actualWebProfileFailure: scenario === 'web-profile-failure-retry',
             actualSdkSelectionFailure: scenario === 'sdk-selection-failure-retry',
+            actualNativeHostFailure: scenario === 'native-host-failure-retry',
             injectedEditorRejection: scenario === 'debug-handoff-declined-retry', nativeAdapterFailure: false,
             actualProgressCancelUi: scenario === 'native-build-cancel', injectedCancellationToken: false },
     };
@@ -115,6 +116,7 @@ exports.run = async function run() {
     const failedWebProfileAttempts = [];
     const failedSdkSelectionAttempts = [];
     const failedHandoffAttempts = [];
+    const failedNativeHostAttempts = [];
     const handoffProviders = new Map();
     const cancelledBuildAttempts = [];
     const nativeCancellation = scenario === 'native-build-cancel' ? expected.nativeCancellation : undefined;
@@ -165,6 +167,7 @@ exports.run = async function run() {
                 expectedWebProfileFailure: launch.expectedWebProfileFailure,
                 expectedSdkSelectionFailure: launch.expectedSdkSelectionFailure,
                 expectedHandoffDeclined: launch.expectedHandoffDeclined,
+                expectedNativeHostFailure: launch.expectedNativeHostFailure,
                 providerCallCount: launch.providerCalls?.length, providerDisposed: launch.providerDisposed,
                 buildPid: launch.buildPid,
                 stopRequestedAtMilliseconds: launch.stopRequestedAtMilliseconds,
@@ -247,6 +250,35 @@ exports.run = async function run() {
         assert(!launch.expectedWebProfileFailure, 'The Web-profile-failed attempt must not create a debug adapter or session');
         assert(!launch.expectedSdkSelectionFailure, 'The SDK-selection-failed attempt must not create a debug adapter or session');
         assert(!launch.expectedHandoffDeclined, 'The editor-declined attempt must not create a debug adapter or session');
+        if (launch.expectedNativeHostFailure && !launch.builtArtifacts) {
+            const config = session.configuration;
+            assert.equal(config.request, 'launch');
+            assert(samePath(launch.base, launch.expectedBase));
+            assert.notEqual(launch.output, launch.previousOutput);
+            assert.notEqual(launch.output, launch.bBefore.output);
+            assert.equal(path.basename(launch.program), 'FileApp.dll');
+            assert.match(path.basename(launch.output), /^run-[A-Za-z0-9]{6}$/);
+            assert(samePath(config.cwd, path.dirname(launch.source)));
+            assert(samePath(config.env.DOTNET_ROOT, expected.sdk.root));
+            assert.equal(config.env.DOTNET_ROLL_FORWARD, launch.invalidRollForward);
+            assert.equal(config.env.ASPNETCORE_URLS, launch.origin);
+            assert.equal(config.serverReadyAction, undefined);
+            assert.equal(config.checkForDevCert, false);
+            const outputStat = fs.lstatSync(launch.output);
+            assert(outputStat.isDirectory() && !outputStat.isSymbolicLink());
+            launch.builtArtifacts = ['FileApp.dll', 'FileApp.pdb', 'FileApp.runtimeconfig.json'].map(name => {
+                const artifact = path.join(launch.output, name);
+                const stat = fs.lstatSync(artifact);
+                assert(stat.isFile() && !stat.isSymbolicLink() && stat.size > 0);
+                return { path: artifact, size: stat.size, sha256: sha256(artifact) };
+            });
+            launch.runtimeConfigSnapshot = fileSnapshot(path.join(launch.output, 'FileApp.runtimeconfig.json'));
+            const runtimeConfig = JSON.parse(Buffer.from(launch.runtimeConfigSnapshot.base64, 'base64'));
+            assert(runtimeConfig.runtimeOptions.frameworks.some(framework => framework.name === 'Microsoft.NETCore.App'));
+            launch.capturedConfiguration = JSON.parse(JSON.stringify(config));
+            record('native-host-failure-built-artifacts', { label: launch.label, sessionId: session.id,
+                configuration: launch.capturedConfiguration, artifacts: launch.builtArtifacts });
+        }
     }
 
     function capturedSessionState(launch) {
@@ -388,7 +420,7 @@ exports.run = async function run() {
             commandName: 'Project', applicationUrl: launch.origin, launchBrowser: false,
             environmentVariables: { LIFECYCLE_TOKEN: nonce, ASPNETCORE_ENVIRONMENT: 'Development' },
         } } }, null, 2) + '\n');
-        if (['web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry'].includes(scenario)) launch.profileSnapshot = fileSnapshot(source.replace(/\.cs$/i, '.run.json'));
+        if (['web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry', 'native-host-failure-retry'].includes(scenario)) launch.profileSnapshot = fileSnapshot(source.replace(/\.cs$/i, '.run.json'));
         const opened = document || await vscode.workspace.openTextDocument(source);
         await vscode.window.showTextDocument(opened);
         launch.commandPending = true;
@@ -407,7 +439,7 @@ exports.run = async function run() {
             state();
         }
         assert.equal(opened.isDirty, false, 'Installed command must save the dirty source before building');
-        if (['web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry'].includes(scenario)) launch.sourceSnapshot = fileSnapshot(source);
+        if (['web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry', 'native-host-failure-retry'].includes(scenario)) launch.sourceSnapshot = fileSnapshot(source);
         await until(() => launch.started, `${label} exact owned session start`);
         assert.equal(launch.capturedSessions.size, 1, 'One launch token must have exactly one captured session');
         assert(exists(launch.program));
@@ -420,6 +452,7 @@ exports.run = async function run() {
         assert(!cancelledBuildAttempts.some(previous => previous.output === launch.output), 'A retry must not reuse cancelled build output');
         assert(!failedWebProfileAttempts.some(previous => previous.output === launch.output), 'A retry must not reuse Web-profile-failed output');
         assert(!failedHandoffAttempts.some(previous => previous.output === launch.output), 'A retry must not reuse editor-declined output');
+        assert(!failedNativeHostAttempts.some(previous => previous.output === launch.output), 'A retry must not reuse native-host-failed output');
         if (inspectBreakpoint) {
             await until(() => launch.dap.some(message => message.event === 'stopped' && message.body?.reason === 'breakpoint'), `${label} source breakpoint`);
             const stopped = launch.dap.find(message => message.event === 'stopped' && message.body?.reason === 'breakpoint');
@@ -591,6 +624,144 @@ exports.run = async function run() {
         record('expected-web-profile-failure-confirmed', { label: attempt.label, output: attempt.output,
             commandResult: attempt.commandResult, sourceUnchanged: true, noAdapter: true, noSession: true, noProcessEvent: true });
         result.checks.push('Actual successful build then per-file Web root failure returns false before handoff, preserves source, removes owned output and leaves B unchanged');
+        state();
+        return attempt;
+    }
+
+    async function nativeHostFailure(source, revision, port, a, b) {
+        let file;
+        await until(() => {
+            file = outputLog();
+            if (!file) return false;
+            const text = fs.readFileSync(file, 'utf8');
+            return buildCommands(text, source).length === 1 && buildCommands(text, b.source).length === 1 &&
+                text.split(/\r?\n/).filter(line => line.startsWith('Phase completed: Starting netcoredbg')).length === 2;
+        }, 'initial A/B command output before actual native host failure');
+        const snapshot = logSnapshot(file);
+        const opened = await vscode.workspace.openTextDocument(source);
+        assert.equal(opened.isDirty, false);
+        assert.equal(opened.getText(), fs.readFileSync(source, 'utf8'));
+        assert(opened.getText().includes('marker += 2;'), 'The host-failed attempt must retain valid source');
+        await vscode.window.showTextDocument(opened);
+        const profile = source.replace(/\.cs$/i, '.run.json');
+        const attempt = { label: 'A-native-host-failure', source, revision, port, origin: a.origin,
+            nonce: crypto.randomUUID(), expectedNativeHostFailure: true,
+            invalidRollForward: 'LIFECYCLE_INVALID_ROLL_FORWARD', dap: [], dapRequests: [], adapterExits: [],
+            adapterCreationCount: 0, editorStartCount: 0, commandInvocations: 3,
+            expectedBase: a.base, previousOutput: a.output, sourceSnapshot: fileSnapshot(source), sourceWasDirty: opened.isDirty,
+            ambientDotnetRootBefore: process.env.DOTNET_ROOT ?? null,
+            ambientRollForwardBefore: process.env.DOTNET_ROLL_FORWARD ?? null };
+        assert(!byToken.has(attempt.nonce));
+        failedNativeHostAttempts.push(attempt);
+        ownedAttempts.push(attempt);
+        byToken.set(attempt.nonce, attempt);
+        // Change only this file's ordinary launch profile. The build and adapter
+        // payload remain real; no configuration provider or target runtime is injected.
+        fs.writeFileSync(profile, JSON.stringify({ profiles: { LifecycleHttp: {
+            commandName: 'Project', applicationUrl: attempt.origin, launchBrowser: false,
+            environmentVariables: { LIFECYCLE_TOKEN: attempt.nonce, ASPNETCORE_ENVIRONMENT: 'Development',
+                DOTNET_ROLL_FORWARD: attempt.invalidRollForward },
+        } } }, null, 2) + '\n');
+        attempt.profileSnapshot = fileSnapshot(profile);
+        await stillAlive(b);
+        attempt.bBefore = { sessionId: b.session.id, pid: b.pid, nonce: b.nonce, output: b.output, response: await request(b.origin) };
+        attempt.commandPending = true;
+        attempt.invokedAtMilliseconds = elapsed(start);
+        record('expected-native-host-failure-request', { label: attempt.label, nonce: attempt.nonce,
+            profileSha256: attempt.profileSnapshot.sha256, sourceSha256: attempt.sourceSnapshot.sha256,
+            invalidRollForward: attempt.invalidRollForward });
+        state();
+        try {
+            attempt.commandOperation = Promise.allSettled(Array.from({ length: attempt.commandInvocations }, () => vscode.commands.executeCommand(COMMAND)));
+            const outcomes = await attempt.commandOperation;
+            const rejected = outcomes.find(outcome => outcome.status === 'rejected');
+            if (rejected) throw rejected.reason;
+            attempt.commandResults = outcomes.map(outcome => outcome.value);
+        } finally { attempt.commandPending = false; attempt.returnedAtMilliseconds = elapsed(start); state(); }
+        // An editor may acknowledge the session before configurationDone fails.
+        // Retain its measured result instead of assuming every native error is false.
+        assert.equal(typeof attempt.commandResults[0], 'boolean');
+        assert.deepEqual(attempt.commandResults, Array(attempt.commandInvocations).fill(attempt.commandResults[0]));
+        assert.equal(opened.isDirty, false);
+        attempt.sourceAfterSnapshot = fileSnapshot(source);
+        attempt.profileAfterSnapshot = fileSnapshot(profile);
+        assert.equal(attempt.sourceAfterSnapshot.sha256, attempt.sourceSnapshot.sha256);
+        assert.equal(attempt.profileAfterSnapshot.sha256, attempt.profileSnapshot.sha256);
+        attempt.ambientDotnetRootAfter = process.env.DOTNET_ROOT ?? null;
+        attempt.ambientRollForwardAfter = process.env.DOTNET_ROLL_FORWARD ?? null;
+        assert.equal(attempt.ambientDotnetRootAfter, attempt.ambientDotnetRootBefore);
+        assert.equal(attempt.ambientRollForwardAfter, attempt.ambientRollForwardBefore);
+        await until(() => attempt.dap.some(message => message.type === 'response' &&
+            message.command === 'configurationDone' && message.success === false), 'native configurationDone failure response');
+        const requests = command => attempt.dapRequests.filter(item => item.message.type === 'request' && item.message.command === command);
+        const initialization = requests('initialize');
+        assert.equal(initialization.length, 1);
+        const initializeResponse = attempt.dap.find(message => message.type === 'response' && message.command === 'initialize' &&
+            message.request_seq === initialization[0].message.seq);
+        assert.equal(initializeResponse?.success, true, 'The real bundled adapter must answer initialize successfully');
+        attempt.initializeResponse = { request: initialization[0], response: initializeResponse };
+        const configurations = requests('configurationDone');
+        assert.equal(configurations.length, 1);
+        const configurationDoneFailure = attempt.dap.find(message => message.type === 'response' && message.command === 'configurationDone' &&
+            message.request_seq === configurations[0].message.seq && message.success === false);
+        assert(configurationDoneFailure, 'The native failure must answer this exact configurationDone request');
+        attempt.configurationDoneFailure = { request: configurations[0], response: configurationDoneFailure };
+        const launches = requests('launch');
+        assert.equal(launches.length, 1);
+        attempt.nativeLaunchRequest = launches[0];
+        assert(samePath(attempt.nativeLaunchRequest.message.arguments.program, attempt.program));
+        assert.equal(attempt.nativeLaunchRequest.message.arguments.env.LIFECYCLE_TOKEN, attempt.nonce);
+        assert.equal(attempt.nativeLaunchRequest.message.arguments.env.DOTNET_ROLL_FORWARD, attempt.invalidRollForward);
+        const diagnostic = "Invalid value for environment variable 'DOTNET_ROLL_FORWARD'.";
+        attempt.hostDiagnostics = attempt.dap.filter(message => message.event === 'output' &&
+            typeof message.body?.output === 'string' && message.body.output.includes(diagnostic));
+        assert(attempt.hostDiagnostics.length > 0, 'The real .NET host must report its exact environment-value error through native DAP output');
+        assert.equal(attempt.adapterCreationCount, 1);
+        assert.equal(attempt.capturedSessions.size, 1);
+        assert(attempt.editorStartCount === 0 || attempt.editorStartCount === 1);
+        assert(attempt.builtArtifacts?.length === 3);
+        // A native process can exit before CoreCLR attach, which precedes the
+        // adapter's process event. Event absence is not OS-process absence evidence.
+        attempt.processEvents = attempt.dap.filter(message => message.event === 'process');
+        await until(() => attempt.terminated, 'native-host-failed exact editor session termination');
+        attempt.terminationObservedWithoutTestStop = true;
+        if (attempt.pid) {
+            await until(() => !pidAlive(attempt.pid), 'reported native-host-failed PID exit');
+            attempt.reportedPidGoneAtMilliseconds = elapsed(start);
+        }
+        let tail;
+        await until(() => {
+            tail = logTail(snapshot);
+            return tail.includes('Phase completed: Starting netcoredbg') || tail.includes('Phase failed: Starting netcoredbg');
+        }, 'measured native-host-failed command phase output');
+        attempt.log = { ...logEvidence(snapshot, tail, source),
+            webPreparationCompletedPhaseDiagnostics: tail.split(/\r?\n/).filter(line => line.startsWith('Phase completed: Preparing web launch settings')),
+            handoffFailedPhaseDiagnostics: tail.split(/\r?\n/).filter(line => line.startsWith('Phase failed: Starting netcoredbg')) };
+        assert.equal(attempt.log.buildCommands.length, 1, 'Three callers must share one actual successful build');
+        assert.equal(attempt.log.buildCompletedPhaseDiagnostics.length, 1);
+        assert.equal(attempt.log.webPreparationCompletedPhaseDiagnostics.length, 1);
+        assert.equal(attempt.log.completedPhaseDiagnostics.length + attempt.log.handoffFailedPhaseDiagnostics.length, 1);
+        assert.equal(attempt.log.completedPhaseDiagnostics.length, Number(attempt.commandResults[0]));
+        assert.equal(attempt.log.failedPhaseDiagnostics.length, 0);
+        assert.equal(attempt.log.cancelledPhaseDiagnostics.length, 0);
+        assert.equal(attempt.log.compilerDiagnostics.length, 0);
+        assert.equal(attempt.log.webPreparationFailedPhaseDiagnostics.length, 0);
+        assert(!tail.includes('dotnet "dev-certs"'));
+        assert(samePath(attempt.log.buildCommands[0].output, attempt.output));
+        await until(() => !exists(attempt.output) && queueEmpty(attempt.base), 'native-host-failed owned output and terminal queues cleanup');
+        attempt.outputRemovedAtMilliseconds = elapsed(start);
+        attempt.outputAbsent = true;
+        attempt.terminalQueuesEmpty = true;
+        assert(await canBind(port));
+        attempt.portReusableAtMilliseconds = elapsed(start);
+        await stillAlive(b);
+        attempt.bAfter = { sessionId: b.session.id, pid: b.pid, nonce: b.nonce, output: b.output, response: await request(b.origin) };
+        assert.deepEqual(attempt.bAfter, attempt.bBefore);
+        record('actual-native-host-failure-confirmed', { label: attempt.label, commandResults: attempt.commandResults,
+            output: attempt.output, sessionId: attempt.session.id, configurationDoneFailure: attempt.configurationDoneFailure,
+            hostDiagnostics: attempt.hostDiagnostics, editorStartCount: attempt.editorStartCount,
+            processEvents: attempt.processEvents, terminationObservedWithoutTestStop: true });
+        result.checks.push('Three installed commands share one real build and adapter; the .NET host rejects the per-file roll-forward value, the exact session terminates and output/queues clear while B survives');
         state();
         return attempt;
     }
@@ -1029,7 +1200,7 @@ exports.run = async function run() {
     async function failureCleanup() {
         // phase() can time out before its action settles. Keep the exact-token
         // rejection armed during this bounded drain, then disarm before session cleanup.
-        for (const attempt of failedHandoffAttempts.filter(item => item.commandPending && item.commandOperation)) {
+        for (const attempt of [...failedHandoffAttempts, ...failedNativeHostAttempts].filter(item => item.commandPending && item.commandOperation)) {
             const cleanup = { label: attempt.label, pendingHandoffCommand: true };
             result.cleanup.push(cleanup);
             try {
@@ -1123,7 +1294,7 @@ exports.run = async function run() {
         subscriptions.push(vscode.debug.onDidStartDebugSession(session => observe('editor-start', () => {
             const launch = ownedLaunch(session);
             if (!launch) return;
-            if (launch.expectedWebProfileFailure || launch.expectedSdkSelectionFailure || launch.expectedHandoffDeclined) launch.editorStartCount++;
+            if (launch.expectedWebProfileFailure || launch.expectedSdkSelectionFailure || launch.expectedHandoffDeclined || launch.expectedNativeHostFailure) launch.editorStartCount++;
             captureSession(session, launch);
             launch.started = true;
             launch.startedAtMilliseconds = elapsed(start);
@@ -1149,12 +1320,15 @@ exports.run = async function run() {
             createDebugAdapterTracker(session) {
                 const launch = ownedLaunch(session);
                 if (!launch) return undefined;
-                if (launch.expectedWebProfileFailure || launch.expectedSdkSelectionFailure || launch.expectedHandoffDeclined) launch.adapterCreationCount++;
+                if (launch.expectedWebProfileFailure || launch.expectedSdkSelectionFailure || launch.expectedHandoffDeclined || launch.expectedNativeHostFailure) launch.adapterCreationCount++;
                 observe('adapter-session', () => captureSession(session, launch));
                 // Keep the tracker even if uniqueness validation failed: it can
                 // still identify the extra owned debuggee for targeted cleanup.
                 return {
-                    onWillReceiveMessage(message) { observe('dap-send', () => record('dap-send', { label: launch.label, sessionId: session.id, message })); },
+                    onWillReceiveMessage(message) { observe('dap-send', () => {
+                        if (launch.expectedNativeHostFailure) launch.dapRequests.push({ sessionId: session.id, message });
+                        record('dap-send', { label: launch.label, sessionId: session.id, message });
+                    }); },
                     onDidSendMessage(message) { observe('dap-receive', () => {
                         launch.dap.push(message);
                         if (message.event === 'process' && message.body?.isLocalProcess === true) {
@@ -1173,6 +1347,11 @@ exports.run = async function run() {
                         record('dap-receive', { label: launch.label, sessionId: session.id, message });
                     }); },
                     onError(error) { observe('adapter-error', () => record('adapter-error', { label: launch.label, error: String(error) })); },
+                    onExit(code, signal) { observe('adapter-exit', () => {
+                        const detail = { label: launch.label, sessionId: session.id, code, signal, atMilliseconds: elapsed(start) };
+                        if (launch.expectedNativeHostFailure) launch.adapterExits.push(detail);
+                        record('adapter-exit', detail);
+                    }); },
                 };
             },
         }));
@@ -1239,6 +1418,8 @@ exports.run = async function run() {
                             ? await phase('A actual unavailable SDK before output allocation while B survives', () => sdkSelectionFailure(aSource, a.revision, aPort, a, b))
                             : scenario === 'debug-handoff-declined-retry' && cycle === 0
                                 ? await phase('A injected editor rejection after successful real build while B survives', () => debugHandoffDeclined(aSource, a.revision, aPort, a, b))
+                                : scenario === 'native-host-failure-retry' && cycle === 0
+                                    ? await phase('A actual native host startup failure after successful real build while B survives', () => nativeHostFailure(aSource, a.revision, aPort, a, b))
                         : undefined;
             if (cycle + 1 < expected.cycles) {
                 const revision = `retry-${cycle + 1}`;
@@ -1293,6 +1474,20 @@ exports.run = async function run() {
                             assert.notEqual(a.profileSnapshot.sha256, failed.profileSnapshot.sha256);
                             assert.equal(failed.providerCalls.length, 1, 'The disposed provider cannot intercept the corrected retry');
                         }
+                        if (failed.expectedNativeHostFailure) {
+                            assert.equal(log.buildCompletedPhaseDiagnostics.length, 1);
+                            assert.equal(log.webPreparationFailedPhaseDiagnostics.length, 0);
+                            assert(!tail.includes('Phase failed: Starting netcoredbg'));
+                            assert.notEqual(a.nonce, failed.nonce);
+                            assert.notEqual(a.sourceSnapshot.sha256, failed.sourceSnapshot.sha256);
+                            assert.notEqual(a.profileSnapshot.sha256, failed.profileSnapshot.sha256);
+                            const profileEnvironment = JSON.parse(Buffer.from(a.profileSnapshot.base64, 'base64')).profiles.LifecycleHttp.environmentVariables;
+                            assert(!Object.hasOwn(profileEnvironment, 'DOTNET_ROLL_FORWARD'));
+                            assert(!Object.hasOwn(a.session.configuration.env, 'DOTNET_ROLL_FORWARD'));
+                            assert(!a.dap.some(message => message.type === 'response' && message.command === 'configurationDone' && message.success === false));
+                            assert(!a.dap.some(message => message.event === 'output' && message.body?.output?.includes("Invalid value for environment variable 'DOTNET_ROLL_FORWARD'.")));
+                            assert.equal(process.env.DOTNET_ROLL_FORWARD ?? null, failed.ambientRollForwardBefore);
+                        }
                         assert(samePath(log.buildCommands[0].output, a.output), 'Coalesced build output must identify the one captured session');
                         if (failed.expectedSdkSelectionFailure) {
                             assert.equal(sha256(failed.restoredGlobalJsonSnapshot.path), failed.globalJsonSnapshot.sha256);
@@ -1307,9 +1502,12 @@ exports.run = async function run() {
                                 previousOutput: failed.previousOutput, freshOutput: a.output !== failed.previousOutput,
                                 failedAttemptAllocatedOutput: false, globalJsonSnapshot: fileSnapshot(failed.restoredGlobalJsonSnapshot.path),
                             } : { failedOutput: failed.output, freshOutput: a.output !== failed.output }),
-                            ...((failed.expectedWebProfileFailure || failed.expectedSdkSelectionFailure || failed.expectedHandoffDeclined) ? { profileSnapshot: a.profileSnapshot, sourceSnapshot: a.sourceSnapshot } : {}),
+                            ...((failed.expectedWebProfileFailure || failed.expectedSdkSelectionFailure || failed.expectedHandoffDeclined || failed.expectedNativeHostFailure) ? { profileSnapshot: a.profileSnapshot, sourceSnapshot: a.sourceSnapshot } : {}),
                             ...(failed.expectedHandoffDeclined ? { providerDisposedBeforeRetry: failed.providerDisposed,
-                                failedNonce: failed.nonce, nonce: a.nonce, freshToken: a.nonce !== failed.nonce } : {}) };
+                                failedNonce: failed.nonce, nonce: a.nonce, freshToken: a.nonce !== failed.nonce } : {}),
+                            ...(failed.expectedNativeHostFailure ? { correctedRollForwardProfile: true,
+                                failedNonce: failed.nonce, nonce: a.nonce, freshToken: a.nonce !== failed.nonce,
+                                nativeLaunchEnvironment: a.session.configuration.env } : {}) };
                         if (failed.expectedSdkSelectionFailure) {
                             assert(result.coalescedRetry.freshOutput);
                             assert(!exists(failed.previousOutput));
@@ -1323,6 +1521,8 @@ exports.run = async function run() {
                                     ? 'Original SDK configuration restored and dirty revision retry share one saved build/session and fresh output across three callers while B survives'
                                     : failed.expectedHandoffDeclined
                                         ? 'Injected editor provider disposed and dirty valid revision retries with three callers sharing one saved build/session, fresh token/output and unchanged B'
+                                        : failed.expectedNativeHostFailure
+                                            ? 'Corrected per-file roll-forward profile and dirty revision retry share one saved real build/session and fresh token/output across three callers while B survives'
                                 : 'Dirty compiler correction retries with three concurrent commands sharing one build/session and fresh output while B survives');
                         record('coalesced-corrected-retry-confirmed', result.coalescedRetry);
                     }
@@ -1391,6 +1591,10 @@ exports.run = async function run() {
             return { ...evidence, sessionId: session?.id, capturedSessions: capturedSessionState(attempt) };
         });
         result.failedHandoffAttempts = failedHandoffAttempts.map(attempt => {
+            const { session, capturedSessions, commandOperation, ...evidence } = attempt;
+            return { ...evidence, sessionId: session?.id, capturedSessions: capturedSessionState(attempt) };
+        });
+        result.failedNativeHostAttempts = failedNativeHostAttempts.map(attempt => {
             const { session, capturedSessions, commandOperation, ...evidence } = attempt;
             return { ...evidence, sessionId: session?.id, capturedSessions: capturedSessionState(attempt) };
         });
