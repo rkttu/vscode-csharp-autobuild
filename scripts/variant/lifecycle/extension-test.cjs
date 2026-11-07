@@ -93,22 +93,24 @@ exports.run = async function run() {
     const expected = JSON.parse(fs.readFileSync(path.join(root, 'expected.json'), 'utf8'));
     assert.equal(expected.schema, 1);
     const scenario = expected.scenario || 'web-lifecycle';
-    assert(['web-lifecycle', 'build-failure-retry', 'native-build-cancel'].includes(scenario));
+    assert(['web-lifecycle', 'build-failure-retry', 'native-build-cancel', 'web-profile-failure-retry'].includes(scenario));
     assert(Number.isInteger(expected.cycles) && expected.cycles >= 2 && expected.cycles <= 10);
     const start = process.hrtime.bigint();
     const result = {
         schema: 1, success: false, expected, editorApiVersion: vscode.version,
         safetyTimeoutMilliseconds: SAFETY_TIMEOUT_MS, checks: [], phases: [], launches: [], cleanup: [], failedBuildAttempts: [],
-        cancelledBuildAttempts: [],
+        cancelledBuildAttempts: [], failedWebProfileAttempts: [],
         scope: { installedCandidate: true, invocation: 'command-api', physicalF5: false,
             VSCodium: true, platform: `${process.platform}-${process.arch}`, macOS: process.platform === 'darwin',
             qualification: false, localOnly: true, published: false, directWebDebuggee: true,
             spawnedGrandchildren: false, hostReload: false, injectedTargetRuntime: false,
             scenario, actualCompilerFailure: scenario === 'build-failure-retry',
+            actualWebProfileFailure: scenario === 'web-profile-failure-retry',
             actualProgressCancelUi: scenario === 'native-build-cancel', injectedCancellationToken: false },
     };
     const launches = [];
     const failedBuildAttempts = [];
+    const failedWebProfileAttempts = [];
     const cancelledBuildAttempts = [];
     const nativeCancellation = scenario === 'native-build-cancel' ? expected.nativeCancellation : undefined;
     if (nativeCancellation) {
@@ -155,6 +157,7 @@ exports.run = async function run() {
                 commandPending: launch.commandPending,
                 expectedBuildFailure: launch.expectedBuildFailure,
                 expectedBuildCancellation: launch.expectedBuildCancellation,
+                expectedWebProfileFailure: launch.expectedWebProfileFailure,
                 buildPid: launch.buildPid,
                 stopRequestedAtMilliseconds: launch.stopRequestedAtMilliseconds,
                 stopPromiseResolvedAtMilliseconds: launch.stopPromiseResolvedAtMilliseconds,
@@ -233,6 +236,7 @@ exports.run = async function run() {
         launch.base = path.dirname(path.dirname(launch.output));
         assert(!launch.expectedBuildFailure, 'The compiler-failed attempt must not create a debug adapter or session');
         assert(!launch.expectedBuildCancellation, 'The cancelled build attempt must not create a debug adapter or session');
+        assert(!launch.expectedWebProfileFailure, 'The Web-profile-failed attempt must not create a debug adapter or session');
     }
 
     function capturedSessionState(launch) {
@@ -296,7 +300,16 @@ exports.run = async function run() {
             compilerDiagnostics: tail.split(/\r?\n/).filter(line => line.includes('CS0103')),
             failedPhaseDiagnostics: tail.split(/\r?\n/).filter(line => line.startsWith('Phase failed: Building file-based app')),
             cancelledPhaseDiagnostics: tail.split(/\r?\n/).filter(line => line.startsWith('Phase cancelled: Building file-based app')),
+            buildCompletedPhaseDiagnostics: tail.split(/\r?\n/).filter(line => line.startsWith('Phase completed: Building file-based app')),
+            webPreparationFailedPhaseDiagnostics: tail.split(/\r?\n/).filter(line => line.startsWith('Phase failed: Preparing web launch settings')),
+            webProfileRootDiagnostics: tail.split(/\r?\n/).filter(line => line.includes('The web launch profile DOTNET_ROOT does not identify the selected dotnet installation.')),
             completedPhaseDiagnostics: tail.split(/\r?\n/).filter(line => line.startsWith('Phase completed: Starting netcoredbg')) };
+    }
+
+    function fileSnapshot(file) {
+        const bytes = fs.readFileSync(file);
+        return { path: file, size: bytes.length, sha256: crypto.createHash('sha256').update(bytes).digest('hex'),
+            base64: bytes.toString('base64') };
     }
 
     async function ready(launch) {
@@ -365,6 +378,7 @@ exports.run = async function run() {
             commandName: 'Project', applicationUrl: launch.origin, launchBrowser: false,
             environmentVariables: { LIFECYCLE_TOKEN: nonce, ASPNETCORE_ENVIRONMENT: 'Development' },
         } } }, null, 2) + '\n');
+        if (scenario === 'web-profile-failure-retry') launch.profileSnapshot = fileSnapshot(source.replace(/\.cs$/i, '.run.json'));
         const opened = document || await vscode.workspace.openTextDocument(source);
         await vscode.window.showTextDocument(opened);
         launch.commandPending = true;
@@ -383,6 +397,7 @@ exports.run = async function run() {
             state();
         }
         assert.equal(opened.isDirty, false, 'Installed command must save the dirty source before building');
+        if (scenario === 'web-profile-failure-retry') launch.sourceSnapshot = fileSnapshot(source);
         await until(() => launch.started, `${label} exact owned session start`);
         assert.equal(launch.capturedSessions.size, 1, 'One launch token must have exactly one captured session');
         assert(exists(launch.program));
@@ -393,6 +408,7 @@ exports.run = async function run() {
         assert(!launches.some(previous => previous !== launch && previous.output === launch.output), 'Every launch needs a fresh output directory');
         assert(!failedBuildAttempts.some(previous => previous.output === launch.output), 'A retry must not reuse failed build output');
         assert(!cancelledBuildAttempts.some(previous => previous.output === launch.output), 'A retry must not reuse cancelled build output');
+        assert(!failedWebProfileAttempts.some(previous => previous.output === launch.output), 'A retry must not reuse Web-profile-failed output');
         if (inspectBreakpoint) {
             await until(() => launch.dap.some(message => message.event === 'stopped' && message.body?.reason === 'breakpoint'), `${label} source breakpoint`);
             const stopped = launch.dap.find(message => message.event === 'stopped' && message.body?.reason === 'breakpoint');
@@ -474,6 +490,96 @@ exports.run = async function run() {
         record('expected-build-failure-confirmed', { label: attempt.label, output: attempt.output, nonce: attempt.nonce,
             compilerDiagnostics: attempt.log.compilerDiagnostics, commandResult: attempt.commandResult });
         result.checks.push('Actual CS0103 returns false, saves broken source, starts no session and removes exact failed output while B survives');
+        state();
+        return attempt;
+    }
+
+    async function webProfileFailure(source, revision, port, a, b) {
+        let file;
+        await until(() => {
+            file = outputLog();
+            if (!file) return false;
+            const text = fs.readFileSync(file, 'utf8');
+            return buildCommands(text, source).length === 1 && buildCommands(text, b.source).length === 1 &&
+                text.split(/\r?\n/).filter(line => line.startsWith('Phase completed: Starting netcoredbg')).length === 2;
+        }, 'initial A/B command output before Web profile failure');
+        const snapshot = logSnapshot(file);
+        const opened = await vscode.workspace.openTextDocument(source);
+        assert.equal(opened.isDirty, false, 'The failure must change only the disk launch profile');
+        assert.equal(opened.getText(), fs.readFileSync(source, 'utf8'));
+        assert(opened.getText().includes('marker += 2;'), 'The source must remain valid through Web preparation');
+        await vscode.window.showTextDocument(opened);
+        const attempt = { label: 'A-web-profile-failure', source, revision, port, origin: `http://127.0.0.1:${port}`,
+            nonce: crypto.randomUUID(), expectedWebProfileFailure: true, dap: [], adapterCreationCount: 0, editorStartCount: 0 };
+        failedWebProfileAttempts.push(attempt);
+        ownedAttempts.push(attempt);
+        byToken.set(attempt.nonce, attempt);
+        attempt.invalidRoot = path.join(root, 'invalid-web-profile-root', attempt.nonce);
+        assert(within(root, attempt.invalidRoot) && !samePath(attempt.invalidRoot, expected.sdk.root));
+        assert(!exists(attempt.invalidRoot), 'The profile fault must name a fresh absent path, never an existing SDK alias');
+        const profile = source.replace(/\.cs$/i, '.run.json');
+        fs.writeFileSync(profile, JSON.stringify({ profiles: { LifecycleHttp: {
+            commandName: 'Project', applicationUrl: attempt.origin, launchBrowser: false,
+            environmentVariables: { LIFECYCLE_TOKEN: attempt.nonce, ASPNETCORE_ENVIRONMENT: 'Development', DOTNET_ROOT: attempt.invalidRoot },
+        } } }, null, 2) + '\n');
+        attempt.profileSnapshot = fileSnapshot(profile);
+        attempt.sourceSnapshot = fileSnapshot(source);
+        attempt.sourceWasDirty = opened.isDirty;
+        attempt.ambientDotnetRootBefore = process.env.DOTNET_ROOT ?? null;
+        attempt.commandPending = true;
+        attempt.invokedAtMilliseconds = elapsed(start);
+        record('expected-web-profile-failure-request', { label: attempt.label, nonce: attempt.nonce,
+            profileSha256: attempt.profileSnapshot.sha256, sourceSha256: attempt.sourceSnapshot.sha256 });
+        state();
+        try { attempt.commandResult = await vscode.commands.executeCommand(COMMAND); }
+        finally { attempt.commandPending = false; attempt.returnedAtMilliseconds = elapsed(start); state(); }
+        assert.equal(attempt.commandResult, false, 'The invalid per-file root must decline before debugger handoff');
+        assert.equal(opened.isDirty, false);
+        attempt.profileAfterSha256 = sha256(profile);
+        assert.equal(attempt.profileAfterSha256, attempt.profileSnapshot.sha256, 'The failed command must read the retained invalid profile bytes');
+        attempt.sourceAfterSha256 = sha256(source);
+        assert.equal(attempt.sourceAfterSha256, attempt.sourceSnapshot.sha256, 'Only the launch profile may change in the failed attempt');
+        attempt.sourceUnchanged = true;
+        attempt.ambientDotnetRootAfter = process.env.DOTNET_ROOT ?? null;
+        assert.equal(attempt.ambientDotnetRootAfter, attempt.ambientDotnetRootBefore, 'A per-file fault must not change the host environment');
+        let tail;
+        await until(() => {
+            tail = logTail(snapshot);
+            return tail.includes('The web launch profile DOTNET_ROOT does not identify the selected dotnet installation.') &&
+                tail.includes('Phase failed: Preparing web launch settings');
+        }, 'successful build and exact Web profile root failure output');
+        attempt.log = logEvidence(snapshot, tail, source);
+        assert.equal(attempt.log.buildCommands.length, 1, 'The profile-failed attempt must execute one actual build');
+        assert.equal(attempt.log.buildCompletedPhaseDiagnostics.length, 1, 'The actual build must succeed before the Web guard');
+        assert.equal(attempt.log.webPreparationFailedPhaseDiagnostics.length, 1);
+        assert(attempt.log.webProfileRootDiagnostics.length > 0);
+        assert.equal(attempt.log.failedPhaseDiagnostics.length, 0);
+        assert.equal(attempt.log.cancelledPhaseDiagnostics.length, 0);
+        assert.equal(attempt.log.compilerDiagnostics.length, 0);
+        assert(!tail.includes('Phase started: Starting netcoredbg'), 'The Web failure must precede the handoff phase');
+        assert(!tail.includes('dotnet "dev-certs"'), 'An explicit HTTP profile must not run certificate commands');
+        assert.equal(attempt.adapterCreationCount, 0, 'No token-matched adapter tracker may be created');
+        assert.equal(attempt.editorStartCount, 0, 'No token-matched editor session may start');
+        assert.equal(attempt.capturedSessions?.size || 0, 0);
+        assert.equal(attempt.session, undefined);
+        assert(!attempt.dap.some(message => message.event === 'process'), 'No token-matched DAP process event may be reported');
+        attempt.noSession = true;
+        attempt.noAdapter = true;
+        attempt.noProcessEvent = true;
+        attempt.output = attempt.log.buildCommands[0].output;
+        attempt.program = path.join(attempt.output, 'FileApp.dll');
+        attempt.base = path.dirname(path.dirname(attempt.output));
+        assert(samePath(attempt.base, a.base));
+        assert.notEqual(attempt.output, a.output);
+        assert(!exists(attempt.output), 'The exact profile-failed output must be absent after command return');
+        assert(queueEmpty(attempt.base), 'The profile-failed attempt must leave both terminal queues empty');
+        attempt.outputRemovedAtMilliseconds = elapsed(start);
+        assert(await canBind(port), 'The profile-failed A attempt must leave its HTTP port reusable');
+        attempt.portReusableAtMilliseconds = elapsed(start);
+        await stillAlive(b);
+        record('expected-web-profile-failure-confirmed', { label: attempt.label, output: attempt.output,
+            commandResult: attempt.commandResult, sourceUnchanged: true, noAdapter: true, noSession: true, noProcessEvent: true });
+        result.checks.push('Actual successful build then per-file Web root failure returns false before handoff, preserves source, removes owned output and leaves B unchanged');
         state();
         return attempt;
     }
@@ -683,6 +789,7 @@ exports.run = async function run() {
         subscriptions.push(vscode.debug.onDidStartDebugSession(session => observe('editor-start', () => {
             const launch = ownedLaunch(session);
             if (!launch) return;
+            if (launch.expectedWebProfileFailure) launch.editorStartCount++;
             captureSession(session, launch);
             launch.started = true;
             launch.startedAtMilliseconds = elapsed(start);
@@ -708,6 +815,7 @@ exports.run = async function run() {
             createDebugAdapterTracker(session) {
                 const launch = ownedLaunch(session);
                 if (!launch) return undefined;
+                if (launch.expectedWebProfileFailure) launch.adapterCreationCount++;
                 observe('adapter-session', () => captureSession(session, launch));
                 // Keep the tracker even if uniqueness validation failed: it can
                 // still identify the extra owned debuggee for targeted cleanup.
@@ -791,7 +899,9 @@ exports.run = async function run() {
                 ? await phase('A actual compiler failure and owned cleanup while B survives', () => compilerFailure(aSource, a.revision, aPort, a, b))
                 : scenario === 'native-build-cancel' && cycle === 0
                     ? await phase('A actual progress Cancel during native build while B survives', () => nativeBuildCancellation(aSource, a.revision, aPort, a, b))
-                    : undefined;
+                    : scenario === 'web-profile-failure-retry' && cycle === 0
+                        ? await phase('A actual Web profile failure after successful build while B survives', () => webProfileFailure(aSource, a.revision, aPort, a, b))
+                        : undefined;
             if (cycle + 1 < expected.cycles) {
                 const revision = `retry-${cycle + 1}`;
                 await phase(`A cycle ${cycle + 1} dirty edit and installed-command retry`, async () => {
@@ -822,16 +932,26 @@ exports.run = async function run() {
                         assert.equal(log.completedPhaseDiagnostics.length, 1, 'Three concurrent corrected commands must share one handoff');
                         assert.equal(log.failedPhaseDiagnostics.length, 0);
                         assert.equal(log.cancelledPhaseDiagnostics.length, 0);
+                        if (failed.expectedWebProfileFailure) {
+                            assert.equal(log.buildCompletedPhaseDiagnostics.length, 1);
+                            assert.equal(log.webPreparationFailedPhaseDiagnostics.length, 0);
+                            assert.equal(log.webProfileRootDiagnostics.length, 0);
+                            assert.notEqual(a.profileSnapshot.sha256, failed.profileSnapshot.sha256);
+                            assert(!Object.hasOwn(JSON.parse(Buffer.from(a.profileSnapshot.base64, 'base64')).profiles.LifecycleHttp.environmentVariables, 'DOTNET_ROOT'));
+                        }
                         assert(samePath(log.buildCommands[0].output, a.output), 'Coalesced build output must identify the one captured session');
                         assert(!exists(failed.output));
                         result.coalescedRetry = { label: a.label, commandInvocations: a.commandInvocations,
                             commandResults: a.commandResults, sessionId: a.session.id, output: a.output,
                             sessionIds: [...a.capturedSessions.keys()],
-                            log, failedOutput: failed.output, freshOutput: a.output !== failed.output };
+                            log, failedOutput: failed.output, freshOutput: a.output !== failed.output,
+                            ...(failed.expectedWebProfileFailure ? { profileSnapshot: a.profileSnapshot, sourceSnapshot: a.sourceSnapshot } : {}) };
                         await stillAlive(b);
                         result.checks.push(failed.expectedBuildCancellation
                             ? 'Dirty retry after native build cancellation shares one saved build/session and fresh output across three callers while B survives'
-                            : 'Dirty compiler correction retries with three concurrent commands sharing one build/session and fresh output while B survives');
+                            : failed.expectedWebProfileFailure
+                                ? 'Corrected Web profile and dirty revision retry share one saved build/session and fresh output across three callers while B survives'
+                                : 'Dirty compiler correction retries with three concurrent commands sharing one build/session and fresh output while B survives');
                         record('coalesced-corrected-retry-confirmed', result.coalescedRetry);
                     }
                 });
@@ -857,6 +977,7 @@ exports.run = async function run() {
             program: launch.program, output: launch.output, response: launch.response,
             commandPending: launch.commandPending,
             commandInvocations: launch.commandInvocations, commandResults: launch.commandResults,
+            profileSnapshot: launch.profileSnapshot, sourceSnapshot: launch.sourceSnapshot,
             capturedSessions: capturedSessionState(launch),
             startedAtMilliseconds: launch.startedAtMilliseconds,
             stopRequestedAtMilliseconds: launch.stopRequestedAtMilliseconds,
@@ -876,6 +997,22 @@ exports.run = async function run() {
             output: attempt.output, program: attempt.program, base: attempt.base,
             outputRemovedAtMilliseconds: attempt.outputRemovedAtMilliseconds,
             portReusableAtMilliseconds: attempt.portReusableAtMilliseconds, noSession: attempt.noSession, log: attempt.log,
+        }));
+        result.failedWebProfileAttempts = failedWebProfileAttempts.map(attempt => ({
+            label: attempt.label, source: attempt.source, revision: attempt.revision, nonce: attempt.nonce,
+            origin: attempt.origin, port: attempt.port, expectedWebProfileFailure: true,
+            commandPending: attempt.commandPending, commandResult: attempt.commandResult,
+            invokedAtMilliseconds: attempt.invokedAtMilliseconds, returnedAtMilliseconds: attempt.returnedAtMilliseconds,
+            profileSnapshot: attempt.profileSnapshot, profileAfterSha256: attempt.profileAfterSha256, invalidRoot: attempt.invalidRoot,
+            sourceSnapshot: attempt.sourceSnapshot, sourceAfterSha256: attempt.sourceAfterSha256, sourceUnchanged: attempt.sourceUnchanged,
+            sourceWasDirty: attempt.sourceWasDirty, ambientDotnetRootBefore: attempt.ambientDotnetRootBefore,
+            ambientDotnetRootAfter: attempt.ambientDotnetRootAfter,
+            adapterCreationCount: attempt.adapterCreationCount, editorStartCount: attempt.editorStartCount,
+            sessionId: attempt.session?.id, pid: attempt.pid, capturedSessions: capturedSessionState(attempt), dap: attempt.dap,
+            output: attempt.output, program: attempt.program, base: attempt.base,
+            outputRemovedAtMilliseconds: attempt.outputRemovedAtMilliseconds,
+            portReusableAtMilliseconds: attempt.portReusableAtMilliseconds,
+            noSession: attempt.noSession, noAdapter: attempt.noAdapter, noProcessEvent: attempt.noProcessEvent, log: attempt.log,
         }));
         result.cancelledBuildAttempts = cancelledBuildAttempts.map(attempt => ({
             label: attempt.label, source: attempt.source, revision: attempt.revision, nonce: attempt.nonce,
