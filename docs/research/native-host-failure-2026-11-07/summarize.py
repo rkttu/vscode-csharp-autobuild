@@ -34,7 +34,7 @@ def validate_units(directory):
     required = {f"scripts/variant/file-based-apps/{name}" for name in previous.MODULE_NAMES}
     required.update(tests)
     required.update(web.HARNESS)
-    if len(sources) != len(metadata["source"]) or not required.issubset(sources):
+    if len(sources) != 46 or len(sources) != len(metadata["source"]) or not required.issubset(sources):
         raise ValueError("Source manifest must bind every product module, selected Node suite and executed harness")
     for name, item in sources.items():
         file = REPO / name

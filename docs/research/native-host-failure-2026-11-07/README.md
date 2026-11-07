@@ -18,7 +18,7 @@ No failed-token DAP `process` event or PID is captured. The host can exit before
 
 ## Retained evidence
 
-Raw profiles and logs remain under `validation-artifacts/native-host-failure-2026-11-07/`, using `n01`, independent compiler regression `c01` and `tests`. [summarize.py](summarize.py) reuses the prior Web/compiler and identity validators, then checks exact source/profile snapshots, generated artifact metadata, matching DAP request/response sequences, automatic termination, cleanup, corrected retry and discrete B checkpoints. [evidence-summary.json](evidence-summary.json) is **113,253 bytes**, SHA-256 `7101a905055a96c7d68ea21686d8958c45342cdf93c6d5266bdabbd9d92a74c7`.
+Raw profiles and logs remain under `validation-artifacts/native-host-failure-2026-11-07/`, using `n01`, independent compiler regression `c01` and `tests`. [summarize.py](summarize.py) reuses the prior Web/compiler and identity validators, then checks exact source/profile snapshots, generated artifact metadata, matching DAP request/response sequences, automatic termination, cleanup, corrected retry and discrete B checkpoints. [evidence-summary.json](evidence-summary.json) is **113,253 bytes**, SHA-256 `ae28229b4b83cf116b3f350d02e46072b43bae0cdbdcff3599b5221360d8bab2`.
 
 | Retained input | SHA-256 |
 | --- | --- |

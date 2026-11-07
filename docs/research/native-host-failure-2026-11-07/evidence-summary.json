@@ -2474,8 +2474,8 @@
   "unexpectedFailures": [],
   "collectors": {
     "docs\\research\\native-host-failure-2026-11-07\\summarize.py": {
-      "sha256": "810dc4fd27fceba2ba4548113b7bb5d133b59c1586eec33bee74c56996945608",
-      "bytes": 24933
+      "sha256": "3b8ba904307be4ab039c37f6852a93d07b85ab0d216774a86e5532c1e60d3897",
+      "bytes": 24955
     },
     "docs\\research\\debug-handoff-declined-2026-11-07\\summarize.py": {
       "sha256": "82ea012762566d2006575b4cdac772742702969457a555c6d78daef52fa354d5",
