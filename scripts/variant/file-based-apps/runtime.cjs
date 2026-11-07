@@ -86,6 +86,36 @@ function insideDirectory(directory, candidate) {
     return relative !== '' && relative !== '..' && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative);
 }
 
+async function createOutputDirectory(parent, { io = fs.promises, platform = process.platform,
+    randomInt = crypto.randomInt, log = () => {} } = {}) {
+    try {
+        return await io.mkdtemp(path.join(parent, 'run-'));
+    } catch (error) {
+        if (platform !== 'win32' || error.code !== 'ENAMETOOLONG') throw error;
+    }
+    // Windows mkdtemp rejects some paths that ordinary mkdir can create. Keep
+    // ordinary path spellings and the v1 journal's six-alphanumeric run name.
+    // Exclusive creation establishes ownership; an existing path is never ours.
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let collision;
+    for (let attempt = 0; attempt < 8; attempt++) {
+        let suffix = '';
+        for (let index = 0; index < 6; index++) suffix += alphabet[randomInt(alphabet.length)];
+        const directory = path.join(parent, `run-${suffix}`);
+        try {
+            await io.mkdir(directory, { mode: 0o700 });
+        } catch (error) {
+            if (error.code !== 'EEXIST') throw error;
+            collision = error;
+            continue;
+        }
+        try { log(`Created Windows file-app output after mkdtemp ENAMETOOLONG: ${directory}`); }
+        catch { /* Diagnostics must not abandon a successfully created output. */ }
+        return directory;
+    }
+    throw collision;
+}
+
 function activate(context, dependencies = {}) {
     const vscode = dependencies.vscode || require('vscode');
     const classifyFile = dependencies.classifyFile || require('./classify.cjs').classifyFile;
@@ -488,7 +518,7 @@ function activate(context, dependencies = {}) {
                     const key = crypto.createHash('sha256').update(source).digest('hex').slice(0, 24);
                     const parent = path.join(outputBase, key);
                     await fs.promises.mkdir(parent, { recursive: true });
-                    generated = await fs.promises.mkdtemp(path.join(parent, 'run-'));
+                    generated = await createOutputDirectory(parent, { log: cleanupLog });
                     ownedOutputs.add(generated);
                     setPhase('Building file-based app');
                     const buildResult = await runDotnet(['build', source, '--configuration', 'Debug', '--output', generated,
@@ -626,4 +656,4 @@ function activate(context, dependencies = {}) {
     return { debugActiveFile: command, recoveryReady, dispose, disposalReady };
 }
 
-module.exports = { activate, COMMAND, findDotnet, runProcess, requireFileAppSdk, sdkArchitecture };
+module.exports = { activate, COMMAND, findDotnet, runProcess, requireFileAppSdk, sdkArchitecture, createOutputDirectory };
