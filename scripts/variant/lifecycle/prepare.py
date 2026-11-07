@@ -118,7 +118,7 @@ def main():
     parser.add_argument("--sdk-version", required=True)
     parser.add_argument("--work-dir", type=Path, required=True)
     parser.add_argument("--cycles", type=int, default=3)
-    parser.add_argument("--scenario", choices=("web-lifecycle", "build-failure-retry", "native-build-cancel", "web-profile-failure-retry"), default="web-lifecycle")
+    parser.add_argument("--scenario", choices=("web-lifecycle", "build-failure-retry", "native-build-cancel", "web-profile-failure-retry", "sdk-selection-failure-retry"), default="web-lifecycle")
     args = parser.parse_args()
     if not 2 <= args.cycles <= 10:
         parser.error("Use 2..10 cycles to exercise bounded same-file retry")
@@ -197,6 +197,11 @@ def main():
                           "macOS": False, "invocation": "command-api", "freshProfiles": 1}}
     if native_cancellation:
         expected["nativeCancellation"] = native_cancellation
+    if args.scenario == "sdk-selection-failure-retry":
+        expected["sdkSelection"] = {"unavailableVersion": "99.0.100",
+                                    "globalJson": str(work / "workspace/global.json"),
+                                    "originalGlobalJsonSha256": digest((work / "workspace/global.json").read_bytes()),
+                                    "inventory": str(work / "logs/sdk-inventory.txt")}
     (work / "expected.json").write_text(json.dumps(expected, indent=2) + "\n")
     print(json.dumps({"workDir": str(work), "candidateSha256": candidate["sha256"], "buildId": candidate["buildId"]}))
 

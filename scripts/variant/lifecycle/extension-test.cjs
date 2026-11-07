@@ -93,24 +93,26 @@ exports.run = async function run() {
     const expected = JSON.parse(fs.readFileSync(path.join(root, 'expected.json'), 'utf8'));
     assert.equal(expected.schema, 1);
     const scenario = expected.scenario || 'web-lifecycle';
-    assert(['web-lifecycle', 'build-failure-retry', 'native-build-cancel', 'web-profile-failure-retry'].includes(scenario));
+    assert(['web-lifecycle', 'build-failure-retry', 'native-build-cancel', 'web-profile-failure-retry', 'sdk-selection-failure-retry'].includes(scenario));
     assert(Number.isInteger(expected.cycles) && expected.cycles >= 2 && expected.cycles <= 10);
     const start = process.hrtime.bigint();
     const result = {
         schema: 1, success: false, expected, editorApiVersion: vscode.version,
         safetyTimeoutMilliseconds: SAFETY_TIMEOUT_MS, checks: [], phases: [], launches: [], cleanup: [], failedBuildAttempts: [],
-        cancelledBuildAttempts: [], failedWebProfileAttempts: [],
+        cancelledBuildAttempts: [], failedWebProfileAttempts: [], failedSdkSelectionAttempts: [],
         scope: { installedCandidate: true, invocation: 'command-api', physicalF5: false,
             VSCodium: true, platform: `${process.platform}-${process.arch}`, macOS: process.platform === 'darwin',
             qualification: false, localOnly: true, published: false, directWebDebuggee: true,
             spawnedGrandchildren: false, hostReload: false, injectedTargetRuntime: false,
             scenario, actualCompilerFailure: scenario === 'build-failure-retry',
             actualWebProfileFailure: scenario === 'web-profile-failure-retry',
+            actualSdkSelectionFailure: scenario === 'sdk-selection-failure-retry',
             actualProgressCancelUi: scenario === 'native-build-cancel', injectedCancellationToken: false },
     };
     const launches = [];
     const failedBuildAttempts = [];
     const failedWebProfileAttempts = [];
+    const failedSdkSelectionAttempts = [];
     const cancelledBuildAttempts = [];
     const nativeCancellation = scenario === 'native-build-cancel' ? expected.nativeCancellation : undefined;
     if (nativeCancellation) {
@@ -158,6 +160,7 @@ exports.run = async function run() {
                 expectedBuildFailure: launch.expectedBuildFailure,
                 expectedBuildCancellation: launch.expectedBuildCancellation,
                 expectedWebProfileFailure: launch.expectedWebProfileFailure,
+                expectedSdkSelectionFailure: launch.expectedSdkSelectionFailure,
                 buildPid: launch.buildPid,
                 stopRequestedAtMilliseconds: launch.stopRequestedAtMilliseconds,
                 stopPromiseResolvedAtMilliseconds: launch.stopPromiseResolvedAtMilliseconds,
@@ -237,6 +240,7 @@ exports.run = async function run() {
         assert(!launch.expectedBuildFailure, 'The compiler-failed attempt must not create a debug adapter or session');
         assert(!launch.expectedBuildCancellation, 'The cancelled build attempt must not create a debug adapter or session');
         assert(!launch.expectedWebProfileFailure, 'The Web-profile-failed attempt must not create a debug adapter or session');
+        assert(!launch.expectedSdkSelectionFailure, 'The SDK-selection-failed attempt must not create a debug adapter or session');
     }
 
     function capturedSessionState(launch) {
@@ -378,7 +382,7 @@ exports.run = async function run() {
             commandName: 'Project', applicationUrl: launch.origin, launchBrowser: false,
             environmentVariables: { LIFECYCLE_TOKEN: nonce, ASPNETCORE_ENVIRONMENT: 'Development' },
         } } }, null, 2) + '\n');
-        if (scenario === 'web-profile-failure-retry') launch.profileSnapshot = fileSnapshot(source.replace(/\.cs$/i, '.run.json'));
+        if (['web-profile-failure-retry', 'sdk-selection-failure-retry'].includes(scenario)) launch.profileSnapshot = fileSnapshot(source.replace(/\.cs$/i, '.run.json'));
         const opened = document || await vscode.workspace.openTextDocument(source);
         await vscode.window.showTextDocument(opened);
         launch.commandPending = true;
@@ -397,7 +401,7 @@ exports.run = async function run() {
             state();
         }
         assert.equal(opened.isDirty, false, 'Installed command must save the dirty source before building');
-        if (scenario === 'web-profile-failure-retry') launch.sourceSnapshot = fileSnapshot(source);
+        if (['web-profile-failure-retry', 'sdk-selection-failure-retry'].includes(scenario)) launch.sourceSnapshot = fileSnapshot(source);
         await until(() => launch.started, `${label} exact owned session start`);
         assert.equal(launch.capturedSessions.size, 1, 'One launch token must have exactly one captured session');
         assert(exists(launch.program));
@@ -581,6 +585,134 @@ exports.run = async function run() {
             commandResult: attempt.commandResult, sourceUnchanged: true, noAdapter: true, noSession: true, noProcessEvent: true });
         result.checks.push('Actual successful build then per-file Web root failure returns false before handoff, preserves source, removes owned output and leaves B unchanged');
         state();
+        return attempt;
+    }
+
+    async function sdkSelectionFailure(source, revision, port, a, b) {
+        const fixture = expected.sdkSelection;
+        assert(fixture && fixture.unavailableVersion === '99.0.100');
+        const globalJson = path.join(root, 'workspace/global.json');
+        const inventory = path.join(root, 'logs/sdk-inventory.txt');
+        assert(within(root, globalJson) && within(root, inventory));
+        assert(samePath(fixture.globalJson, globalJson) && samePath(fixture.inventory, inventory));
+        const inventorySnapshot = fileSnapshot(inventory);
+        const inventoryText = Buffer.from(inventorySnapshot.base64, 'base64').toString('utf8');
+        const installedVersions = inventoryText.split(/\r?\n/).map(line => /^(\S+)\s+\[/.exec(line)?.[1]).filter(Boolean);
+        assert(installedVersions.includes(expected.sdk.version), 'Captured native inventory must include the pinned selected SDK');
+        assert(!installedVersions.includes(fixture.unavailableVersion), 'The requested SDK must actually be unavailable');
+        let file;
+        await until(() => {
+            file = outputLog();
+            if (!file) return false;
+            const text = fs.readFileSync(file, 'utf8');
+            return buildCommands(text, source).length === 1 && buildCommands(text, b.source).length === 1 &&
+                text.split(/\r?\n/).filter(line => line.startsWith('Phase completed: Starting netcoredbg')).length === 2;
+        }, 'initial A/B command output before SDK selection failure');
+        const snapshot = logSnapshot(file);
+        const opened = await vscode.workspace.openTextDocument(source);
+        assert.equal(opened.isDirty, false);
+        assert.equal(opened.getText(), fs.readFileSync(source, 'utf8'));
+        assert(opened.getText().startsWith('#:sdk Microsoft.NET.Sdk.Web'), 'The explicit directive must classify without an SDK evaluation');
+        await vscode.window.showTextDocument(opened);
+        const profile = source.replace(/\.cs$/i, '.run.json');
+        const attempt = { label: 'A-sdk-selection-failure', source, revision, port, origin: a.origin, nonce: a.nonce,
+            expectedSdkSelectionFailure: true, dap: [], adapterCreationCount: 0, editorStartCount: 0,
+            inventorySnapshot, installedVersions, unavailableVersion: fixture.unavailableVersion,
+            globalJsonSnapshot: fileSnapshot(globalJson), sourceSnapshot: fileSnapshot(source), profileSnapshot: fileSnapshot(profile),
+            sourceWasDirty: opened.isDirty, ambientDotnetRootBefore: process.env.DOTNET_ROOT ?? null,
+            previousOutput: a.output, outputParent: path.dirname(a.output), base: a.base };
+        assert.equal(attempt.globalJsonSnapshot.sha256, fixture.originalGlobalJsonSha256);
+        assert.deepEqual(JSON.parse(Buffer.from(attempt.globalJsonSnapshot.base64, 'base64')), {
+            sdk: { version: expected.sdk.version, rollForward: 'disable' },
+        });
+        assert.equal(JSON.parse(Buffer.from(attempt.profileSnapshot.base64, 'base64')).profiles.LifecycleHttp.environmentVariables.LIFECYCLE_TOKEN, attempt.nonce);
+        attempt.outputParentBefore = fs.readdirSync(attempt.outputParent).sort();
+        assert(queueEmpty(attempt.base));
+        await stillAlive(b);
+        attempt.bBefore = { sessionId: b.session.id, pid: b.pid, nonce: b.nonce, output: b.output, response: await request(b.origin) };
+        failedSdkSelectionAttempts.push(attempt);
+        ownedAttempts.push(attempt);
+        // Retain the unchanged profile's token after its previous session has stopped.
+        byToken.set(attempt.nonce, attempt);
+        const originalBytes = Buffer.from(attempt.globalJsonSnapshot.base64, 'base64');
+        let firstError;
+        try {
+            fs.writeFileSync(globalJson, JSON.stringify({ sdk: { version: fixture.unavailableVersion, rollForward: 'disable' } }) + '\n');
+            attempt.invalidGlobalJsonSnapshot = fileSnapshot(globalJson);
+            attempt.commandPending = true;
+            attempt.invokedAtMilliseconds = elapsed(start);
+            record('expected-sdk-selection-failure-request', { label: attempt.label, nonce: attempt.nonce,
+                globalJsonSha256: attempt.invalidGlobalJsonSnapshot.sha256, inventorySha256: inventorySnapshot.sha256 });
+            state();
+            try { attempt.commandResult = await vscode.commands.executeCommand(COMMAND); }
+            finally { attempt.commandPending = false; attempt.returnedAtMilliseconds = elapsed(start); state(); }
+            assert.equal(attempt.commandResult, false, 'An unavailable SDK must decline the installed command');
+            assert.equal(opened.isDirty, false);
+            attempt.sourceAfterSnapshot = fileSnapshot(source);
+            attempt.profileAfterSnapshot = fileSnapshot(profile);
+            assert.equal(attempt.sourceAfterSnapshot.sha256, attempt.sourceSnapshot.sha256);
+            assert.equal(attempt.profileAfterSnapshot.sha256, attempt.profileSnapshot.sha256);
+            attempt.ambientDotnetRootAfter = process.env.DOTNET_ROOT ?? null;
+            assert.equal(attempt.ambientDotnetRootAfter, attempt.ambientDotnetRootBefore);
+            let tail;
+            await until(() => {
+                tail = logTail(snapshot);
+                return tail.includes('A compatible .NET SDK was not found.') &&
+                    tail.includes(`Requested SDK version: ${fixture.unavailableVersion}`) &&
+                    tail.includes('Phase failed: Checking .NET SDK');
+            }, 'native unavailable SDK diagnostics and exact SDK-check failure phase');
+            attempt.log = { ...logEvidence(snapshot, tail, source),
+                dotnetCommands: tail.split(/\r?\n/).filter(line => line.startsWith('dotnet ')),
+                sdkFailedPhaseDiagnostics: tail.split(/\r?\n/).filter(line => line.startsWith('Phase failed: Checking .NET SDK')),
+                sdkNotFoundDiagnostics: tail.split(/\r?\n/).filter(line => line.includes('A compatible .NET SDK was not found.') ||
+                    line.includes(`Requested SDK version: ${fixture.unavailableVersion}`)) };
+            assert.deepEqual(attempt.log.dotnetCommands, ['dotnet "--version"'], 'SDK failure must precede --info and every build');
+            assert.equal(attempt.log.sdkFailedPhaseDiagnostics.length, 1);
+            assert.equal(attempt.log.buildCommands.length, 0);
+            for (const name of ['Preparing build output', 'Building file-based app', 'Preparing web launch settings', 'Starting netcoredbg']) {
+                assert(!tail.includes(`Phase started: ${name}`), `SDK failure must precede ${name}`);
+            }
+            assert.equal(attempt.adapterCreationCount, 0);
+            assert.equal(attempt.editorStartCount, 0);
+            assert.equal(attempt.capturedSessions?.size || 0, 0);
+            assert.equal(attempt.session, undefined);
+            assert(!attempt.dap.some(message => message.event === 'process'));
+            attempt.noSession = true;
+            attempt.noAdapter = true;
+            attempt.noProcessEvent = true;
+            attempt.outputParentAfter = fs.readdirSync(attempt.outputParent).sort();
+            assert.deepEqual(attempt.outputParentAfter, attempt.outputParentBefore, 'No new output may remain after a pre-allocation SDK failure');
+            assert(queueEmpty(attempt.base));
+            attempt.noOutputAllocated = true;
+            attempt.resourcesCheckedAtMilliseconds = elapsed(start);
+            assert(await canBind(port));
+            attempt.portReusableAtMilliseconds = elapsed(start);
+            await stillAlive(b);
+            attempt.bAfter = { sessionId: b.session.id, pid: b.pid, nonce: b.nonce, output: b.output, response: await request(b.origin) };
+            assert.deepEqual(attempt.bAfter, attempt.bBefore);
+            record('expected-sdk-selection-failure-confirmed', { label: attempt.label, commandResult: attempt.commandResult,
+                noOutputAllocated: true, noAdapter: true, noSession: true, noProcessEvent: true });
+            result.checks.push('Actual unavailable SDK returns false during SDK checking before output allocation or handoff while source, profile, ambient root and B remain unchanged');
+        } catch (error) {
+            firstError = error;
+            throw error;
+        } finally {
+            try {
+                try { attempt.globalJsonAfterSnapshot = fileSnapshot(globalJson); }
+                finally {
+                    fs.writeFileSync(globalJson, originalBytes);
+                    attempt.restoredGlobalJsonSnapshot = fileSnapshot(globalJson);
+                    assert.equal(attempt.restoredGlobalJsonSnapshot.sha256, attempt.globalJsonSnapshot.sha256);
+                    attempt.globalJsonRestoredAtMilliseconds = elapsed(start);
+                }
+                assert.equal(attempt.globalJsonAfterSnapshot.sha256, attempt.invalidGlobalJsonSnapshot.sha256,
+                    'The failed command must retain the exact unavailable SDK configuration until restoration');
+                record('sdk-selection-original-config-restored', { sha256: attempt.restoredGlobalJsonSnapshot.sha256 });
+            } catch (error) {
+                attempt.restorationError = error.stack || String(error);
+                if (!firstError) throw error;
+            } finally { state(); }
+        }
         return attempt;
     }
 
@@ -789,7 +921,7 @@ exports.run = async function run() {
         subscriptions.push(vscode.debug.onDidStartDebugSession(session => observe('editor-start', () => {
             const launch = ownedLaunch(session);
             if (!launch) return;
-            if (launch.expectedWebProfileFailure) launch.editorStartCount++;
+            if (launch.expectedWebProfileFailure || launch.expectedSdkSelectionFailure) launch.editorStartCount++;
             captureSession(session, launch);
             launch.started = true;
             launch.startedAtMilliseconds = elapsed(start);
@@ -815,7 +947,7 @@ exports.run = async function run() {
             createDebugAdapterTracker(session) {
                 const launch = ownedLaunch(session);
                 if (!launch) return undefined;
-                if (launch.expectedWebProfileFailure) launch.adapterCreationCount++;
+                if (launch.expectedWebProfileFailure || launch.expectedSdkSelectionFailure) launch.adapterCreationCount++;
                 observe('adapter-session', () => captureSession(session, launch));
                 // Keep the tracker even if uniqueness validation failed: it can
                 // still identify the extra owned debuggee for targeted cleanup.
@@ -901,6 +1033,8 @@ exports.run = async function run() {
                     ? await phase('A actual progress Cancel during native build while B survives', () => nativeBuildCancellation(aSource, a.revision, aPort, a, b))
                     : scenario === 'web-profile-failure-retry' && cycle === 0
                         ? await phase('A actual Web profile failure after successful build while B survives', () => webProfileFailure(aSource, a.revision, aPort, a, b))
+                        : scenario === 'sdk-selection-failure-retry' && cycle === 0
+                            ? await phase('A actual unavailable SDK before output allocation while B survives', () => sdkSelectionFailure(aSource, a.revision, aPort, a, b))
                         : undefined;
             if (cycle + 1 < expected.cycles) {
                 const revision = `retry-${cycle + 1}`;
@@ -940,17 +1074,31 @@ exports.run = async function run() {
                             assert(!Object.hasOwn(JSON.parse(Buffer.from(a.profileSnapshot.base64, 'base64')).profiles.LifecycleHttp.environmentVariables, 'DOTNET_ROOT'));
                         }
                         assert(samePath(log.buildCommands[0].output, a.output), 'Coalesced build output must identify the one captured session');
-                        assert(!exists(failed.output));
+                        if (failed.expectedSdkSelectionFailure) {
+                            assert.equal(sha256(failed.restoredGlobalJsonSnapshot.path), failed.globalJsonSnapshot.sha256);
+                            assert.equal(log.buildCompletedPhaseDiagnostics.length, 1);
+                            assert(!tail.includes('Phase failed: Checking .NET SDK'));
+                        } else assert(!exists(failed.output));
                         result.coalescedRetry = { label: a.label, commandInvocations: a.commandInvocations,
                             commandResults: a.commandResults, sessionId: a.session.id, output: a.output,
                             sessionIds: [...a.capturedSessions.keys()],
-                            log, failedOutput: failed.output, freshOutput: a.output !== failed.output,
-                            ...(failed.expectedWebProfileFailure ? { profileSnapshot: a.profileSnapshot, sourceSnapshot: a.sourceSnapshot } : {}) };
+                            log,
+                            ...(failed.expectedSdkSelectionFailure ? {
+                                previousOutput: failed.previousOutput, freshOutput: a.output !== failed.previousOutput,
+                                failedAttemptAllocatedOutput: false, globalJsonSnapshot: fileSnapshot(failed.restoredGlobalJsonSnapshot.path),
+                            } : { failedOutput: failed.output, freshOutput: a.output !== failed.output }),
+                            ...((failed.expectedWebProfileFailure || failed.expectedSdkSelectionFailure) ? { profileSnapshot: a.profileSnapshot, sourceSnapshot: a.sourceSnapshot } : {}) };
+                        if (failed.expectedSdkSelectionFailure) {
+                            assert(result.coalescedRetry.freshOutput);
+                            assert(!exists(failed.previousOutput));
+                        }
                         await stillAlive(b);
                         result.checks.push(failed.expectedBuildCancellation
                             ? 'Dirty retry after native build cancellation shares one saved build/session and fresh output across three callers while B survives'
                             : failed.expectedWebProfileFailure
                                 ? 'Corrected Web profile and dirty revision retry share one saved build/session and fresh output across three callers while B survives'
+                                : failed.expectedSdkSelectionFailure
+                                    ? 'Original SDK configuration restored and dirty revision retry share one saved build/session and fresh output across three callers while B survives'
                                 : 'Dirty compiler correction retries with three concurrent commands sharing one build/session and fresh output while B survives');
                         record('coalesced-corrected-retry-confirmed', result.coalescedRetry);
                     }
@@ -1014,6 +1162,10 @@ exports.run = async function run() {
             portReusableAtMilliseconds: attempt.portReusableAtMilliseconds,
             noSession: attempt.noSession, noAdapter: attempt.noAdapter, noProcessEvent: attempt.noProcessEvent, log: attempt.log,
         }));
+        result.failedSdkSelectionAttempts = failedSdkSelectionAttempts.map(attempt => {
+            const { session, capturedSessions, ...evidence } = attempt;
+            return { ...evidence, sessionId: session?.id, capturedSessions: capturedSessionState(attempt) };
+        });
         result.cancelledBuildAttempts = cancelledBuildAttempts.map(attempt => ({
             label: attempt.label, source: attempt.source, revision: attempt.revision, nonce: attempt.nonce,
             origin: attempt.origin, port: attempt.port, expectedBuildCancellation: true,

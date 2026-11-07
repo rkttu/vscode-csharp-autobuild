@@ -26,6 +26,12 @@ foreach ($fixture in @('a.cs', 'b.cs')) {
     Assert-Hash (Join-Path $work ('workspace/' + $fixture)) $fixtureHash
 }
 if ($expected.nativeCancellation) { Assert-Hash $expected.nativeCancellation.target $expected.harness.'fixtures/cancel-build.targets' }
+if ($expected.scenario -eq 'sdk-selection-failure-retry') {
+    Assert-Hash (Join-Path $work 'workspace/global.json') $expected.sdkSelection.originalGlobalJsonSha256
+    if ($expected.sdkSelection.unavailableVersion -cne '99.0.100' -or
+        $expected.sdkSelection.globalJson -cne (Join-Path $work 'workspace/global.json') -or
+        $expected.sdkSelection.inventory -cne (Join-Path $work 'logs/sdk-inventory.txt')) { throw 'Unexpected isolated SDK selection fixture' }
+}
 $attempt = [IO.File]::Open((Join-Path $work 'attempt.json'), [IO.FileMode]::CreateNew, [IO.FileAccess]::Write)
 try {
     $bytes = [Text.Encoding]::UTF8.GetBytes('{"schema":1,"attempted":true}')
@@ -96,6 +102,13 @@ try {
         $sdkOutput = & $expected.sdk.executable --version 2>&1 | Out-String
         if ($LASTEXITCODE -ne 0 -or ($sdkOutput.Trim() -split '\r?\n')[-1] -ne $expected.sdk.version) { throw "Selected SDK differs: $sdkOutput" }
         [IO.File]::WriteAllText((Join-Path $logs 'sdk-version.txt'), $sdkOutput)
+        if ($expected.scenario -eq 'sdk-selection-failure-retry') {
+            $inventory = & $expected.sdk.executable --list-sdks 2>&1 | Out-String
+            $inventoryExit = $LASTEXITCODE
+            [IO.File]::WriteAllText($expected.sdkSelection.inventory, $inventory)
+            if ($inventoryExit -ne 0 -or $inventory -notmatch ('(?m)^' + [regex]::Escape($expected.sdk.version) + '\s+\[')) { throw "Could not verify the installed SDK inventory: $inventory" }
+            if ($inventory -match ('(?m)^' + [regex]::Escape($expected.sdkSelection.unavailableVersion) + '\s+\[')) { throw 'The intended unavailable SDK is installed; retain this first preflight failure' }
+        }
     } finally { Pop-Location }
     $editorVersion = & $expected.editor.cli --version 2>&1 | Out-String
     if ($LASTEXITCODE -ne 0 -or !$editorVersion.Contains($expected.editor.version) -or !$editorVersion.Contains($expected.editor.commit)) { throw "Editor version differs: $editorVersion" }
