@@ -93,13 +93,13 @@ exports.run = async function run() {
     const expected = JSON.parse(fs.readFileSync(path.join(root, 'expected.json'), 'utf8'));
     assert.equal(expected.schema, 1);
     const scenario = expected.scenario || 'web-lifecycle';
-    assert(['web-lifecycle', 'build-failure-retry', 'native-build-cancel', 'web-profile-failure-retry', 'sdk-selection-failure-retry'].includes(scenario));
+    assert(['web-lifecycle', 'build-failure-retry', 'native-build-cancel', 'web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry'].includes(scenario));
     assert(Number.isInteger(expected.cycles) && expected.cycles >= 2 && expected.cycles <= 10);
     const start = process.hrtime.bigint();
     const result = {
         schema: 1, success: false, expected, editorApiVersion: vscode.version,
         safetyTimeoutMilliseconds: SAFETY_TIMEOUT_MS, checks: [], phases: [], launches: [], cleanup: [], failedBuildAttempts: [],
-        cancelledBuildAttempts: [], failedWebProfileAttempts: [], failedSdkSelectionAttempts: [],
+        cancelledBuildAttempts: [], failedWebProfileAttempts: [], failedSdkSelectionAttempts: [], failedHandoffAttempts: [],
         scope: { installedCandidate: true, invocation: 'command-api', physicalF5: false,
             VSCodium: true, platform: `${process.platform}-${process.arch}`, macOS: process.platform === 'darwin',
             qualification: false, localOnly: true, published: false, directWebDebuggee: true,
@@ -107,12 +107,15 @@ exports.run = async function run() {
             scenario, actualCompilerFailure: scenario === 'build-failure-retry',
             actualWebProfileFailure: scenario === 'web-profile-failure-retry',
             actualSdkSelectionFailure: scenario === 'sdk-selection-failure-retry',
+            injectedEditorRejection: scenario === 'debug-handoff-declined-retry', nativeAdapterFailure: false,
             actualProgressCancelUi: scenario === 'native-build-cancel', injectedCancellationToken: false },
     };
     const launches = [];
     const failedBuildAttempts = [];
     const failedWebProfileAttempts = [];
     const failedSdkSelectionAttempts = [];
+    const failedHandoffAttempts = [];
+    const handoffProviders = new Map();
     const cancelledBuildAttempts = [];
     const nativeCancellation = scenario === 'native-build-cancel' ? expected.nativeCancellation : undefined;
     if (nativeCancellation) {
@@ -161,6 +164,8 @@ exports.run = async function run() {
                 expectedBuildCancellation: launch.expectedBuildCancellation,
                 expectedWebProfileFailure: launch.expectedWebProfileFailure,
                 expectedSdkSelectionFailure: launch.expectedSdkSelectionFailure,
+                expectedHandoffDeclined: launch.expectedHandoffDeclined,
+                providerCallCount: launch.providerCalls?.length, providerDisposed: launch.providerDisposed,
                 buildPid: launch.buildPid,
                 stopRequestedAtMilliseconds: launch.stopRequestedAtMilliseconds,
                 stopPromiseResolvedAtMilliseconds: launch.stopPromiseResolvedAtMilliseconds,
@@ -241,6 +246,7 @@ exports.run = async function run() {
         assert(!launch.expectedBuildCancellation, 'The cancelled build attempt must not create a debug adapter or session');
         assert(!launch.expectedWebProfileFailure, 'The Web-profile-failed attempt must not create a debug adapter or session');
         assert(!launch.expectedSdkSelectionFailure, 'The SDK-selection-failed attempt must not create a debug adapter or session');
+        assert(!launch.expectedHandoffDeclined, 'The editor-declined attempt must not create a debug adapter or session');
     }
 
     function capturedSessionState(launch) {
@@ -382,7 +388,7 @@ exports.run = async function run() {
             commandName: 'Project', applicationUrl: launch.origin, launchBrowser: false,
             environmentVariables: { LIFECYCLE_TOKEN: nonce, ASPNETCORE_ENVIRONMENT: 'Development' },
         } } }, null, 2) + '\n');
-        if (['web-profile-failure-retry', 'sdk-selection-failure-retry'].includes(scenario)) launch.profileSnapshot = fileSnapshot(source.replace(/\.cs$/i, '.run.json'));
+        if (['web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry'].includes(scenario)) launch.profileSnapshot = fileSnapshot(source.replace(/\.cs$/i, '.run.json'));
         const opened = document || await vscode.workspace.openTextDocument(source);
         await vscode.window.showTextDocument(opened);
         launch.commandPending = true;
@@ -401,7 +407,7 @@ exports.run = async function run() {
             state();
         }
         assert.equal(opened.isDirty, false, 'Installed command must save the dirty source before building');
-        if (['web-profile-failure-retry', 'sdk-selection-failure-retry'].includes(scenario)) launch.sourceSnapshot = fileSnapshot(source);
+        if (['web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry'].includes(scenario)) launch.sourceSnapshot = fileSnapshot(source);
         await until(() => launch.started, `${label} exact owned session start`);
         assert.equal(launch.capturedSessions.size, 1, 'One launch token must have exactly one captured session');
         assert(exists(launch.program));
@@ -413,6 +419,7 @@ exports.run = async function run() {
         assert(!failedBuildAttempts.some(previous => previous.output === launch.output), 'A retry must not reuse failed build output');
         assert(!cancelledBuildAttempts.some(previous => previous.output === launch.output), 'A retry must not reuse cancelled build output');
         assert(!failedWebProfileAttempts.some(previous => previous.output === launch.output), 'A retry must not reuse Web-profile-failed output');
+        assert(!failedHandoffAttempts.some(previous => previous.output === launch.output), 'A retry must not reuse editor-declined output');
         if (inspectBreakpoint) {
             await until(() => launch.dap.some(message => message.event === 'stopped' && message.body?.reason === 'breakpoint'), `${label} source breakpoint`);
             const stopped = launch.dap.find(message => message.event === 'stopped' && message.body?.reason === 'breakpoint');
@@ -585,6 +592,181 @@ exports.run = async function run() {
             commandResult: attempt.commandResult, sourceUnchanged: true, noAdapter: true, noSession: true, noProcessEvent: true });
         result.checks.push('Actual successful build then per-file Web root failure returns false before handoff, preserves source, removes owned output and leaves B unchanged');
         state();
+        return attempt;
+    }
+
+    async function debugHandoffDeclined(source, revision, port, a, b) {
+        let file;
+        await until(() => {
+            file = outputLog();
+            if (!file) return false;
+            const text = fs.readFileSync(file, 'utf8');
+            return buildCommands(text, source).length === 1 && buildCommands(text, b.source).length === 1 &&
+                text.split(/\r?\n/).filter(line => line.startsWith('Phase completed: Starting netcoredbg')).length === 2;
+        }, 'initial A/B command output before injected editor rejection');
+        const snapshot = logSnapshot(file);
+        const opened = await vscode.workspace.openTextDocument(source);
+        assert.equal(opened.isDirty, false);
+        assert.equal(opened.getText(), fs.readFileSync(source, 'utf8'));
+        assert(opened.getText().includes('marker += 2;'), 'The declined attempt must retain valid source');
+        await vscode.window.showTextDocument(opened);
+        const profile = source.replace(/\.cs$/i, '.run.json');
+        const attempt = { label: 'A-editor-handoff-declined', source, revision, port, origin: a.origin,
+            nonce: crypto.randomUUID(), expectedHandoffDeclined: true, dap: [], adapterCreationCount: 0, editorStartCount: 0,
+            providerCalls: [], providerPassthroughCount: 0, providerDisposed: false, providerDisposalCount: 0,
+            commandInvocations: 3, sourceSnapshot: fileSnapshot(source),
+            sourceWasDirty: opened.isDirty, ambientDotnetRootBefore: process.env.DOTNET_ROOT ?? null };
+        assert(!byToken.has(attempt.nonce), 'The failure must have a fresh token distinct from both prior sessions');
+        failedHandoffAttempts.push(attempt);
+        ownedAttempts.push(attempt);
+        byToken.set(attempt.nonce, attempt);
+        let ownedProvider;
+        let firstError;
+        try {
+            fs.writeFileSync(profile, JSON.stringify({ profiles: { LifecycleHttp: {
+                commandName: 'Project', applicationUrl: attempt.origin, launchBrowser: false,
+                environmentVariables: { LIFECYCLE_TOKEN: attempt.nonce, ASPNETCORE_ENVIRONMENT: 'Development' },
+            } } }, null, 2) + '\n');
+            attempt.profileSnapshot = fileSnapshot(profile);
+            await stillAlive(b);
+            attempt.bBefore = { sessionId: b.session.id, pid: b.pid, nonce: b.nonce, output: b.output, response: await request(b.origin) };
+            // This supported editor API deliberately rejects one exact test token.
+            // It is not a native adapter failure or an injected product runtime.
+            const provider = vscode.debug.registerDebugConfigurationProvider('coreclr', {
+                resolveDebugConfigurationWithSubstitutedVariables(_folder, config) {
+                    if (config?.env?.LIFECYCLE_TOKEN !== attempt.nonce) {
+                        attempt.providerPassthroughCount++;
+                        return config;
+                    }
+                    const call = { atMilliseconds: elapsed(start), configuration: JSON.parse(JSON.stringify(config)) };
+                    attempt.providerCalls.push(call);
+                    observe('injected-editor-rejection', () => {
+                        // Capture paths before validation so failed runs retain the owned evidence.
+                        attempt.program = config.program;
+                        attempt.output = config.__netcoredbgFileAppOutput;
+                        assert.equal(typeof attempt.program, 'string');
+                        assert.equal(typeof attempt.output, 'string');
+                        assert(within(root, attempt.output) && within(attempt.output, attempt.program));
+                        attempt.base = path.dirname(path.dirname(attempt.output));
+                        assert(samePath(attempt.base, a.base));
+                        assert(samePath(path.dirname(attempt.program), attempt.output));
+                        assert.equal(path.basename(attempt.program), 'FileApp.dll');
+                        assert.match(path.basename(attempt.output), /^run-[A-Za-z0-9]{6}$/);
+                        assert.notEqual(attempt.output, a.output);
+                        assert.equal(config.type, 'coreclr');
+                        assert.equal(config.request, 'launch');
+                        assert(samePath(config.cwd, path.dirname(source)));
+                        assert(samePath(config.env.DOTNET_ROOT, expected.sdk.root));
+                        assert.equal(config.env.ASPNETCORE_URLS, attempt.origin);
+                        assert.equal(config.serverReadyAction, undefined);
+                        assert.equal(config.checkForDevCert, false);
+                        const outputStat = fs.lstatSync(attempt.output);
+                        assert(outputStat.isDirectory() && !outputStat.isSymbolicLink());
+                        call.artifacts = ['FileApp.dll', 'FileApp.pdb'].map(name => {
+                            const artifact = path.join(attempt.output, name);
+                            const stat = fs.lstatSync(artifact);
+                            assert(stat.isFile() && !stat.isSymbolicLink() && stat.size > 0);
+                            return { path: artifact, size: stat.size, sha256: sha256(artifact) };
+                        });
+                        record('injected-editor-rejection', { label: attempt.label, nonce: attempt.nonce, call });
+                        state();
+                    });
+                    // A callback captured before disposal must still reject this exact token.
+                    return undefined; // null would open launch configuration UI instead of simply aborting.
+                },
+            });
+            attempt.providerActive = true;
+            attempt.providerRegisteredAtMilliseconds = elapsed(start);
+            ownedProvider = { dispose() {
+                if (!attempt.providerActive) return;
+                attempt.providerActive = false;
+                try { provider.dispose(); }
+                finally {
+                    attempt.providerDisposed = true;
+                    attempt.providerDisposalCount++;
+                    attempt.providerDisposedAtMilliseconds = elapsed(start);
+                    handoffProviders.delete(ownedProvider);
+                    record('injected-editor-rejection-provider-disposed', { label: attempt.label, count: attempt.providerDisposalCount });
+                    state();
+                }
+            } };
+            handoffProviders.set(ownedProvider, attempt);
+            // A phase timeout may outrun this helper: run-level cleanup also owns disarming it.
+            subscriptions.push(ownedProvider);
+            record('injected-editor-rejection-provider-registered', { label: attempt.label, nonce: attempt.nonce });
+            attempt.commandPending = true;
+            attempt.invokedAtMilliseconds = elapsed(start);
+            state();
+            try {
+                attempt.commandOperation = Promise.allSettled(Array.from({ length: attempt.commandInvocations }, () => vscode.commands.executeCommand(COMMAND)));
+                const outcomes = await attempt.commandOperation;
+                const rejected = outcomes.find(outcome => outcome.status === 'rejected');
+                if (rejected) throw rejected.reason;
+                attempt.commandResults = outcomes.map(outcome => outcome.value);
+            } finally { attempt.commandPending = false; attempt.returnedAtMilliseconds = elapsed(start); state(); }
+            assert.deepEqual(attempt.commandResults, [false, false, false], 'All three callers must observe the one editor-declined start');
+            assert.equal(attempt.providerCalls.length, 1, 'Three failed callers must share one actual editor handoff');
+            assert.equal(opened.isDirty, false);
+            attempt.sourceAfterSnapshot = fileSnapshot(source);
+            attempt.profileAfterSnapshot = fileSnapshot(profile);
+            assert.equal(attempt.sourceAfterSnapshot.sha256, attempt.sourceSnapshot.sha256);
+            assert.equal(attempt.profileAfterSnapshot.sha256, attempt.profileSnapshot.sha256);
+            attempt.ambientDotnetRootAfter = process.env.DOTNET_ROOT ?? null;
+            assert.equal(attempt.ambientDotnetRootAfter, attempt.ambientDotnetRootBefore);
+            const diagnostic = 'The editor did not start the netcoredbg debug session. Check C# and Debug Console output for details before retrying';
+            let tail;
+            await until(() => {
+                tail = logTail(snapshot);
+                return tail.includes(diagnostic) && tail.includes('Phase failed: Starting netcoredbg');
+            }, 'exact editor-declined start diagnostic and handoff failure phase');
+            attempt.log = { ...logEvidence(snapshot, tail, source),
+                webPreparationCompletedPhaseDiagnostics: tail.split(/\r?\n/).filter(line => line.startsWith('Phase completed: Preparing web launch settings')),
+                handoffFailedPhaseDiagnostics: tail.split(/\r?\n/).filter(line => line.startsWith('Phase failed: Starting netcoredbg')),
+                declinedStartDiagnostics: tail.split(/\r?\n/).filter(line => line.includes(diagnostic)) };
+            assert.equal(attempt.log.buildCommands.length, 1, 'Three failed callers must share one real build');
+            assert.equal(attempt.log.buildCompletedPhaseDiagnostics.length, 1);
+            assert.equal(attempt.log.webPreparationCompletedPhaseDiagnostics.length, 1);
+            assert.equal(attempt.log.handoffFailedPhaseDiagnostics.length, 1);
+            assert(attempt.log.declinedStartDiagnostics.length > 0);
+            assert.equal(attempt.log.completedPhaseDiagnostics.length, 0);
+            assert.equal(attempt.log.failedPhaseDiagnostics.length, 0);
+            assert.equal(attempt.log.cancelledPhaseDiagnostics.length, 0);
+            assert.equal(attempt.log.compilerDiagnostics.length, 0);
+            assert.equal(attempt.log.webPreparationFailedPhaseDiagnostics.length, 0);
+            assert(!tail.includes('dotnet "dev-certs"'), 'The explicit HTTP profile must avoid certificate commands');
+            assert(samePath(attempt.log.buildCommands[0].output, attempt.output));
+            assert.equal(attempt.adapterCreationCount, 0);
+            assert.equal(attempt.editorStartCount, 0);
+            assert.equal(attempt.capturedSessions?.size || 0, 0);
+            assert.equal(attempt.session, undefined);
+            assert(!attempt.dap.some(message => message.event === 'process'));
+            attempt.noSession = true;
+            attempt.noAdapter = true;
+            attempt.noProcessEvent = true;
+            assert(!exists(attempt.output), 'The editor-declined output must be absent after all commands return');
+            attempt.outputAbsentAfterReturn = true;
+            attempt.terminalQueuesEmpty = queueEmpty(attempt.base);
+            assert(attempt.terminalQueuesEmpty, 'Both terminal queues must be empty after the declined handoff');
+            attempt.outputRemovedAtMilliseconds = elapsed(start);
+            assert(await canBind(port));
+            attempt.portReusableAtMilliseconds = elapsed(start);
+            await stillAlive(b);
+            attempt.bAfter = { sessionId: b.session.id, pid: b.pid, nonce: b.nonce, output: b.output, response: await request(b.origin) };
+            assert.deepEqual(attempt.bAfter, attempt.bBefore);
+            record('injected-editor-rejection-confirmed', { label: attempt.label, commandResults: attempt.commandResults,
+                output: attempt.output, providerCallCount: attempt.providerCalls.length, noAdapter: true, noSession: true, noProcessEvent: true });
+            result.checks.push('Three installed commands share one real successful build and injected editor rejection, return false, remove owned output/queues, release the HTTP port and preserve B');
+        } catch (error) {
+            firstError = error;
+            throw error;
+        } finally {
+            try { ownedProvider?.dispose(); }
+            catch (error) {
+                attempt.providerDisposalError = error.stack || String(error);
+                if (!firstError) throw error;
+            } finally { state(); }
+        }
+        assert.equal(attempt.providerDisposalCount, 1);
         return attempt;
     }
 
@@ -845,6 +1027,26 @@ exports.run = async function run() {
     }
 
     async function failureCleanup() {
+        // phase() can time out before its action settles. Keep the exact-token
+        // rejection armed during this bounded drain, then disarm before session cleanup.
+        for (const attempt of failedHandoffAttempts.filter(item => item.commandPending && item.commandOperation)) {
+            const cleanup = { label: attempt.label, pendingHandoffCommand: true };
+            result.cleanup.push(cleanup);
+            try {
+                const outcomes = await bounded(attempt.commandOperation, 'failure cleanup pending editor-handoff command outcomes', 15000);
+                cleanup.pendingCommandOutcomes = outcomes.map(outcome => ({ status: outcome.status,
+                    ...(outcome.status === 'fulfilled' ? { value: outcome.value } : { reason: String(outcome.reason) }) }));
+            } catch (error) { cleanup.pendingCommandError = error.stack || String(error); }
+            state();
+        }
+        for (const [provider, attempt] of [...handoffProviders]) {
+            const cleanup = { label: attempt.label, injectedEditorProvider: true };
+            result.cleanup.push(cleanup);
+            try {
+                provider.dispose();
+                cleanup.providerDisposed = attempt.providerDisposed;
+            } catch (error) { cleanup.providerDisposalError = error.stack || String(error); }
+        }
         // Keep evidence when exact API stop or fixture ownership verification fails.
         // Do not issue global Stop, process-tree kill or filesystem cleanup.
         // Release only this exact nonce/PID-verified in-process fixture barrier;
@@ -921,7 +1123,7 @@ exports.run = async function run() {
         subscriptions.push(vscode.debug.onDidStartDebugSession(session => observe('editor-start', () => {
             const launch = ownedLaunch(session);
             if (!launch) return;
-            if (launch.expectedWebProfileFailure || launch.expectedSdkSelectionFailure) launch.editorStartCount++;
+            if (launch.expectedWebProfileFailure || launch.expectedSdkSelectionFailure || launch.expectedHandoffDeclined) launch.editorStartCount++;
             captureSession(session, launch);
             launch.started = true;
             launch.startedAtMilliseconds = elapsed(start);
@@ -947,7 +1149,7 @@ exports.run = async function run() {
             createDebugAdapterTracker(session) {
                 const launch = ownedLaunch(session);
                 if (!launch) return undefined;
-                if (launch.expectedWebProfileFailure || launch.expectedSdkSelectionFailure) launch.adapterCreationCount++;
+                if (launch.expectedWebProfileFailure || launch.expectedSdkSelectionFailure || launch.expectedHandoffDeclined) launch.adapterCreationCount++;
                 observe('adapter-session', () => captureSession(session, launch));
                 // Keep the tracker even if uniqueness validation failed: it can
                 // still identify the extra owned debuggee for targeted cleanup.
@@ -1035,10 +1237,18 @@ exports.run = async function run() {
                         ? await phase('A actual Web profile failure after successful build while B survives', () => webProfileFailure(aSource, a.revision, aPort, a, b))
                         : scenario === 'sdk-selection-failure-retry' && cycle === 0
                             ? await phase('A actual unavailable SDK before output allocation while B survives', () => sdkSelectionFailure(aSource, a.revision, aPort, a, b))
+                            : scenario === 'debug-handoff-declined-retry' && cycle === 0
+                                ? await phase('A injected editor rejection after successful real build while B survives', () => debugHandoffDeclined(aSource, a.revision, aPort, a, b))
                         : undefined;
             if (cycle + 1 < expected.cycles) {
                 const revision = `retry-${cycle + 1}`;
                 await phase(`A cycle ${cycle + 1} dirty edit and installed-command retry`, async () => {
+                    if (failed?.expectedHandoffDeclined) {
+                        assert.equal(failed.providerActive, false);
+                        assert.equal(failed.providerDisposed, true);
+                        assert.equal(failed.providerDisposalCount, 1);
+                        assert.equal(sha256(failed.profileSnapshot.path), failed.profileSnapshot.sha256);
+                    }
                     const current = await vscode.workspace.openTextDocument(aSource);
                     const content = current.getText();
                     assert(content.includes(`const string revision = "${a.revision}";`));
@@ -1073,6 +1283,16 @@ exports.run = async function run() {
                             assert.notEqual(a.profileSnapshot.sha256, failed.profileSnapshot.sha256);
                             assert(!Object.hasOwn(JSON.parse(Buffer.from(a.profileSnapshot.base64, 'base64')).profiles.LifecycleHttp.environmentVariables, 'DOTNET_ROOT'));
                         }
+                        if (failed.expectedHandoffDeclined) {
+                            assert.equal(log.buildCompletedPhaseDiagnostics.length, 1);
+                            assert.equal(log.webPreparationFailedPhaseDiagnostics.length, 0);
+                            assert(!tail.includes('Phase failed: Starting netcoredbg'));
+                            assert(!tail.includes('The editor did not start the netcoredbg debug session.'));
+                            assert.notEqual(a.nonce, failed.nonce);
+                            assert.notEqual(a.sourceSnapshot.sha256, failed.sourceSnapshot.sha256);
+                            assert.notEqual(a.profileSnapshot.sha256, failed.profileSnapshot.sha256);
+                            assert.equal(failed.providerCalls.length, 1, 'The disposed provider cannot intercept the corrected retry');
+                        }
                         assert(samePath(log.buildCommands[0].output, a.output), 'Coalesced build output must identify the one captured session');
                         if (failed.expectedSdkSelectionFailure) {
                             assert.equal(sha256(failed.restoredGlobalJsonSnapshot.path), failed.globalJsonSnapshot.sha256);
@@ -1087,7 +1307,9 @@ exports.run = async function run() {
                                 previousOutput: failed.previousOutput, freshOutput: a.output !== failed.previousOutput,
                                 failedAttemptAllocatedOutput: false, globalJsonSnapshot: fileSnapshot(failed.restoredGlobalJsonSnapshot.path),
                             } : { failedOutput: failed.output, freshOutput: a.output !== failed.output }),
-                            ...((failed.expectedWebProfileFailure || failed.expectedSdkSelectionFailure) ? { profileSnapshot: a.profileSnapshot, sourceSnapshot: a.sourceSnapshot } : {}) };
+                            ...((failed.expectedWebProfileFailure || failed.expectedSdkSelectionFailure || failed.expectedHandoffDeclined) ? { profileSnapshot: a.profileSnapshot, sourceSnapshot: a.sourceSnapshot } : {}),
+                            ...(failed.expectedHandoffDeclined ? { providerDisposedBeforeRetry: failed.providerDisposed,
+                                failedNonce: failed.nonce, nonce: a.nonce, freshToken: a.nonce !== failed.nonce } : {}) };
                         if (failed.expectedSdkSelectionFailure) {
                             assert(result.coalescedRetry.freshOutput);
                             assert(!exists(failed.previousOutput));
@@ -1099,6 +1321,8 @@ exports.run = async function run() {
                                 ? 'Corrected Web profile and dirty revision retry share one saved build/session and fresh output across three callers while B survives'
                                 : failed.expectedSdkSelectionFailure
                                     ? 'Original SDK configuration restored and dirty revision retry share one saved build/session and fresh output across three callers while B survives'
+                                    : failed.expectedHandoffDeclined
+                                        ? 'Injected editor provider disposed and dirty valid revision retries with three callers sharing one saved build/session, fresh token/output and unchanged B'
                                 : 'Dirty compiler correction retries with three concurrent commands sharing one build/session and fresh output while B survives');
                         record('coalesced-corrected-retry-confirmed', result.coalescedRetry);
                     }
@@ -1164,6 +1388,10 @@ exports.run = async function run() {
         }));
         result.failedSdkSelectionAttempts = failedSdkSelectionAttempts.map(attempt => {
             const { session, capturedSessions, ...evidence } = attempt;
+            return { ...evidence, sessionId: session?.id, capturedSessions: capturedSessionState(attempt) };
+        });
+        result.failedHandoffAttempts = failedHandoffAttempts.map(attempt => {
+            const { session, capturedSessions, commandOperation, ...evidence } = attempt;
             return { ...evidence, sessionId: session?.id, capturedSessions: capturedSessionState(attempt) };
         });
         result.cancelledBuildAttempts = cancelledBuildAttempts.map(attempt => ({

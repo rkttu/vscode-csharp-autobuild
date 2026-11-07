@@ -2210,25 +2210,34 @@ test('a new activation preserves output whose cancelled editor start is still un
     await waitFor(() => !fs.existsSync(config.__netcoredbgFileAppOutput), 'The declined request may now clean output');
 });
 
-test('a declined debug start permits retry while its notification remains open', { timeout: 2000 }, async t => {
+test('coalesced declined debug starts permit coalesced retry while their notification remains open', { timeout: 3000 }, async t => {
     let dismiss;
     const notification = new Promise(resolve => { dismiss = resolve; });
     t.after(() => dismiss());
     const options = { startResult: false, showErrorMessage: () => notification };
     const f = fixture(t, options);
-    assert.equal(await f.api.debugActiveFile(), false);
+    assert.deepEqual(await Promise.all(Array.from({ length: 3 }, () => f.api.debugActiveFile())), [false, false, false]);
+    assert.equal(f.calls.launches.length, 1, 'Three failed callers must share one editor start');
+    assert.equal(f.calls.processes.filter(call => call.args[0] === 'build').length, 1);
     const rejected = f.calls.launches[0].config;
     assert.equal(f.calls.errors.length, 1);
+    assert.match(f.calls.errors[0], /The editor did not start the netcoredbg debug session/);
     assert(!fs.existsSync(rejected.program));
+    assert.deepEqual(terminalOutputs(f), []);
     options.startResult = true;
     f.document.isDirty = true;
-    assert.equal(await f.api.debugActiveFile(), true);
+    assert.deepEqual(await Promise.all(Array.from({ length: 3 }, () => f.api.debugActiveFile())), [true, true, true]);
     assert.equal(f.calls.saves, 1);
     assert.equal(f.calls.launches.length, 2);
+    assert.equal(f.calls.processes.filter(call => call.args[0] === 'build').length, 2, 'Three corrected callers must share one fresh build');
     const retried = f.calls.launches[1].config;
     assert.notEqual(retried.program, rejected.program);
     assert(fs.existsSync(retried.program));
     assert.equal(f.calls.errors.length, 1, 'Retry must not duplicate the earlier failure');
+    f.terminate(retried);
+    await f.api.dispose();
+    assert(!fs.existsSync(retried.__netcoredbgFileAppOutput));
+    assert.deepEqual(terminalOutputs(f), []);
 });
 
 test('cancellation during a declined debug start is quiet and releases the file for retry', { timeout: 2000 }, async t => {
