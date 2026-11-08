@@ -271,10 +271,18 @@ function activate(context, dependencies = {}) {
             (!launch.session || launch.session.id === session.id);
     }
 
-    async function finishLaunch(launch) {
+    function dispatchTerminalCleanup(directory) {
+        // Register actual cleanup/drain ownership before releasing the foreground result.
+        // Filesystem settlement may be indefinite; its late failure stays observed.
+        void cleanup(directory).catch(error => {
+            cleanupLog(`Could not finish terminal file-app output ${directory}: ${error?.message || String(error)}`);
+        });
+    }
+
+    function finishLaunch(launch) {
         launch.terminal = true;
         launches.delete(launch.directory);
-        await cleanup(launch.directory);
+        dispatchTerminalCleanup(launch.directory);
     }
 
     async function requestCancelledStop(launch, session) {
@@ -397,12 +405,12 @@ function activate(context, dependencies = {}) {
         const start = Promise.resolve().then(() => {
             signal.throwIfAborted();
             return vscode.debug.startDebugging(folder, config);
-        }).then(async started => {
-            if (!started && !launch.session) await finishLaunch(launch);
+        }).then(started => {
+            if (!started && !launch.session) finishLaunch(launch);
             signal.throwIfAborted();
             return started;
-        }, async error => {
-            if (!launch.session) await finishLaunch(launch);
+        }, error => {
+            if (!launch.session) finishLaunch(launch);
             signal.throwIfAborted();
             throw error;
         }).finally(() => {
@@ -597,7 +605,7 @@ function activate(context, dependencies = {}) {
             return false;
         } finally {
             controllers.delete(controller);
-            if (generated && !launchOwnsOutput) await cleanup(generated);
+            if (generated && !launchOwnsOutput) dispatchTerminalCleanup(generated);
             releaseDisposedResources();
         }
     }

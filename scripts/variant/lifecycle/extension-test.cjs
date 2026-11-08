@@ -80,7 +80,8 @@ async function request(origin, endpoint = '/probe', options = {}) {
 }
 
 function queueEmpty(base) {
-    for (const name of ['terminal-cleanup-v1', 'terminal-cleanup-staging-v1']) {
+    // Observe forward publication order so a staging-to-ready rename is not missed between reads.
+    for (const name of ['terminal-cleanup-staging-v1', 'terminal-cleanup-v1']) {
         const directory = path.join(base, name);
         if (exists(directory) && fs.readdirSync(directory).length !== 0) return false;
     }
@@ -890,6 +891,7 @@ exports.run = async function run() {
         attempt.base = path.dirname(path.dirname(attempt.output));
         assert(samePath(attempt.base, a.base), 'Failed and successful A output must share the known owned output base');
         assert.notEqual(attempt.output, a.output);
+        await until(() => !exists(attempt.output) && queueEmpty(attempt.base), 'compiler-failed owned output and terminal queues cleanup');
         assert(!exists(attempt.output), 'The exact failed output must be gone at the post-return resource check');
         assert(queueEmpty(attempt.base), 'The failed attempt must leave no terminal recovery queue');
         attempt.outputRemovedAtMilliseconds = elapsed(start);
@@ -981,6 +983,7 @@ exports.run = async function run() {
         attempt.base = path.dirname(path.dirname(attempt.output));
         assert(samePath(attempt.base, a.base));
         assert.notEqual(attempt.output, a.output);
+        await until(() => !exists(attempt.output) && queueEmpty(attempt.base), 'Web-profile-failed owned output and terminal queues cleanup');
         assert(!exists(attempt.output), 'The exact profile-failed output must be absent after command return');
         assert(queueEmpty(attempt.base), 'The profile-failed attempt must leave both terminal queues empty');
         attempt.outputRemovedAtMilliseconds = elapsed(start);
@@ -1553,7 +1556,8 @@ exports.run = async function run() {
             attempt.noSession = true;
             attempt.noAdapter = true;
             attempt.noProcessEvent = true;
-            assert(!exists(attempt.output), 'The editor-declined output must be absent after all commands return');
+            await until(() => !exists(attempt.output) && queueEmpty(attempt.base), 'editor-declined owned output and terminal queues cleanup');
+            assert(!exists(attempt.output), 'The editor-declined output must be absent after the resource observation');
             attempt.outputAbsentAfterReturn = true;
             attempt.terminalQueuesEmpty = queueEmpty(attempt.base);
             assert(attempt.terminalQueuesEmpty, 'Both terminal queues must be empty after the declined handoff');
@@ -1822,6 +1826,7 @@ exports.run = async function run() {
         assert.equal(attempt.log.failedPhaseDiagnostics.length, 0);
         assert.equal(attempt.log.completedPhaseDiagnostics.length, 0);
         assert(!tail.includes('Phase timed out:'), 'Expected UI cancellation must stay distinct from a timeout');
+        await until(() => !exists(attempt.output) && queueEmpty(attempt.base), 'cancelled-build owned output and terminal queues cleanup');
         assert(!exists(attempt.output), 'The exact cancelled output must be gone at the post-return resource observation');
         assert(queueEmpty(attempt.base));
         attempt.outputRemovedAtMilliseconds = elapsed(start);
