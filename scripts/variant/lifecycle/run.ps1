@@ -22,10 +22,12 @@ foreach ($driverFile in @('driver.cjs', 'extension-test.cjs')) {
     Assert-Hash (Join-Path $work ('driver/' + $driverFile)) $expected.harness.$driverFile
 }
 foreach ($fixture in @('a.cs', 'b.cs')) {
-    $fixtureHash = if ($fixture -eq 'a.cs' -and $expected.harness.'prepared/a.cs') { $expected.harness.'prepared/a.cs' } else { $expected.harness.'fixtures/web.cs' }
+    $preparedKey = 'prepared/' + $fixture
+    $fixtureHash = if ($expected.harness.$preparedKey) { $expected.harness.$preparedKey } else { $expected.harness.'fixtures/web.cs' }
     Assert-Hash (Join-Path $work ('workspace/' + $fixture)) $fixtureHash
 }
 if ($expected.nativeCancellation) { Assert-Hash $expected.nativeCancellation.target $expected.harness.'fixtures/cancel-build.targets' }
+if ($expected.concurrent) { Assert-Hash $expected.concurrent.target $expected.harness.'fixtures/concurrent-build.targets' }
 if ($expected.scenario -eq 'sdk-selection-failure-retry') {
     Assert-Hash (Join-Path $work 'workspace/global.json') $expected.sdkSelection.originalGlobalJsonSha256
     if ($expected.sdkSelection.unavailableVersion -cne '99.0.100' -or

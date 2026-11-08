@@ -1,0 +1,60 @@
+<Project>
+  <!-- One bounded task runs inside each real SDK process; it spawns no child. -->
+  <UsingTask TaskName="LifecycleConcurrentBarrier" TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)/Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Marker ParameterType="System.String" Required="true" />
+      <Release ParameterType="System.String" Required="true" />
+      <Nonce ParameterType="System.String" Required="true" />
+      <Source ParameterType="System.String" Required="true" />
+      <CompileInputs ParameterType="System.String" Required="true" />
+      <OutputDirectory ParameterType="System.String" Required="true" />
+      <ProjectPath ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        System.Guid parsed;
+        if (!System.Guid.TryParse(Nonce, out parsed)) {
+            Log.LogError("Expected a unique concurrent build nonce.");
+            return false;
+        }
+        System.Func<string, string> quote = value => {
+            var builder = new System.Text.StringBuilder("\"");
+            foreach (var character in value) {
+                if (character == '\\' || character == '"') builder.Append('\\').Append(character);
+                else if (character < 32) builder.Append("\\u").Append(((int)character).ToString("x4"));
+                else builder.Append(character);
+            }
+            return builder.Append('"').ToString();
+        };
+        using (var process = System.Diagnostics.Process.GetCurrentProcess()) {
+            var json = "{\"schema\":1,\"pid\":" + process.Id.ToString(System.Globalization.CultureInfo.InvariantCulture) +
+                ",\"nonce\":" + quote(Nonce) + ",\"source\":" + quote(System.IO.Path.GetFullPath(Source)) +
+                ",\"compileInputs\":" + quote(CompileInputs) +
+                ",\"output\":" + quote(System.IO.Path.GetFullPath(OutputDirectory)) +
+                ",\"project\":" + quote(ProjectPath) + ",\"executable\":" + quote(process.MainModule.FileName) +
+                ",\"startUtc\":" + quote(process.StartTime.ToUniversalTime().ToString("o")) + "}";
+            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(Marker));
+            System.IO.File.WriteAllText(Marker + ".tmp", json);
+            System.IO.File.Move(Marker + ".tmp", Marker);
+        }
+        var elapsed = System.Diagnostics.Stopwatch.StartNew();
+        while (true) {
+            if (System.IO.File.Exists(Release) && System.IO.File.ReadAllText(Release).Trim() == Nonce) break;
+            if (elapsed.ElapsedMilliseconds > 150000) {
+                Log.LogError("Concurrent build barrier exceeded its safety limit.");
+                return false;
+            }
+            System.Threading.Thread.Sleep(25);
+        }
+      ]]></Code>
+    </Task>
+  </UsingTask>
+  <!-- Ignore language-service design-time builds and every unrelated assembly. -->
+  <Target Name="WaitForLifecycleConcurrent" BeforeTargets="CoreCompile"
+          Condition="'$(LifecycleConcurrentEnabled)' == 'true' and '$(AssemblyName)' == 'FileApp' and '$(DesignTimeBuild)' != 'true'">
+    <LifecycleConcurrentBarrier Marker="$(LifecycleConcurrentMarker)" Release="$(LifecycleConcurrentRelease)"
+      Nonce="$(LifecycleConcurrentNonce)" Source="$(LifecycleConcurrentSource)"
+      CompileInputs="@(Compile->'%(FullPath)')" OutputDirectory="$(OutputPath)" ProjectPath="$(MSBuildProjectFullPath)" />
+  </Target>
+</Project>

@@ -118,7 +118,7 @@ def main():
     parser.add_argument("--sdk-version", required=True)
     parser.add_argument("--work-dir", type=Path, required=True)
     parser.add_argument("--cycles", type=int, default=3)
-    parser.add_argument("--scenario", choices=("web-lifecycle", "build-failure-retry", "native-build-cancel", "web-profile-failure-retry", "sdk-selection-failure-retry", "debug-handoff-declined-retry", "native-host-failure-retry", "native-adapter-loss"), default="web-lifecycle")
+    parser.add_argument("--scenario", choices=("web-lifecycle", "build-failure-retry", "native-build-cancel", "web-profile-failure-retry", "sdk-selection-failure-retry", "debug-handoff-declined-retry", "native-host-failure-retry", "native-adapter-loss", "concurrent-files"), default="web-lifecycle")
     args = parser.parse_args()
     if not 2 <= args.cycles <= 10:
         parser.error("Use 2..10 cycles to exercise bounded same-file retry")
@@ -157,6 +157,28 @@ def main():
     for name in ("a.cs", "b.cs"):
         (work / "workspace" / name).write_bytes(fixture)
     native_cancellation = None
+    concurrent = None
+    if args.scenario == "concurrent-files":
+        target = work / "workspace/concurrent-build.targets"
+        target.write_bytes((Path(__file__).parent / "fixtures/concurrent-build.targets").read_bytes())
+        concurrent = {"target": str(target), "entries": []}
+        for name in ("a", "b"):
+            source = work / "workspace" / (name + ".cs")
+            entry = {"label": name.upper(), "source": str(source), "nonce": str(uuid.uuid4()),
+                     "revision": "parallel-" + name,
+                     "marker": str(work / "progress" / ("concurrent-" + name + "-ready.json")),
+                     "release": str(work / "progress" / ("concurrent-" + name + "-release"))}
+            concurrent["entries"].append(entry)
+            directives = "\n".join((
+                "#:property LifecycleConcurrentEnabled=true",
+                "#:property CustomAfterMicrosoftCommonTargets=" + target.as_posix(),
+                "#:property LifecycleConcurrentSource=" + source.as_posix(),
+                "#:property LifecycleConcurrentMarker=" + Path(entry["marker"]).as_posix(),
+                "#:property LifecycleConcurrentRelease=" + Path(entry["release"]).as_posix(),
+                "#:property LifecycleConcurrentNonce=" + entry["nonce"],
+            )) + "\n"
+            source.write_bytes(directives.encode() + fixture.replace(b'\r\n', b'\n').replace(b'const string revision = "initial";',
+                ('const string revision = "' + entry["revision"] + '";').encode()))
     if args.scenario == "native-build-cancel":
         nonce = str(uuid.uuid4())
         target = work / "workspace/cancel-build.targets"
@@ -187,6 +209,10 @@ def main():
     if native_cancellation:
         harness["fixtures/cancel-build.targets"] = digest(target.read_bytes())
         harness["prepared/a.cs"] = digest((work / "workspace/a.cs").read_bytes())
+    if concurrent:
+        harness["fixtures/concurrent-build.targets"] = digest(target.read_bytes())
+        for name in ("a.cs", "b.cs"):
+            harness["prepared/" + name] = digest((work / "workspace" / name).read_bytes())
     if args.scenario == "native-adapter-loss":
         harness["adapter-loss.ps1"] = digest((Path(__file__).parent / "adapter-loss.ps1").read_bytes())
     expected = {"schema": 1, "extensionId": EXTENSION_ID, "candidate": candidate, "cycles": args.cycles,
@@ -201,6 +227,8 @@ def main():
                           "macOS": False, "invocation": "command-api", "freshProfiles": 1}}
     if native_cancellation:
         expected["nativeCancellation"] = native_cancellation
+    if concurrent:
+        expected["concurrent"] = concurrent
     if args.scenario == "native-adapter-loss":
         with zipfile.ZipFile(candidate["path"]) as archive:
             native_adapter_sha256 = digest(archive.read("extension/.debugger/netcoredbg/netcoredbg.exe"))
