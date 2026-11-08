@@ -457,3 +457,94 @@ test('failed trust and failed post-trust validation stop preparation', async t =
     f.input.runDotnet = async args => ({ exitCode: args.includes('--check') ? 7 : 0 });
     await assert.rejects(f.prepare(), /still missing or untrusted/);
 });
+
+test('foreground diagnostics preserve selected and virtual HTTP profiles when profile logging throws', async t => {
+    for (const selected of [true, false]) {
+        const f = fixture(t);
+        if (selected) f.write({ Local: { commandName: 'Project', applicationUrl: 'http://localhost:5017',
+            commandLineArgs: '--message "hello world"', environmentVariables: { USER_VALUE: 'unchanged' },
+            launchBrowser: true, launchUrl: 'health' } });
+        else f.input.environment = { ASPNETCORE_URLS: 'http://localhost:5017' };
+        const expected = await f.prepare();
+        const attemptedDiagnostics = [];
+        f.input.output.appendLine = line => {
+            attemptedDiagnostics.push(line);
+            throw new Error('Profile diagnostic unavailable');
+        };
+        assert.deepEqual(await f.prepare(), expected);
+        assert.equal(attemptedDiagnostics.length, 1);
+        assert.match(attemptedDiagnostics[0], selected ? /^Using web launch profile / : /^Using an in-memory development profile /);
+        assert.equal(expected.requiresHttps, false);
+        assert.deepEqual(f.calls.processes, []);
+        assert.deepEqual(f.calls.prompts, []);
+    }
+});
+
+test('foreground diagnostics preserve profile precedence and the original malformed-profile error', async t => {
+    const f = fixture(t);
+    f.write({ Adjacent: { commandName: 'Project', applicationUrl: 'http://localhost:5017' } });
+    f.write('{invalid conventional profile', true);
+    let diagnosticAttempts = 0;
+    f.input.output.appendLine = line => {
+        if (!line.includes('Properties/launchSettings.json takes precedence.')) return;
+        diagnosticAttempts++;
+        throw new Error('Precedence diagnostic unavailable');
+    };
+    await assert.rejects(f.prepare(), error => error.message.startsWith('Could not read launch profile ') &&
+        error.message.includes(path.join(f.root, 'Properties', 'launchSettings.json')) &&
+        !error.message.includes('Precedence diagnostic unavailable'));
+    f.write({ IIS: { commandName: 'IISExpress' }, Conventional: { commandName: 'Project',
+        applicationUrl: 'http://localhost:5021', commandLineArgs: '--source conventional',
+        environmentVariables: { PROFILE_SOURCE: 'conventional' } } }, true);
+    const result = await f.prepare();
+    assert.equal(result.profileName, 'Conventional');
+    assert.equal(result.env.ASPNETCORE_URLS, 'http://localhost:5021');
+    assert.equal(result.env.PROFILE_SOURCE, 'conventional');
+    assert.deepEqual(result.args, ['--source', 'conventional']);
+    assert.equal(diagnosticAttempts, 2);
+    assert.deepEqual(f.calls.processes, []);
+    assert.deepEqual(f.calls.prompts, []);
+});
+
+test('foreground diagnostics preserve certificate consent and business errors without swallowing progress errors', async t => {
+    for (const mode of ['trust', 'refuse', 'verification', 'trust-exit', 'trust-provider']) {
+        const failure = new Error('Original trust provider rejection');
+        const f = fixture(t, {
+            prompt: async (...args) => mode === 'refuse' ? 'Cancel' : args[2],
+            runDotnet: async (_args, _settings, calls) => {
+                if (calls.processes.length === 1) throw new Error('Original missing certificate');
+                if (calls.processes.length === 2 && mode === 'trust-provider') throw failure;
+                if (calls.processes.length === 2 && mode === 'trust-exit') return { exitCode: 7 };
+                if (calls.processes.length === 3 && mode === 'verification') throw new Error('Original failed verification');
+                return { exitCode: 0 };
+            },
+        });
+        f.write({ Https: { commandName: 'Project', applicationUrl: 'https://localhost:5011' } });
+        let diagnosticAttempts = 0;
+        f.input.output.appendLine = line => {
+            if (!line.startsWith('HTTPS development certificate needs attention:')) return;
+            diagnosticAttempts++;
+            throw new Error('Certificate diagnostic unavailable');
+        };
+        if (mode === 'trust') assert.equal((await f.prepare()).requiresHttps, true);
+        else if (mode === 'refuse') await assert.rejects(f.prepare(), { name: 'AbortError' });
+        else if (mode === 'verification') await assert.rejects(f.prepare(), /still missing or untrusted after setup/);
+        else if (mode === 'trust-exit') await assert.rejects(f.prepare(), /setup failed \(exit 7\)/);
+        else await assert.rejects(f.prepare(), error => error === failure);
+        assert.equal(diagnosticAttempts, mode === 'verification' ? 2 : 1);
+        assert.equal(f.calls.prompts.length, 1);
+        assert.deepEqual(f.calls.processes.map(call => call.args), [
+            ['dev-certs', 'https', '--check', '--trust'],
+            ...(mode === 'refuse' ? [] : [['dev-certs', 'https', '--trust']]),
+            ...(['trust', 'verification'].includes(mode) ? [['dev-certs', 'https', '--check', '--trust']] : []),
+        ]);
+    }
+
+    const failure = new Error('Original Web progress failure');
+    const f = fixture(t);
+    f.write({ Https: { commandName: 'Project', applicationUrl: 'https://localhost:5011' } });
+    f.input.onProgress = () => { throw failure; };
+    await assert.rejects(f.prepare(), error => error === failure);
+    assert.deepEqual(f.calls.processes, []);
+    assert.deepEqual(f.calls.prompts, []);
+});

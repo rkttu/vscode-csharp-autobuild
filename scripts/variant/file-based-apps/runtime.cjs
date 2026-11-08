@@ -503,7 +503,8 @@ function activate(context, dependencies = {}) {
                     const runDotnet = async (args, options = {}) => {
                         checkpoint();
                         const settings = { cwd: path.dirname(source), signal: controller.signal, ...options };
-                        output.appendLine(`dotnet ${args.map(value => JSON.stringify(value)).join(' ')}`);
+                        phaseLog(`dotnet ${args.map(value => JSON.stringify(value)).join(' ')}`);
+                        checkpoint();
                         let streamOutputFailureReported = false;
                         const result = dependencies.runDotnet ?
                             await dependencies.runDotnet(args, { ...settings, dotnetPath: selected.executable }) :
@@ -535,7 +536,7 @@ function activate(context, dependencies = {}) {
                         signal: controller.signal,
                     });
                     checkpoint();
-                    output.appendLine(`${source}: ${classification.kind} (${classification.reason})`);
+                    phaseLog(`${source}: ${classification.kind} (${classification.reason})`);
                     if (classification.kind === 'project') {
                         stopPreparation();
                         setPhase('Starting selected project configuration');

@@ -158,6 +158,10 @@ function withAbort(promise, signal) {
     });
 }
 
+function logDiagnostic(output, message) {
+    try { output?.appendLine(message); } catch { /* Diagnostics must not replace the operation result. */ }
+}
+
 async function readProfile(source, output, signal) {
     const conventional = path.join(path.dirname(source), 'Properties', 'launchSettings.json');
     const adjacent = path.join(path.dirname(source), `${path.basename(source, path.extname(source))}.run.json`);
@@ -169,7 +173,7 @@ async function readProfile(source, output, signal) {
     const filename = conventionalText !== undefined ? conventional : adjacent;
     const text = conventionalText ?? adjacentText;
     if (text === undefined) return undefined;
-    if (conventionalText !== undefined && adjacentText !== undefined) output?.appendLine(`Using ${conventional}; ${adjacent} is ignored because Properties/launchSettings.json takes precedence.`);
+    if (conventionalText !== undefined && adjacentText !== undefined) logDiagnostic(output, `Using ${conventional}; ${adjacent} is ignored because Properties/launchSettings.json takes precedence.`);
     let settings;
     try { settings = parseJsonc(text); }
     catch (error) { throw new Error(`Could not read launch profile ${filename}: ${error.message}`); }
@@ -214,7 +218,7 @@ async function checkCertificate({ runDotnet, source, signal, vscode, output, onP
         } catch (error) {
             abort(signal);
             if (error.name === 'AbortError') throw error;
-            output?.appendLine(`HTTPS development certificate needs attention: ${error.message}`);
+            logDiagnostic(output, `HTTPS development certificate needs attention: ${error.message}`);
             return false;
         }
     };
@@ -307,7 +311,7 @@ async function prepareWebLaunch({ source, metadata, environment = process.env, s
         args = splitCommandLine(profile.commandLineArgs || '');
         launchBrowser = profile.launchBrowser === true;
         launchUrl = profile.launchUrl;
-        output?.appendLine(`Using web launch profile ${selected.name} from ${selected.filename}.`);
+        logDiagnostic(output, `Using web launch profile ${selected.name} from ${selected.filename}.`);
     } else {
         const ambient = Object.fromEntries(Object.entries(environment).map(([name, value]) => [name.toUpperCase(), value]));
         if (!ambient.ASPNETCORE_ENVIRONMENT && !ambient.DOTNET_ENVIRONMENT) env.ASPNETCORE_ENVIRONMENT = 'Development';
@@ -317,7 +321,7 @@ async function prepareWebLaunch({ source, metadata, environment = process.env, s
             env.ASPNETCORE_URLS = `https://localhost:${httpsPort};http://localhost:${httpPort}`;
         }
         launchBrowser = true;
-        output?.appendLine(`Using an in-memory development profile for ${path.basename(source)}.`);
+        logDiagnostic(output, `Using an in-memory development profile for ${path.basename(source)}.`);
     }
     const endpoints = endpointConfiguration(environment, env, args);
     const urls = endpoints.URLS || '';

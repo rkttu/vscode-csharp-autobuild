@@ -2,6 +2,7 @@
 
 const assert = require('node:assert/strict');
 const { spawnSync } = require('node:child_process');
+const { getEventListeners } = require('node:events');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
@@ -3635,4 +3636,141 @@ test('SDK checks accept supported versions and parse English host architecture',
     }
     assert.equal(sdkArchitecture('Host:\r\n  Version: 10.0.13\r\n  Architecture: arm64\r\n'), 'arm64');
     assert.throws(() => sdkArchitecture('unknown'), /architecture/);
+});
+
+for (const sink of ['command', 'classification']) {
+    test(`foreground diagnostics preserve build failure and a coalesced dirty retry when ${sink} logging throws`, { timeout: 5000 }, async t => {
+        const failure = new Error(`Original build failure under ${sink} logging`);
+        let broken = true, diagnosticAttempts = 0;
+        const f = fixture(t, { appendLine: line => {
+            if (sink === 'command' ? line.startsWith('dotnet ') : line.includes(': file (fixture)')) {
+                diagnosticAttempts++;
+                throw new Error(`${sink} diagnostic unavailable`);
+            }
+        } });
+        const run = f.dependencies.runDotnet;
+        f.dependencies.runDotnet = async (args, settings) => {
+            if (args[0] === 'build' && broken) {
+                f.calls.processes.push({ args, settings });
+                throw failure;
+            }
+            return run(args, settings);
+        };
+        try {
+            assert.equal(await f.api.debugActiveFile(), false);
+            assert.equal(f.calls.errors.length, 1);
+            assert.match(f.calls.errors[0], new RegExp(failure.message));
+            assert.equal(f.calls.launches.length, 0);
+            const failedBuild = f.calls.processes.find(call => call.args[0] === 'build');
+            assert(failedBuild, 'A diagnostic failure must not prevent the real build');
+            const failedDirectory = failedBuild.args[failedBuild.args.indexOf('--output') + 1];
+            await waitForRemovedOutput(f, failedDirectory);
+            assert.deepEqual(terminalOutputs(f), []);
+
+            broken = false;
+            f.document.isDirty = true;
+            assert.deepEqual(await Promise.all(Array.from({ length: 3 }, () => f.api.debugActiveFile())), [true, true, true]);
+            assert.equal(f.calls.saves, 1);
+            assert.equal(f.calls.classifications.length, 2);
+            assert.equal(f.calls.processes.filter(call => call.args[0] === 'build').length, 2);
+            assert.equal(f.calls.launches.length, 1);
+            assert.equal(f.calls.errors.length, 1, 'A corrected retry must not report the failed diagnostic');
+            assert.equal(diagnosticAttempts, sink === 'command' ? 6 : 2);
+            const config = f.calls.launches[0].config;
+            assert.notEqual(config.__netcoredbgFileAppOutput, failedDirectory);
+            assert(fs.existsSync(config.program));
+            f.terminate(config);
+            await f.api.dispose();
+            assert(!fs.existsSync(config.__netcoredbgFileAppOutput));
+            assert.deepEqual(terminalOutputs(f), []);
+            assertDisposed(f);
+        } finally { await f.api.dispose(); }
+    });
+}
+
+test('foreground diagnostics checkpoint reentrant command-log cancellation and disposal without swallowing progress errors', async t => {
+    for (const action of ['cancel', 'dispose']) {
+        let f, disposal, diagnosticAttempts = 0, heldOutput;
+        f = fixture(t, { appendLine: line => {
+            if (!line.startsWith('dotnet ')) return;
+            diagnosticAttempts++;
+            if (action === 'cancel') f.cancel();
+            else disposal = f.api.dispose();
+            heldOutput = f.calls.disposals.output === 0;
+            throw new Error('Command diagnostic failed after reentrant cancellation');
+        } });
+        try {
+            // The fixture SDK provider deliberately ignores its AbortSignal.
+            assert.equal(await f.api.debugActiveFile(), false);
+            assert.equal(diagnosticAttempts, 1);
+            assert.equal(heldOutput, true, 'The command must retain diagnostics until its continuation settles');
+            assert.equal(f.calls.classifications.length, 1);
+            assert.deepEqual(f.calls.processes, [], 'No provider may dispatch after command logging cancels');
+            assert.deepEqual(f.calls.launches, []);
+            assert.deepEqual(f.calls.errors, []);
+        } finally { await (disposal || f.api.dispose()); }
+        assertDisposed(f);
+    }
+
+    const failure = new Error('Original progress delivery failure');
+    const f = fixture(t, { reportProgress: () => { throw failure; } });
+    try {
+        assert.equal(await f.api.debugActiveFile(), false);
+        assert.equal(f.calls.errors.length, 1);
+        assert.match(f.calls.errors[0], /Original progress delivery failure/);
+        assert.deepEqual(f.calls.classifications, []);
+        assert.deepEqual(f.calls.processes, []);
+        assert.deepEqual(f.calls.launches, []);
+    } finally { await f.api.dispose(); }
+    assertDisposed(f);
+});
+
+test('foreground diagnostics keep certificate cancellation quiet and reject late consent after output drains', { timeout: 5000 }, async t => {
+    for (const timing of ['log', 'consent']) for (const action of ['cancel', 'dispose']) {
+        let f, disposal, dismiss, diagnosticAttempts = 0;
+        const cancel = () => {
+            if (action === 'cancel') f.cancel();
+            else disposal = f.api.dispose();
+        };
+        f = certificatePhaseFixture(t, {
+            certificateProcess: async () => { throw new Error('Original missing certificate'); },
+            certificatePrompt: () => new Promise(resolve => { dismiss = resolve; }),
+            appendLine: line => {
+                if (!line.startsWith('HTTPS development certificate needs attention:')) return;
+                diagnosticAttempts++;
+                if (timing === 'log') cancel();
+                throw new Error('Certificate diagnostic unavailable');
+            },
+        });
+        const operation = f.api.debugActiveFile();
+        try {
+            if (timing === 'consent') {
+                await waitFor(() => dismiss, 'A broken diagnostic must not prevent the consent modal');
+                assert.equal(getEventListeners(f.certificate.processes[0].settings.signal, 'abort').length, 1);
+                cancel();
+            }
+            assert.equal(await operation, false);
+            await (disposal || f.api.dispose());
+            assert.equal(diagnosticAttempts, 1);
+            assert.equal(f.certificate.processes.length, 1);
+            assert.equal(f.certificate.prompts, timing === 'consent' ? 1 : 0);
+            assert.equal(getEventListeners(f.certificate.processes[0].settings.signal, 'abort').length, 0);
+            assert.deepEqual(f.calls.errors, []);
+            assert.deepEqual(f.calls.launches, []);
+            const build = f.calls.processes.find(call => call.args[0] === 'build');
+            assert(!fs.existsSync(build.args[build.args.indexOf('--output') + 1]));
+            assert.deepEqual(terminalOutputs(f), []);
+            assertDisposed(f);
+            const logCount = f.calls.logs.length;
+            dismiss?.('Trust development certificate');
+            await new Promise(resolve => setImmediate(resolve));
+            assert.equal(f.certificate.processes.length, 1, 'A late Trust answer cannot authorize work');
+            assert.equal(f.calls.logs.length, logCount, 'Late consent must not write to disposed output');
+        } finally {
+            f.cancel();
+            dismiss?.('Cancel');
+            await operation;
+            await (disposal || f.api.dispose());
+        }
+    }
 });
