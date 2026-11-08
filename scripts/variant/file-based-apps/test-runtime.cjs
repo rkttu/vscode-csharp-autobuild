@@ -117,6 +117,7 @@ function fixture(t, options = {}) {
         ...(options.removeOutput ? { removeOutput: options.removeOutput } : {}),
         ...(options.now ? { now: options.now } : {}),
         ...(options.preparationTimeoutMs !== undefined ? { preparationTimeoutMs: options.preparationTimeoutMs } : {}),
+        ...(options.handoffTimeoutMs !== undefined ? { handoffTimeoutMs: options.handoffTimeoutMs } : {}),
         ...(options.scheduleTimeout ? { scheduleTimeout: options.scheduleTimeout, clearTimeout: options.clearTimeout } : {}),
         findDotnet: options.findDotnet || (async () => ({ executable: path.join(root, 'dotnet', 'dotnet.exe'), root: path.join(root, 'dotnet') })),
         classifyFile: async input => {
@@ -4196,5 +4197,352 @@ test('foreground drain retains a held filesystem allocation and cleans its late-
         completeAllocation?.();
         await operation;
         await (disposal?.promise || f.api.dispose());
+    }
+});
+
+function handoffDeadlineFixture(t, options = {}) {
+    let elapsed = 0;
+    const timers = new Set(), scheduled = [];
+    const limit = options.defaultBudget ? 5 * 60 * 1000 : 100;
+    const f = fixture(t, { ...options, preparationTimeoutMs: 1000,
+        ...(options.defaultBudget ? {} : { handoffTimeoutMs: limit }),
+        now: () => elapsed,
+        scheduleTimeout: (callback, delay) => {
+            const timer = { callback, delay, due: elapsed + delay };
+            timers.add(timer); scheduled.push(timer); return timer;
+        },
+        clearTimeout: timer => timers.delete(timer),
+    });
+    return { ...f, timers, scheduled, limit, advance: ms => { elapsed += ms; },
+        get handoffTimers() { return scheduled.filter(timer => timer.delay === limit); },
+        expireHandoff() {
+            const timer = scheduled.filter(timer => timer.delay === limit).at(-1);
+            elapsed += limit;
+            for (const due of [...timers].filter(candidate => candidate.due <= elapsed)) {
+                if (timers.has(due)) due.callback();
+            }
+            return timer;
+        },
+    };
+}
+
+test('handoff deadline releases a timed-out start for a distinct coalesced retry while retaining the original request', { timeout: 5000 }, async t => {
+    let resolveOld;
+    const f = handoffDeadlineFixture(t, { startDebugging: (_folder, config) => {
+        if (!resolveOld) return new Promise(resolve => { resolveOld = resolve; });
+        f.startSession(config);
+        return true;
+    } });
+    const first = f.api.debugActiveFile();
+    let disposal;
+    try {
+        await waitFor(() => resolveOld, 'The original editor start must be pending');
+        const old = f.calls.launches[0].config;
+        const oldTimer = f.expireHandoff();
+        assert.equal(await awaitForegroundResult(first), false);
+        assert.equal(f.timers.size, 0);
+        assert.equal(getEventListeners(f.calls.processes[0].settings.signal, 'abort').length, 0);
+        assert.match(f.calls.errors[0], /Debugger handoff timed out during Starting netcoredbg after 100 ms \(limit 100 ms\)/);
+        assert(fs.existsSync(old.program));
+        assert.deepEqual(terminalOutputs(f), []);
+        await waitForForegroundDrain(f);
+        f.document.isDirty = true;
+        assert.deepEqual(await Promise.all(Array.from({ length: 3 }, () => f.api.debugActiveFile())), [true, true, true]);
+        const current = f.calls.launches[1].config;
+        assert.notEqual(current.program, old.program);
+        assert.equal(f.calls.saves, 1);
+        assert.equal(f.calls.launches.length, 2);
+        oldTimer.callback();
+        assert.equal(f.calls.stops.length, 0, 'A stale deadline cannot stop the corrected session');
+        assert.equal(f.calls.errors.length, 1);
+        f.startSession(old);
+        await waitForRemovedOutput(f, old.__netcoredbgFileAppOutput);
+        assert.equal(f.calls.stops.length, 1);
+        assert.equal(f.calls.stops[0], f.session(old));
+        assert(fs.existsSync(current.program));
+        disposal = observeDisposal(f);
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(disposal.settled, false, 'The original API result must still retain disposal after its session terminates');
+        resolveOld(true);
+        await disposal.promise;
+        assert.equal(f.calls.errors.length, 1);
+        assert(!fs.existsSync(current.program));
+        assertDisposed(f);
+    } finally {
+        resolveOld?.(false);
+        await first;
+        await (disposal?.promise || f.api.dispose());
+    }
+});
+
+test('handoff deadline stops a captured session but keeps output until exact termination and the pending API until settlement', { timeout: 5000 }, async t => {
+    let resolveStart;
+    const f = handoffDeadlineFixture(t, { startDebugging: (_folder, config) => {
+        f.startSession(config);
+        return new Promise(resolve => { resolveStart = resolve; });
+    }, stopDebugging: async () => {} });
+    const operation = f.api.debugActiveFile();
+    let disposal;
+    try {
+        await waitFor(() => resolveStart, 'The captured start must remain pending');
+        const config = f.calls.launches[0].config, session = f.session(config);
+        f.expireHandoff();
+        assert.equal(await awaitForegroundResult(operation), false);
+        await waitFor(() => f.calls.stops.length === 1, 'The exact captured session must receive Stop');
+        assert.equal(f.calls.stops[0], session);
+        assert(fs.existsSync(config.program), 'Stop acknowledgement cannot authorize deletion');
+        f.configuration(session);
+        await waitFor(() => f.calls.stops.length === 2, 'Adapter configuration permits one serialized follow-up Stop');
+        assert(f.calls.stops.every(stopped => stopped === session));
+        assert(fs.existsSync(config.program));
+        disposal = observeDisposal(f);
+        f.terminate(config);
+        await waitForRemovedOutput(f, config.__netcoredbgFileAppOutput);
+        assert.equal(disposal.settled, false);
+        resolveStart(true);
+        await disposal.promise;
+        assert.equal(f.calls.errors.length, 1);
+        assert.equal(f.calls.stops.length, 2);
+        assertDisposed(f);
+    } finally {
+        if (f.calls.launches[0]) f.terminate(f.calls.launches[0].config);
+        resolveStart?.(false);
+        await operation;
+        await (disposal?.promise || f.api.dispose());
+    }
+});
+
+for (const rejected of [false, true]) {
+    test(`handoff deadline retains its first timeout through a late ${rejected ? 'rejection' : 'decline'} without a captured session`, { timeout: 5000 }, async t => {
+        let settleStart;
+        const f = handoffDeadlineFixture(t, { startDebugging: () => new Promise((resolve, reject) => {
+            settleStart = () => rejected ? reject(new Error('Original late editor rejection')) : resolve(false);
+        }) });
+        const operation = f.api.debugActiveFile();
+        let disposal;
+        try {
+            await waitFor(() => settleStart, 'The editor result must be held');
+            const config = f.calls.launches[0].config;
+            f.expireHandoff();
+            assert.equal(await awaitForegroundResult(operation), false);
+            assert(fs.existsSync(config.program));
+            disposal = observeDisposal(f);
+            await new Promise(resolve => setImmediate(resolve));
+            assert.equal(disposal.settled, false);
+            settleStart();
+            await disposal.promise;
+            assert(!fs.existsSync(config.program));
+            assert.equal(f.calls.errors.length, 1);
+            assert.match(f.calls.errors[0], /Debugger handoff timed out/);
+            assert.deepEqual(f.calls.stops, []);
+            assert.deepEqual(terminalOutputs(f), []);
+            assertDisposed(f);
+        } finally { settleStart?.(); await operation; await (disposal?.promise || f.api.dispose()); }
+    });
+}
+
+for (const started of [true, false]) {
+    test(`handoff deadline checks a delayed ${started} response even when its timer callback has not run`, async t => {
+        const f = handoffDeadlineFixture(t, { startDebugging: (_folder, config) => {
+            if (started) f.startSession(config);
+            f.advance(101);
+            return started;
+        } });
+        try {
+            assert.equal(await f.api.debugActiveFile(), false);
+            await f.api.dispose();
+            assert.equal(f.calls.launches.length, 1);
+            assert.equal(f.calls.errors.length, 1);
+            assert.match(f.calls.errors[0], /Debugger handoff timed out.*101 ms \(limit 100 ms\)/);
+            assert.equal(f.calls.stops.length, started ? 1 : 0);
+            assert(!fs.existsSync(f.calls.launches[0].config.program));
+            assert.equal(f.timers.size, 0);
+            assertDisposed(f);
+        } finally { await f.api.dispose(); }
+    });
+}
+
+test('handoff deadline disarms at an accepted response and preserves original errors without inferring an undelivered timeout', async t => {
+    for (const mode of ['default-success', 'decline', 'rejection']) {
+        const failure = new Error('Original editor start rejection after elapsed budget');
+        let f;
+        f = handoffDeadlineFixture(t, { defaultBudget: mode === 'default-success',
+            startResult: mode !== 'decline',
+            ...(mode === 'rejection' ? { startDebugging: () => { f.advance(101); throw failure; } } : {}),
+            appendLine: line => {
+                if (mode === 'default-success' && line.startsWith('Phase completed: Starting netcoredbg')) {
+                    f.advance(600000);
+                    f.handoffTimers[0].callback();
+                }
+            },
+        });
+        try {
+            assert.equal(await f.api.debugActiveFile(), mode === 'default-success');
+            assert.equal(f.handoffTimers.length, 1);
+            assert.equal(f.handoffTimers[0].delay, mode === 'default-success' ? 300000 : 100);
+            f.handoffTimers[0].callback();
+            assert.equal(f.timers.size, 0);
+            assert.equal(f.calls.stops.length, 0, 'Bookkeeping and a stale timer cannot reverse an accepted response');
+            if (mode === 'default-success') {
+                assert.deepEqual(f.calls.errors, []);
+                assert(fs.existsSync(f.calls.launches[0].config.program));
+                f.terminate(f.calls.launches[0].config);
+            } else {
+                assert.equal(f.calls.errors.length, 1);
+                assert.match(f.calls.errors[0], mode === 'rejection' ? /Original editor start rejection after elapsed budget/ : /editor did not start/);
+                assert(!f.calls.errors[0].includes('timed out'));
+            }
+        } finally { await f.api.dispose(); }
+        assertDisposed(f);
+    }
+});
+
+test('handoff deadline preserves user cancellation or timeout ahead of stale expiry and later progress errors', { timeout: 5000 }, async t => {
+    for (const mode of ['cancel', 'timeout']) {
+        let resolveStart;
+        const f = handoffDeadlineFixture(t, { startDebugging: () => new Promise(resolve => { resolveStart = resolve; }) });
+        const withProgress = f.vscode.window.withProgress;
+        if (mode === 'timeout') f.vscode.window.withProgress = async (...args) => {
+            try { return await withProgress(...args); }
+            catch { throw new Error('Late handoff progress provider failure'); }
+        };
+        const operation = f.api.debugActiveFile();
+        try {
+            await waitFor(() => resolveStart, 'The start must be held before selecting the first outcome');
+            assert.equal(f.handoffTimers.length, 1);
+            const timer = f.handoffTimers[0];
+            if (mode === 'cancel') f.cancel();
+            else f.expireHandoff();
+            assert.equal(await awaitForegroundResult(operation), false);
+            f.advance(101); timer.callback(); f.cancel();
+            assert.equal(f.timers.size, 0);
+            assert.equal(f.calls.errors.length, mode === 'cancel' ? 0 : 1);
+            if (mode === 'timeout') assert.match(f.calls.errors[0], /Debugger handoff timed out/);
+            resolveStart(false);
+            await f.api.dispose();
+            assert.equal(f.calls.errors.length, mode === 'cancel' ? 0 : 1);
+            assert.deepEqual(f.calls.stops, []);
+            assertDisposed(f);
+        } finally { resolveStart?.(false); await operation; await f.api.dispose(); }
+    }
+});
+
+test('handoff deadline checkpoints phase progress and the actual queued API dispatch before starting the editor', async t => {
+    for (const mode of ['progress', 'queued-dispatch']) {
+        let f;
+        f = handoffDeadlineFixture(t, { reportProgress: value => {
+            if (mode === 'progress' && value.message === 'Starting netcoredbg') f.advance(101);
+        } });
+        if (mode === 'queued-dispatch') f.vscode.workspace.getWorkspaceFolder = () => {
+            queueMicrotask(() => f.advance(101));
+            return undefined;
+        };
+        try {
+            assert.equal(await f.api.debugActiveFile(), false);
+            await f.api.dispose();
+            assert.deepEqual(f.calls.launches, []);
+            assert.deepEqual(f.calls.stops, []);
+            assert.equal(f.calls.errors.length, 1);
+            assert.match(f.calls.errors[0], /Debugger handoff timed out/);
+            const build = f.calls.processes.find(call => call.args[0] === 'build');
+            assert(!fs.existsSync(build.args[build.args.indexOf('--output') + 1]));
+            assert.deepEqual(terminalOutputs(f), []);
+            assert.equal(f.timers.size, 0);
+            assertDisposed(f);
+        } finally { await f.api.dispose(); }
+    }
+});
+
+test('handoff deadline disposal disarms its timer while retaining late exact-session and API ownership', { timeout: 5000 }, async t => {
+    let resolveStart;
+    const f = handoffDeadlineFixture(t, { startDebugging: () => new Promise(resolve => { resolveStart = resolve; }) });
+    const operation = f.api.debugActiveFile();
+    let disposal;
+    try {
+        await waitFor(() => resolveStart, 'The deadline must be active before disposal');
+        assert.equal(f.handoffTimers.length, 1);
+        const config = f.calls.launches[0].config, timer = f.handoffTimers[0];
+        disposal = observeDisposal(f);
+        assert.equal(await awaitForegroundResult(operation), false);
+        assert.equal(f.timers.size, 0);
+        f.advance(101); timer.callback();
+        assert.deepEqual(f.calls.errors, []);
+        assert.equal(disposal.settled, false);
+        assert(fs.existsSync(config.program));
+        f.startSession(config);
+        await waitForRemovedOutput(f, config.__netcoredbgFileAppOutput);
+        assert.equal(f.calls.stops.length, 1);
+        assert.equal(f.calls.stops[0], f.session(config));
+        assert.equal(disposal.settled, false);
+        resolveStart(true);
+        await disposal.promise;
+        assert.deepEqual(f.calls.errors, []);
+        assertDisposed(f);
+    } finally { resolveStart?.(false); await operation; await (disposal?.promise || f.api.dispose()); }
+});
+
+test('handoff deadline excludes save, Web interaction and already dispatched selected-project debugging', { timeout: 5000 }, async t => {
+    for (const stage of ['save', 'Web settings', 'certificate consent', 'OS trust', 'project']) {
+        let releaseStage;
+        const held = () => new Promise(resolve => { releaseStage = resolve; });
+        const f = handoffDeadlineFixture(t, {
+            ...(stage === 'save' ? { dirty: true, save: held } : {}),
+            ...(stage === 'project' ? { kind: 'project' } : {}),
+            ...(['Web settings', 'certificate consent', 'OS trust'].includes(stage) ? { webSupport: {
+                BUILD_METADATA_ARGS: [], parseBuildMetadata: () => ({ isWebServer: true }),
+                prepareWebLaunch: ({ onProgress }) => {
+                    onProgress(stage === 'certificate consent' ? 'Waiting for HTTPS certificate consent' :
+                        stage === 'OS trust' ? 'Preparing HTTPS development certificate' : 'Preparing web launch settings');
+                    return held();
+                },
+            } } : {}),
+        });
+        if (stage === 'project') f.vscode.commands.executeCommand = held;
+        const operation = f.api.debugActiveFile();
+        try {
+            await waitFor(() => releaseStage, 'The excluded stage must be held');
+            assert.equal(f.handoffTimers.length, 0);
+            assert.equal(f.timers.size, 0);
+            f.advance(600000);
+            for (const timer of f.scheduled) timer.callback();
+            f.cancel();
+            if (stage === 'project') releaseStage(true);
+            else assert.equal(await awaitForegroundResult(operation), false);
+            releaseStage(stage === 'project');
+            assert.equal(await operation, stage === 'project');
+            await f.api.dispose();
+            assert.equal(f.handoffTimers.length, 0);
+            assert.deepEqual(f.calls.errors, []);
+            assert.deepEqual(f.calls.launches, []);
+            assertDisposed(f);
+        } finally { releaseStage?.(false); await operation; await f.api.dispose(); }
+    }
+});
+
+test('handoff deadline prepares foreign launch arguments before ownership transfer and permits a corrected retry', async t => {
+    for (const cancel of [false, true]) {
+        const failure = new Error('Original workspace lookup failure');
+        const f = handoffDeadlineFixture(t);
+        const folder = f.vscode.workspace.getWorkspaceFolder;
+        f.vscode.workspace.getWorkspaceFolder = () => {
+            if (cancel) f.cancel();
+            throw failure;
+        };
+        try {
+            assert.equal(await f.api.debugActiveFile(), false);
+            const failed = f.calls.processes.find(call => call.args[0] === 'build');
+            await waitForRemovedOutput(f, failed.args[failed.args.indexOf('--output') + 1]);
+            assert.deepEqual(f.calls.launches, []);
+            assert.deepEqual(f.calls.stops, []);
+            assert.equal(f.calls.errors.length, cancel ? 0 : 1);
+            if (!cancel) assert.match(f.calls.errors[0], /Original workspace lookup failure/);
+            f.vscode.workspace.getWorkspaceFolder = folder;
+            assert.deepEqual(await Promise.all([f.api.debugActiveFile(), f.api.debugActiveFile()]), [true, true]);
+            assert.equal(f.calls.launches.length, 1);
+            assert.notEqual(f.calls.launches[0].config.__netcoredbgFileAppOutput, failed.args[failed.args.indexOf('--output') + 1]);
+            assert.equal(f.calls.errors.length, cancel ? 0 : 1);
+            f.terminate(f.calls.launches[0].config);
+        } finally { await f.api.dispose(); }
+        assertDisposed(f);
     }
 });
