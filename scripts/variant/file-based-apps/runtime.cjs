@@ -125,6 +125,7 @@ function activate(context, dependencies = {}) {
     const removeOutput = dependencies.removeOutput || ((directory, options) => fs.promises.rm(directory, options));
     const now = dependencies.now || (() => performance.now());
     const preparationTimeoutMs = dependencies.preparationTimeoutMs ?? 5 * 60 * 1000;
+    const handoffTimeoutMs = dependencies.handoffTimeoutMs ?? 5 * 60 * 1000;
     const scheduleTimeout = dependencies.scheduleTimeout || setTimeout;
     const cancelTimeout = dependencies.clearTimeout || clearTimeout;
     const storage = (context.globalStorageUri || context.storageUri)?.fsPath;
@@ -387,7 +388,7 @@ function activate(context, dependencies = {}) {
         if (launch && matchesLaunch(session, launch)) void finishLaunch(launch);
     });
 
-    async function startFileDebugging(folder, config, signal) {
+    async function startFileDebugging(folder, config, signal, checkpoint) {
         const launch = { directory: config.__netcoredbgFileAppOutput, program: config.program,
             cancelled: false, terminal: false, session: undefined, stopPromise: undefined, configuredSessions: new Set() };
         launches.set(launch.directory, launch);
@@ -403,7 +404,7 @@ function activate(context, dependencies = {}) {
             if (signal.aborted) abort();
         });
         const start = Promise.resolve().then(() => {
-            signal.throwIfAborted();
+            checkpoint();
             return vscode.debug.startDebugging(folder, config);
         }).then(started => {
             if (!started && !launch.session) finishLaunch(launch);
@@ -465,14 +466,24 @@ function activate(context, dependencies = {}) {
                 let preparationActive = false;
                 let preparationBegan;
                 let timer;
+                let handoffActive = false;
+                let handoffBegan;
+                let handoffTimer;
                 const expire = () => {
                     if (!preparationActive || controller.signal.aborted) return;
                     const error = new Error(`Preparation timed out during ${phase || 'SDK discovery'} after ${Math.round(now() - preparationBegan)} ms (limit ${preparationTimeoutMs} ms). Check project evaluation, SDK and restore output before retrying`);
                     error.name = 'TimeoutError';
                     controller.abort(error);
                 };
+                const expireHandoff = () => {
+                    if (!handoffActive || controller.signal.aborted) return;
+                    const error = new Error(`Debugger handoff timed out during Starting netcoredbg after ${Math.round(now() - handoffBegan)} ms (limit ${handoffTimeoutMs} ms). Check C# and Debug Console output. Uncertain start requests remain tracked; late owned sessions are stopped and output is retained until safely terminal`);
+                    error.name = 'TimeoutError';
+                    controller.abort(error);
+                };
                 const checkpoint = () => {
                     if (preparationActive && now() - preparationBegan >= preparationTimeoutMs) expire();
+                    if (handoffActive && now() - handoffBegan >= handoffTimeoutMs) expireHandoff();
                     controller.signal.throwIfAborted();
                 };
                 const stopPreparation = () => {
@@ -480,6 +491,13 @@ function activate(context, dependencies = {}) {
                     if (timer !== undefined) {
                         cancelTimeout(timer);
                         timer = undefined;
+                    }
+                };
+                const stopHandoff = () => {
+                    handoffActive = false;
+                    if (handoffTimer !== undefined) {
+                        cancelTimeout(handoffTimer);
+                        handoffTimer = undefined;
                     }
                 };
                 const phaseLog = message => {
@@ -507,8 +525,11 @@ function activate(context, dependencies = {}) {
                     outcome = foregroundAbort?.name === 'TimeoutError' ? 'timed out' :
                         foregroundAbort?.name === 'AbortError' ? 'cancelled' : 'failed';
                     stopPreparation();
+                    stopHandoff();
                     logPhase(outcome);
-                    phaseLog(`Foreground ${outcome} during ${phase || 'C# file preparation'}; unfinished work remains observed. This file cannot retry until that work settles.`);
+                    phaseLog(launchOwnsOutput ?
+                        `Foreground ${outcome} during ${phase}; uncertain debugger starts remain tracked and their output is retained until safely terminal. A distinct retry can start after this foreground workflow drains, while an earlier request is still pending.` :
+                        `Foreground ${outcome} during ${phase || 'C# file preparation'}; unfinished work remains observed. This file cannot retry until that work settles.`);
                     // Cancellation can fall between a successful editor handoff and the
                     // caller resuming. Retain the existing exact-session Stop/termination path.
                     const launch = launchOwnsOutput && launches.get(generated);
@@ -522,6 +543,7 @@ function activate(context, dependencies = {}) {
                     if (!progressActive) return;
                     progressActive = false;
                     stopPreparation();
+                    stopHandoff();
                     controller.signal.removeEventListener('abort', abortForeground);
                     if (cancel) disposeResource(cancel);
                 };
@@ -644,10 +666,12 @@ function activate(context, dependencies = {}) {
                     if (webLaunch?.env?.DOTNET_ROOT && comparable(webLaunch.env.DOTNET_ROOT) !== comparable(selected.root)) {
                         throw new Error('The web launch profile DOTNET_ROOT does not identify the selected dotnet installation.');
                     }
+                    handoffBegan = now();
+                    handoffActive = true;
+                    handoffTimer = scheduleTimeout(expireHandoff, handoffTimeoutMs);
                     setPhase('Starting netcoredbg');
-                    // From here the launch tracker owns cleanup, including results arriving after cancellation.
-                    launchOwnsOutput = true;
-                    const started = await startFileDebugging(vscode.workspace.getWorkspaceFolder(sourceUri), {
+                    const folder = vscode.workspace.getWorkspaceFolder(sourceUri);
+                    const configuration = {
                         name: `C#: ${path.basename(source)}`,
                         type: 'coreclr',
                         request: 'launch',
@@ -664,7 +688,13 @@ function activate(context, dependencies = {}) {
                         } : {}),
                         env: { ...webLaunch?.env, DOTNET_ROOT: selected.root },
                         __netcoredbgFileAppOutput: generated,
-                    }, controller.signal);
+                    };
+                    checkpoint();
+                    // Transfer only after argument preparation and its cancellation checks.
+                    launchOwnsOutput = true;
+                    const started = await startFileDebugging(folder, configuration, controller.signal, checkpoint);
+                    checkpoint();
+                    stopHandoff();
                     if (!started) {
                         controller.signal.throwIfAborted();
                         throw new Error('The editor did not start the netcoredbg debug session. Check C# and Debug Console output for details before retrying');
@@ -679,6 +709,7 @@ function activate(context, dependencies = {}) {
                     throw failure;
                   } finally {
                     stopPreparation();
+                    stopHandoff();
                     logPhase(foregroundAbort ? `drained after ${outcome}` : outcome);
                   }
                 }).then(value => {
