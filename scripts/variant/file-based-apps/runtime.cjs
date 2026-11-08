@@ -425,7 +425,7 @@ function activate(context, dependencies = {}) {
         }
     }
 
-    async function debugFile(sourceUri, source, text) {
+    async function debugFile(document, source) {
         const controller = new AbortController();
         controllers.add(controller);
         let generated;
@@ -441,21 +441,25 @@ function activate(context, dependencies = {}) {
                 let phase;
                 let phaseBegan = began;
                 let outcome = 'completed';
-                let preparationActive = true;
+                let preparationActive = false;
+                let preparationBegan;
+                let timer;
                 const expire = () => {
                     if (!preparationActive || controller.signal.aborted) return;
-                    const error = new Error(`Preparation timed out during ${phase || 'SDK discovery'} after ${Math.round(now() - began)} ms (limit ${preparationTimeoutMs} ms). Check project evaluation, SDK and restore output before retrying`);
+                    const error = new Error(`Preparation timed out during ${phase || 'SDK discovery'} after ${Math.round(now() - preparationBegan)} ms (limit ${preparationTimeoutMs} ms). Check project evaluation, SDK and restore output before retrying`);
                     error.name = 'TimeoutError';
                     controller.abort(error);
                 };
-                const timer = scheduleTimeout(expire, preparationTimeoutMs);
                 const checkpoint = () => {
-                    if (preparationActive && now() - began >= preparationTimeoutMs) expire();
+                    if (preparationActive && now() - preparationBegan >= preparationTimeoutMs) expire();
                     controller.signal.throwIfAborted();
                 };
                 const stopPreparation = () => {
                     preparationActive = false;
-                    cancelTimeout(timer);
+                    if (timer !== undefined) {
+                        cancelTimeout(timer);
+                        timer = undefined;
+                    }
                 };
                 const phaseLog = message => {
                     try { output.appendLine(message); } catch { /* Diagnostics must not replace the operation result. */ }
@@ -473,8 +477,27 @@ function activate(context, dependencies = {}) {
                     checkpoint();
                 };
                 try {
-                    if (cancellation.isCancellationRequested) controller.abort();
+                    if (cancellation.isCancellationRequested || disposed) controller.abort();
+                    checkpoint();
+                    const sourceUri = document.uri;
+                    if (document.isDirty) {
+                        setPhase('Saving C# file');
+                        // The editor save API has no cancellation token. Keep this exact
+                        // save coalesced and observed until settlement; Cancel stops its
+                        // continuation without pretending the editor finished saving.
+                        const saved = await document.save();
+                        checkpoint();
+                        if (!saved) { outcome = 'not saved'; return false; }
+                    }
+                    const text = document.getText();
+                    checkpoint();
+                    // Editor-owned save time is visible in total phase duration but
+                    // does not consume the noninteractive SDK preparation budget.
+                    preparationBegan = now();
+                    preparationActive = true;
                     setPhase('Locating .NET SDK');
+                    timer = scheduleTimeout(expire, preparationTimeoutMs);
+                    checkpoint();
                     const selected = await getDotnet();
                     checkpoint();
                     const runDotnet = async (args, options = {}) => {
@@ -630,9 +653,7 @@ function activate(context, dependencies = {}) {
                 if (disposed) return false;
                 await retryFailedCleanup();
                 if (disposed) return false;
-                if (document.isDirty && !await document.save()) return false;
-                if (disposed) return false;
-                return debugFile(document.uri, source, document.getText());
+                return debugFile(document, source);
             } catch (error) {
                 cleanupLog(error.stack || error.message || String(error));
                 showError(`C# file debugging failed: ${error.message || error}.`);
