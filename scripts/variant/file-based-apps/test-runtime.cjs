@@ -1,6 +1,7 @@
 'use strict';
 
 const assert = require('node:assert/strict');
+const { spawnSync } = require('node:child_process');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
@@ -197,6 +198,240 @@ function activationWithOutputIO(overrides) {
         require: name => name === 'node:fs' ? { ...fs, promises: { ...fs.promises, ...overrides } } : require(name),
     });
     return runtimeModule.exports.activate;
+}
+
+// Run the real activation/native executor branch in an isolated strict host.
+// The SDK, debug sessions and DLL/PDB are stand-ins; the OS children and their
+// stdout/stderr/exit/close events are real. Every CLI exits independently of its
+// host, including when the baseline host dies from the unguarded data callback.
+async function streamOutputProbe() {
+    const assert = require('node:assert/strict');
+    const cp = require('node:child_process');
+    const fs = require('node:fs');
+    const path = require('node:path');
+    const vm = require('node:vm');
+    const [runtimeFile, root, mode] = process.argv.slice(1);
+    const diagnostic = 'Could not write .NET process output; process completion is still being observed.';
+    const source = path.join(root, 'a.cs'), otherSource = path.join(root, 'b.cs');
+    fs.writeFileSync(source, 'Console.WriteLine("original");\n');
+    fs.writeFileSync(otherSource, 'Console.WriteLine("other");\n');
+    const external = path.join(root, 'external-preserved.dll');
+    fs.writeFileSync(external, 'unrelated marker');
+    const rows = [], appends = [], logs = [], errors = [], stops = [], cleanup = [], metadata = [];
+    let current, retry = false, cancelled = false, outputDisposed = false, postDisposeWrites = 0;
+    let started, terminated, cancel, api, disposal, disposalSettled = false, commandSettled = false, snapshot;
+    function ownedCli() {
+        const fs = require('node:fs'), path = require('node:path');
+        const args = process.argv.slice(1), command = args[0];
+        const failing = process.env.STREAM_PROBE_BUILD_FAILURE === '1';
+        process.stdout.on('error', () => {});
+        process.stderr.on('error', () => {});
+        // This bounded stand-in cannot remain orphaned after its host crashes.
+        setTimeout(() => process.exit(failing ? 23 : 0), 1000);
+        if (command === '--version') return process.stdout.write('10.0.403\n', () => process.exit(0));
+        if (command === '--info') return process.stdout.write('Host:\n  Architecture: arm64\n', () => process.exit(0));
+        if (command !== 'build') return process.exit(24);
+        const directory = args[args.indexOf('--output') + 1];
+        fs.writeFileSync(path.join(directory, 'FileApp.dll'), JSON.stringify({ source: args[1], originalOutput: directory }));
+        fs.writeFileSync(path.join(directory, 'FileApp.pdb'), 'stand-in PDB');
+        process.stdout.write('STREAM_STDOUT_1\n');
+        setTimeout(() => process.stderr.write('STREAM_STDERR_1\n'), 15);
+        setTimeout(() => process.stdout.write('STREAM_STDOUT_2\n'), 30);
+        setTimeout(() => process.stderr.write('STREAM_STDERR_2\n'), 45);
+        setTimeout(() => {
+            const evaluated = JSON.stringify({ Properties: { UsingMicrosoftNETSdkWeb: '', OutputType: 'Exe',
+                TargetFrameworkIdentifier: '.NETCoreApp' }, Items: { FrameworkReference: [] } });
+            Promise.all([
+                new Promise(resolve => process.stdout.write(evaluated + '\n', resolve)),
+                new Promise(resolve => process.stderr.write(failing ? 'CLI_BUILD_FAILURE_23\n' : '', resolve)),
+            ]).then(() => process.exit(failing ? 23 : 0));
+        }, 60);
+    }
+    const cliCode = '(' + ownedCli.toString() + ')()';
+    const executor = { ...cp, execFile(_executable, args, settings, callback) {
+        const row = { kind: args[0], source: args[0] === 'build' ? args[1] : undefined,
+            output: args[0] === 'build' ? args[args.indexOf('--output') + 1] : undefined,
+            closed: false, retry };
+        const child = cp.execFile(process.execPath, ['-e', cliCode, '--', ...args], {
+            ...settings, env: { ...settings.env, STREAM_PROBE_BUILD_FAILURE:
+                row.source === source && mode === 'failure' && !retry ? '1' : '0' },
+        }, (error, stdout, stderr) => {
+            row.callback = true; row.stdout = stdout; row.stderr = stderr; row.error = error;
+            callback(error, stdout, stderr);
+        });
+        row.pid = child.pid; rows.push(row); current = row;
+        // The baseline may terminate on its first stream callback. Publish the
+        // exact PID synchronously before that callback can prevent pipe flushing.
+        fs.writeSync(1, JSON.stringify({ event: 'owned-child', pid: row.pid, kind: row.kind }) + '\n');
+        child.once('close', () => { row.closed = true; });
+        return child;
+    } };
+    const runtimeModule = { exports: {} };
+    const localRequire = name => name === 'node:child_process' ? executor :
+        name.startsWith('.') ? require(path.resolve(path.dirname(runtimeFile), name)) : require(name);
+    vm.runInNewContext(fs.readFileSync(runtimeFile, 'utf8'), {
+        module: runtimeModule, require: localRequire, process, AbortController, setTimeout, clearTimeout,
+    }, { filename: runtimeFile });
+    const sessions = new Map();
+    const document = filename => ({ uri: { scheme: 'file', fsPath: filename }, isDirty: false,
+        getText: () => fs.readFileSync(filename, 'utf8'), save: async () => true });
+    const active = document(source);
+    const output = {
+        append(value) {
+            if (outputDisposed) postDisposeWrites++;
+            appends.push({ source: current?.source, kind: current?.kind, value });
+            if (current?.source !== source || current.kind !== 'build') return;
+            if (!retry && !cancelled && ['cancel', 'dispose'].includes(mode)) {
+                cancelled = true;
+                queueMicrotask(() => {
+                    if (mode === 'cancel') cancel();
+                    else { disposal = api.dispose(); disposal.then(() => { disposalSettled = true; }); }
+                    snapshot = { closed: current.closed, commandSettled, disposalSettled,
+                        outputExists: fs.existsSync(current.output), outputDisposed };
+                });
+            }
+            if (mode === 'failure') throw { get message() { throw new Error('Hostile message getter'); },
+                toString() { throw new Error('Hostile error conversion'); } };
+            throw new Error('STREAM_DIAGNOSTIC_SINK_THROW');
+        },
+        appendLine(value) {
+            if (outputDisposed) postDisposeWrites++;
+            logs.push(value);
+            if (value === diagnostic && mode === 'dispose') throw new Error('Secondary diagnostic sink failed');
+        },
+        dispose() { outputDisposed = true; },
+    };
+    const vscode = { ProgressLocation: { Notification: 15 },
+        window: { activeTextEditor: { document: document(otherSource) }, createOutputChannel: () => output,
+            showErrorMessage(message) { errors.push(message); return Promise.resolve(undefined); },
+            withProgress: (_settings, task) => task({ report() {} }, { isCancellationRequested: false,
+                onCancellationRequested(callback) { cancel = callback; return { dispose() { cancel = undefined; } }; } }),
+        },
+        workspace: { isTrusted: true, getWorkspaceFolder: () => undefined },
+        commands: { registerCommand: () => ({ dispose() {} }) },
+        debug: {
+            onDidStartDebugSession(callback) { started = callback; return { dispose() { started = undefined; } }; },
+            onDidTerminateDebugSession(callback) { terminated = callback; return { dispose() { terminated = undefined; } }; },
+            async startDebugging(_folder, config) {
+                const session = { id: 'owned-' + sessions.size, type: config.type, name: config.name, configuration: config };
+                sessions.set(config.__netcoredbgFileAppOutput, session); started(session); return true;
+            },
+            async stopDebugging(session) { stops.push(session.id); terminated(session); },
+        },
+    };
+    const realWeb = require(path.join(path.dirname(runtimeFile), 'web.cjs'));
+    api = runtimeModule.exports.activate({ globalStorageUri: { fsPath: path.join(root, 'storage') }, subscriptions: [],
+        extension: { packageJSON: { netcoredbgBuild: { target: 'win32-arm64' } } } }, {
+        vscode, env: {}, findDotnet: async () => ({ executable: process.execPath, root: path.dirname(process.execPath) }),
+        classifyFile: async () => ({ kind: 'file', reason: 'stand-in classification' }),
+        webSupport: { ...realWeb, parseBuildMetadata(value) { metadata.push(value); return realWeb.parseBuildMetadata(value); } },
+        removeOutput: async (directory, options) => {
+            const marker = path.join(directory, 'FileApp.dll');
+            const identity = fs.existsSync(marker) ? JSON.parse(fs.readFileSync(marker, 'utf8')) : undefined;
+            const build = rows.find(row => row.kind === 'build' && row.source === identity?.source && row.output === identity?.originalOutput);
+            cleanup.push({ owner: identity?.source, originalOutput: identity?.originalOutput,
+                closed: build?.closed, callback: build?.callback });
+            await fs.promises.rm(directory, options);
+        },
+    });
+    await api.recoveryReady;
+    assert.equal(await api.debugActiveFile(), true);
+    const other = [...sessions.values()][0];
+    started({ id: 'external-session', type: 'coreclr', name: 'external',
+        configuration: { type: 'coreclr', program: external, __netcoredbgFileAppOutput: root } });
+    vscode.window.activeTextEditor = { document: active };
+    const requests = Array.from({ length: 3 }, () => api.debugActiveFile());
+    const values = await Promise.all(requests).then(value => { commandSettled = true; return value; });
+    const expected = mode === 'success';
+    assert.deepEqual(values, [expected, expected, expected]);
+    const first = rows.find(row => row.kind === 'build' && row.source === source);
+    assert.equal(first.closed, true, 'The original command must observe actual child close');
+    assert.equal(first.callback, true);
+    const firstAppends = appends.filter(row => row.source === source && row.kind === 'build').map(row => row.value).join('');
+    assert(firstAppends.includes('STREAM_STDOUT_1'));
+    assert.equal(logs.filter(line => line === diagnostic).length, 1, 'One failed sink diagnostic per process');
+    if (mode === 'success' || mode === 'failure') {
+        for (const text of ['STREAM_STDOUT_1', 'STREAM_STDOUT_2', 'STREAM_STDERR_1', 'STREAM_STDERR_2']) {
+            assert(firstAppends.includes(text), 'Later chunks still attempt the diagnostic sink: ' + text);
+        }
+        assert(first.stdout.includes('STREAM_STDOUT_1') && first.stdout.includes('STREAM_STDOUT_2'));
+        assert(first.stderr.includes('STREAM_STDERR_1') && first.stderr.includes('STREAM_STDERR_2'));
+    }
+    if (mode === 'failure') {
+        assert.equal(first.error.code, 23);
+        assert.equal(first.error.stdout, first.stdout);
+        assert.equal(first.error.stderr, first.stderr);
+        assert.equal(errors.length, 1);
+        assert(errors[0].includes('CLI_BUILD_FAILURE_23'));
+    } else assert.equal(errors.length, 0, 'Sink failure must not become a launch error or cancellation notification');
+    if (mode === 'cancel' || mode === 'dispose') {
+        assert.deepEqual(snapshot, { closed: false, commandSettled: false, disposalSettled: false,
+            outputExists: true, outputDisposed: false }, 'A real pending child retains command/output/disposal ownership');
+    }
+    const waitFor = async predicate => {
+        const limit = Date.now() + 3000;
+        while (!predicate() && Date.now() < limit) await new Promise(resolve => setTimeout(resolve, 10));
+        assert(predicate(), 'Probe resources must finish their actual cleanup');
+    };
+    if (mode !== 'dispose') {
+        assert(fs.existsSync(other.configuration.program));
+        assert.deepEqual(stops, [], 'An unrelated live file must not be stopped for a sink failure');
+    }
+    if (!expected) await waitFor(() => !fs.existsSync(first.output));
+    if (mode === 'failure' || mode === 'cancel') {
+        retry = true; active.isDirty = true;
+        active.save = async () => { fs.writeFileSync(source, 'Console.WriteLine("corrected");\n'); active.isDirty = false; return true; };
+        assert.deepEqual(await Promise.all(Array.from({ length: 3 }, () => api.debugActiveFile())), [true, true, true]);
+        const next = rows.filter(row => row.kind === 'build' && row.source === source).at(-1);
+        assert.notEqual(next.output, first.output);
+        assert.equal(next.closed, true);
+        assert.equal(logs.filter(line => line === diagnostic).length, 2, 'The next process may report its own sink failure once');
+        assert(fs.existsSync(other.configuration.program));
+        assert.deepEqual(stops, []);
+    }
+    if (mode === 'success') assert(metadata.some(value => value.includes('STREAM_STDOUT_2')));
+    await (disposal || api.dispose());
+    assert.equal(outputDisposed, true);
+    assert.equal(postDisposeWrites, 0, 'Actual child observation must finish before diagnostics are disposed');
+    assert(cleanup.filter(row => row.owner === source).every(row => row.closed && row.callback),
+        'Cleanup observations outside the guarded sink must follow actual child close');
+    for (const build of rows.filter(row => row.kind === 'build')) {
+        assert(cleanup.some(row => row.owner === build.source && row.originalOutput === build.output && row.closed && row.callback),
+            'Each exact original output must retain its own close/cleanup witness across publication and retry');
+    }
+    assert(!stops.includes('external-session'));
+    assert.equal(fs.readFileSync(external, 'utf8'), 'unrelated marker');
+    assert(rows.every(row => row.closed));
+    process.stdout.write(JSON.stringify({ event: 'probe-done', mode, values, childCount: rows.length,
+        diagnosticCount: logs.filter(line => line === diagnostic).length, cleanupCount: cleanup.length }) + '\n');
+}
+
+for (const mode of ['success', 'failure', 'cancel', 'dispose']) {
+    test(`stream output diagnostics preserve ${mode} through a throwing native stream sink`, { timeout: 15000 }, async t => {
+        const root = fs.mkdtempSync(path.join(os.tmpdir(), 'netcoredbg-stream-probe-'));
+        const pids = [];
+        t.after(async () => {
+            const alive = pid => { try { process.kill(pid, 0); return true; } catch (error) { if (error.code === 'ESRCH') return false; throw error; } };
+            const limit = Date.now() + 3000;
+            while (pids.some(alive) && Date.now() < limit) await new Promise(resolve => setTimeout(resolve, 20));
+            assert(pids.every(pid => !alive(pid)), 'Every exact owned CLI child must exit before fixture deletion, even after a baseline host crash');
+            assert.equal(path.dirname(path.resolve(root)), path.resolve(os.tmpdir()));
+            assert(path.basename(root).startsWith('netcoredbg-stream-probe-'));
+            fs.rmSync(root, { recursive: true, force: true });
+        });
+        const child = spawnSync(process.execPath, ['--unhandled-rejections=strict', '-e',
+            '(' + streamOutputProbe.toString() + ')().catch(error => { console.error(error); process.exitCode = 2; })',
+            require.resolve('./runtime.cjs'), root, mode], { encoding: 'utf8', timeout: 10000, windowsHide: true });
+        const records = child.stdout.split(/\r?\n/).filter(Boolean).map(line => JSON.parse(line));
+        pids.push(...records.filter(row => row.event === 'owned-child').map(row => row.pid));
+        assert.equal(child.error, undefined, 'The strict activation probe must complete within its safety limit');
+        assert(pids.length >= 6, 'The probe must reach the real CLI build after its independent file control');
+        assert.equal(child.status, 0, `A stream diagnostic exception must not escape the ${mode} activation host.\n${child.stderr}`);
+        const completed = records.find(row => row.event === 'probe-done');
+        assert.equal(completed?.mode, mode);
+        assert.equal(completed.childCount, pids.length);
+        assert(completed.cleanupCount >= 2);
+    });
 }
 
 test('output allocation retains ordinary mkdtemp behavior without entering the Windows fallback', async () => {

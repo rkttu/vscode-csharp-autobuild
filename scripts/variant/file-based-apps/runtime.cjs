@@ -504,12 +504,20 @@ function activate(context, dependencies = {}) {
                         checkpoint();
                         const settings = { cwd: path.dirname(source), signal: controller.signal, ...options };
                         output.appendLine(`dotnet ${args.map(value => JSON.stringify(value)).join(' ')}`);
+                        let streamOutputFailureReported = false;
                         const result = dependencies.runDotnet ?
                             await dependencies.runDotnet(args, { ...settings, dotnetPath: selected.executable }) :
                             await runProcess(selected.executable, args, {
                                 ...settings,
                                 env: { ...environment, DOTNET_ROOT: selected.root },
-                                onOutput: chunk => output.append(chunk.toString()),
+                                onOutput: chunk => {
+                                    try { output.append(chunk.toString()); }
+                                    catch {
+                                        if (streamOutputFailureReported) return;
+                                        streamOutputFailureReported = true;
+                                        phaseLog('Could not write .NET process output; process completion is still being observed.');
+                                    }
+                                },
                             });
                         checkpoint();
                         if (result && typeof result !== 'string' && result.exitCode && result.exitCode !== 0) {
