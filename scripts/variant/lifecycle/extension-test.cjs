@@ -93,7 +93,7 @@ exports.run = async function run() {
     const expected = JSON.parse(fs.readFileSync(path.join(root, 'expected.json'), 'utf8'));
     assert.equal(expected.schema, 1);
     const scenario = expected.scenario || 'web-lifecycle';
-    assert(['web-lifecycle', 'build-failure-retry', 'native-build-cancel', 'web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry', 'native-host-failure-retry'].includes(scenario));
+    assert(['web-lifecycle', 'build-failure-retry', 'native-build-cancel', 'web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry', 'native-host-failure-retry', 'native-adapter-loss'].includes(scenario));
     assert(Number.isInteger(expected.cycles) && expected.cycles >= 2 && expected.cycles <= 10);
     const start = process.hrtime.bigint();
     const result = {
@@ -108,7 +108,8 @@ exports.run = async function run() {
             actualWebProfileFailure: scenario === 'web-profile-failure-retry',
             actualSdkSelectionFailure: scenario === 'sdk-selection-failure-retry',
             actualNativeHostFailure: scenario === 'native-host-failure-retry',
-            injectedEditorRejection: scenario === 'debug-handoff-declined-retry', nativeAdapterFailure: false,
+            injectedEditorRejection: scenario === 'debug-handoff-declined-retry', nativeAdapterFailure: scenario === 'native-adapter-loss',
+            actualAdapterProcessKill: scenario === 'native-adapter-loss',
             actualProgressCancelUi: scenario === 'native-build-cancel', injectedCancellationToken: false },
     };
     const launches = [];
@@ -120,6 +121,14 @@ exports.run = async function run() {
     const handoffProviders = new Map();
     const cancelledBuildAttempts = [];
     const nativeCancellation = scenario === 'native-build-cancel' ? expected.nativeCancellation : undefined;
+    const adapterLoss = scenario === 'native-adapter-loss' ? expected.adapterLoss : undefined;
+    if (adapterLoss) {
+        assert.equal(typeof adapterLoss.nonce, 'string');
+        assert(adapterLoss.nonce.length > 0);
+        for (const key of ['marker', 'receipt', 'helper']) assert(path.isAbsolute(adapterLoss[key]) && within(root, adapterLoss[key]));
+        assert(!exists(adapterLoss.marker) && !exists(adapterLoss.receipt));
+        assert.equal(sha256(adapterLoss.helper), expected.harness['adapter-loss.ps1']);
+    } else assert.notEqual(scenario, 'native-adapter-loss');
     if (nativeCancellation) {
         assert.equal(typeof nativeCancellation.nonce, 'string');
         assert(nativeCancellation.nonce.length > 0);
@@ -408,6 +417,152 @@ exports.run = async function run() {
         launch.outputRemovedAtMilliseconds = elapsed(start);
         record('owned-resources-released', { label: launch.label, pid: launch.pid, port: launch.port, output: launch.output });
         state();
+    }
+
+    async function nativeAdapterLoss(a, b) {
+        assert(adapterLoss);
+        await stillAlive(a);
+        await stillAlive(b);
+        assert(!a.terminated && !b.terminated);
+        assert.equal(a.stopRequestedAtMilliseconds, undefined);
+        assert(!a.dapRequests.some(item => ['disconnect', 'terminate'].includes(item.message.command)));
+        assert(a.dap.some(message => message.type === 'response' && message.command === 'configurationDone' && message.success === true));
+        const adapterPath = path.join(result.installedExtension.path, adapterLoss.adapterRelativePath);
+        const adapterSha256 = sha256(adapterPath);
+        assert.equal(adapterSha256, adapterLoss.adapterSha256, 'Installed native bytes must match the prepared archive before the fault');
+        const launcher = JSON.parse(fs.readFileSync(path.join(root, 'launch.json'), 'utf8'));
+        assert(samePath(launcher.work, root));
+        assert(Number.isSafeInteger(launcher.pid) && launcher.pid > 0);
+        const fixture = launch => ({ sessionId: launch.session.id, pid: launch.pid, nonce: launch.nonce,
+            source: launch.source, program: launch.program, output: launch.output, port: launch.port, response: launch.response });
+        const marker = { schema: 1, nonce: adapterLoss.nonce, root, extensionHostPid: process.pid, editorPid: launcher.pid,
+            adapter: { path: adapterPath, sha256: adapterSha256 }, a: fixture(a), b: fixture(b) };
+        const evidence = result.adapterLoss = { nonce: adapterLoss.nonce, observationOnly: true,
+            before: { a: fixture(a), b: fixture(b), aDap: [...a.dap], aRequests: [...a.dapRequests],
+                aSource: fileSnapshot(a.source), bSource: fileSnapshot(b.source),
+                aProfile: fileSnapshot(a.source.replace(/\.cs$/i, '.run.json')),
+                bProfile: fileSnapshot(b.source.replace(/\.cs$/i, '.run.json')) }, observations: [] };
+        const temporaryMarker = adapterLoss.marker + '.tmp';
+        assert(!exists(temporaryMarker) && !exists(adapterLoss.marker) && !exists(adapterLoss.receipt));
+        fs.writeFileSync(temporaryMarker, JSON.stringify(marker, null, 2) + '\n', { flag: 'wx' });
+        fs.renameSync(temporaryMarker, adapterLoss.marker);
+        evidence.markerSnapshot = fileSnapshot(adapterLoss.marker);
+        evidence.helperRequestedAtMilliseconds = elapsed(start);
+        record('exact-adapter-loss-ready', { marker, markerSha256: evidence.markerSnapshot.sha256 });
+        state();
+        await until(() => exists(adapterLoss.receipt), 'external exact adapter process fault receipt');
+        evidence.receiptSnapshot = fileSnapshot(adapterLoss.receipt);
+        const receipt = evidence.receipt = JSON.parse(Buffer.from(evidence.receiptSnapshot.base64, 'base64'));
+        assert.equal(receipt.nonce, adapterLoss.nonce);
+        assert(samePath(receipt.root, root));
+        assert.equal(receipt.markerSha256, evidence.markerSnapshot.sha256);
+        assert.equal(receipt.helperSha256, expected.harness['adapter-loss.ps1']);
+        assert.equal(receipt.success, true, receipt.error || 'Exact adapter fault helper failed');
+        assert.equal(receipt.killRequested, true);
+        assert.equal(receipt.killedOnlyAdapter, true);
+        assert.equal(receipt.identities.aDebuggee.processId, a.pid);
+        assert.equal(receipt.identities.bDebuggee.processId, b.pid);
+        assert.equal(receipt.killedProcessId, receipt.identities.aAdapter.processId);
+        assert.equal(receipt.identities.aDebuggee.parentProcessId, receipt.killedProcessId);
+        assert.notEqual(receipt.killedProcessId, receipt.identities.bAdapter.processId);
+        assert.equal(receipt.identities.aAdapter.parentProcessId, process.pid);
+        assert(samePath(receipt.identities.aAdapter.executablePath, adapterPath));
+        evidence.faultReceiptObservedAtMilliseconds = elapsed(start);
+        record('exact-adapter-loss-receipt', receipt);
+        async function observeResources(label) {
+            const item = { label, atMilliseconds: elapsed(start), aTerminated: !!a.terminated,
+                aPidRespondsToSignalZero: pidAlive(a.pid), aProgramExists: exists(a.program), aOutputExists: exists(a.output),
+                terminalQueuesEmpty: queueEmpty(a.base), aAdapterExits: [...(a.adapterExits || [])] };
+            try {
+                const body = await request(a.origin);
+                assert.deepEqual(body, a.response, 'Any surviving A HTTP endpoint must retain the captured PID/nonce/revision/value');
+                item.aOwnedHttpResponse = body;
+            } catch (error) {
+                if (error instanceof assert.AssertionError) throw error;
+                item.aHttpError = String(error);
+            }
+            item.aPortBindable = await canBind(a.port);
+            await stillAlive(b);
+            item.b = { ...fixture(b), response: await request(b.origin), outputExists: exists(b.output), programExists: exists(b.program) };
+            evidence.observations.push(item);
+            record('adapter-loss-resource-observation', item);
+            state();
+            return item;
+        }
+        await observeResources('receipt');
+        await delay(250);
+        await observeResources('after-250ms');
+        await delay(750);
+        await observeResources('after-1000ms');
+        try {
+            await until(() => a.terminated && !pidAlive(a.pid) && !exists(a.output) && queueEmpty(a.base),
+                'observed adapter-loss session/PID/output settlement', 5000);
+        } catch (error) { evidence.settlementWaitError = error.stack || String(error); }
+        const settled = await observeResources('settlement');
+        evidence.aDapAfterFault = [...a.dap];
+        evidence.aRequestsAfterFault = [...a.dapRequests];
+        evidence.aAdapterExits = [...(a.adapterExits || [])];
+        evidence.aEditorTerminatedAtMilliseconds = a.terminatedAtMilliseconds;
+        evidence.sourceAndProfilesUnchanged = [evidence.before.aSource, evidence.before.bSource,
+            evidence.before.aProfile, evidence.before.bProfile].every(snapshot => sha256(snapshot.path) === snapshot.sha256);
+        assert.equal(evidence.sourceAndProfilesUnchanged, true);
+        // Persist actual post-fault ownership before any test-only fallback or
+        // retry. Editor termination does not by itself prove debuggee exit.
+        evidence.liveOwnedHttpAfterEditorTermination = evidence.observations.some(item => item.aTerminated && item.aOwnedHttpResponse);
+        evidence.outputRemovedWhileOwnedHttpAlive = evidence.observations.some(item => !item.aOutputExists && item.aOwnedHttpResponse);
+        evidence.observationCompletedAtMilliseconds = elapsed(start);
+        record('adapter-loss-observation-complete', { ...evidence, before: undefined });
+        if (!settled.aTerminated || settled.aPidRespondsToSignalZero || settled.aOwnedHttpResponse ||
+            !settled.aPortBindable || settled.aOutputExists || !settled.terminalQueuesEmpty) {
+            result.observedProductGap = { kind: 'adapter-loss-resources-not-released', observedAtMilliseconds: elapsed(start),
+                sessionId: a.session.id, pid: a.pid, output: a.output, settled,
+                liveOwnedHttpAfterEditorTermination: evidence.liveOwnedHttpAfterEditorTermination,
+                outputRemovedWhileOwnedHttpAlive: evidence.outputRemovedWhileOwnedHttpAlive };
+            throw new Error('Observed adapter-loss resources remain; retain this first control before considering a product fix');
+        }
+        evidence.observationOnly = false;
+        let retryLogFile;
+        await until(() => {
+            retryLogFile = outputLog();
+            if (!retryLogFile) return false;
+            const text = fs.readFileSync(retryLogFile, 'utf8');
+            return buildCommands(text, a.source).length === 1 && buildCommands(text, b.source).length === 1 &&
+                text.split(/\r?\n/).filter(line => line.startsWith('Phase completed: Starting netcoredbg')).length === 2;
+        }, 'initial A/B output flush before adapter-loss dirty retry');
+        const retryLogStart = logSnapshot(retryLogFile);
+        const document = await vscode.workspace.openTextDocument(a.source);
+        const content = document.getText();
+        const revision = 'adapter-loss-retry';
+        assert(content.includes(`const string revision = "${a.revision}";`));
+        const edit = new vscode.WorkspaceEdit();
+        edit.replace(document.uri, new vscode.Range(document.positionAt(0), document.positionAt(content.length)),
+            content.replace(`const string revision = "${a.revision}";`, `const string revision = "${revision}";`));
+        assert.equal(await vscode.workspace.applyEdit(edit), true);
+        assert.equal(document.isDirty, true);
+        const retry = await launchFile('A-adapter-loss-retry', a.source, revision, a.port, false, document, 3);
+        assert.notEqual(retry.output, a.output);
+        assert.notEqual(retry.session.id, a.session.id);
+        assert.notEqual(retry.nonce, a.nonce);
+        let retryTail;
+        await until(() => {
+            retryTail = logTail(retryLogStart);
+            return retryTail.includes('Phase completed: Starting netcoredbg');
+        }, 'coalesced adapter-loss retry command output');
+        const retryLog = logEvidence(retryLogStart, retryTail, a.source);
+        assert.equal(retryLog.buildCommands.length, 1, 'Three adapter-loss retry callers must share exactly one actual build');
+        assert.equal(retryLog.buildCompletedPhaseDiagnostics.length, 1);
+        assert.equal(retryLog.completedPhaseDiagnostics.length, 1);
+        assert.equal(retryLog.failedPhaseDiagnostics.length, 0);
+        assert.equal(retryLog.cancelledPhaseDiagnostics.length, 0);
+        assert(samePath(retryLog.buildCommands[0].output, retry.output));
+        assert.equal(fs.readFileSync(retry.source, 'utf8'), document.getText());
+        await stillAlive(b);
+        evidence.retry = { ...fixture(retry), commandResults: retry.commandResults, commandInvocations: retry.commandInvocations,
+            freshOutput: true, freshSession: true, freshToken: true, log: retryLog,
+            sourceSnapshot: fileSnapshot(retry.source), profileSnapshot: fileSnapshot(retry.source.replace(/\.cs$/i, '.run.json')),
+            configuration: JSON.parse(JSON.stringify(retry.session.configuration)) };
+        result.checks.push('Exact installed A adapter process loss is observed separately from debuggee/session/output release; B survives and three dirty retry callers share one new real session');
+        return retry;
     }
 
     async function launchFile(label, source, revision, port, inspectBreakpoint = false, document, commandInvocations = 1) {
@@ -1326,7 +1481,10 @@ exports.run = async function run() {
                 // still identify the extra owned debuggee for targeted cleanup.
                 return {
                     onWillReceiveMessage(message) { observe('dap-send', () => {
-                        if (launch.expectedNativeHostFailure) launch.dapRequests.push({ sessionId: session.id, message });
+                        if (launch.expectedNativeHostFailure || adapterLoss) {
+                            launch.dapRequests ||= [];
+                            launch.dapRequests.push({ sessionId: session.id, message });
+                        }
                         record('dap-send', { label: launch.label, sessionId: session.id, message });
                     }); },
                     onDidSendMessage(message) { observe('dap-receive', () => {
@@ -1349,7 +1507,10 @@ exports.run = async function run() {
                     onError(error) { observe('adapter-error', () => record('adapter-error', { label: launch.label, error: String(error) })); },
                     onExit(code, signal) { observe('adapter-exit', () => {
                         const detail = { label: launch.label, sessionId: session.id, code, signal, atMilliseconds: elapsed(start) };
-                        if (launch.expectedNativeHostFailure) launch.adapterExits.push(detail);
+                        if (launch.expectedNativeHostFailure || adapterLoss) {
+                            launch.adapterExits ||= [];
+                            launch.adapterExits.push(detail);
+                        }
                         record('adapter-exit', detail);
                     }); },
                 };
@@ -1403,6 +1564,7 @@ exports.run = async function run() {
         result.checks.push('Two independent real Web sessions respond with distinct owned nonces and PIDs');
         assert.notEqual(a.pid, b.pid);
         assert.notEqual(a.session.id, b.session.id);
+        if (adapterLoss) a = await phase('A exact native adapter process loss observed while B survives', () => nativeAdapterLoss(a, b));
 
         for (let cycle = 0; cycle < expected.cycles; cycle++) {
             await phase(`A cycle ${cycle} targeted stop and owned cleanup`, () => stop(a));
@@ -1550,6 +1712,7 @@ exports.run = async function run() {
             commandPending: launch.commandPending,
             commandInvocations: launch.commandInvocations, commandResults: launch.commandResults,
             profileSnapshot: launch.profileSnapshot, sourceSnapshot: launch.sourceSnapshot,
+            dap: adapterLoss ? launch.dap : undefined, dapRequests: launch.dapRequests, adapterExits: launch.adapterExits,
             capturedSessions: capturedSessionState(launch),
             startedAtMilliseconds: launch.startedAtMilliseconds,
             stopRequestedAtMilliseconds: launch.stopRequestedAtMilliseconds,

@@ -118,7 +118,7 @@ def main():
     parser.add_argument("--sdk-version", required=True)
     parser.add_argument("--work-dir", type=Path, required=True)
     parser.add_argument("--cycles", type=int, default=3)
-    parser.add_argument("--scenario", choices=("web-lifecycle", "build-failure-retry", "native-build-cancel", "web-profile-failure-retry", "sdk-selection-failure-retry", "debug-handoff-declined-retry", "native-host-failure-retry"), default="web-lifecycle")
+    parser.add_argument("--scenario", choices=("web-lifecycle", "build-failure-retry", "native-build-cancel", "web-profile-failure-retry", "sdk-selection-failure-retry", "debug-handoff-declined-retry", "native-host-failure-retry", "native-adapter-loss"), default="web-lifecycle")
     args = parser.parse_args()
     if not 2 <= args.cycles <= 10:
         parser.error("Use 2..10 cycles to exercise bounded same-file retry")
@@ -149,6 +149,8 @@ def main():
         (work / directory).mkdir(parents=True, exist_ok=True)
     for name in ("driver.cjs", "extension-test.cjs"):
         (work / "driver" / name).write_bytes((Path(__file__).parent / name).read_bytes())
+    if args.scenario == "native-adapter-loss":
+        (work / "driver/adapter-loss.ps1").write_bytes((Path(__file__).parent / "adapter-loss.ps1").read_bytes())
     (work / "driver/package.json").write_text(json.dumps({"publisher": "local-lifecycle-test", "name": "web-lifecycle-driver",
         "version": "0.0.1", "main": "./driver.cjs", "engines": {"vscode": "^1.106.0"}, "activationEvents": ["*"]}))
     fixture = (Path(__file__).parent / "fixtures/web.cs").read_bytes()
@@ -185,6 +187,8 @@ def main():
     if native_cancellation:
         harness["fixtures/cancel-build.targets"] = digest(target.read_bytes())
         harness["prepared/a.cs"] = digest((work / "workspace/a.cs").read_bytes())
+    if args.scenario == "native-adapter-loss":
+        harness["adapter-loss.ps1"] = digest((Path(__file__).parent / "adapter-loss.ps1").read_bytes())
     expected = {"schema": 1, "extensionId": EXTENSION_ID, "candidate": candidate, "cycles": args.cycles,
                 "scenario": args.scenario,
                 "harness": harness,
@@ -197,6 +201,15 @@ def main():
                           "macOS": False, "invocation": "command-api", "freshProfiles": 1}}
     if native_cancellation:
         expected["nativeCancellation"] = native_cancellation
+    if args.scenario == "native-adapter-loss":
+        with zipfile.ZipFile(candidate["path"]) as archive:
+            native_adapter_sha256 = digest(archive.read("extension/.debugger/netcoredbg/netcoredbg.exe"))
+        expected["adapterLoss"] = {"nonce": str(uuid.uuid4()),
+                                   "marker": str(work / "progress/needs-adapter-loss.json"),
+                                   "receipt": str(work / "progress/adapter-loss-receipt.json"),
+                                   "helper": str(work / "driver/adapter-loss.ps1"),
+                                   "adapterRelativePath": ".debugger/netcoredbg/netcoredbg.exe",
+                                   "adapterSha256": native_adapter_sha256}
     if args.scenario == "sdk-selection-failure-retry":
         expected["sdkSelection"] = {"unavailableVersion": "99.0.100",
                                     "globalJson": str(work / "workspace/global.json"),
