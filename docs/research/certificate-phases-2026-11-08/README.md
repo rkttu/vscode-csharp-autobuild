@@ -36,7 +36,7 @@ Full [#18 AC6](https://github.com/rkttu/vscode-csharp-autobuild/issues/18) and [
 
 ## Evidence and regeneration
 
-[evidence-summary.json](evidence-summary.json) is **106,360 bytes**, SHA-256 84fdd7fc2158f4f126080ed4d0cda9b1336c709e75db26295c4128ed3f4de17c. It binds the final frozen suites, exact selected contrast, one formal source-archived development attempt and one ordinary installed HTTP control. The collector reads retained evidence without rerunning suites or launching an editor.
+[evidence-summary.json](evidence-summary.json) is **106,352 bytes**, SHA-256 b6a320abbd493c34723407bc361b181738016cf871c8cf5f245cec5b04162485. It binds the final frozen suites, exact selected contrast, one formal source-archived development attempt and one ordinary installed HTTP control. The collector reads retained evidence without rerunning suites or launching an editor.
 
 From this worktree, this single PowerShell command validates retained records and regenerates the summary:
 

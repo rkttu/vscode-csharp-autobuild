@@ -1642,7 +1642,7 @@
           "bytes": 10510
         }
       },
-      "preparationInterpretation": "SourceBindingsBefore/After and productSourceUnchanged mean unchanged during preparation of this implementation commit, whose runtime differs from the merged base while Web remains unchanged. The raw editorNotRun control records preparation time before the later single installed smoke."
+      "preparationInterpretation": "SourceBindingsBefore/After and productSourceUnchanged mean unchanged during preparation of this implementation commit, whose runtime and Web modules both differ from the merged base. The raw editorNotRun control records preparation time before the later single installed smoke."
     },
     "compilerFailure": {
       "label": "A-compile-failure",
@@ -2108,8 +2108,8 @@
   },
   "collectors": {
     "docs\\research\\certificate-phases-2026-11-08\\summarize.py": {
-      "sha256": "dc5000484299a7b98812751b6ae5e125d6fe8747dfa6298471e09506dffaf00e",
-      "bytes": 53079
+      "sha256": "eed15da13f92c9a3e406d08d2c12240bce425c15008e0c8fbac5955963210cab",
+      "bytes": 53071
     },
     "docs\\research\\build-failure-retry-2026-11-05\\summarize.py": {
       "sha256": "690f25544a8ec068d5125ae51e31de73e07c72cd59dcd197dba1654c0b52df40",

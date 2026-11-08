@@ -454,7 +454,7 @@ def validate_diagnostic_launcher(work, expected, result, base_vsix):
             "preparationReceipt": {"file": binding(receipt_file), "record": receipt},
             "actualLaunch": launch,
             "retainedFiles": {path.name: binding(path) for path in (before_file, baseline_file, diagnostic_file)},
-            "preparationInterpretation": "SourceBindingsBefore/After and productSourceUnchanged mean unchanged during preparation of this implementation commit, whose runtime differs from the merged base while Web remains unchanged. The raw editorNotRun control records preparation time before the later single installed smoke."}
+            "preparationInterpretation": "SourceBindingsBefore/After and productSourceUnchanged mean unchanged during preparation of this implementation commit, whose runtime and Web modules both differ from the merged base. The raw editorNotRun control records preparation time before the later single installed smoke."}
 
 
 def validate_product(work, expected, result, base_vsix):
