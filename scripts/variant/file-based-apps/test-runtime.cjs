@@ -74,7 +74,7 @@ function fixture(t, options = {}) {
                 return options.showErrorMessage ? options.showErrorMessage(message) : Promise.resolve(undefined);
             },
             withProgress: async (_settings, callback) => callback({ report: value => options.reportProgress?.(value) }, {
-                isCancellationRequested: false,
+                isCancellationRequested: Boolean(options.cancellationRequested),
                 onCancellationRequested: callback => { cancellation = callback; return { dispose() { cancellation = undefined; } }; },
             }),
         },
@@ -1457,26 +1457,31 @@ test('repeated F5 during classification coalesces the same file build', async t 
 
 test('concurrent dirty-file commands share a cancelled save and permit a corrected retry', async t => {
     let completeSave;
+    let saveProvider = () => new Promise(resolve => { completeSave = resolve; });
     const progress = [];
     const options = { dirty: true, reportProgress: value => progress.push(value),
-        save: () => new Promise(resolve => { completeSave = resolve; }) };
-    const f = fixture(t, options);
+        save: () => saveProvider() };
+    const f = preparationFixture(t, options);
     t.after(() => completeSave?.(false));
     const requests = Array.from({ length: 3 }, () => f.api.debugActiveFile());
     await waitFor(() => completeSave, 'The shared dirty source save must be pending');
     assert.equal(f.calls.saves, 1);
     assert.equal(f.calls.classifications.length, 0);
     assert.equal(f.calls.processes.length, 0);
-    assert.deepEqual(progress, [], 'Progress cancellation has not begun while save is pending');
+    assert.deepEqual(progress, [{ message: 'Saving C# file' }], 'The shared save must report the cancellable save phase');
+    assert.equal(f.timers.size, 0, 'The preparation timer must remain unarmed during save');
     completeSave(false);
     assert.deepEqual(await Promise.all(requests), [false, false, false]);
     assert.deepEqual(f.calls.errors, []);
     assert.equal(f.calls.launches.length, 0);
     assert.equal(f.calls.classifications.length, 0);
     assert.equal(f.calls.processes.length, 0);
+    assert.equal(f.timers.size, 0, 'A false save must not arm an SDK preparation timer');
+    assert(f.calls.logs.some(line => /^Phase not saved: Saving C# file /.test(line)));
+    assert(!f.calls.logs.some(line => /^Phase completed: Saving C# file /.test(line)), 'A false save must not claim success');
 
     fs.writeFileSync(f.source, 'Console.WriteLine("corrected after save cancellation");\n');
-    options.save = async () => { f.document.isDirty = false; return true; };
+    saveProvider = async () => { f.document.isDirty = false; return true; };
     assert.deepEqual(await Promise.all(Array.from({ length: 3 }, () => f.api.debugActiveFile())), [true, true, true]);
     assert.equal(f.calls.saves, 2, 'The retry must perform exactly one new save');
     assert.equal(f.calls.classifications.length, 1);
@@ -1484,6 +1489,172 @@ test('concurrent dirty-file commands share a cancelled save and permit a correct
     assert.equal(f.calls.launches.length, 1);
     assert.equal(f.document.isDirty, false);
     assert.deepEqual(f.calls.errors, []);
+});
+
+test('save progress retains a cancelled save for coalesced callers and a corrected retry', { timeout: 5000 }, async t => {
+    let completeSave;
+    const progress = [];
+    const options = { dirty: true, reportProgress: value => progress.push(value.message),
+        save: () => new Promise(resolve => { completeSave = resolve; }) };
+    const f = fixture(t, options);
+    let settled = 0;
+    const requests = Array.from({ length: 3 }, () => f.api.debugActiveFile().then(result => { settled++; return result; }));
+    try {
+        await waitFor(() => completeSave, 'The original save provider must be pending');
+        assert.deepEqual(progress, ['Saving C# file'], 'The save must be visible inside the cancellable command progress');
+        assert.equal(f.calls.saves, 1);
+        f.cancel();
+        const repeated = f.api.debugActiveFile().then(result => { settled++; return result; });
+        requests.push(repeated);
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(settled, 0, 'Cancel intent must not pretend the original save has settled');
+        assert.equal(f.calls.saves, 1, 'Repeated calls must not compete with the outstanding editor save');
+        assert.deepEqual(f.calls.classifications, []);
+        assert.deepEqual(f.calls.processes, []);
+        assert.deepEqual(f.calls.launches, []);
+        completeSave(true);
+        assert.deepEqual(await Promise.all(requests), [false, false, false, false]);
+        assert.deepEqual(f.calls.classifications, [], 'A late successful save must not continue the cancelled command');
+        assert.deepEqual(f.calls.processes, []);
+        assert.deepEqual(f.calls.errors, []);
+        assert(f.calls.logs.some(line => /^Phase cancelled: Saving C# file /.test(line)));
+
+        const savedText = 'Console.WriteLine("saved corrected revision");\n';
+        options.save = async () => { fs.writeFileSync(f.source, savedText); f.document.isDirty = false; return true; };
+        assert.deepEqual(await Promise.all(Array.from({ length: 3 }, () => f.api.debugActiveFile())), [true, true, true]);
+        assert.equal(f.calls.saves, 2, 'The corrected retry must share exactly one new save');
+        assert.equal(f.calls.classifications.length, 1);
+        assert.equal(f.calls.classifications[0].text, savedText, 'Classification must capture text after the successful save');
+        assert.equal(f.calls.processes.filter(call => call.args[0] === 'build').length, 1);
+        assert.equal(f.calls.launches.length, 1);
+        assert.deepEqual(f.calls.errors, []);
+    } finally {
+        completeSave?.(false);
+        await Promise.all(requests);
+        await f.api.dispose();
+    }
+});
+
+test('save progress observes a late rejection after Cancel without starting preparation or notifying', { timeout: 5000 }, async t => {
+    let rejectSave;
+    const progress = [];
+    const f = fixture(t, { dirty: true, reportProgress: value => progress.push(value.message),
+        save: () => new Promise((_resolve, reject) => { rejectSave = reject; }) });
+    const operation = f.api.debugActiveFile();
+    try {
+        await waitFor(() => rejectSave, 'The save rejection must remain controllable');
+        assert.deepEqual(progress, ['Saving C# file']);
+        f.cancel();
+        rejectSave(new Error('Original save provider rejected after Cancel'));
+        assert.equal(await operation, false);
+        assert.deepEqual(f.calls.classifications, []);
+        assert.deepEqual(f.calls.processes, []);
+        assert.deepEqual(f.calls.launches, []);
+        assert.deepEqual(f.calls.errors, [], 'Expected cancellation must remain quiet after a late save fault');
+        assert(f.calls.logs.some(line => line.includes('Error observed during Saving C# file after cancellation:') &&
+            line.includes('Original save provider rejected after Cancel')), 'The actual late save failure must remain diagnosed');
+        assert(f.calls.logs.some(line => /^Phase cancelled: Saving C# file /.test(line)));
+    } finally {
+        rejectSave?.(new Error('Test released the original save provider'));
+        await operation;
+        await f.api.dispose();
+    }
+});
+
+test('save progress cancellation before dispatch prevents the editor save and SDK work', async t => {
+    let f;
+    f = fixture(t, { dirty: true, reportProgress: value => { if (value.message === 'Saving C# file') f.cancel(); } });
+    try {
+        assert.equal(await f.api.debugActiveFile(), false);
+        assert.equal(f.calls.saves, 0, 'Cancel reported before dispatch must prevent the editor save call');
+        assert.deepEqual(f.calls.classifications, []);
+        assert.deepEqual(f.calls.processes, []);
+        assert.deepEqual(f.calls.launches, []);
+        assert.deepEqual(f.calls.errors, []);
+    } finally { await f.api.dispose(); }
+});
+
+test('save progress honors an already cancelled notification before saving a dirty document', async t => {
+    const f = fixture(t, { dirty: true, cancellationRequested: true });
+    try {
+        assert.equal(await f.api.debugActiveFile(), false);
+        assert.equal(f.calls.saves, 0, 'An already cancelled progress token must precede the save provider');
+        assert.deepEqual(f.calls.classifications, []);
+        assert.deepEqual(f.calls.processes, []);
+        assert.deepEqual(f.calls.launches, []);
+        assert.deepEqual(f.calls.errors, []);
+    } finally { await f.api.dispose(); }
+});
+
+test('save progress excludes save time from preparation while retaining total phase duration', { timeout: 5000 }, async t => {
+    let completeSave, completeClassification;
+    const progress = [];
+    const f = preparationFixture(t, { dirty: true, reportProgress: value => progress.push(value.message),
+        save: () => new Promise(resolve => { completeSave = resolve; }),
+        classify: () => new Promise(resolve => { completeClassification = resolve; }) });
+    const operation = f.api.debugActiveFile();
+    try {
+        await waitFor(() => completeSave, 'The save must precede SDK preparation');
+        assert.deepEqual(progress, ['Saving C# file']);
+        assert.equal(f.timers.size, 0, 'The SDK preparation budget must not be armed during an editor-owned save');
+        f.advance(1000);
+        completeSave(true);
+        await waitFor(() => completeClassification, 'The successful save must receive a fresh preparation budget');
+        assert.equal(f.timers.size, 1);
+        assert(f.calls.logs.some(line => line === 'Phase completed: Saving C# file (1000 ms; total 1000 ms)'));
+        f.expire();
+        completeClassification({ kind: 'file', reason: 'late classification after preparation expiry' });
+        assert.equal(await operation, false);
+        assert.equal(f.calls.processes.length, 0);
+        assert.equal(f.calls.launches.length, 0);
+        assert.equal(f.calls.errors.length, 1);
+        assert.match(f.calls.errors[0], /Preparation timed out during Checking project membership after 100 ms \(limit 100 ms\)/);
+        assert(f.calls.logs.some(line => line === 'Phase timed out: Checking project membership (100 ms; total 1100 ms)'));
+        assert.equal(f.timers.size, 0);
+    } finally {
+        completeSave?.(false);
+        completeClassification?.({ kind: 'file', reason: 'test release' });
+        await operation;
+        await f.api.dispose();
+    }
+});
+
+test('save progress permits another file while a cancelled save retains its captured document', { timeout: 5000 }, async t => {
+    let completeSave;
+    const progress = [];
+    const f = fixture(t, { dirty: true, reportProgress: value => progress.push(value.message),
+        save: () => new Promise(resolve => { completeSave = resolve; }) });
+    const operation = f.api.debugActiveFile();
+    try {
+        await waitFor(() => completeSave, 'The first file save must be outstanding');
+        assert.deepEqual(progress, ['Saving C# file']);
+        f.cancel();
+        const otherSource = path.join(path.dirname(f.source), 'other.cs');
+        const otherText = 'Console.WriteLine("independent other source");\n';
+        fs.writeFileSync(otherSource, otherText);
+        f.vscode.window.activeTextEditor = { document: {
+            uri: { scheme: 'file', fsPath: otherSource }, isDirty: false,
+            getText: () => otherText, save: async () => { assert.fail('The clean other document must not save'); },
+        } };
+        assert.equal(await f.api.debugActiveFile(), true, 'A different source must progress independently');
+        assert.equal(f.calls.classifications.length, 1);
+        assert.equal(f.calls.classifications[0].filePath, otherSource);
+        assert.equal(f.calls.classifications[0].text, otherText);
+        assert.equal(f.calls.launches.length, 1);
+        const live = f.calls.launches[0].config;
+        assert(fs.existsSync(live.program));
+        completeSave(true);
+        assert.equal(await operation, false);
+        assert.equal(f.calls.classifications.length, 1, 'The first source must not resume using the new active document');
+        assert.equal(f.calls.launches.length, 1);
+        assert.equal(f.calls.stops.length, 0, 'Cancel intent for the first save must not stop the other session');
+        assert(fs.existsSync(live.program));
+        assert.deepEqual(f.calls.errors, []);
+    } finally {
+        completeSave?.(false);
+        await operation;
+        await f.api.dispose();
+    }
 });
 
 test('user build cancellation stays coalesced until child close and permits one dirty concurrent retry', async t => {
