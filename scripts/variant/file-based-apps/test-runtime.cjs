@@ -346,7 +346,13 @@ async function streamOutputProbe() {
     const expected = mode === 'success';
     assert.deepEqual(values, [expected, expected, expected]);
     const first = rows.find(row => row.kind === 'build' && row.source === source);
-    assert.equal(first.closed, true, 'The original command must observe actual child close');
+    const waitFor = async predicate => {
+        const limit = Date.now() + 3000;
+        while (!predicate() && Date.now() < limit) await new Promise(resolve => setTimeout(resolve, 10));
+        assert(predicate(), 'Probe resources must finish their actual cleanup');
+    };
+    if (mode === 'cancel' || mode === 'dispose') await waitFor(() => first.closed && first.callback);
+    assert.equal(first.closed, true, 'The retained workflow must observe actual child close independently of foreground return');
     assert.equal(first.callback, true);
     const firstAppends = appends.filter(row => row.source === source && row.kind === 'build').map(row => row.value).join('');
     assert(firstAppends.includes('STREAM_STDOUT_1'));
@@ -367,13 +373,8 @@ async function streamOutputProbe() {
     } else assert.equal(errors.length, 0, 'Sink failure must not become a launch error or cancellation notification');
     if (mode === 'cancel' || mode === 'dispose') {
         assert.deepEqual(snapshot, { closed: false, commandSettled: false, disposalSettled: false,
-            outputExists: true, outputDisposed: false }, 'A real pending child retains command/output/disposal ownership');
+            outputExists: true, outputDisposed: false }, 'The pre-cancellation snapshot retains the real child/output/disposal ownership');
     }
-    const waitFor = async predicate => {
-        const limit = Date.now() + 3000;
-        while (!predicate() && Date.now() < limit) await new Promise(resolve => setTimeout(resolve, 10));
-        assert(predicate(), 'Probe resources must finish their actual cleanup');
-    };
     if (mode !== 'dispose') {
         assert(fs.existsSync(other.configuration.program));
         assert.deepEqual(stops, [], 'An unrelated live file must not be stopped for a sink failure');
@@ -1336,7 +1337,7 @@ test('a preparation deadline waits for the build to settle before cleanup and re
     let returned = false;
     void operation.then(() => { returned = true; });
     await new Promise(resolve => setImmediate(resolve));
-    assert(!returned, 'Do not abandon a process that can still write output');
+    assert(returned, 'The timeout releases foreground callers without abandoning the writing process');
     assert(fs.existsSync(path.join(directory, 'FileApp.dll')));
     settleChild();
     assert.equal(await operation, false);
@@ -1450,7 +1451,7 @@ test('certificate phases retain a cancelled trust provider and its output until 
         f.cancel();
         disposal = f.api.dispose().then(() => { disposed = true; });
         await new Promise(resolve => setImmediate(resolve));
-        assert.equal(returned, false, 'Cancel must not pretend the trust provider settled');
+        assert.equal(returned, true, 'Cancellation returns while the trust provider remains owned and unsettled');
         assert.equal(disposed, false, 'Disposal must retain the active trust provider');
         assert(fs.existsSync(path.join(directory, 'FileApp.dll')));
         assert.equal(f.calls.disposals.output, 0);
@@ -1891,13 +1892,14 @@ test('save progress retains a cancelled save for coalesced callers and a correct
         const repeated = f.api.debugActiveFile().then(result => { settled++; return result; });
         requests.push(repeated);
         await new Promise(resolve => setImmediate(resolve));
-        assert.equal(settled, 0, 'Cancel intent must not pretend the original save has settled');
+        assert.equal(settled, 4, 'Cancellation returns to coalesced callers while the original save remains owned');
         assert.equal(f.calls.saves, 1, 'Repeated calls must not compete with the outstanding editor save');
         assert.deepEqual(f.calls.classifications, []);
         assert.deepEqual(f.calls.processes, []);
         assert.deepEqual(f.calls.launches, []);
         completeSave(true);
         assert.deepEqual(await Promise.all(requests), [false, false, false, false]);
+        await waitForForegroundDrain(f);
         assert.deepEqual(f.calls.classifications, [], 'A late successful save must not continue the cancelled command');
         assert.deepEqual(f.calls.processes, []);
         assert.deepEqual(f.calls.errors, []);
@@ -1931,6 +1933,7 @@ test('save progress observes a late rejection after Cancel without starting prep
         f.cancel();
         rejectSave(new Error('Original save provider rejected after Cancel'));
         assert.equal(await operation, false);
+        await waitForForegroundDrain(f);
         assert.deepEqual(f.calls.classifications, []);
         assert.deepEqual(f.calls.processes, []);
         assert.deepEqual(f.calls.launches, []);
@@ -2118,7 +2121,7 @@ test('web preparation cancellation cleans the failed output and permits one corr
     }
 });
 
-test('user build cancellation stays coalesced until child close and permits one dirty concurrent retry', async t => {
+test('user build cancellation returns coalesced foreground while retaining child ownership and permits one dirty concurrent retry', async t => {
     let completeChild;
     let childPending = false;
     let firstBuild = true;
@@ -2153,7 +2156,7 @@ test('user build cancellation stays coalesced until child close and permits one 
     let settled = 0;
     for (const request of requests) void request.then(() => { settled++; });
     await new Promise(resolve => setImmediate(resolve));
-    assert.equal(settled, 0, 'Repeated commands must keep sharing the cancelled child until close');
+    assert.equal(settled, 3, 'Repeated commands return the cancelled foreground while sharing its held child ownership');
     assert.equal(f.calls.classifications.length, 1);
     assert.equal(f.calls.processes.filter(call => call.args[0] === 'build').length, 1);
     assert(fs.existsSync(path.join(directory, 'FileApp.dll')));
@@ -2468,7 +2471,7 @@ test('current terminal cleanup releases a failed build for coalesced dirty retry
     }
 });
 
-test('current terminal cleanup releases cancellation only after child close and retains its deletion drain', { timeout: 5000 }, async t => {
+test('current terminal cleanup returns cancelled foreground before child close and retains its deletion drain', { timeout: 5000 }, async t => {
     let closeChild;
     let writing = false;
     let releaseCleanup;
@@ -2499,7 +2502,7 @@ test('current terminal cleanup releases cancellation only after child close and 
         requests = Promise.all([first, f.api.debugActiveFile(), f.api.debugActiveFile()])
             .then(result => { returned = true; return result; });
         await new Promise(resolve => setImmediate(resolve));
-        assert.equal(returned, false, 'Cancellation still coalesces the writing child until close');
+        assert.equal(returned, true, 'Cancelled callers return while the same writing child remains owned');
         assert.equal(deleting, undefined);
         assert.deepEqual(terminalOutputs(f), []);
         closeChild();
@@ -3746,7 +3749,8 @@ test('foreground diagnostics keep certificate cancellation quiet and reject late
         try {
             if (timing === 'consent') {
                 await waitFor(() => dismiss, 'A broken diagnostic must not prevent the consent modal');
-                assert.equal(getEventListeners(f.certificate.processes[0].settings.signal, 'abort').length, 1);
+                assert.equal(getEventListeners(f.certificate.processes[0].settings.signal, 'abort').length, 2,
+                    'The foreground and modal each observe the active cancellation signal');
                 cancel();
             }
             assert.equal(await operation, false);
@@ -3772,5 +3776,425 @@ test('foreground diagnostics keep certificate cancellation quiet and reject late
             await operation;
             await (disposal || f.api.dispose());
         }
+    }
+});
+
+function foregroundDrainFixture(t, options = {}, certificate = false) {
+    const f = certificate ? certificatePhaseFixture(t, options) : preparationFixture(t, options);
+    const state = { windows: [], registrations: 0, lateReports: 0 };
+    const withProgress = f.vscode.window.withProgress;
+    f.vscode.window.withProgress = async (settings, callback) => {
+        const window = { closed: false };
+        state.windows.push(window);
+        try {
+            return await withProgress(settings, (progress, cancellation) => callback({ report(value) {
+                if (window.closed) state.lateReports++;
+                progress.report(value);
+            } }, {
+                ...cancellation,
+                onCancellationRequested(handler) {
+                    state.registrations++;
+                    const registration = cancellation.onCancellationRequested(handler);
+                    let disposed = false;
+                    return { dispose() {
+                        if (disposed) return;
+                        disposed = true;
+                        state.registrations--;
+                        registration.dispose();
+                    } };
+                },
+            }));
+        } finally { window.closed = true; }
+    };
+    return { ...f, foreground: state };
+}
+
+async function waitForForegroundDrain(f, count = 1) {
+    await waitFor(() => f.calls.logs.filter(line => line.startsWith('Phase drained after ')).length >= count,
+        'The actual cancelled workflow must settle separately from its foreground');
+    await new Promise(resolve => setImmediate(resolve));
+}
+
+async function awaitForegroundResult(operation) {
+    let returned = false;
+    void operation.then(() => { returned = true; }, () => { returned = true; });
+    await waitFor(() => returned, 'Cancellation or timeout must release the foreground before the held provider settles');
+    return operation;
+}
+
+test('foreground drain releases cancelled save callers while retaining the source gate and allowing another file', { timeout: 5000 }, async t => {
+    let completeSave;
+    const f = foregroundDrainFixture(t, { dirty: true, save: () => new Promise(resolve => { completeSave = resolve; }) });
+    const operation = f.api.debugActiveFile();
+    try {
+        await waitFor(() => completeSave, 'The original save must be held');
+        f.advance(7);
+        f.cancel();
+        assert.equal(await awaitForegroundResult(operation), false);
+        assert.equal(f.foreground.windows[0].closed, true);
+        assert.equal(f.foreground.registrations, 0);
+        assert.equal(f.timers.size, 0);
+        assert.equal(await f.api.debugActiveFile(), false, 'A held same-source drain must return the cancelled result');
+        assert.equal(f.calls.saves, 1);
+        assert.equal(f.foreground.windows.length, 1, 'A repeated source must not open another progress or save');
+        assert.deepEqual(f.calls.processes, []);
+        assert.equal(f.calls.disposals.output, 0);
+
+        const other = path.join(path.dirname(f.source), 'independent.cs');
+        const text = 'Console.WriteLine("independent");\n';
+        fs.writeFileSync(other, text);
+        f.vscode.window.activeTextEditor = { document: { uri: { scheme: 'file', fsPath: other },
+            isDirty: false, getText: () => text } };
+        assert.equal(await f.api.debugActiveFile(), true);
+        const otherConfig = f.calls.launches[0].config;
+        assert.equal(otherConfig.cwd, path.dirname(other));
+        f.advance(31);
+        completeSave(true);
+        await waitForForegroundDrain(f);
+        assert(f.calls.logs.includes('Phase cancelled: Saving C# file (7 ms; total 7 ms)'));
+        assert(f.calls.logs.includes('Phase drained after cancelled: Saving C# file (38 ms; total 38 ms)'));
+        assert.equal(f.calls.classifications.length, 1, 'The late save must not classify either source again');
+        assert.equal(f.calls.stops.length, 0, 'The cancelled source cannot stop the independent session');
+        assert(fs.existsSync(otherConfig.program));
+        f.vscode.window.activeTextEditor = { document: f.document };
+        f.document.isDirty = false;
+        assert.deepEqual(await Promise.all([f.api.debugActiveFile(), f.api.debugActiveFile()]), [true, true]);
+        assert.equal(f.calls.launches.length, 2);
+        assert.deepEqual(f.calls.errors, []);
+        assert.equal(f.foreground.lateReports, 0);
+    } finally {
+        completeSave?.(false);
+        await awaitForegroundResult(operation);
+        await f.api.dispose();
+    }
+    assertDisposed(f);
+});
+
+for (const stage of ['SDK discovery', 'classification']) {
+    test(`foreground drain returns a ${stage} timeout before the noncooperative provider settles`, { timeout: 5000 }, async t => {
+        let rejectProvider;
+        const held = () => new Promise((_resolve, reject) => { rejectProvider = reject; });
+        const f = foregroundDrainFixture(t, stage === 'SDK discovery' ? { findDotnet: held } : { classify: held });
+        const operation = f.api.debugActiveFile();
+        let disposal;
+        try {
+            await waitFor(() => rejectProvider, 'The noncooperative provider must be held');
+            f.expire();
+            assert.equal(await awaitForegroundResult(operation), false);
+            assert.equal(await f.api.debugActiveFile(), false);
+            assert.equal(f.foreground.windows.length, 1);
+            assert.equal(f.foreground.windows[0].closed, true);
+            assert.equal(f.foreground.registrations, 0);
+            assert.equal(f.timers.size, 0);
+            assert.equal(f.calls.errors.length, 1);
+            assert.match(f.calls.errors[0], /Preparation timed out/);
+            assert.deepEqual(f.calls.processes, []);
+            disposal = observeDisposal(f);
+            await new Promise(resolve => setImmediate(resolve));
+            assert.equal(disposal.settled, false);
+            assert.equal(f.calls.disposals.output, 0);
+            f.advance(17);
+            rejectProvider(new Error(`Original late ${stage} failure`));
+            await disposal.promise;
+            assert.equal(f.calls.errors.length, 1, 'A late provider error cannot duplicate the timeout notification');
+            assert(f.calls.logs.some(line => line.includes(`Original late ${stage} failure`)));
+            assert(f.calls.logs.some(line => /Phase drained after timed out: .*\(117 ms; total 117 ms\)/.test(line)));
+            assert.equal(f.foreground.lateReports, 0);
+            assert.deepEqual(f.calls.launches, []);
+            assertDisposed(f);
+        } finally {
+            rejectProvider?.(new Error('Test released held provider'));
+            await awaitForegroundResult(operation);
+            await (disposal?.promise || f.api.dispose());
+        }
+    });
+}
+
+test('foreground drain retains a writing build and its output after cancellation until real provider settlement', { timeout: 5000 }, async t => {
+    let settleBuild, signal;
+    const f = foregroundDrainFixture(t);
+    const run = f.dependencies.runDotnet;
+    f.dependencies.runDotnet = async (args, settings) => {
+        const result = await run(args, settings);
+        if (args[0] !== 'build') return result;
+        signal = settings.signal;
+        return new Promise((_resolve, reject) => { settleBuild = reject; });
+    };
+    const operation = f.api.debugActiveFile();
+    let disposal;
+    try {
+        await waitFor(() => settleBuild, 'The writing build provider must be held');
+        const build = f.calls.processes.find(call => call.args[0] === 'build');
+        const directory = build.args[build.args.indexOf('--output') + 1];
+        f.cancel();
+        assert.equal(await awaitForegroundResult(operation), false);
+        assert.equal(await f.api.debugActiveFile(), false);
+        assert.equal(f.calls.processes.filter(call => call.args[0] === 'build').length, 1);
+        assert(fs.existsSync(path.join(directory, 'FileApp.dll')));
+        assert.deepEqual(terminalOutputs(f), [], 'Cancellation does not establish terminal output');
+        assert.equal(getEventListeners(signal, 'abort').length, 0, 'Foreground listeners must be removed while the provider remains held');
+        assert.equal(f.foreground.registrations, 0);
+        assert.equal(f.timers.size, 0);
+        disposal = observeDisposal(f);
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(disposal.settled, false);
+        assert.equal(f.calls.disposals.output, 0);
+        settleBuild(new Error('Original build provider failure after foreground cancellation'));
+        await disposal.promise;
+        assert(!fs.existsSync(directory));
+        assert.deepEqual(terminalOutputs(f), []);
+        assert.deepEqual(f.calls.errors, []);
+        assert(f.calls.logs.some(line => line.includes('Original build provider failure after foreground cancellation')));
+        assert.equal(f.foreground.lateReports, 0);
+        assertDisposed(f);
+    } finally {
+        settleBuild?.(new Error('Test released held build'));
+        await awaitForegroundResult(operation);
+        await (disposal?.promise || f.api.dispose());
+    }
+});
+
+test('foreground drain retains cancelled certificate trust without a timer, verification or premature output cleanup', { timeout: 5000 }, async t => {
+    let rejectTrust;
+    const f = foregroundDrainFixture(t, { certificateProcess: async (_args, _settings, count) => {
+        if (count === 1) return { exitCode: 7 };
+        return new Promise((_resolve, reject) => { rejectTrust = reject; });
+    } }, true);
+    const operation = f.api.debugActiveFile();
+    let disposal;
+    try {
+        await waitFor(() => rejectTrust, 'Trust must remain held independently of its foreground');
+        assert.equal(f.timers.size, 0);
+        f.cancel();
+        assert.equal(await awaitForegroundResult(operation), false);
+        assert.equal(await f.api.debugActiveFile(), false);
+        assert.equal(f.foreground.windows[0].closed, true);
+        assert.equal(f.foreground.registrations, 0);
+        assert.equal(getEventListeners(f.certificate.processes[1].settings.signal, 'abort').length, 0);
+        const build = f.calls.processes.find(call => call.args[0] === 'build');
+        const directory = build.args[build.args.indexOf('--output') + 1];
+        assert(fs.existsSync(path.join(directory, 'FileApp.dll')));
+        disposal = observeDisposal(f);
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(disposal.settled, false);
+        rejectTrust(new Error('Original late trust failure'));
+        await disposal.promise;
+        assert.equal(f.certificate.processes.length, 2);
+        assert(!f.calls.logs.some(line => line.includes('Phase started: Verifying HTTPS')));
+        assert(f.calls.logs.some(line => line.includes('Original late trust failure')));
+        assert.deepEqual(f.calls.errors, []);
+        assert.deepEqual(f.calls.launches, []);
+        assert(!fs.existsSync(directory));
+        assert.equal(f.foreground.lateReports, 0);
+        assertDisposed(f);
+    } finally {
+        rejectTrust?.(new Error('Test released held trust'));
+        await awaitForegroundResult(operation);
+        await (disposal?.promise || f.api.dispose());
+    }
+});
+
+test('foreground drain observes reentrant rejected save results and handles cancellation before progress dispatch', async t => {
+    for (const mode of ['promise', 'thenable', 'pre-aborted']) {
+        let f;
+        f = foregroundDrainFixture(t, { dirty: true, cancellationRequested: mode === 'pre-aborted', save: () => {
+            f.cancel();
+            const failure = new Error(`Original reentrant ${mode} save rejection`);
+            return mode === 'thenable' ? { then(_resolve, reject) { reject(failure); } } : Promise.reject(failure);
+        } });
+        try {
+            assert.equal(await f.api.debugActiveFile(), false);
+            await f.api.dispose();
+            assert.equal(f.calls.saves, mode === 'pre-aborted' ? 0 : 1);
+            if (mode !== 'pre-aborted') assert(f.calls.logs.some(line => line.includes(`Original reentrant ${mode} save rejection`)));
+            assert.deepEqual(f.calls.errors, []);
+            assert.deepEqual(f.calls.processes, []);
+            assert.deepEqual(f.calls.launches, []);
+            assert.equal(f.foreground.registrations, 0);
+            assert.equal(f.foreground.lateReports, 0);
+            assertDisposed(f);
+        } finally { await f.api.dispose(); }
+    }
+    const f = fixture(t);
+    const operation = f.api.debugActiveFile();
+    const disposal = f.api.dispose();
+    assert.equal(await awaitForegroundResult(operation), false);
+    await disposal;
+    assertDisposed(f);
+});
+
+test('foreground drain preserves progress provider errors and retains an already started workflow until it settles', { timeout: 5000 }, async t => {
+    for (const mode of ['before-callback', 'held-work', 'after-cancel', 'after-timeout']) {
+        let rejectWork, lateCallback;
+        const failure = new Error(`Original ${mode} progress provider failure`);
+        const held = () => new Promise((_resolve, reject) => { rejectWork = reject; });
+        const f = foregroundDrainFixture(t, mode === 'after-timeout' ? { classify: held } : { dirty: true, save: held });
+        const withProgress = f.vscode.window.withProgress;
+        f.vscode.window.withProgress = async (settings, callback) => {
+            if (mode === 'before-callback') { lateCallback = () => withProgress(settings, callback); throw failure; }
+            const task = withProgress(settings, callback);
+            void task.catch(() => {});
+            await waitFor(() => rejectWork, 'The callback workflow must start before its provider rejects');
+            if (mode === 'after-cancel') f.cancel();
+            if (mode === 'after-timeout') f.expire();
+            if (mode === 'after-cancel' || mode === 'after-timeout') {
+                await assert.rejects(task, { name: mode === 'after-cancel' ? 'AbortError' : 'TimeoutError' });
+            }
+            throw failure;
+        };
+        const operation = f.api.debugActiveFile();
+        let disposal;
+        try {
+            assert.equal(await awaitForegroundResult(operation), false);
+            const expectedErrors = mode === 'after-cancel' ? 0 : 1;
+            assert.equal(f.calls.errors.length, expectedErrors);
+            if (expectedErrors) assert.match(f.calls.errors[0], mode === 'after-timeout' ? /Preparation timed out/ : new RegExp(failure.message));
+            if (mode !== 'before-callback') assert.equal(await f.api.debugActiveFile(), false, 'A late progress failure cannot release an unsettled source gate');
+            disposal = observeDisposal(f);
+            if (mode !== 'before-callback') {
+                await new Promise(resolve => setImmediate(resolve));
+                assert.equal(disposal.settled, false);
+                rejectWork(new Error('Original held-work rejection after progress provider failure'));
+            } else assert.equal(await lateCallback(), false, 'A late progress callback must not revive the released source');
+            await disposal.promise;
+            assert.equal(f.calls.errors.length, expectedErrors);
+            if (mode === 'after-cancel' || mode === 'after-timeout') {
+                assert(f.calls.logs.some(line => line.includes('Progress provider failed after foreground ') && line.includes(failure.message)));
+            }
+            assert.deepEqual(f.calls.processes, []);
+            assert.deepEqual(f.calls.launches, []);
+            assert.equal(f.foreground.registrations, 0);
+            assertDisposed(f);
+        } finally {
+            rejectWork?.(new Error('Test released held work'));
+            await awaitForegroundResult(operation);
+            await (disposal?.promise || f.api.dispose());
+        }
+    }
+});
+
+test('foreground drain lets completed workflow results win over a late progress provider rejection', async t => {
+    for (const failed of [false, true]) {
+        const original = new Error('Original completed build failure');
+        const f = foregroundDrainFixture(t, failed ? { buildError: original } : {});
+        const withProgress = f.vscode.window.withProgress;
+        f.vscode.window.withProgress = async (settings, callback) => {
+            try { await withProgress(settings, callback); } catch { /* The original workflow outcome must remain owned. */ }
+            f.cancel();
+            throw new Error('Late progress provider rejection');
+        };
+        try {
+            assert.equal(await f.api.debugActiveFile(), !failed);
+            if (failed) {
+                assert.equal(f.calls.errors.length, 1);
+                assert.match(f.calls.errors[0], /Original completed build failure/);
+            } else {
+                assert.deepEqual(f.calls.errors, []);
+                assert.equal(f.calls.launches.length, 1);
+                assert.equal(f.calls.stops.length, 0);
+                f.terminate(f.calls.launches[0].config);
+            }
+        } finally { await f.api.dispose(); }
+        assertDisposed(f);
+    }
+});
+
+test('foreground drain preserves dispatched selected-project completion because it owns no captured project session', { timeout: 5000 }, async t => {
+    let completeProject;
+    const f = foregroundDrainFixture(t, { kind: 'project' });
+    f.vscode.commands.executeCommand = command => {
+        f.calls.commands.push(command);
+        return new Promise(resolve => { completeProject = resolve; });
+    };
+    let returned = false;
+    const operation = f.api.debugActiveFile().then(value => { returned = true; return value; });
+    try {
+        await waitFor(() => completeProject, 'The existing project command must be dispatched');
+        f.cancel();
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(returned, false, 'This exception must not report false before an unowned project start settles');
+        assert.equal(f.timers.size, 0);
+        completeProject(true);
+        assert.equal(await awaitForegroundResult(operation), true);
+        assert.deepEqual(f.calls.commands, ['workbench.action.debug.start']);
+        assert.deepEqual(f.calls.launches, []);
+        assert.deepEqual(f.calls.stops, []);
+        assert.deepEqual(f.calls.errors, []);
+    } finally { completeProject?.(false); await awaitForegroundResult(operation); await f.api.dispose(); }
+    assertDisposed(f);
+});
+
+test('foreground drain stops the exact captured session when cancellation reaches the completed-handoff microtask gap', async t => {
+    const f = foregroundDrainFixture(t);
+    let gapObserved = false;
+    f.vscode.debug.startDebugging = (_folder, config) => {
+        f.calls.launches.push({ config });
+        f.startSession(config);
+        const signal = f.calls.processes[0].settings.signal;
+        let attempts = 0;
+        const cancelAfterHandoff = () => {
+            // The workflow observer remains after startFileDebugging removes its
+            // own listener, before the awaiting workflow records its result.
+            if (getEventListeners(signal, 'abort').length === 1) {
+                gapObserved = true;
+                f.cancel();
+            } else if (++attempts < 32) queueMicrotask(cancelAfterHandoff);
+        };
+        queueMicrotask(cancelAfterHandoff);
+        return Promise.resolve(true);
+    };
+    try {
+        assert.equal(await f.api.debugActiveFile(), false);
+        await f.api.dispose();
+        assert.equal(gapObserved, true);
+        assert.equal(f.calls.launches.length, 1);
+        assert.equal(f.calls.stops.length, 1);
+        assert.equal(f.calls.stops[0], f.session(f.calls.launches[0].config));
+        assert.deepEqual(f.calls.errors, []);
+        assert(!fs.existsSync(f.calls.launches[0].config.program));
+        assertDisposed(f);
+    } finally { await f.api.dispose(); }
+});
+
+test('foreground drain retains a held filesystem allocation and cleans its late-created output only after settlement', { timeout: 5000 }, async t => {
+    let directory, completeAllocation, allocationReturned = false;
+    const removals = [];
+    const activate = activationWithOutputIO({ mkdtemp: async prefix => {
+        directory = await fs.promises.mkdtemp(prefix);
+        return new Promise(resolve => { completeAllocation = () => { allocationReturned = true; resolve(directory); }; });
+    } });
+    const f = foregroundDrainFixture(t, { activate, removeOutput: async (output, settings) => {
+        removals.push({ output, allocationReturned });
+        await fs.promises.rm(output, settings);
+    } });
+    const operation = f.api.debugActiveFile();
+    let disposal;
+    try {
+        await waitFor(() => completeAllocation, 'The filesystem result must be held after creating its directory');
+        f.cancel();
+        assert.equal(await awaitForegroundResult(operation), false);
+        assert.equal(await f.api.debugActiveFile(), false);
+        assert(fs.existsSync(directory));
+        assert.deepEqual(removals, []);
+        assert.deepEqual(terminalOutputs(f), []);
+        assert(!f.calls.processes.some(call => call.args[0] === 'build'));
+        disposal = observeDisposal(f);
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(disposal.settled, false);
+        assert.equal(f.calls.disposals.output, 0);
+        completeAllocation();
+        await disposal.promise;
+        assert.equal(removals.length, 1);
+        assert.equal(removals[0].allocationReturned, true, 'A pending filesystem allocation cannot authorize deletion');
+        assert(!fs.existsSync(directory));
+        assert.deepEqual(terminalOutputs(f), []);
+        assert.deepEqual(f.calls.launches, []);
+        assert.deepEqual(f.calls.errors, []);
+        assert.equal(f.foreground.lateReports, 0);
+        assertDisposed(f);
+    } finally {
+        completeAllocation?.();
+        await operation;
+        await (disposal?.promise || f.api.dispose());
     }
 });

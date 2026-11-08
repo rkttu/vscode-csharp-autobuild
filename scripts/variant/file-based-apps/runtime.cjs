@@ -425,18 +425,39 @@ function activate(context, dependencies = {}) {
         }
     }
 
-    async function debugFile(document, source) {
+    async function debugFile(document, source, settled) {
         const controller = new AbortController();
         controllers.add(controller);
         let generated;
         let launchOwnsOutput = false;
+        let workStarted = false;
+        let workSettled = false;
+        let foregroundSettled = false;
+        let workOutcome;
+        let foregroundAbort;
+        let closeForeground = () => {};
+        const release = () => {
+            if (!foregroundSettled || workStarted && !workSettled) return;
+            controllers.delete(controller);
+            settled();
+            releaseDisposedResources();
+        };
+        const finishWork = () => {
+            if (generated && !launchOwnsOutput) dispatchTerminalCleanup(generated);
+            workSettled = true;
+            release();
+        };
         try {
             return await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
                 title: 'Debug C# file',
                 cancellable: true,
-            }, async (progress, cancellation) => {
-                const cancel = cancellation.onCancellationRequested(() => controller.abort());
+            }, (progress, cancellation) => {
+              const task = (async () => {
+                if (foregroundSettled) return false;
+                let cancel;
+                let progressActive = true;
+                let delegatedProject = false;
                 const began = now();
                 let phase;
                 let phaseBegan = began;
@@ -473,10 +494,41 @@ function activate(context, dependencies = {}) {
                     phase = name;
                     phaseBegan = now();
                     phaseLog(`Phase started: ${phase}`);
-                    progress.report({ message: phase });
+                    if (progressActive) progress.report({ message: phase });
                     checkpoint();
                 };
-                try {
+                let rejectCancelled;
+                const cancelled = new Promise((_resolve, reject) => { rejectCancelled = reject; });
+                const abortForeground = () => {
+                    // A completed workflow wins over later UI cancellation. Existing project
+                    // delegation has no owned-session contract, so its dispatched API must settle.
+                    if (workOutcome || delegatedProject || foregroundAbort) return;
+                    foregroundAbort = controller.signal.reason;
+                    outcome = foregroundAbort?.name === 'TimeoutError' ? 'timed out' :
+                        foregroundAbort?.name === 'AbortError' ? 'cancelled' : 'failed';
+                    stopPreparation();
+                    logPhase(outcome);
+                    phaseLog(`Foreground ${outcome} during ${phase || 'C# file preparation'}; unfinished work remains observed. This file cannot retry until that work settles.`);
+                    // Cancellation can fall between a successful editor handoff and the
+                    // caller resuming. Retain the existing exact-session Stop/termination path.
+                    const launch = launchOwnsOutput && launches.get(generated);
+                    if (launch && !launch.terminal) {
+                        launch.cancelled = true;
+                        void stopCancelledSession(launch);
+                    }
+                    rejectCancelled(foregroundAbort);
+                };
+                closeForeground = () => {
+                    if (!progressActive) return;
+                    progressActive = false;
+                    stopPreparation();
+                    controller.signal.removeEventListener('abort', abortForeground);
+                    if (cancel) disposeResource(cancel);
+                };
+                // Observe both results before a cancellation/provider callback can reenter.
+                workStarted = true;
+                const work = Promise.resolve().then(async () => {
+                  try {
                     if (cancellation.isCancellationRequested || disposed) controller.abort();
                     checkpoint();
                     const sourceUri = document.uri;
@@ -540,6 +592,7 @@ function activate(context, dependencies = {}) {
                     if (classification.kind === 'project') {
                         stopPreparation();
                         setPhase('Starting selected project configuration');
+                        delegatedProject = true;
                         return await vscode.commands.executeCommand('workbench.action.debug.start');
                     }
                     if (classification.kind !== 'file') throw new Error('Could not classify the active C# file.');
@@ -617,29 +670,71 @@ function activate(context, dependencies = {}) {
                         throw new Error('The editor did not start the netcoredbg debug session. Check C# and Debug Console output for details before retrying');
                     }
                     return started;
-                } catch (error) {
+                  } catch (error) {
                     const failure = controller.signal.aborted ? controller.signal.reason : error;
                     if (failure !== error && error?.name !== 'AbortError') {
                         phaseLog(`Error observed during ${phase} after cancellation: ${error?.stack || error?.message || String(error)}`);
                     }
                     outcome = failure?.name === 'TimeoutError' ? 'timed out' : failure?.name === 'AbortError' ? 'cancelled' : 'failed';
                     throw failure;
-                } finally {
+                  } finally {
                     stopPreparation();
-                    logPhase(outcome);
-                    cancel.dispose();
-                }
+                    logPhase(foregroundAbort ? `drained after ${outcome}` : outcome);
+                  }
+                }).then(value => {
+                    if (foregroundAbort) {
+                        workOutcome = { error: foregroundAbort };
+                        finishWork();
+                        throw foregroundAbort;
+                    }
+                    workOutcome = { value };
+                    finishWork();
+                    return value;
+                }, error => {
+                    workOutcome = { error };
+                    finishWork();
+                    throw error;
+                });
+                const result = Promise.race([work, cancelled]);
+                void result.catch(() => {});
+                controller.signal.addEventListener('abort', abortForeground, { once: true });
+                try {
+                    cancel = cancellation.onCancellationRequested(() => {
+                        if (!workOutcome) controller.abort();
+                    });
+                    if (cancellation.isCancellationRequested || disposed) controller.abort();
+                    if (controller.signal.aborted) abortForeground();
+                    return await result;
+                } catch (error) {
+                    if (!controller.signal.aborted) controller.abort(error);
+                    throw error;
+                } finally { closeForeground(); }
+              })();
+              void task.catch(() => {});
+              return task;
             });
         } catch (error) {
+            // A late UI-provider error cannot turn a completed launch into a false
+            // cancellation result while leaving its captured session running.
+            if (foregroundAbort) {
+                if (error !== foregroundAbort) cleanupLog(`Progress provider failed after foreground ${foregroundAbort.name}: ${error?.message || String(error)}`);
+                error = foregroundAbort;
+            } else if (workOutcome) {
+                if (!('error' in workOutcome)) {
+                    cleanupLog(`Progress provider failed after C# workflow completion: ${error?.message || String(error)}`);
+                    return workOutcome.value;
+                }
+                error = workOutcome.error;
+            } else if (!controller.signal.aborted) controller.abort(error);
             if (error.name !== 'AbortError') {
                 cleanupLog(error.stack || error.message || String(error));
                 showError(`C# file debugging failed: ${error.message || error}. See the C# File Debugging output.`);
             }
             return false;
         } finally {
-            controllers.delete(controller);
-            if (generated && !launchOwnsOutput) dispatchTerminalCleanup(generated);
-            releaseDisposedResources();
+            closeForeground();
+            foregroundSettled = true;
+            release();
         }
     }
 
@@ -658,25 +753,26 @@ function activate(context, dependencies = {}) {
         if (pending.has(source)) return pending.get(source);
         // Register pending ownership before invoking callbacks that can dispose
         // this activation reentrantly, including save and cleanup providers.
+        let transferred = false;
+        const settled = () => {
+            if (pending.get(source) === operation) pending.delete(source);
+            releaseDisposedResources();
+        };
         const operation = Promise.resolve().then(async () => {
             try {
                 if (disposed) return false;
                 await retryFailedCleanup();
                 if (disposed) return false;
-                return debugFile(document, source);
+                transferred = true;
+                return debugFile(document, source, settled);
             } catch (error) {
                 cleanupLog(error.stack || error.message || String(error));
                 showError(`C# file debugging failed: ${error.message || error}.`);
                 return false;
-            }
+            } finally { if (!transferred) settled(); }
         });
         pending.set(source, operation);
-        try {
-            return await operation;
-        } finally {
-            pending.delete(source);
-            releaseDisposedResources();
-        }
+        return await operation;
     }
 
     const registered = vscode.commands.registerCommand(COMMAND, command);
