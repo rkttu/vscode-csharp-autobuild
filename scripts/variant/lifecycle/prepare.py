@@ -118,7 +118,7 @@ def main():
     parser.add_argument("--sdk-version", required=True)
     parser.add_argument("--work-dir", type=Path, required=True)
     parser.add_argument("--cycles", type=int, default=3)
-    parser.add_argument("--scenario", choices=("web-lifecycle", "build-failure-retry", "native-build-cancel", "web-profile-failure-retry", "sdk-selection-failure-retry", "debug-handoff-declined-retry", "native-host-failure-retry", "native-adapter-loss", "concurrent-files"), default="web-lifecycle")
+    parser.add_argument("--scenario", choices=("web-lifecycle", "build-failure-retry", "native-build-cancel", "web-profile-failure-retry", "sdk-selection-failure-retry", "debug-handoff-declined-retry", "native-host-failure-retry", "native-adapter-loss", "concurrent-files", "native-handoff-cancel"), default="web-lifecycle")
     args = parser.parse_args()
     if not 2 <= args.cycles <= 10:
         parser.error("Use 2..10 cycles to exercise bounded same-file retry")
@@ -203,6 +203,13 @@ def main():
                 "dotnetAcquisitionExtension.existingDotnetPath": [{"extensionId": EXTENSION_ID, "path": str(dotnet)}]}
     if native_cancellation:
         settings["window.title"] = native_cancellation["windowTitle"]
+    handoff_cancellation = None
+    if args.scenario == "native-handoff-cancel":
+        nonce = str(uuid.uuid4())
+        handoff_cancellation = {"nonce": nonce, "windowTitle": "FBA handoff cancellation " + nonce,
+                                "request": str(work / "needs-ui-cancel.json"),
+                                "receipt": str(work / "ui-cancel-action.json")}
+        settings["window.title"] = handoff_cancellation["windowTitle"]
     (work / "profile/User/settings.json").write_text(json.dumps(settings, indent=2))
     harness = {name: digest((Path(__file__).parent / name).read_bytes())
                for name in ("prepare.py", "run.ps1", "driver.cjs", "extension-test.cjs", "fixtures/web.cs")}
@@ -227,6 +234,8 @@ def main():
                           "macOS": False, "invocation": "command-api", "freshProfiles": 1}}
     if native_cancellation:
         expected["nativeCancellation"] = native_cancellation
+    if handoff_cancellation:
+        expected["handoffCancellation"] = handoff_cancellation
     if concurrent:
         expected["concurrent"] = concurrent
     if args.scenario == "native-adapter-loss":

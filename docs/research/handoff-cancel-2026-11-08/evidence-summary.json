@@ -1,0 +1,3039 @@
+{
+  "schema": 1,
+  "kind": "installed actual UI progress cancellation during held debugger handoff and late native cleanup",
+  "issue": "https://github.com/rkttu/vscode-csharp-autobuild/issues/18",
+  "qualification": false,
+  "productChange": false,
+  "primaryRun": {
+    "name": "n01",
+    "localArtifactDirectory": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01",
+    "success": true,
+    "editorExitCode": 0,
+    "scope": {
+      "installedCandidate": true,
+      "invocation": "command-api",
+      "physicalF5": false,
+      "VSCodium": true,
+      "platform": "win32-arm64",
+      "macOS": false,
+      "qualification": false,
+      "localOnly": true,
+      "published": false,
+      "directWebDebuggee": true,
+      "spawnedGrandchildren": false,
+      "hostReload": false,
+      "injectedTargetRuntime": false,
+      "scenario": "native-handoff-cancel",
+      "actualCompilerFailure": false,
+      "actualWebProfileFailure": false,
+      "actualSdkSelectionFailure": false,
+      "actualNativeHostFailure": false,
+      "injectedEditorRejection": false,
+      "nativeAdapterFailure": false,
+      "actualAdapterProcessKill": false,
+      "concurrentSeparateFiles": false,
+      "injectedEditorHandoffGate": true,
+      "actualProgressCancelUi": true,
+      "injectedCancellationToken": false
+    },
+    "freshProfiles": 1,
+    "aLaunchesAndStopCycles": 3,
+    "bLaunches": 1,
+    "candidate": {
+      "baseVsixSha256": "0d239dff83d3120786ff3596a046fd0866b045f1d883c86fb83c64a7d808d0c5",
+      "sourceCommit": "2b9b01252f85afd6f554c3d5b149a936845c5a18",
+      "target": "win32-arm64",
+      "ownedModules": {
+        "entry.cjs": "8cb28056b4f634d1897302f2b97303e140e9c11c233b2f771c32f7845aab44e3",
+        "runtime.cjs": "fd72cad8a4c27ff707dec3c243db2b9cb7cae47fb64ce738a02e14731aebc1d8",
+        "classify.cjs": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+        "web.cjs": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+        "recovery.cjs": "099f74d6d25c0fad95b0f56e3adaebe43a3f211991b6ef436f92ceed6be199d4"
+      },
+      "buildId": "c4ff1765ce1411e26088e9e5805aa62f3aefd6f22fd470ce62f4a185e4f94c57",
+      "sha256": "be3b320d3f6c71f2e3c29b1a9b2958489872adcc8e3540e049071833eeab3510",
+      "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\local-lifecycle.vsix",
+      "version": "11.7.18004",
+      "localOnly": true,
+      "published": false,
+      "unchangedEntries": 736,
+      "unchangedPayloadDigest": "5b655a847a8d304972570006e1ecd7f4ac1cc01f855055bf3c35640237e2cdf1"
+    },
+    "editor": {
+      "executable": "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\VSCodium.exe",
+      "cli": "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\bin\\codium.cmd",
+      "version": "1.143.17232",
+      "commit": "c072cf642cbbadabefa22f39c58cc902a8b7427f",
+      "sha256": "61b273b2c0196d7cee4ba84f7412ccc74975f0fcefd3579e69a7b373f79027cd",
+      "machine": "arm64",
+      "apiVersion": "1.143.1"
+    },
+    "sdk": {
+      "executable": "C:\\Program Files\\dotnet\\dotnet.exe",
+      "root": "C:\\Program Files\\dotnet",
+      "version": "10.0.403",
+      "sha256": "8f9714d921c3fa1425611e3f79940715b74a18e2b21a5171bbd58e3775ff8315"
+    },
+    "dependency": {
+      "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\resources\\ms-dotnettools.vscode-dotnet-runtime-3.2.0.vsix",
+      "sha256": "a4cff5409f66e3827ee2c6a727ae59382290a182a653ca0f9ac97c63536ee541",
+      "version": "3.2.0"
+    },
+    "installedExtension": {
+      "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\extensions\\dotnetdev-kr-custom.csharp-with-netcoredbg-11.7.18004",
+      "version": "11.7.18004",
+      "displayName": "C# (netcoredbg) LOCAL WEB LIFECYCLE TEST",
+      "metadata": {
+        "installedTimestamp": 1794123991926,
+        "targetPlatform": "undefined",
+        "size": 200481597
+      },
+      "build": {
+        "target": "win32-arm64",
+        "upstreamCsharpCommit": "1c27e135b5dada55a240e4a504bafa759ec578e8",
+        "upstreamCsharpVersion": "11.7.18",
+        "upstreamCsharpTag": "v11.7.18-prerelease",
+        "upstreamPackageVersion": "42.42.42-placeholder",
+        "netcoredbgTag": "3.2.0-1092",
+        "packagingRevision": 4,
+        "releaseTag": "csharp-v11.7.18-netcoredbg-v3.2.0-1092-g9744e1f05186-r4",
+        "versionPolicy": "upstream-patch-revision-v1",
+        "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+        "debuggerArchiveSha256": "cfc272be9e883bcb90c9ed0704731fbb1349faf207d872f71e6bfb83b55869ad",
+        "validationRunId": "41644074504",
+        "validationWorkflowCommit": "ca5d10d97431181d934369c76c28347fac8a05a6",
+        "upstreamMain": "./dist/extension",
+        "localCandidate": true,
+        "lifecycleBuildId": "c4ff1765ce1411e26088e9e5805aa62f3aefd6f22fd470ce62f4a185e4f94c57",
+        "lifecycleSourceCommit": "2b9b01252f85afd6f554c3d5b149a936845c5a18"
+      }
+    },
+    "installedDependency": {
+      "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\extensions\\ms-dotnettools.vscode-dotnet-runtime-3.2.0",
+      "version": "3.2.0"
+    },
+    "installedOwnedModules": {
+      "entry.cjs": "8cb28056b4f634d1897302f2b97303e140e9c11c233b2f771c32f7845aab44e3",
+      "runtime.cjs": "fd72cad8a4c27ff707dec3c243db2b9cb7cae47fb64ce738a02e14731aebc1d8",
+      "classify.cjs": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+      "web.cjs": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+      "recovery.cjs": "099f74d6d25c0fad95b0f56e3adaebe43a3f211991b6ef436f92ceed6be199d4"
+    },
+    "harnessPinnedBeforeLaunch": {
+      "prepare.py": "081aebb838c4ca54633fc18b2690de67523bab9086e7548a20e64b86a7e0c409",
+      "run.ps1": "cf5d3218d002772422455cc90dfdc57c735cbf8b50c3d72577f882c472871866",
+      "driver.cjs": "8c76ce1ed4411968b253dd7f8a5cd27950a5e8d03dc29c1e79c805283e9d1703",
+      "extension-test.cjs": "9c2379192df150a417120054ad4692575950a9e0c5e7565ac9f0f4f0d97e62c6",
+      "fixtures/web.cs": "4d865a4bfb51e53379d0c73b306ad27ef7c925e192d2de3e9201f7acc4fd2cb6"
+    },
+    "executedCopiesSha256": {
+      "driver.cjs": "8c76ce1ed4411968b253dd7f8a5cd27950a5e8d03dc29c1e79c805283e9d1703",
+      "extension-test.cjs": "9c2379192df150a417120054ad4692575950a9e0c5e7565ac9f0f4f0d97e62c6",
+      "fixtures/web.cs": "4d865a4bfb51e53379d0c73b306ad27ef7c925e192d2de3e9201f7acc4fd2cb6"
+    },
+    "checks": [
+      "Normally installed local candidate activates with exact owned module hashes and isolated loaded path",
+      "A source breakpoint binds and evaluates marker=40 through the installed native adapter",
+      "Two independent real Web sessions respond with distinct owned nonces and PIDs",
+      "A cycle 0: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+      "Actual progress Cancel returns three false callers while the editor provider remains held and output/B are preserved; the original released config starts a real late session that terminates without test Stop and releases owned resources",
+      "After actual handoff UI Cancel and late native session cleanup, the disposed gate permits one fresh dirty build/session shared by three callers while B survives",
+      "A cycle 1: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+      "A cycle 2: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+      "B final stop releases its exact PID, HTTP port and owned output"
+    ],
+    "phases": [
+      {
+        "label": "verify installed local candidate",
+        "startedAtMilliseconds": 1.4549,
+        "outcome": "passed",
+        "elapsedMilliseconds": 1579.714
+      },
+      {
+        "label": "A initial installed-command launch and breakpoint",
+        "startedAtMilliseconds": 1591.9303,
+        "outcome": "passed",
+        "elapsedMilliseconds": 5918.0002
+      },
+      {
+        "label": "B independent installed-command launch",
+        "startedAtMilliseconds": 7510.2001,
+        "outcome": "passed",
+        "elapsedMilliseconds": 4931.5626
+      },
+      {
+        "label": "A cycle 0 targeted stop and owned cleanup",
+        "startedAtMilliseconds": 12442.0378,
+        "outcome": "passed",
+        "elapsedMilliseconds": 752.5403
+      },
+      {
+        "label": "B preserved after A cycle 0",
+        "startedAtMilliseconds": 13194.7482,
+        "outcome": "passed",
+        "elapsedMilliseconds": 18.3061
+      },
+      {
+        "label": "A actual progress Cancel during held editor handoff and late native session cleanup",
+        "startedAtMilliseconds": 13234.3246,
+        "outcome": "passed",
+        "elapsedMilliseconds": 39219.4696
+      },
+      {
+        "label": "A cycle 1 dirty edit and installed-command retry",
+        "startedAtMilliseconds": 52453.9126,
+        "outcome": "passed",
+        "elapsedMilliseconds": 4653.5997
+      },
+      {
+        "label": "A cycle 1 targeted stop and owned cleanup",
+        "startedAtMilliseconds": 57109.6535,
+        "outcome": "passed",
+        "elapsedMilliseconds": 612.8486
+      },
+      {
+        "label": "B preserved after A cycle 1",
+        "startedAtMilliseconds": 57722.6684,
+        "outcome": "passed",
+        "elapsedMilliseconds": 2.5831
+      },
+      {
+        "label": "A cycle 2 dirty edit and installed-command retry",
+        "startedAtMilliseconds": 57728.2606,
+        "outcome": "passed",
+        "elapsedMilliseconds": 4927.4383
+      },
+      {
+        "label": "A cycle 2 targeted stop and owned cleanup",
+        "startedAtMilliseconds": 62655.8736,
+        "outcome": "passed",
+        "elapsedMilliseconds": 674.5424
+      },
+      {
+        "label": "B preserved after A cycle 2",
+        "startedAtMilliseconds": 63330.579,
+        "outcome": "passed",
+        "elapsedMilliseconds": 4.9029
+      },
+      {
+        "label": "B final targeted stop and owned cleanup",
+        "startedAtMilliseconds": 63337.4703,
+        "outcome": "passed",
+        "elapsedMilliseconds": 701.4585
+      }
+    ],
+    "elapsedMilliseconds": 64039.5863,
+    "launches": [
+      {
+        "label": "A-0",
+        "revision": "initial",
+        "pid": 99616,
+        "sessionId": "12d6800b-2307-4912-9921-890f7a1dc14c",
+        "origin": "http://127.0.0.1:59239",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-EeKywD",
+        "response": {
+          "pid": 99616,
+          "nonce": "295aea6c-fcc2-43b9-8e90-b0a6860a85af",
+          "revision": "initial",
+          "value": 42
+        },
+        "afterStopMilliseconds": {
+          "stopPromise": 44.458,
+          "matchingEditorTermination": 709.148,
+          "pidObservedGone": 710.565,
+          "portRebindSucceeded": 711.711,
+          "outputAndQueuesClear": 751.879
+        },
+        "stopPromiseToTerminationMilliseconds": 664.69
+      },
+      {
+        "label": "B",
+        "revision": "initial",
+        "pid": 102340,
+        "sessionId": "b14a82b5-3735-4686-8ca2-b9bd4e49dee2",
+        "origin": "http://127.0.0.1:59240",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ef7b8cf20ce0081450d5de68\\run-kPpCOn",
+        "response": {
+          "pid": 102340,
+          "nonce": "2c0b47f6-be4c-45ee-b2eb-ebf6ef687736",
+          "revision": "initial",
+          "value": 42
+        },
+        "afterStopMilliseconds": {
+          "stopPromise": 46.041,
+          "matchingEditorTermination": 652.673,
+          "pidObservedGone": 654.378,
+          "portRebindSucceeded": 655.414,
+          "outputAndQueuesClear": 700.806
+        },
+        "stopPromiseToTerminationMilliseconds": 606.632
+      },
+      {
+        "label": "A-1",
+        "revision": "retry-1",
+        "pid": 100452,
+        "sessionId": "5f8cbfdf-fb64-44e4-a614-2f9135e320a5",
+        "origin": "http://127.0.0.1:59239",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-rfF9bL",
+        "response": {
+          "pid": 100452,
+          "nonce": "c5c69891-ab3d-4dc2-8006-298154068010",
+          "revision": "retry-1",
+          "value": 42
+        },
+        "afterStopMilliseconds": {
+          "stopPromise": 31.951,
+          "matchingEditorTermination": 590.665,
+          "pidObservedGone": 610.72,
+          "portRebindSucceeded": 611.821,
+          "outputAndQueuesClear": 612.268
+        },
+        "stopPromiseToTerminationMilliseconds": 558.714
+      },
+      {
+        "label": "A-2",
+        "revision": "retry-2",
+        "pid": 60936,
+        "sessionId": "c587226b-2077-493b-a55d-64a113ba6067",
+        "origin": "http://127.0.0.1:59239",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-gKOOKV",
+        "response": {
+          "pid": 60936,
+          "nonce": "aa75f004-2bc0-4797-8992-7ddd7b795a63",
+          "revision": "retry-2",
+          "value": 42
+        },
+        "afterStopMilliseconds": {
+          "stopPromise": 38.782,
+          "matchingEditorTermination": 635.479,
+          "pidObservedGone": 644.086,
+          "portRebindSucceeded": 645.305,
+          "outputAndQueuesClear": 674.136
+        },
+        "stopPromiseToTerminationMilliseconds": 596.697
+      }
+    ],
+    "unrelatedSessionPreserved": [
+      {
+        "atMilliseconds": 13212.8503,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "b14a82b5-3735-4686-8ca2-b9bd4e49dee2",
+          "pid": 102340
+        }
+      },
+      {
+        "atMilliseconds": 13285.2543,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "b14a82b5-3735-4686-8ca2-b9bd4e49dee2",
+          "pid": 102340
+        }
+      },
+      {
+        "atMilliseconds": 17052.8769,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "b14a82b5-3735-4686-8ca2-b9bd4e49dee2",
+          "pid": 102340
+        }
+      },
+      {
+        "atMilliseconds": 51225.3836,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "b14a82b5-3735-4686-8ca2-b9bd4e49dee2",
+          "pid": 102340
+        }
+      },
+      {
+        "atMilliseconds": 52450.3268,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "b14a82b5-3735-4686-8ca2-b9bd4e49dee2",
+          "pid": 102340
+        }
+      },
+      {
+        "atMilliseconds": 57107.2379,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "b14a82b5-3735-4686-8ca2-b9bd4e49dee2",
+          "pid": 102340
+        }
+      },
+      {
+        "atMilliseconds": 57725.1892,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "b14a82b5-3735-4686-8ca2-b9bd4e49dee2",
+          "pid": 102340
+        }
+      },
+      {
+        "atMilliseconds": 63335.3946,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "b14a82b5-3735-4686-8ca2-b9bd4e49dee2",
+          "pid": 102340
+        }
+      }
+    ],
+    "stopDiagnostics": [
+      {
+        "atMilliseconds": 12511.5243,
+        "event": "adapter-error",
+        "detail": {
+          "label": "A-0",
+          "error": "Error: read error"
+        },
+        "afterStopMilliseconds": 69.197
+      },
+      {
+        "atMilliseconds": 51903.4977,
+        "event": "adapter-error",
+        "detail": {
+          "label": "A-handoff-cancel",
+          "error": "Error: read error"
+        },
+        "afterStopMilliseconds": null
+      },
+      {
+        "atMilliseconds": 57160.7101,
+        "event": "adapter-error",
+        "detail": {
+          "label": "A-1",
+          "error": "Error: read error"
+        },
+        "afterStopMilliseconds": 50.916
+      },
+      {
+        "atMilliseconds": 62724.5528,
+        "event": "adapter-error",
+        "detail": {
+          "label": "A-2",
+          "error": "Error: read error"
+        },
+        "afterStopMilliseconds": 68.61
+      },
+      {
+        "atMilliseconds": 63412.4818,
+        "event": "adapter-error",
+        "detail": {
+          "label": "B",
+          "error": "Error: read error"
+        },
+        "afterStopMilliseconds": 74.795
+      }
+    ],
+    "observedCoreRuntimeDirectories": [
+      "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14"
+    ],
+    "observedCoreLibraryModulePaths": [
+      "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Private.CoreLib.dll"
+    ],
+    "rawEvidence": {
+      "result.json": {
+        "sha256": "26d25b99b83f02275537a33b79aa5b19b6f8c1d708419a5a7028128999bac5c8",
+        "bytes": 79602
+      },
+      "expected.json": {
+        "sha256": "eaf98f991df15ace5c7a7aeb220e40973c470979ff2d4c1bf7b10798717996b1",
+        "bytes": 3355
+      },
+      "trace.jsonl": {
+        "sha256": "69d2ef672493fe30a2da95bf771a3982a717a7668b9a3853b9cbee880ddd6a5f",
+        "bytes": 293434
+      },
+      "launcher-result.json": {
+        "sha256": "1dbbb127e301a8632804331e7d6c785482c79f7de3ee2d9adb3e1af51967752f",
+        "bytes": 436
+      },
+      "attempt.json": {
+        "sha256": "f384bfa6e84ea2528a693fb0d2bd876f5c5699f996ceacd61f5443fbafcf49c8",
+        "bytes": 29
+      },
+      "launch.json": {
+        "sha256": "dd28c41b526a0a7b500afdabf834777223472024ff051d74775d847b0dbcd368",
+        "bytes": 1069
+      },
+      "progress/state.json": {
+        "sha256": "b56052a7d865e247de4c9384efa5973d287e481bb37160bd7c919690f4be7387",
+        "bytes": 9454
+      },
+      "logs/candidate-install.txt": {
+        "sha256": "434c922f436a8f13b79dc42e16648e11678adeeb62f83e51e999255147883863",
+        "bytes": 395
+      },
+      "logs/editor-version.txt": {
+        "sha256": "aff6841c98558e85f0dde480073005e9e8267d1e06817b8165756bbc14ab2ca2",
+        "bytes": 62
+      },
+      "logs/runtime-install.txt": {
+        "sha256": "87ae6b7dd637f9a96ede690c3d0efc7ba9003a565840aa2fd0f85f29ab9ca819",
+        "bytes": 422
+      },
+      "logs/sdk-version.txt": {
+        "sha256": "e4e6a678725873a4192c048849cd64d852983991bfcb210a40c3b80cc8fcf2eb",
+        "bytes": 10
+      },
+      "logs/stderr.txt": {
+        "sha256": "7e5fb989d71cf0d5488c777f108d0eea71a4d9bca691335bc8ed994e538e99d6",
+        "bytes": 838
+      },
+      "logs/stdout.txt": {
+        "sha256": "f3b1056adaf622816d47ac9006ff5bd7f81211d73379a4d5c84e1d7a0c320dc4",
+        "bytes": 1336
+      },
+      "profile/logs/20261108T164633/window1/exthost/output_logging_20261108T164636/3-C# File Debugging.log": {
+        "sha256": "786d60fdc71937fd19f30faa47db1f95c1c734266608fa66e3b48d67e505e5eb",
+        "bytes": 29794
+      },
+      "profile/logs/20261108T164633/window1/exthost/exthost.log": {
+        "sha256": "c0b9948249270a98eb1471f4ed3fb6641ed29f142c6f367d3c00fc5156222009",
+        "bytes": 7185
+      },
+      "profile/logs/20261108T164633/window1/exthost/dotnetdev-kr-custom.csharp-with-netcoredbg/C#.log": {
+        "sha256": "31c8f21cd0b88e42a79114113276aed6ba6066b91ceecd604c11f4ae64e1df4e",
+        "bytes": 57954
+      },
+      "needs-ui-cancel.json": {
+        "sha256": "2b3e2bf4388f3d6ccf316e41ab324435655017a6a21b95ac15081ad731e2f2ed",
+        "bytes": 900
+      },
+      "ui-cancel-action.json": {
+        "sha256": "68cbda0b3503cb14bb135f3d8ad6ba0448ddac8821564e062fc531dc8efcae4a",
+        "bytes": 1264
+      },
+      "ui/after.json": {
+        "sha256": "7ea0edd2b6cbfa8d8e98516ad887eccc472722b59681dc43fc640eb2a61764b4",
+        "bytes": 19241
+      },
+      "ui/before.json": {
+        "sha256": "a097685669569229548334a68b6adaeba491087da5f8c9b571420752dd361fcc",
+        "bytes": 19242
+      }
+    },
+    "interpretation": "Behavioral lifecycle assertions passed. Stop-time adapter errors remain recorded; this is not an error-free-log or release-qualification claim."
+  },
+  "primaryIdentity": {
+    "baseCommit": "2b9b01252f85afd6f554c3d5b149a936845c5a18",
+    "productModulesUnchanged": true,
+    "currentOwnedModules": {
+      "classify.cjs": {
+        "sha256": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+        "bytes": 11396
+      },
+      "entry.cjs": {
+        "sha256": "8cb28056b4f634d1897302f2b97303e140e9c11c233b2f771c32f7845aab44e3",
+        "bytes": 2759
+      },
+      "recovery.cjs": {
+        "sha256": "099f74d6d25c0fad95b0f56e3adaebe43a3f211991b6ef436f92ceed6be199d4",
+        "bytes": 16057
+      },
+      "runtime.cjs": {
+        "sha256": "fd72cad8a4c27ff707dec3c243db2b9cb7cae47fb64ce738a02e14731aebc1d8",
+        "bytes": 35296
+      },
+      "web.cjs": {
+        "sha256": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+        "bytes": 17865
+      }
+    },
+    "completeHarness": {
+      "prepare.py": "081aebb838c4ca54633fc18b2690de67523bab9086e7548a20e64b86a7e0c409",
+      "run.ps1": "cf5d3218d002772422455cc90dfdc57c735cbf8b50c3d72577f882c472871866",
+      "driver.cjs": "8c76ce1ed4411968b253dd7f8a5cd27950a5e8d03dc29c1e79c805283e9d1703",
+      "extension-test.cjs": "9c2379192df150a417120054ad4692575950a9e0c5e7565ac9f0f4f0d97e62c6",
+      "fixtures/web.cs": "4d865a4bfb51e53379d0c73b306ad27ef7c925e192d2de3e9201f7acc4fd2cb6"
+    }
+  },
+  "handoffCancellation": {
+    "attempt": {
+      "label": "A-handoff-cancel",
+      "source": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\workspace\\a.cs",
+      "revision": "initial",
+      "port": 59239,
+      "origin": "http://127.0.0.1:59239",
+      "nonce": "41ba4ac1-7958-41ac-b964-245d2b6cc34e",
+      "expectedHandoffCancellation": true,
+      "commandInvocations": 3,
+      "dap": [
+        {
+          "body": {
+            "capabilities": {
+              "exceptionBreakpointFilters": [
+                {
+                  "filter": "all",
+                  "label": "all"
+                },
+                {
+                  "filter": "user-unhandled",
+                  "label": "user-unhandled"
+                }
+              ],
+              "supportTerminateDebuggee": true,
+              "supportsCancelRequest": true,
+              "supportsConditionalBreakpoints": true,
+              "supportsConfigurationDoneRequest": true,
+              "supportsExceptionFilterOptions": true,
+              "supportsExceptionInfoRequest": true,
+              "supportsExceptionOptions": false,
+              "supportsFunctionBreakpoints": true,
+              "supportsSetExpression": true,
+              "supportsSetVariable": true,
+              "supportsTerminateRequest": true
+            }
+          },
+          "event": "capabilities",
+          "seq": 1,
+          "type": "event"
+        },
+        {
+          "body": {
+            "exceptionBreakpointFilters": [
+              {
+                "filter": "all",
+                "label": "all"
+              },
+              {
+                "filter": "user-unhandled",
+                "label": "user-unhandled"
+              }
+            ],
+            "supportTerminateDebuggee": true,
+            "supportsCancelRequest": true,
+            "supportsConditionalBreakpoints": true,
+            "supportsConfigurationDoneRequest": true,
+            "supportsExceptionFilterOptions": true,
+            "supportsExceptionInfoRequest": true,
+            "supportsExceptionOptions": false,
+            "supportsFunctionBreakpoints": true,
+            "supportsSetExpression": true,
+            "supportsSetVariable": true,
+            "supportsTerminateRequest": true
+          },
+          "command": "initialize",
+          "request_seq": 1,
+          "seq": 2,
+          "success": true,
+          "type": "response"
+        },
+        {
+          "body": {},
+          "event": "initialized",
+          "seq": 3,
+          "type": "event"
+        },
+        {
+          "body": {},
+          "command": "launch",
+          "request_seq": 2,
+          "seq": 4,
+          "success": true,
+          "type": "response"
+        },
+        {
+          "body": {
+            "breakpoints": []
+          },
+          "command": "setFunctionBreakpoints",
+          "request_seq": 3,
+          "seq": 5,
+          "success": true,
+          "type": "response"
+        },
+        {
+          "body": {},
+          "command": "setExceptionBreakpoints",
+          "request_seq": 4,
+          "seq": 6,
+          "success": true,
+          "type": "response"
+        },
+        {
+          "body": {},
+          "command": "terminate",
+          "request_seq": 5,
+          "seq": 7,
+          "success": true,
+          "type": "response"
+        },
+        {
+          "body": {
+            "isLocalProcess": true,
+            "name": "dotnet",
+            "startMethod": "launch",
+            "systemProcessId": 30500
+          },
+          "event": "process",
+          "seq": 8,
+          "type": "event"
+        },
+        {
+          "body": {},
+          "command": "configurationDone",
+          "request_seq": 6,
+          "seq": 9,
+          "success": true,
+          "type": "response"
+        },
+        {
+          "body": {
+            "threads": []
+          },
+          "command": "threads",
+          "request_seq": 7,
+          "seq": 10,
+          "success": true,
+          "type": "response"
+        },
+        {
+          "body": {
+            "exitCode": 0
+          },
+          "event": "exited",
+          "seq": 11,
+          "type": "event"
+        },
+        {
+          "body": {},
+          "event": "terminated",
+          "seq": 12,
+          "type": "event"
+        },
+        {
+          "body": {},
+          "command": "disconnect",
+          "request_seq": 8,
+          "seq": 13,
+          "success": true,
+          "type": "response"
+        }
+      ],
+      "dapRequests": [
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "command": "initialize",
+            "arguments": {
+              "clientID": "vscode",
+              "clientName": "VSCodium",
+              "adapterID": "coreclr",
+              "pathFormat": "path",
+              "linesStartAt1": true,
+              "columnsStartAt1": true,
+              "supportsVariableType": true,
+              "supportsVariablePaging": true,
+              "supportsRunInTerminalRequest": true,
+              "locale": "en",
+              "supportsProgressReporting": true,
+              "supportsInvalidatedEvent": true,
+              "supportsMemoryReferences": true,
+              "supportsArgsCanBeInterpretedByShell": true,
+              "supportsMemoryEvent": true,
+              "supportsStartDebuggingRequest": true,
+              "supportsANSIStyling": true
+            },
+            "type": "request",
+            "seq": 1
+          },
+          "atMilliseconds": 51645.1271
+        },
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "command": "launch",
+            "arguments": {
+              "name": "C#: a.cs",
+              "type": "coreclr",
+              "request": "launch",
+              "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-UzyfZ2\\FileApp.dll",
+              "cwd": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\workspace",
+              "console": "internalConsole",
+              "stopAtEntry": false,
+              "justMyCode": true,
+              "targetArchitecture": "arm64",
+              "args": [],
+              "checkForDevCert": false,
+              "env": {
+                "ASPNETCORE_URLS": "http://127.0.0.1:59239",
+                "LIFECYCLE_TOKEN": "41ba4ac1-7958-41ac-b964-245d2b6cc34e",
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "DOTNET_LAUNCH_PROFILE": "LifecycleHttp",
+                "DOTNET_ROOT": "C:\\Program Files\\dotnet"
+              },
+              "__netcoredbgFileAppOutput": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-UzyfZ2",
+              "requireExactSource": true,
+              "enableStepFiltering": true,
+              "logging": {
+                "exceptions": true,
+                "moduleLoad": true,
+                "programOutput": true,
+                "browserStdOut": true,
+                "elapsedTiming": false,
+                "threadExit": false,
+                "processExit": true,
+                "engineLogging": false,
+                "diagnosticsLog": {
+                  "protocolMessages": false,
+                  "dispatcherMessages": "none",
+                  "debugEngineAPITracing": "none",
+                  "debugRuntimeEventTracing": false,
+                  "expressionEvaluationTracing": false,
+                  "startDebuggingTracing": false
+                },
+                "consoleUsageMessage": true
+              },
+              "suppressJITOptimizations": false,
+              "symbolOptions": {
+                "searchPaths": [],
+                "searchMicrosoftSymbolServer": false,
+                "searchNuGetOrgSymbolServer": false,
+                "cachePath": "",
+                "moduleFilter": {
+                  "mode": "loadAllButExcluded",
+                  "excludedModules": [],
+                  "includedModules": [],
+                  "includeSymbolsNextToModules": true,
+                  "includeSymbolsOnDemand": true
+                }
+              },
+              "expressionEvaluationOptions": {
+                "allowImplicitFuncEval": true,
+                "allowToString": true,
+                "allowFastEvaluate": true,
+                "showRawValues": false
+              },
+              "terminateChildProcesses": false,
+              "internalConsoleOptions": "openOnSessionStart",
+              "__sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80"
+            },
+            "type": "request",
+            "seq": 2
+          },
+          "atMilliseconds": 51669.617
+        },
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "command": "setFunctionBreakpoints",
+            "arguments": {
+              "breakpoints": []
+            },
+            "type": "request",
+            "seq": 3
+          },
+          "atMilliseconds": 51669.9471
+        },
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "command": "setExceptionBreakpoints",
+            "arguments": {
+              "filters": [],
+              "filterOptions": []
+            },
+            "type": "request",
+            "seq": 4
+          },
+          "atMilliseconds": 51670.1436
+        },
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "command": "terminate",
+            "arguments": {
+              "restart": false
+            },
+            "type": "request",
+            "seq": 5
+          },
+          "atMilliseconds": 51672.6892
+        },
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "command": "configurationDone",
+            "type": "request",
+            "seq": 6
+          },
+          "atMilliseconds": 51674.3993
+        },
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "command": "threads",
+            "type": "request",
+            "seq": 7
+          },
+          "atMilliseconds": 51840.8439
+        },
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "command": "disconnect",
+            "arguments": {
+              "restart": false,
+              "terminateDebuggee": true
+            },
+            "type": "request",
+            "seq": 8
+          },
+          "atMilliseconds": 51841.1409
+        }
+      ],
+      "dapTimeline": [
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "body": {
+              "capabilities": {
+                "exceptionBreakpointFilters": [
+                  {
+                    "filter": "all",
+                    "label": "all"
+                  },
+                  {
+                    "filter": "user-unhandled",
+                    "label": "user-unhandled"
+                  }
+                ],
+                "supportTerminateDebuggee": true,
+                "supportsCancelRequest": true,
+                "supportsConditionalBreakpoints": true,
+                "supportsConfigurationDoneRequest": true,
+                "supportsExceptionFilterOptions": true,
+                "supportsExceptionInfoRequest": true,
+                "supportsExceptionOptions": false,
+                "supportsFunctionBreakpoints": true,
+                "supportsSetExpression": true,
+                "supportsSetVariable": true,
+                "supportsTerminateRequest": true
+              }
+            },
+            "event": "capabilities",
+            "seq": 1,
+            "type": "event"
+          },
+          "atMilliseconds": 51667.9879
+        },
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "body": {
+              "exceptionBreakpointFilters": [
+                {
+                  "filter": "all",
+                  "label": "all"
+                },
+                {
+                  "filter": "user-unhandled",
+                  "label": "user-unhandled"
+                }
+              ],
+              "supportTerminateDebuggee": true,
+              "supportsCancelRequest": true,
+              "supportsConditionalBreakpoints": true,
+              "supportsConfigurationDoneRequest": true,
+              "supportsExceptionFilterOptions": true,
+              "supportsExceptionInfoRequest": true,
+              "supportsExceptionOptions": false,
+              "supportsFunctionBreakpoints": true,
+              "supportsSetExpression": true,
+              "supportsSetVariable": true,
+              "supportsTerminateRequest": true
+            },
+            "command": "initialize",
+            "request_seq": 1,
+            "seq": 2,
+            "success": true,
+            "type": "response"
+          },
+          "atMilliseconds": 51668.5663
+        },
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "body": {},
+            "event": "initialized",
+            "seq": 3,
+            "type": "event"
+          },
+          "atMilliseconds": 51668.7544
+        },
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "body": {},
+            "command": "launch",
+            "request_seq": 2,
+            "seq": 4,
+            "success": true,
+            "type": "response"
+          },
+          "atMilliseconds": 51670.3415
+        },
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "body": {
+              "breakpoints": []
+            },
+            "command": "setFunctionBreakpoints",
+            "request_seq": 3,
+            "seq": 5,
+            "success": true,
+            "type": "response"
+          },
+          "atMilliseconds": 51672.2694
+        },
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "body": {},
+            "command": "setExceptionBreakpoints",
+            "request_seq": 4,
+            "seq": 6,
+            "success": true,
+            "type": "response"
+          },
+          "atMilliseconds": 51672.4429
+        },
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "body": {},
+            "command": "terminate",
+            "request_seq": 5,
+            "seq": 7,
+            "success": true,
+            "type": "response"
+          },
+          "atMilliseconds": 51672.9123
+        },
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "body": {
+              "isLocalProcess": true,
+              "name": "dotnet",
+              "startMethod": "launch",
+              "systemProcessId": 30500
+            },
+            "event": "process",
+            "seq": 8,
+            "type": "event"
+          },
+          "atMilliseconds": 51839.4836
+        },
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "body": {},
+            "command": "configurationDone",
+            "request_seq": 6,
+            "seq": 9,
+            "success": true,
+            "type": "response"
+          },
+          "atMilliseconds": 51840.268
+        },
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "body": {
+              "threads": []
+            },
+            "command": "threads",
+            "request_seq": 7,
+            "seq": 10,
+            "success": true,
+            "type": "response"
+          },
+          "atMilliseconds": 51841.4371
+        },
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "body": {
+              "exitCode": 0
+            },
+            "event": "exited",
+            "seq": 11,
+            "type": "event"
+          },
+          "atMilliseconds": 51881.5681
+        },
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "body": {},
+            "event": "terminated",
+            "seq": 12,
+            "type": "event"
+          },
+          "atMilliseconds": 51882.3728
+        },
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "body": {},
+            "command": "disconnect",
+            "request_seq": 8,
+            "seq": 13,
+            "success": true,
+            "type": "response"
+          },
+          "atMilliseconds": 51883.1389
+        }
+      ],
+      "adapterExits": [
+        {
+          "label": "A-handoff-cancel",
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "code": 0,
+          "atMilliseconds": 51902.8831
+        }
+      ],
+      "adapterCreationCount": 1,
+      "editorStartCount": 1,
+      "providerCalls": [
+        {
+          "atMilliseconds": 17035.6654,
+          "configuration": {
+            "name": "C#: a.cs",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-UzyfZ2\\FileApp.dll",
+            "cwd": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\workspace",
+            "console": "internalConsole",
+            "stopAtEntry": false,
+            "justMyCode": true,
+            "targetArchitecture": "arm64",
+            "args": [],
+            "checkForDevCert": false,
+            "env": {
+              "ASPNETCORE_URLS": "http://127.0.0.1:59239",
+              "LIFECYCLE_TOKEN": "41ba4ac1-7958-41ac-b964-245d2b6cc34e",
+              "ASPNETCORE_ENVIRONMENT": "Development",
+              "DOTNET_LAUNCH_PROFILE": "LifecycleHttp",
+              "DOTNET_ROOT": "C:\\Program Files\\dotnet"
+            },
+            "__netcoredbgFileAppOutput": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-UzyfZ2",
+            "requireExactSource": true,
+            "enableStepFiltering": true,
+            "logging": {
+              "exceptions": true,
+              "moduleLoad": true,
+              "programOutput": true,
+              "browserStdOut": true,
+              "elapsedTiming": false,
+              "threadExit": false,
+              "processExit": true,
+              "engineLogging": false,
+              "diagnosticsLog": {
+                "protocolMessages": false,
+                "dispatcherMessages": "none",
+                "debugEngineAPITracing": "none",
+                "debugRuntimeEventTracing": false,
+                "expressionEvaluationTracing": false,
+                "startDebuggingTracing": false
+              },
+              "consoleUsageMessage": true
+            },
+            "suppressJITOptimizations": false,
+            "symbolOptions": {
+              "searchPaths": [],
+              "searchMicrosoftSymbolServer": false,
+              "searchNuGetOrgSymbolServer": false,
+              "cachePath": "",
+              "moduleFilter": {
+                "mode": "loadAllButExcluded",
+                "excludedModules": [],
+                "includedModules": [],
+                "includeSymbolsNextToModules": true,
+                "includeSymbolsOnDemand": true
+              }
+            },
+            "expressionEvaluationOptions": {
+              "allowImplicitFuncEval": true,
+              "allowToString": true,
+              "allowFastEvaluate": true,
+              "showRawValues": false
+            },
+            "terminateChildProcesses": false,
+            "internalConsoleOptions": "openOnSessionStart"
+          },
+          "providerTokenCancelled": false,
+          "artifacts": [
+            {
+              "path": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-UzyfZ2\\FileApp.dll",
+              "size": 9728,
+              "sha256": "a2fa074d6b74ce5f474ee9479f64a44271ac34ec4afa9dca0412f80592bba9fa"
+            },
+            {
+              "path": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-UzyfZ2\\FileApp.pdb",
+              "size": 23192,
+              "sha256": "89272609c13f17c43ee93bf3a03106a943b6fe3e66952f8a34db9f492631e6b4"
+            }
+          ]
+        }
+      ],
+      "providerPending": false,
+      "providerActive": false,
+      "providerPassthroughCount": 0,
+      "providerDisposed": true,
+      "providerDisposalCount": 1,
+      "providerTokenEvents": [],
+      "gateReleased": true,
+      "gateSettled": true,
+      "testStopRequested": false,
+      "sourceSnapshot": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\workspace\\a.cs",
+        "size": 969,
+        "sha256": "4d865a4bfb51e53379d0c73b306ad27ef7c925e192d2de3e9201f7acc4fd2cb6",
+        "base64": "IzpzZGsgTWljcm9zb2Z0Lk5FVC5TZGsuV2ViDQojOnByb3BlcnR5IFRhcmdldEZyYW1ld29yaz1uZXQxMC4wDQoNCnZhciBtYXJrZXIgPSA0MDsNCm1hcmtlciArPSAyOw0KY29uc3Qgc3RyaW5nIHJldmlzaW9uID0gImluaXRpYWwiOw0KdmFyIG5vbmNlID0gRW52aXJvbm1lbnQuR2V0RW52aXJvbm1lbnRWYXJpYWJsZSgiTElGRUNZQ0xFX1RPS0VOIikNCiAgICA/PyB0aHJvdyBuZXcgSW52YWxpZE9wZXJhdGlvbkV4Y2VwdGlvbigiTWlzc2luZyBvd25lZCBsaWZlY3ljbGUgdG9rZW4uIik7DQp2YXIgYnVpbGRlciA9IFdlYkFwcGxpY2F0aW9uLkNyZWF0ZVNsaW1CdWlsZGVyKGFyZ3MpOw0KdmFyIGFwcCA9IGJ1aWxkZXIuQnVpbGQoKTsNCg0KYXBwLk1hcEdldCgiL3Byb2JlIiwgKCkgPT4gUmVzdWx0cy5Kc29uKG5ldw0Kew0KICAgIHBpZCA9IEVudmlyb25tZW50LlByb2Nlc3NJZCwNCiAgICBub25jZSwNCiAgICByZXZpc2lvbiwNCiAgICB2YWx1ZSA9IG1hcmtlcg0KfSkpOw0KDQovLyBUaGlzIGVuZHBvaW50IHBlcm1pdHMgYSBmYWlsZWQgdGVzdCB0byByZWxlYXNlIG9ubHkgaXRzIG93biB2ZXJpZmllZCBzZXJ2ZXIuDQovLyBJdCBpcyBhIGZpeHR1cmUgZmFjaWxpdHksIG5vdCBhIHByb2R1Y3Rpb24gZGVidWdnZXIgY2xlYW51cCBtZWNoYW5pc20uDQphcHAuTWFwUG9zdCgiL3NodXRkb3duIiwgKEh0dHBDb250ZXh0IGNvbnRleHQsIElIb3N0QXBwbGljYXRpb25MaWZldGltZSBsaWZldGltZSkgPT4NCnsNCiAgICBpZiAoY29udGV4dC5SZXF1ZXN0LlF1ZXJ5WyJ0b2tlbiJdLlRvU3RyaW5nKCkgIT0gbm9uY2UpDQogICAgICAgIHJldHVybiBSZXN1bHRzLlVuYXV0aG9yaXplZCgpOw0KICAgIGxpZmV0aW1lLlN0b3BBcHBsaWNhdGlvbigpOw0KICAgIHJldHVybiBSZXN1bHRzLk9rKG5ldyB7IHBpZCA9IEVudmlyb25tZW50LlByb2Nlc3NJZCwgbm9uY2UgfSk7DQp9KTsNCg0KYXBwLlJ1bigpOw0K"
+      },
+      "profileSnapshot": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\workspace\\a.run.json",
+        "size": 320,
+        "sha256": "1b9cc74147dada8d48f665b589acb9d72aebc24db074cbddaa3cbc8ac5cda59e",
+        "base64": "ewogICJwcm9maWxlcyI6IHsKICAgICJMaWZlY3ljbGVIdHRwIjogewogICAgICAiY29tbWFuZE5hbWUiOiAiUHJvamVjdCIsCiAgICAgICJhcHBsaWNhdGlvblVybCI6ICJodHRwOi8vMTI3LjAuMC4xOjU5MjM5IiwKICAgICAgImxhdW5jaEJyb3dzZXIiOiBmYWxzZSwKICAgICAgImVudmlyb25tZW50VmFyaWFibGVzIjogewogICAgICAgICJMSUZFQ1lDTEVfVE9LRU4iOiAiNDFiYTRhYzEtNzk1OC00MWFjLWI5NjQtMjQ1ZDJiNmNjMzRlIiwKICAgICAgICAiQVNQTkVUQ09SRV9FTlZJUk9OTUVOVCI6ICJEZXZlbG9wbWVudCIKICAgICAgfQogICAgfQogIH0KfQo="
+      },
+      "bBefore": {
+        "sessionId": "b14a82b5-3735-4686-8ca2-b9bd4e49dee2",
+        "pid": 102340,
+        "nonce": "2c0b47f6-be4c-45ee-b2eb-ebf6ef687736",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ef7b8cf20ce0081450d5de68\\run-kPpCOn",
+        "response": {
+          "pid": 102340,
+          "nonce": "2c0b47f6-be4c-45ee-b2eb-ebf6ef687736",
+          "revision": "initial",
+          "value": 42
+        }
+      },
+      "commandPending": false,
+      "invokedAtMilliseconds": 13291.4164,
+      "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-UzyfZ2\\FileApp.dll",
+      "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-UzyfZ2",
+      "base": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps",
+      "uiRequestSnapshot": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\needs-ui-cancel.json",
+        "size": 900,
+        "sha256": "2b3e2bf4388f3d6ccf316e41ab324435655017a6a21b95ac15081ad731e2f2ed",
+        "base64": "ewogICJzY2hlbWEiOiAxLAogICJub25jZSI6ICI4OTdkNTJlZi1mNDM0LTRlZjktOTJmYS1mNjMxYjUyMDZiZjMiLAogICJ0b2tlbiI6ICI0MWJhNGFjMS03OTU4LTQxYWMtYjk2NC0yNDVkMmI2Y2MzNGUiLAogICJ3aW5kb3dUaXRsZSI6ICJGQkEgaGFuZG9mZiBjYW5jZWxsYXRpb24gODk3ZDUyZWYtZjQzNC00ZWY5LTkyZmEtZjYzMWI1MjA2YmYzIiwKICAicGhhc2UiOiAiU3RhcnRpbmcgbmV0Y29yZWRiZyIsCiAgInN0YWdlIjogInByb3ZpZGVyLWhlbGQiLAogICJzb3VyY2UiOiAiRDpcXFByb2plY3RzXFx2c2NvZGUtY3NoYXJwLWF1dG9idWlsZFxcdmFsaWRhdGlvbi1hcnRpZmFjdHNcXGhhbmRvZmYtY2FuY2VsLTIwMjYtMTEtMDhcXG4wMVxcd29ya3NwYWNlXFxhLmNzIiwKICAicHJvZ3JhbSI6ICJkOlxcUHJvamVjdHNcXHZzY29kZS1jc2hhcnAtYXV0b2J1aWxkXFx2YWxpZGF0aW9uLWFydGlmYWN0c1xcaGFuZG9mZi1jYW5jZWwtMjAyNi0xMS0wOFxcbjAxXFxwcm9maWxlXFxVc2VyXFxnbG9iYWxTdG9yYWdlXFxkb3RuZXRkZXYta3ItY3VzdG9tLmNzaGFycC13aXRoLW5ldGNvcmVkYmdcXGZpbGUtYmFzZWQtYXBwc1xcY2U5Y2NiYWExMGY2ZGM0MDRlMDhmYjllXFxydW4tVXp5ZloyXFxGaWxlQXBwLmRsbCIsCiAgIm91dHB1dCI6ICJkOlxcUHJvamVjdHNcXHZzY29kZS1jc2hhcnAtYXV0b2J1aWxkXFx2YWxpZGF0aW9uLWFydGlmYWN0c1xcaGFuZG9mZi1jYW5jZWwtMjAyNi0xMS0wOFxcbjAxXFxwcm9maWxlXFxVc2VyXFxnbG9iYWxTdG9yYWdlXFxkb3RuZXRkZXYta3ItY3VzdG9tLmNzaGFycC13aXRoLW5ldGNvcmVkYmdcXGZpbGUtYmFzZWQtYXBwc1xcY2U5Y2NiYWExMGY2ZGM0MDRlMDhmYjllXFxydW4tVXp5ZloyIiwKICAicHJvdmlkZXJDYWxsQ291bnQiOiAxCn0K"
+      },
+      "uiRequestedAtMilliseconds": 17053.7624,
+      "returnedAtMilliseconds": 50990.9336,
+      "commandResults": [
+        false,
+        false,
+        false
+      ],
+      "uiActionSnapshot": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\ui-cancel-action.json",
+        "size": 1264,
+        "sha256": "68cbda0b3503cb14bb135f3d8ad6ba0448ddac8821564e062fc531dc8efcae4a",
+        "base64": "ewogICJzY2hlbWEiOiAxLAogICJub25jZSI6ICI4OTdkNTJlZi1mNDM0LTRlZjktOTJmYS1mNjMxYjUyMDZiZjMiLAogICJ0b2tlbiI6ICI0MWJhNGFjMS03OTU4LTQxYWMtYjk2NC0yNDVkMmI2Y2MzNGUiLAogICJwaGFzZSI6ICJTdGFydGluZyBuZXRjb3JlZGJnIiwKICAic3RhZ2UiOiAicHJvdmlkZXItaGVsZCIsCiAgImF1dG9tYXRpb24iOiAiQG9haS9za3kiLAogICJtZXRob2QiOiAiY2xpY2siLAogICJjb250cm9sIjogInByb2dyZXNzIENhbmNlbCIsCiAgIm5vdGlmaWNhdGlvblRpdGxlIjogIkRlYnVnIEMjIGZpbGUiLAogICJtZXNzYWdlIjogIlN0YXJ0aW5nIG5ldGNvcmVkYmciLAogICJleHBlY3RlZFdpbmRvd1RpdGxlIjogIkZCQSBoYW5kb2ZmIGNhbmNlbGxhdGlvbiA4OTdkNTJlZi1mNDM0LTRlZjktOTJmYS1mNjMxYjUyMDZiZjMiLAogICJ3aW5kb3ciOiB7CiAgICAiYXBwIjogInByb2Nlc3M6QzpcXFVzZXJzXFxya3R0dVxcQXBwRGF0YVxcTG9jYWxcXFByb2dyYW1zXFxWU0NvZGl1bVxcVlNDb2RpdW0uZXhlIiwKICAgICJpZCI6IDIzMjA0ODYyLAogICAgInRpdGxlIjogIltFeHRlbnNpb24gRGV2ZWxvcG1lbnQgSG9zdF0gRkJBIGhhbmRvZmYgY2FuY2VsbGF0aW9uIDg5N2Q1MmVmLWY0MzQtNGVmOS05MmZhLWY2MzFiNTIwNmJmMyIKICB9LAogICJhY3Rpb25TdGFydGVkVXRjIjogIjIwMjYtMTEtMDhUMDc6NDc6MzIuMDc3WiIsCiAgImFjdGlvbkNvbXBsZXRlZFV0YyI6ICIyMDI2LTExLTA4VDA3OjQ3OjMyLjI0NFoiLAogICJ0YXJnZXQiOiB7CiAgICAiZWxlbWVudF9pbmRleCI6IDgxNAogIH0sCiAgImJlZm9yZU9ic2VydmF0aW9uRmlsZSI6ICJEOi9Qcm9qZWN0cy92c2NvZGUtY3NoYXJwLWF1dG9idWlsZC92YWxpZGF0aW9uLWFydGlmYWN0cy9oYW5kb2ZmLWNhbmNlbC0yMDI2LTExLTA4L24wMS91aS9iZWZvcmUuanNvbiIsCiAgImFmdGVyT2JzZXJ2YXRpb25GaWxlIjogIkQ6L1Byb2plY3RzL3ZzY29kZS1jc2hhcnAtYXV0b2J1aWxkL3ZhbGlkYXRpb24tYXJ0aWZhY3RzL2hhbmRvZmYtY2FuY2VsLTIwMjYtMTEtMDgvbjAxL3VpL2FmdGVyLmpzb24iLAogICJiZWZvcmVPYnNlcnZhdGlvblNoYTI1NiI6ICJhMDk3Njg1NjY5NTY5MjI5NTQ4MzM0YTY4YjZhZGFlYmE0OTEwODdkYTVmOGM5YjU3MTQyMDc1MmRkMzYxZmNjIiwKICAiYWZ0ZXJPYnNlcnZhdGlvblNoYTI1NiI6ICI3ZWEwZWRkMmI2Y2JmYThkOGU5ODUxNmFkODg3ZWNjYzQ3MjcyMmI1OTY4MWRjNDNmYzY0MGViMmE2MTc2NGI0Igp9Cg=="
+      },
+      "uiAction": {
+        "schema": 1,
+        "nonce": "897d52ef-f434-4ef9-92fa-f631b5206bf3",
+        "token": "41ba4ac1-7958-41ac-b964-245d2b6cc34e",
+        "phase": "Starting netcoredbg",
+        "stage": "provider-held",
+        "automation": "@oai/sky",
+        "method": "click",
+        "control": "progress Cancel",
+        "notificationTitle": "Debug C# file",
+        "message": "Starting netcoredbg",
+        "expectedWindowTitle": "FBA handoff cancellation 897d52ef-f434-4ef9-92fa-f631b5206bf3",
+        "window": {
+          "app": "process:C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\VSCodium.exe",
+          "id": 23204862,
+          "title": "[Extension Development Host] FBA handoff cancellation 897d52ef-f434-4ef9-92fa-f631b5206bf3"
+        },
+        "actionStartedUtc": "2026-11-08T07:47:32.077Z",
+        "actionCompletedUtc": "2026-11-08T07:47:32.244Z",
+        "target": {
+          "element_index": 814
+        },
+        "beforeObservationFile": "D:/Projects/vscode-csharp-autobuild/validation-artifacts/handoff-cancel-2026-11-08/n01/ui/before.json",
+        "afterObservationFile": "D:/Projects/vscode-csharp-autobuild/validation-artifacts/handoff-cancel-2026-11-08/n01/ui/after.json",
+        "beforeObservationSha256": "a097685669569229548334a68b6adaeba491087da5f8c9b571420752dd361fcc",
+        "afterObservationSha256": "7ea0edd2b6cbfa8d8e98516ad887eccc472722b59681dc43fc640eb2a61764b4"
+      },
+      "uiObservations": [
+        {
+          "path": "D:/Projects/vscode-csharp-autobuild/validation-artifacts/handoff-cancel-2026-11-08/n01/ui/before.json",
+          "size": 19242,
+          "sha256": "a097685669569229548334a68b6adaeba491087da5f8c9b571420752dd361fcc"
+        },
+        {
+          "path": "D:/Projects/vscode-csharp-autobuild/validation-artifacts/handoff-cancel-2026-11-08/n01/ui/after.json",
+          "size": 19241,
+          "sha256": "7ea0edd2b6cbfa8d8e98516ad887eccc472722b59681dc43fc640eb2a61764b4"
+        }
+      ],
+      "providerTokenCancelledAfterForeground": false,
+      "log": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\logs\\20261108T164633\\window1\\exthost\\output_logging_20261108T164636\\3-C# File Debugging.log",
+        "offsetCharacters": 11912,
+        "prefixSha256": "a957fc75c4fa598f2edbdd19174308edd1f9be016cb8bd08879f513fd606d54c",
+        "tailCharacters": 5929,
+        "tailSha256": "98bef0e31a4bc2753695c72468418c50b6fde9212b72b33b5bcf79fbdb99e84e",
+        "buildCommands": [
+          {
+            "args": [
+              "build",
+              "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\workspace\\a.cs",
+              "--configuration",
+              "Debug",
+              "--output",
+              "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-UzyfZ2",
+              "-p:AssemblyName=FileApp",
+              "-p:DebugType=portable",
+              "-p:Optimize=false",
+              "-p:PublishAot=false",
+              "-p:UseSharedCompilation=false",
+              "--disable-build-servers",
+              "--nologo",
+              "-target:Build",
+              "-getProperty:UsingMicrosoftNETSdkWeb,UsingMicrosoftNETSdkRazor,UsingMicrosoftNETSdkWorker,OutputType,TargetFrameworkIdentifier,TargetPlatformIdentifier",
+              "-getItem:FrameworkReference"
+            ],
+            "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-UzyfZ2"
+          }
+        ],
+        "compilerDiagnostics": [],
+        "failedPhaseDiagnostics": [],
+        "cancelledPhaseDiagnostics": [],
+        "buildCompletedPhaseDiagnostics": [
+          "Phase completed: Building file-based app (3153 ms; total 3665 ms)"
+        ],
+        "webPreparationFailedPhaseDiagnostics": [],
+        "webProfileRootDiagnostics": [],
+        "completedPhaseDiagnostics": [],
+        "handoffCancelledDiagnostics": [
+          "Phase cancelled: Starting netcoredbg (34032 ms; total 37699 ms)"
+        ]
+      },
+      "heldAfterForeground": {
+        "atMilliseconds": 51225.5209,
+        "providerPending": true,
+        "gateSettled": false,
+        "outputExists": true,
+        "artifacts": [
+          {
+            "path": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-UzyfZ2\\FileApp.dll",
+            "size": 9728,
+            "sha256": "a2fa074d6b74ce5f474ee9479f64a44271ac34ec4afa9dca0412f80592bba9fa",
+            "retainedSha256": "a2fa074d6b74ce5f474ee9479f64a44271ac34ec4afa9dca0412f80592bba9fa",
+            "retainedSize": 9728
+          },
+          {
+            "path": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-UzyfZ2\\FileApp.pdb",
+            "size": 23192,
+            "sha256": "89272609c13f17c43ee93bf3a03106a943b6fe3e66952f8a34db9f492631e6b4",
+            "retainedSha256": "89272609c13f17c43ee93bf3a03106a943b6fe3e66952f8a34db9f492631e6b4",
+            "retainedSize": 23192
+          }
+        ],
+        "terminalQueuesEmpty": true,
+        "portBindable": true,
+        "b": {
+          "sessionId": "b14a82b5-3735-4686-8ca2-b9bd4e49dee2",
+          "pid": 102340,
+          "nonce": "2c0b47f6-be4c-45ee-b2eb-ebf6ef687736",
+          "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ef7b8cf20ce0081450d5de68\\run-kPpCOn",
+          "response": {
+            "pid": 102340,
+            "nonce": "2c0b47f6-be4c-45ee-b2eb-ebf6ef687736",
+            "revision": "initial",
+            "value": 42
+          }
+        }
+      },
+      "gateMode": "valid-original",
+      "gateSettledAtMilliseconds": 51231.7528,
+      "originalObjectReleased": true,
+      "providerReturnedAtMilliseconds": 51231.8851,
+      "started": true,
+      "startedAtMilliseconds": 51671.3095,
+      "nativeInitialize": {
+        "request": {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "command": "initialize",
+            "arguments": {
+              "clientID": "vscode",
+              "clientName": "VSCodium",
+              "adapterID": "coreclr",
+              "pathFormat": "path",
+              "linesStartAt1": true,
+              "columnsStartAt1": true,
+              "supportsVariableType": true,
+              "supportsVariablePaging": true,
+              "supportsRunInTerminalRequest": true,
+              "locale": "en",
+              "supportsProgressReporting": true,
+              "supportsInvalidatedEvent": true,
+              "supportsMemoryReferences": true,
+              "supportsArgsCanBeInterpretedByShell": true,
+              "supportsMemoryEvent": true,
+              "supportsStartDebuggingRequest": true,
+              "supportsANSIStyling": true
+            },
+            "type": "request",
+            "seq": 1
+          },
+          "atMilliseconds": 51645.1271
+        },
+        "response": {
+          "body": {
+            "exceptionBreakpointFilters": [
+              {
+                "filter": "all",
+                "label": "all"
+              },
+              {
+                "filter": "user-unhandled",
+                "label": "user-unhandled"
+              }
+            ],
+            "supportTerminateDebuggee": true,
+            "supportsCancelRequest": true,
+            "supportsConditionalBreakpoints": true,
+            "supportsConfigurationDoneRequest": true,
+            "supportsExceptionFilterOptions": true,
+            "supportsExceptionInfoRequest": true,
+            "supportsExceptionOptions": false,
+            "supportsFunctionBreakpoints": true,
+            "supportsSetExpression": true,
+            "supportsSetVariable": true,
+            "supportsTerminateRequest": true
+          },
+          "command": "initialize",
+          "request_seq": 1,
+          "seq": 2,
+          "success": true,
+          "type": "response"
+        }
+      },
+      "pid": 30500,
+      "terminated": true,
+      "terminatedAtMilliseconds": 52407.005,
+      "launchRequestObserved": true,
+      "nativeLaunchRequest": {
+        "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+        "message": {
+          "command": "launch",
+          "arguments": {
+            "name": "C#: a.cs",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-UzyfZ2\\FileApp.dll",
+            "cwd": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\workspace",
+            "console": "internalConsole",
+            "stopAtEntry": false,
+            "justMyCode": true,
+            "targetArchitecture": "arm64",
+            "args": [],
+            "checkForDevCert": false,
+            "env": {
+              "ASPNETCORE_URLS": "http://127.0.0.1:59239",
+              "LIFECYCLE_TOKEN": "41ba4ac1-7958-41ac-b964-245d2b6cc34e",
+              "ASPNETCORE_ENVIRONMENT": "Development",
+              "DOTNET_LAUNCH_PROFILE": "LifecycleHttp",
+              "DOTNET_ROOT": "C:\\Program Files\\dotnet"
+            },
+            "__netcoredbgFileAppOutput": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-UzyfZ2",
+            "requireExactSource": true,
+            "enableStepFiltering": true,
+            "logging": {
+              "exceptions": true,
+              "moduleLoad": true,
+              "programOutput": true,
+              "browserStdOut": true,
+              "elapsedTiming": false,
+              "threadExit": false,
+              "processExit": true,
+              "engineLogging": false,
+              "diagnosticsLog": {
+                "protocolMessages": false,
+                "dispatcherMessages": "none",
+                "debugEngineAPITracing": "none",
+                "debugRuntimeEventTracing": false,
+                "expressionEvaluationTracing": false,
+                "startDebuggingTracing": false
+              },
+              "consoleUsageMessage": true
+            },
+            "suppressJITOptimizations": false,
+            "symbolOptions": {
+              "searchPaths": [],
+              "searchMicrosoftSymbolServer": false,
+              "searchNuGetOrgSymbolServer": false,
+              "cachePath": "",
+              "moduleFilter": {
+                "mode": "loadAllButExcluded",
+                "excludedModules": [],
+                "includedModules": [],
+                "includeSymbolsNextToModules": true,
+                "includeSymbolsOnDemand": true
+              }
+            },
+            "expressionEvaluationOptions": {
+              "allowImplicitFuncEval": true,
+              "allowToString": true,
+              "allowFastEvaluate": true,
+              "showRawValues": false
+            },
+            "terminateChildProcesses": false,
+            "internalConsoleOptions": "openOnSessionStart",
+            "__sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80"
+          },
+          "type": "request",
+          "seq": 2
+        },
+        "atMilliseconds": 51669.617
+      },
+      "nativeStopRequests": [
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "command": "terminate",
+            "arguments": {
+              "restart": false
+            },
+            "type": "request",
+            "seq": 5
+          },
+          "atMilliseconds": 51672.6892
+        },
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "message": {
+            "command": "disconnect",
+            "arguments": {
+              "restart": false,
+              "terminateDebuggee": true
+            },
+            "type": "request",
+            "seq": 8
+          },
+          "atMilliseconds": 51841.1409
+        }
+      ],
+      "reportedPidGoneAtMilliseconds": 52412.1107,
+      "pidReported": true,
+      "outputRemovedAtMilliseconds": 52444.9012,
+      "outputAbsent": true,
+      "terminalQueuesEmpty": true,
+      "portBindable": true,
+      "portReusableAtMilliseconds": 52445.8879,
+      "sourceAfterSnapshot": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\workspace\\a.cs",
+        "size": 969,
+        "sha256": "4d865a4bfb51e53379d0c73b306ad27ef7c925e192d2de3e9201f7acc4fd2cb6",
+        "base64": "IzpzZGsgTWljcm9zb2Z0Lk5FVC5TZGsuV2ViDQojOnByb3BlcnR5IFRhcmdldEZyYW1ld29yaz1uZXQxMC4wDQoNCnZhciBtYXJrZXIgPSA0MDsNCm1hcmtlciArPSAyOw0KY29uc3Qgc3RyaW5nIHJldmlzaW9uID0gImluaXRpYWwiOw0KdmFyIG5vbmNlID0gRW52aXJvbm1lbnQuR2V0RW52aXJvbm1lbnRWYXJpYWJsZSgiTElGRUNZQ0xFX1RPS0VOIikNCiAgICA/PyB0aHJvdyBuZXcgSW52YWxpZE9wZXJhdGlvbkV4Y2VwdGlvbigiTWlzc2luZyBvd25lZCBsaWZlY3ljbGUgdG9rZW4uIik7DQp2YXIgYnVpbGRlciA9IFdlYkFwcGxpY2F0aW9uLkNyZWF0ZVNsaW1CdWlsZGVyKGFyZ3MpOw0KdmFyIGFwcCA9IGJ1aWxkZXIuQnVpbGQoKTsNCg0KYXBwLk1hcEdldCgiL3Byb2JlIiwgKCkgPT4gUmVzdWx0cy5Kc29uKG5ldw0Kew0KICAgIHBpZCA9IEVudmlyb25tZW50LlByb2Nlc3NJZCwNCiAgICBub25jZSwNCiAgICByZXZpc2lvbiwNCiAgICB2YWx1ZSA9IG1hcmtlcg0KfSkpOw0KDQovLyBUaGlzIGVuZHBvaW50IHBlcm1pdHMgYSBmYWlsZWQgdGVzdCB0byByZWxlYXNlIG9ubHkgaXRzIG93biB2ZXJpZmllZCBzZXJ2ZXIuDQovLyBJdCBpcyBhIGZpeHR1cmUgZmFjaWxpdHksIG5vdCBhIHByb2R1Y3Rpb24gZGVidWdnZXIgY2xlYW51cCBtZWNoYW5pc20uDQphcHAuTWFwUG9zdCgiL3NodXRkb3duIiwgKEh0dHBDb250ZXh0IGNvbnRleHQsIElIb3N0QXBwbGljYXRpb25MaWZldGltZSBsaWZldGltZSkgPT4NCnsNCiAgICBpZiAoY29udGV4dC5SZXF1ZXN0LlF1ZXJ5WyJ0b2tlbiJdLlRvU3RyaW5nKCkgIT0gbm9uY2UpDQogICAgICAgIHJldHVybiBSZXN1bHRzLlVuYXV0aG9yaXplZCgpOw0KICAgIGxpZmV0aW1lLlN0b3BBcHBsaWNhdGlvbigpOw0KICAgIHJldHVybiBSZXN1bHRzLk9rKG5ldyB7IHBpZCA9IEVudmlyb25tZW50LlByb2Nlc3NJZCwgbm9uY2UgfSk7DQp9KTsNCg0KYXBwLlJ1bigpOw0K"
+      },
+      "profileAfterSnapshot": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\workspace\\a.run.json",
+        "size": 320,
+        "sha256": "1b9cc74147dada8d48f665b589acb9d72aebc24db074cbddaa3cbc8ac5cda59e",
+        "base64": "ewogICJwcm9maWxlcyI6IHsKICAgICJMaWZlY3ljbGVIdHRwIjogewogICAgICAiY29tbWFuZE5hbWUiOiAiUHJvamVjdCIsCiAgICAgICJhcHBsaWNhdGlvblVybCI6ICJodHRwOi8vMTI3LjAuMC4xOjU5MjM5IiwKICAgICAgImxhdW5jaEJyb3dzZXIiOiBmYWxzZSwKICAgICAgImVudmlyb25tZW50VmFyaWFibGVzIjogewogICAgICAgICJMSUZFQ1lDTEVfVE9LRU4iOiAiNDFiYTRhYzEtNzk1OC00MWFjLWI5NjQtMjQ1ZDJiNmNjMzRlIiwKICAgICAgICAiQVNQTkVUQ09SRV9FTlZJUk9OTUVOVCI6ICJEZXZlbG9wbWVudCIKICAgICAgfQogICAgfQogIH0KfQo="
+      },
+      "bAfter": {
+        "sessionId": "b14a82b5-3735-4686-8ca2-b9bd4e49dee2",
+        "pid": 102340,
+        "nonce": "2c0b47f6-be4c-45ee-b2eb-ebf6ef687736",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ef7b8cf20ce0081450d5de68\\run-kPpCOn",
+        "response": {
+          "pid": 102340,
+          "nonce": "2c0b47f6-be4c-45ee-b2eb-ebf6ef687736",
+          "revision": "initial",
+          "value": 42
+        }
+      },
+      "lateTerminationObservedWithoutTestStop": true,
+      "providerDisposedAtMilliseconds": 52453.5314,
+      "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+      "capturedSessions": [
+        {
+          "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+          "primary": true,
+          "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-UzyfZ2\\FileApp.dll",
+          "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-UzyfZ2",
+          "pid": 30500,
+          "terminated": true,
+          "terminatedAtMilliseconds": 52407.005
+        }
+      ]
+    },
+    "coalescedRetry": {
+      "label": "A-1",
+      "commandInvocations": 3,
+      "commandResults": [
+        true,
+        true,
+        true
+      ],
+      "sessionId": "5f8cbfdf-fb64-44e4-a614-2f9135e320a5",
+      "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-rfF9bL",
+      "sessionIds": [
+        "5f8cbfdf-fb64-44e4-a614-2f9135e320a5"
+      ],
+      "log": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\logs\\20261108T164633\\window1\\exthost\\output_logging_20261108T164636\\3-C# File Debugging.log",
+        "offsetCharacters": 17942,
+        "prefixSha256": "4ec23ba7b4f0d3e99dd79b0a466f4510ee098a7741f921c13a973c5e32c69a20",
+        "tailCharacters": 5926,
+        "tailSha256": "a7fa21cd0194fb90568a17b413ae5ad8e63ebef542468a15127d08963ca40325",
+        "buildCommands": [
+          {
+            "args": [
+              "build",
+              "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\workspace\\a.cs",
+              "--configuration",
+              "Debug",
+              "--output",
+              "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-rfF9bL",
+              "-p:AssemblyName=FileApp",
+              "-p:DebugType=portable",
+              "-p:Optimize=false",
+              "-p:PublishAot=false",
+              "-p:UseSharedCompilation=false",
+              "--disable-build-servers",
+              "--nologo",
+              "-target:Build",
+              "-getProperty:UsingMicrosoftNETSdkWeb,UsingMicrosoftNETSdkRazor,UsingMicrosoftNETSdkWorker,OutputType,TargetFrameworkIdentifier,TargetPlatformIdentifier",
+              "-getItem:FrameworkReference"
+            ],
+            "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-rfF9bL"
+          }
+        ],
+        "compilerDiagnostics": [],
+        "failedPhaseDiagnostics": [],
+        "cancelledPhaseDiagnostics": [],
+        "buildCompletedPhaseDiagnostics": [
+          "Phase completed: Building file-based app (2899 ms; total 3365 ms)"
+        ],
+        "webPreparationFailedPhaseDiagnostics": [],
+        "webProfileRootDiagnostics": [],
+        "completedPhaseDiagnostics": [
+          "Phase completed: Starting netcoredbg (493 ms; total 3860 ms)"
+        ]
+      },
+      "failedOutput": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-UzyfZ2",
+      "freshOutput": true,
+      "profileSnapshot": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\workspace\\a.run.json",
+        "size": 320,
+        "sha256": "8cec8fbb1b639aebaf661e5ed5847a3d40c1d02d69e0130950808e89c1fb7810",
+        "base64": "ewogICJwcm9maWxlcyI6IHsKICAgICJMaWZlY3ljbGVIdHRwIjogewogICAgICAiY29tbWFuZE5hbWUiOiAiUHJvamVjdCIsCiAgICAgICJhcHBsaWNhdGlvblVybCI6ICJodHRwOi8vMTI3LjAuMC4xOjU5MjM5IiwKICAgICAgImxhdW5jaEJyb3dzZXIiOiBmYWxzZSwKICAgICAgImVudmlyb25tZW50VmFyaWFibGVzIjogewogICAgICAgICJMSUZFQ1lDTEVfVE9LRU4iOiAiYzVjNjk4OTEtYWIzZC00ZGMyLTgwMDYtMjk4MTU0MDY4MDEwIiwKICAgICAgICAiQVNQTkVUQ09SRV9FTlZJUk9OTUVOVCI6ICJEZXZlbG9wbWVudCIKICAgICAgfQogICAgfQogIH0KfQo="
+      },
+      "sourceSnapshot": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\workspace\\a.cs",
+        "size": 969,
+        "sha256": "2a57f8a4b62b880b64e12cde7fb76ed3d0a3188e93c10300d0971f36a352ba47",
+        "base64": "IzpzZGsgTWljcm9zb2Z0Lk5FVC5TZGsuV2ViDQojOnByb3BlcnR5IFRhcmdldEZyYW1ld29yaz1uZXQxMC4wDQoNCnZhciBtYXJrZXIgPSA0MDsNCm1hcmtlciArPSAyOw0KY29uc3Qgc3RyaW5nIHJldmlzaW9uID0gInJldHJ5LTEiOw0KdmFyIG5vbmNlID0gRW52aXJvbm1lbnQuR2V0RW52aXJvbm1lbnRWYXJpYWJsZSgiTElGRUNZQ0xFX1RPS0VOIikNCiAgICA/PyB0aHJvdyBuZXcgSW52YWxpZE9wZXJhdGlvbkV4Y2VwdGlvbigiTWlzc2luZyBvd25lZCBsaWZlY3ljbGUgdG9rZW4uIik7DQp2YXIgYnVpbGRlciA9IFdlYkFwcGxpY2F0aW9uLkNyZWF0ZVNsaW1CdWlsZGVyKGFyZ3MpOw0KdmFyIGFwcCA9IGJ1aWxkZXIuQnVpbGQoKTsNCg0KYXBwLk1hcEdldCgiL3Byb2JlIiwgKCkgPT4gUmVzdWx0cy5Kc29uKG5ldw0Kew0KICAgIHBpZCA9IEVudmlyb25tZW50LlByb2Nlc3NJZCwNCiAgICBub25jZSwNCiAgICByZXZpc2lvbiwNCiAgICB2YWx1ZSA9IG1hcmtlcg0KfSkpOw0KDQovLyBUaGlzIGVuZHBvaW50IHBlcm1pdHMgYSBmYWlsZWQgdGVzdCB0byByZWxlYXNlIG9ubHkgaXRzIG93biB2ZXJpZmllZCBzZXJ2ZXIuDQovLyBJdCBpcyBhIGZpeHR1cmUgZmFjaWxpdHksIG5vdCBhIHByb2R1Y3Rpb24gZGVidWdnZXIgY2xlYW51cCBtZWNoYW5pc20uDQphcHAuTWFwUG9zdCgiL3NodXRkb3duIiwgKEh0dHBDb250ZXh0IGNvbnRleHQsIElIb3N0QXBwbGljYXRpb25MaWZldGltZSBsaWZldGltZSkgPT4NCnsNCiAgICBpZiAoY29udGV4dC5SZXF1ZXN0LlF1ZXJ5WyJ0b2tlbiJdLlRvU3RyaW5nKCkgIT0gbm9uY2UpDQogICAgICAgIHJldHVybiBSZXN1bHRzLlVuYXV0aG9yaXplZCgpOw0KICAgIGxpZmV0aW1lLlN0b3BBcHBsaWNhdGlvbigpOw0KICAgIHJldHVybiBSZXN1bHRzLk9rKG5ldyB7IHBpZCA9IEVudmlyb25tZW50LlByb2Nlc3NJZCwgbm9uY2UgfSk7DQp9KTsNCg0KYXBwLlJ1bigpOw0K"
+      },
+      "providerDisposedBeforeRetry": true,
+      "failedNonce": "41ba4ac1-7958-41ac-b964-245d2b6cc34e",
+      "nonce": "c5c69891-ab3d-4dc2-8006-298154068010",
+      "freshToken": true
+    },
+    "ui": {
+      "request": {
+        "schema": 1,
+        "nonce": "897d52ef-f434-4ef9-92fa-f631b5206bf3",
+        "token": "41ba4ac1-7958-41ac-b964-245d2b6cc34e",
+        "windowTitle": "FBA handoff cancellation 897d52ef-f434-4ef9-92fa-f631b5206bf3",
+        "phase": "Starting netcoredbg",
+        "stage": "provider-held",
+        "source": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\workspace\\a.cs",
+        "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-UzyfZ2\\FileApp.dll",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-UzyfZ2",
+        "providerCallCount": 1
+      },
+      "receipt": {
+        "schema": 1,
+        "nonce": "897d52ef-f434-4ef9-92fa-f631b5206bf3",
+        "token": "41ba4ac1-7958-41ac-b964-245d2b6cc34e",
+        "phase": "Starting netcoredbg",
+        "stage": "provider-held",
+        "automation": "@oai/sky",
+        "method": "click",
+        "control": "progress Cancel",
+        "notificationTitle": "Debug C# file",
+        "message": "Starting netcoredbg",
+        "expectedWindowTitle": "FBA handoff cancellation 897d52ef-f434-4ef9-92fa-f631b5206bf3",
+        "window": {
+          "app": "process:C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\VSCodium.exe",
+          "id": 23204862,
+          "title": "[Extension Development Host] FBA handoff cancellation 897d52ef-f434-4ef9-92fa-f631b5206bf3"
+        },
+        "actionStartedUtc": "2026-11-08T07:47:32.077Z",
+        "actionCompletedUtc": "2026-11-08T07:47:32.244Z",
+        "target": {
+          "element_index": 814
+        },
+        "beforeObservationFile": "D:/Projects/vscode-csharp-autobuild/validation-artifacts/handoff-cancel-2026-11-08/n01/ui/before.json",
+        "afterObservationFile": "D:/Projects/vscode-csharp-autobuild/validation-artifacts/handoff-cancel-2026-11-08/n01/ui/after.json",
+        "beforeObservationSha256": "a097685669569229548334a68b6adaeba491087da5f8c9b571420752dd361fcc",
+        "afterObservationSha256": "7ea0edd2b6cbfa8d8e98516ad887eccc472722b59681dc43fc640eb2a61764b4"
+      },
+      "beforeObservation": {
+        "path": "D:/Projects/vscode-csharp-autobuild/validation-artifacts/handoff-cancel-2026-11-08/n01/ui/before.json",
+        "sha256": "a097685669569229548334a68b6adaeba491087da5f8c9b571420752dd361fcc",
+        "bytes": 19242,
+        "atUtc": "2026-11-08T07:47:32.067Z",
+        "window": {
+          "app": "process:C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\VSCodium.exe",
+          "id": 23204862,
+          "title": "[Extension Development Host] FBA handoff cancellation 897d52ef-f434-4ef9-92fa-f631b5206bf3"
+        },
+        "screenshots": [
+          {
+            "id": "screenshot-0",
+            "width": 1445,
+            "height": 904,
+            "originX": 839,
+            "originY": 405,
+            "zIndex": 0,
+            "path": "D:/Projects/vscode-csharp-autobuild/validation-artifacts/handoff-cancel-2026-11-08/n01/ui/before-0.image",
+            "mimeType": "image/jpeg",
+            "bytes": 172529,
+            "sha256": "b892ca4a6db5881a2b68fbcd6ef84aa0c90da247c631e7f046c6a2c2f94eff0b"
+          }
+        ],
+        "selectedCancelRow": "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t814 \ub2e8\ucd94 Cancel",
+        "notificationContext": "\t\t\t\t\t\t\t\t\t\t\t\t809 LIST Info: Debug C# file: Locating .NET SDK, source: C# (netcoredbg) LOCAL WEB LIFECYCLE TEST, notification\n\t\t\t\t\t\t\t\t\t\t\t\t\t810 \ub300\ud654 \uc0c1\uc790 Info: Debug C# file: Locating .NET SDK, source: C# (netcoredbg) LOCAL WEB LIFECYCLE TEST, notification, Inspect the response in the accessible view with Alt+F2 Secondary Actions: Raise ID: list_id_18_0\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t811 \uadf8\ub8f9\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t812 \uadf8\ub8f9\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t813 \ud14d\uc2a4\ud2b8 Source: C# (netcoredbg) LOCAL WEB LIFECYCLE TEST\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t814 \ub2e8\ucd94 Cancel\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t815 \ud14d\uc2a4\ud2b8 \uea74\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t816 \uadf8\ub8f9\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t857 \ud14d\uc2a4\ud2b8 Debug C# file: Starting netcoredbg\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t818 \ub3c4\uad6c \ubaa8\uc74c Notification Actions\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t819 \uadf8\ub8f9\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t820 \uadf8\ub8f9\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t821 \ub2e8\ucd94 More Actions...\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t822 \ud14d\uc2a4\ud2b8 \ueaf8\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t823 progress indicator Progress Value: 0"
+      },
+      "afterObservation": {
+        "path": "D:/Projects/vscode-csharp-autobuild/validation-artifacts/handoff-cancel-2026-11-08/n01/ui/after.json",
+        "sha256": "7ea0edd2b6cbfa8d8e98516ad887eccc472722b59681dc43fc640eb2a61764b4",
+        "bytes": 19241,
+        "atUtc": "2026-11-08T07:47:32.469Z",
+        "window": {
+          "app": "process:C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\VSCodium.exe",
+          "id": 23204862,
+          "title": "[Extension Development Host] FBA handoff cancellation 897d52ef-f434-4ef9-92fa-f631b5206bf3"
+        },
+        "screenshots": [
+          {
+            "id": "screenshot-0",
+            "width": 1445,
+            "height": 904,
+            "originX": 839,
+            "originY": 405,
+            "zIndex": 0,
+            "path": "D:/Projects/vscode-csharp-autobuild/validation-artifacts/handoff-cancel-2026-11-08/n01/ui/after-0.image",
+            "mimeType": "image/jpeg",
+            "bytes": 169348,
+            "sha256": "4d713f93b2f16936d346d8f5c3f2040a2fa2fe211882d122e99e8e891f0ad63f"
+          }
+        ],
+        "cachedCancelTextStillPresent": true
+      },
+      "rawEvidence": {
+        "needs-ui-cancel.json": {
+          "sha256": "2b3e2bf4388f3d6ccf316e41ab324435655017a6a21b95ac15081ad731e2f2ed",
+          "bytes": 900
+        },
+        "ui-cancel-action.json": {
+          "sha256": "68cbda0b3503cb14bb135f3d8ad6ba0448ddac8821564e062fc531dc8efcae4a",
+          "bytes": 1264
+        },
+        "ui/after.json": {
+          "sha256": "7ea0edd2b6cbfa8d8e98516ad887eccc472722b59681dc43fc640eb2a61764b4",
+          "bytes": 19241
+        },
+        "ui/before.json": {
+          "sha256": "a097685669569229548334a68b6adaeba491087da5f8c9b571420752dd361fcc",
+          "bytes": 19242
+        },
+        "ui/before-0.image": {
+          "sha256": "b892ca4a6db5881a2b68fbcd6ef84aa0c90da247c631e7f046c6a2c2f94eff0b",
+          "bytes": 172529
+        },
+        "ui/after-0.image": {
+          "sha256": "4d713f93b2f16936d346d8f5c3f2040a2fa2fe211882d122e99e8e891f0ad63f",
+          "bytes": 169348
+        }
+      },
+      "interpretation": "The action receipt is a tool/operator attestation linked to returned window identity, exact pre-click Cancel element and saved observations. Images are bound by encoded-byte hash only, without reopening. An immediate post-click accessibility tree may be stale; absence of cached text is not required. Returned window metadata supplies no process PID."
+    },
+    "bPreservedAfterRetry": [
+      {
+        "atMilliseconds": 57107.2379,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "b14a82b5-3735-4686-8ca2-b9bd4e49dee2",
+          "pid": 102340
+        }
+      }
+    ],
+    "validatedOutputLogs": {
+      "profile/logs/20261108T164633/window1/exthost/output_logging_20261108T164636/3-C# File Debugging.log": {
+        "sha256": "786d60fdc71937fd19f30faa47db1f95c1c734266608fa66e3b48d67e505e5eb",
+        "bytes": 29794
+      }
+    },
+    "mechanism": "An exact-token test provider holds the actual valid editor handoff after a real build; an actual progress Cancel releases foreground callers while the original configuration remains held, then real native initialization/teardown is observed after release.",
+    "stopAttribution": "The control records no Stop or fallback for this attempt. Native terminate/disconnect requests are protocol observations; DAP alone does not identify the API caller. Product cancellation ownership is assessed with unchanged runtime source and this controlled trace.",
+    "nativeOutcome": {
+      "nativeInitializeSucceeded": true,
+      "nativeLaunchRequestObserved": true,
+      "debuggeePidReported": true
+    },
+    "productFollowupStopObservation": {
+      "diagnostics": [
+        "Retrying cancelled C# session Stop after adapter configuration: b99050d9-9aac-4bf9-a9d9-0c5282bedc80"
+      ],
+      "configurationDone": [
+        {
+          "request": {
+            "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+            "message": {
+              "command": "configurationDone",
+              "type": "request",
+              "seq": 6
+            },
+            "atMilliseconds": 51674.3993
+          },
+          "response": {
+            "sessionId": "b99050d9-9aac-4bf9-a9d9-0c5282bedc80",
+            "message": {
+              "body": {},
+              "command": "configurationDone",
+              "request_seq": 6,
+              "seq": 9,
+              "success": true,
+              "type": "response"
+            },
+            "atMilliseconds": 51840.268
+          }
+        }
+      ],
+      "interpretation": "The exact-session product diagnostic and correlated readiness/native requests support the serialized follow-up Stop path when observed; DAP requests alone do not identify their API caller."
+    },
+    "pidObservation": "A reported native process PID requires a separate exit observation; missing DAP process events never establish OS-process absence.",
+    "limits": "Provider-induced timing and discrete resource/B samples; retry follows late termination/cleanup and provider disposal. No unconstrained latency, pending-late-handoff overlap retry, physical F5 or cross-platform qualification."
+  },
+  "languageServiceFixture": {
+    "log": {
+      "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\logs\\20261108T164633\\window1\\exthost\\dotnetdev-kr-custom.csharp-with-netcoredbg\\C#.log",
+      "sha256": "31c8f21cd0b88e42a79114113276aed6ba6066b91ceecd604c11f4ae64e1df4e",
+      "bytes": 57954,
+      "lines": 324
+    },
+    "samples": {
+      "a.cs": [
+        {
+          "line": 151,
+          "text": "2026-11-08 16:46:46.753 [info] [textDocument/_vs_getProjectContexts] [FileBasedProgramsProjectSystem] a.cs\uc744(\ub97c) \ubcf5\uc6d0\ud558\ub294 \uc911: d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\workspace\\a.cs.csproj : error NU1100: Unable to resolve 'Microsoft.DotNet.ILCompiler (>= 10.0.14)' for 'net10.0'."
+        },
+        {
+          "line": 152,
+          "text": "2026-11-08 16:46:46.753 [info] [textDocument/_vs_getProjectContexts] [FileBasedProgramsProjectSystem] a.cs\uc744(\ub97c) \ubcf5\uc6d0\ud558\ub294 \uc911: d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\workspace\\a.cs.csproj : error NU1100: Unable to resolve 'Microsoft.NET.ILLink.Tasks (>= 10.0.14)' for 'net10.0'."
+        }
+      ],
+      "b.cs": [
+        {
+          "line": 180,
+          "text": "2026-11-08 16:46:51.109 [info] [textDocument/diagnostic] [FileBasedProgramsProjectSystem] b.cs\uc744(\ub97c) \ubcf5\uc6d0\ud558\ub294 \uc911: d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\workspace\\b.cs.csproj : error NU1100: Unable to resolve 'Microsoft.DotNet.ILCompiler (>= 10.0.14)' for 'net10.0'."
+        },
+        {
+          "line": 181,
+          "text": "2026-11-08 16:46:51.109 [info] [textDocument/diagnostic] [FileBasedProgramsProjectSystem] b.cs\uc744(\ub97c) \ubcf5\uc6d0\ud558\ub294 \uc911: d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\workspace\\b.cs.csproj : error NU1100: Unable to resolve 'Microsoft.NET.ILLink.Tasks (>= 10.0.14)' for 'net10.0'."
+        }
+      ]
+    },
+    "offlineNugetConfigurations": {
+      "workspace/NuGet.Config": {
+        "sha256": "d240b9affa63e3d05d49f0463bc05947ed2ff1d6c97159e1a4ce73fec946d5ef",
+        "bytes": 75
+      },
+      "appdata/NuGet/NuGet.Config": {
+        "sha256": "d240b9affa63e3d05d49f0463bc05947ed2ff1d6c97159e1a4ce73fec946d5ef",
+        "bytes": 75
+      }
+    },
+    "ownedDebugBuildArgs": [
+      "build",
+      "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\workspace\\a.cs",
+      "--configuration",
+      "Debug",
+      "--output",
+      "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\n01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\ce9ccbaa10f6dc404e08fb9e\\run-UzyfZ2",
+      "-p:AssemblyName=FileApp",
+      "-p:DebugType=portable",
+      "-p:Optimize=false",
+      "-p:PublishAot=false",
+      "-p:UseSharedCompilation=false",
+      "--disable-build-servers",
+      "--nologo",
+      "-target:Build",
+      "-getProperty:UsingMicrosoftNETSdkWeb,UsingMicrosoftNETSdkRazor,UsingMicrosoftNETSdkWorker,OutputType,TargetFrameworkIdentifier,TargetPlatformIdentifier",
+      "-getItem:FrameworkReference"
+    ],
+    "interpretation": "Observed: this isolated fixture clears package sources; the language service separately restores a.cs/b.cs and reports unresolved AOT/linker/runtime packages, while the owned debug build sets PublishAot=false and succeeds. Inference: those project-load notifications are consistent with the offline fixture and differing restore settings, not evidence here of handoff/adapter failure. This control does not qualify language-service readiness or error-free UI/logs."
+  },
+  "compilerRegression": {
+    "name": "c01",
+    "localArtifactDirectory": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01",
+    "success": true,
+    "editorExitCode": 0,
+    "scope": {
+      "installedCandidate": true,
+      "invocation": "command-api",
+      "physicalF5": false,
+      "VSCodium": true,
+      "platform": "win32-arm64",
+      "macOS": false,
+      "qualification": false,
+      "localOnly": true,
+      "published": false,
+      "directWebDebuggee": true,
+      "spawnedGrandchildren": false,
+      "hostReload": false,
+      "injectedTargetRuntime": false,
+      "scenario": "build-failure-retry",
+      "actualCompilerFailure": true,
+      "actualWebProfileFailure": false,
+      "actualSdkSelectionFailure": false,
+      "actualNativeHostFailure": false,
+      "injectedEditorRejection": false,
+      "nativeAdapterFailure": false,
+      "actualAdapterProcessKill": false,
+      "concurrentSeparateFiles": false,
+      "injectedEditorHandoffGate": false,
+      "actualProgressCancelUi": false,
+      "injectedCancellationToken": false
+    },
+    "freshProfiles": 1,
+    "aLaunchesAndStopCycles": 3,
+    "bLaunches": 1,
+    "candidate": {
+      "baseVsixSha256": "0d239dff83d3120786ff3596a046fd0866b045f1d883c86fb83c64a7d808d0c5",
+      "sourceCommit": "2b9b01252f85afd6f554c3d5b149a936845c5a18",
+      "target": "win32-arm64",
+      "ownedModules": {
+        "entry.cjs": "8cb28056b4f634d1897302f2b97303e140e9c11c233b2f771c32f7845aab44e3",
+        "runtime.cjs": "fd72cad8a4c27ff707dec3c243db2b9cb7cae47fb64ce738a02e14731aebc1d8",
+        "classify.cjs": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+        "web.cjs": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+        "recovery.cjs": "099f74d6d25c0fad95b0f56e3adaebe43a3f211991b6ef436f92ceed6be199d4"
+      },
+      "buildId": "c4ff1765ce1411e26088e9e5805aa62f3aefd6f22fd470ce62f4a185e4f94c57",
+      "sha256": "acb135a6dac6a436909e1b7388d7769cd6fbfe2913d939e2e05e4b21a7f240af",
+      "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\local-lifecycle.vsix",
+      "version": "11.7.18004",
+      "localOnly": true,
+      "published": false,
+      "unchangedEntries": 736,
+      "unchangedPayloadDigest": "5b655a847a8d304972570006e1ecd7f4ac1cc01f855055bf3c35640237e2cdf1"
+    },
+    "editor": {
+      "executable": "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\VSCodium.exe",
+      "cli": "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\bin\\codium.cmd",
+      "version": "1.143.17232",
+      "commit": "c072cf642cbbadabefa22f39c58cc902a8b7427f",
+      "sha256": "61b273b2c0196d7cee4ba84f7412ccc74975f0fcefd3579e69a7b373f79027cd",
+      "machine": "arm64",
+      "apiVersion": "1.143.1"
+    },
+    "sdk": {
+      "executable": "C:\\Program Files\\dotnet\\dotnet.exe",
+      "root": "C:\\Program Files\\dotnet",
+      "version": "10.0.403",
+      "sha256": "8f9714d921c3fa1425611e3f79940715b74a18e2b21a5171bbd58e3775ff8315"
+    },
+    "dependency": {
+      "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\resources\\ms-dotnettools.vscode-dotnet-runtime-3.2.0.vsix",
+      "sha256": "a4cff5409f66e3827ee2c6a727ae59382290a182a653ca0f9ac97c63536ee541",
+      "version": "3.2.0"
+    },
+    "installedExtension": {
+      "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\extensions\\dotnetdev-kr-custom.csharp-with-netcoredbg-11.7.18004",
+      "version": "11.7.18004",
+      "displayName": "C# (netcoredbg) LOCAL WEB LIFECYCLE TEST",
+      "metadata": {
+        "installedTimestamp": 1794124221414,
+        "targetPlatform": "undefined",
+        "size": 200481597
+      },
+      "build": {
+        "target": "win32-arm64",
+        "upstreamCsharpCommit": "1c27e135b5dada55a240e4a504bafa759ec578e8",
+        "upstreamCsharpVersion": "11.7.18",
+        "upstreamCsharpTag": "v11.7.18-prerelease",
+        "upstreamPackageVersion": "42.42.42-placeholder",
+        "netcoredbgTag": "3.2.0-1092",
+        "packagingRevision": 4,
+        "releaseTag": "csharp-v11.7.18-netcoredbg-v3.2.0-1092-g9744e1f05186-r4",
+        "versionPolicy": "upstream-patch-revision-v1",
+        "netcoredbgCommit": "9744e1f051866215611b8440c638042aa2aa2f72",
+        "debuggerArchiveSha256": "cfc272be9e883bcb90c9ed0704731fbb1349faf207d872f71e6bfb83b55869ad",
+        "validationRunId": "41644074504",
+        "validationWorkflowCommit": "ca5d10d97431181d934369c76c28347fac8a05a6",
+        "upstreamMain": "./dist/extension",
+        "localCandidate": true,
+        "lifecycleBuildId": "c4ff1765ce1411e26088e9e5805aa62f3aefd6f22fd470ce62f4a185e4f94c57",
+        "lifecycleSourceCommit": "2b9b01252f85afd6f554c3d5b149a936845c5a18"
+      }
+    },
+    "installedDependency": {
+      "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\extensions\\ms-dotnettools.vscode-dotnet-runtime-3.2.0",
+      "version": "3.2.0"
+    },
+    "installedOwnedModules": {
+      "entry.cjs": "8cb28056b4f634d1897302f2b97303e140e9c11c233b2f771c32f7845aab44e3",
+      "runtime.cjs": "fd72cad8a4c27ff707dec3c243db2b9cb7cae47fb64ce738a02e14731aebc1d8",
+      "classify.cjs": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+      "web.cjs": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+      "recovery.cjs": "099f74d6d25c0fad95b0f56e3adaebe43a3f211991b6ef436f92ceed6be199d4"
+    },
+    "harnessPinnedBeforeLaunch": {
+      "prepare.py": "081aebb838c4ca54633fc18b2690de67523bab9086e7548a20e64b86a7e0c409",
+      "run.ps1": "cf5d3218d002772422455cc90dfdc57c735cbf8b50c3d72577f882c472871866",
+      "driver.cjs": "8c76ce1ed4411968b253dd7f8a5cd27950a5e8d03dc29c1e79c805283e9d1703",
+      "extension-test.cjs": "9c2379192df150a417120054ad4692575950a9e0c5e7565ac9f0f4f0d97e62c6",
+      "fixtures/web.cs": "4d865a4bfb51e53379d0c73b306ad27ef7c925e192d2de3e9201f7acc4fd2cb6"
+    },
+    "executedCopiesSha256": {
+      "driver.cjs": "8c76ce1ed4411968b253dd7f8a5cd27950a5e8d03dc29c1e79c805283e9d1703",
+      "extension-test.cjs": "9c2379192df150a417120054ad4692575950a9e0c5e7565ac9f0f4f0d97e62c6",
+      "fixtures/web.cs": "4d865a4bfb51e53379d0c73b306ad27ef7c925e192d2de3e9201f7acc4fd2cb6"
+    },
+    "checks": [
+      "Normally installed local candidate activates with exact owned module hashes and isolated loaded path",
+      "A source breakpoint binds and evaluates marker=40 through the installed native adapter",
+      "Two independent real Web sessions respond with distinct owned nonces and PIDs",
+      "A cycle 0: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+      "Actual CS0103 returns false, saves broken source, starts no session and removes exact failed output while B survives",
+      "Dirty compiler correction retries with three concurrent commands sharing one build/session and fresh output while B survives",
+      "A cycle 1: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+      "A cycle 2: exact session terminates, PID exits, port rebinds and output/terminal queues clear while B survives",
+      "B final stop releases its exact PID, HTTP port and owned output"
+    ],
+    "phases": [
+      {
+        "label": "verify installed local candidate",
+        "startedAtMilliseconds": 0.7314,
+        "outcome": "passed",
+        "elapsedMilliseconds": 1331.8248
+      },
+      {
+        "label": "A initial installed-command launch and breakpoint",
+        "startedAtMilliseconds": 1509.5914,
+        "outcome": "passed",
+        "elapsedMilliseconds": 8564.6506
+      },
+      {
+        "label": "B independent installed-command launch",
+        "startedAtMilliseconds": 10074.4937,
+        "outcome": "passed",
+        "elapsedMilliseconds": 8051.9804
+      },
+      {
+        "label": "A cycle 0 targeted stop and owned cleanup",
+        "startedAtMilliseconds": 18126.7568,
+        "outcome": "passed",
+        "elapsedMilliseconds": 1272.0516
+      },
+      {
+        "label": "B preserved after A cycle 0",
+        "startedAtMilliseconds": 19399.8616,
+        "outcome": "passed",
+        "elapsedMilliseconds": 15.6155
+      },
+      {
+        "label": "A actual compiler failure and owned cleanup while B survives",
+        "startedAtMilliseconds": 19417.4506,
+        "outcome": "passed",
+        "elapsedMilliseconds": 5528.1819
+      },
+      {
+        "label": "A cycle 1 dirty edit and installed-command retry",
+        "startedAtMilliseconds": 24945.9452,
+        "outcome": "passed",
+        "elapsedMilliseconds": 8465.3297
+      },
+      {
+        "label": "A cycle 1 targeted stop and owned cleanup",
+        "startedAtMilliseconds": 33465.5042,
+        "outcome": "passed",
+        "elapsedMilliseconds": 951.7322
+      },
+      {
+        "label": "B preserved after A cycle 1",
+        "startedAtMilliseconds": 34417.4719,
+        "outcome": "passed",
+        "elapsedMilliseconds": 4.1069
+      },
+      {
+        "label": "A cycle 2 dirty edit and installed-command retry",
+        "startedAtMilliseconds": 34425.3544,
+        "outcome": "passed",
+        "elapsedMilliseconds": 6475.5953
+      },
+      {
+        "label": "A cycle 2 targeted stop and owned cleanup",
+        "startedAtMilliseconds": 40901.2325,
+        "outcome": "passed",
+        "elapsedMilliseconds": 930.1012
+      },
+      {
+        "label": "B preserved after A cycle 2",
+        "startedAtMilliseconds": 41831.6005,
+        "outcome": "passed",
+        "elapsedMilliseconds": 5.08
+      },
+      {
+        "label": "B final targeted stop and owned cleanup",
+        "startedAtMilliseconds": 41847.2975,
+        "outcome": "passed",
+        "elapsedMilliseconds": 935.3638
+      }
+    ],
+    "elapsedMilliseconds": 42783.5837,
+    "launches": [
+      {
+        "label": "A-0",
+        "revision": "initial",
+        "pid": 69952,
+        "sessionId": "822fb168-212f-4889-b2db-78a0dc0ee8dc",
+        "origin": "http://127.0.0.1:53092",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8bfd973378e7277edcdb38d5\\run-CnnvpB",
+        "response": {
+          "pid": 69952,
+          "nonce": "c5a45f23-eaa5-4cd0-89fb-bc4dbe57efa3",
+          "revision": "initial",
+          "value": 42
+        },
+        "afterStopMilliseconds": {
+          "stopPromise": 58.758,
+          "matchingEditorTermination": 1186.722,
+          "pidObservedGone": 1189.685,
+          "portRebindSucceeded": 1191.349,
+          "outputAndQueuesClear": 1250.168
+        },
+        "stopPromiseToTerminationMilliseconds": 1127.964
+      },
+      {
+        "label": "B",
+        "revision": "initial",
+        "pid": 13876,
+        "sessionId": "cb59a124-a1c5-4692-850b-d346d59c0b19",
+        "origin": "http://127.0.0.1:53093",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\e389460c92451484c3c500ab\\run-XIe4PP",
+        "response": {
+          "pid": 13876,
+          "nonce": "e939d31c-8c7a-4c89-9944-1089b210c61c",
+          "revision": "initial",
+          "value": 42
+        },
+        "afterStopMilliseconds": {
+          "stopPromise": 56.326,
+          "matchingEditorTermination": 902.038,
+          "pidObservedGone": 904.19,
+          "portRebindSucceeded": 905.462,
+          "outputAndQueuesClear": 934.441
+        },
+        "stopPromiseToTerminationMilliseconds": 845.712
+      },
+      {
+        "label": "A-1",
+        "revision": "retry-1",
+        "pid": 99988,
+        "sessionId": "4daf3b66-99a0-421b-a85d-3d68ef431cf8",
+        "origin": "http://127.0.0.1:53092",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8bfd973378e7277edcdb38d5\\run-PC6QIv",
+        "response": {
+          "pid": 99988,
+          "nonce": "f4d53042-da17-4ce0-a9dd-53ff075b2aca",
+          "revision": "retry-1",
+          "value": 42
+        },
+        "afterStopMilliseconds": {
+          "stopPromise": 70.636,
+          "matchingEditorTermination": 921.218,
+          "pidObservedGone": 948.945,
+          "portRebindSucceeded": 950.498,
+          "outputAndQueuesClear": 950.943
+        },
+        "stopPromiseToTerminationMilliseconds": 850.581
+      },
+      {
+        "label": "A-2",
+        "revision": "retry-2",
+        "pid": 80268,
+        "sessionId": "5a076a02-2387-4fbd-b6cc-36c1c68b8947",
+        "origin": "http://127.0.0.1:53092",
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8bfd973378e7277edcdb38d5\\run-eF4xa6",
+        "response": {
+          "pid": 80268,
+          "nonce": "3f39d4e9-0783-4891-a81d-3c4817e47aa4",
+          "revision": "retry-2",
+          "value": 42
+        },
+        "afterStopMilliseconds": {
+          "stopPromise": 47.83,
+          "matchingEditorTermination": 888.238,
+          "pidObservedGone": 894.736,
+          "portRebindSucceeded": 896.738,
+          "outputAndQueuesClear": 929.623
+        },
+        "stopPromiseToTerminationMilliseconds": 840.408
+      }
+    ],
+    "unrelatedSessionPreserved": [
+      {
+        "atMilliseconds": 19415.1852,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "cb59a124-a1c5-4692-850b-d346d59c0b19",
+          "pid": 13876
+        }
+      },
+      {
+        "atMilliseconds": 24944.8028,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "cb59a124-a1c5-4692-850b-d346d59c0b19",
+          "pid": 13876
+        }
+      },
+      {
+        "atMilliseconds": 33410.8091,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "cb59a124-a1c5-4692-850b-d346d59c0b19",
+          "pid": 13876
+        }
+      },
+      {
+        "atMilliseconds": 34421.4958,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "cb59a124-a1c5-4692-850b-d346d59c0b19",
+          "pid": 13876
+        }
+      },
+      {
+        "atMilliseconds": 41836.4987,
+        "event": "unrelated-preserved",
+        "detail": {
+          "label": "B",
+          "sessionId": "cb59a124-a1c5-4692-850b-d346d59c0b19",
+          "pid": 13876
+        }
+      }
+    ],
+    "stopDiagnostics": [
+      {
+        "atMilliseconds": 18217.198,
+        "event": "adapter-error",
+        "detail": {
+          "label": "A-0",
+          "error": "Error: read error"
+        },
+        "afterStopMilliseconds": 90.107
+      },
+      {
+        "atMilliseconds": 33566.1204,
+        "event": "adapter-error",
+        "detail": {
+          "label": "A-1",
+          "error": "Error: read error"
+        },
+        "afterStopMilliseconds": 100.243
+      },
+      {
+        "atMilliseconds": 41778.708,
+        "event": "adapter-error",
+        "detail": {
+          "label": "A-2",
+          "error": "Error: read error"
+        },
+        "afterStopMilliseconds": 877.397
+      },
+      {
+        "atMilliseconds": 41984.8727,
+        "event": "adapter-error",
+        "detail": {
+          "label": "B",
+          "error": "Error: read error"
+        },
+        "afterStopMilliseconds": 137.267
+      }
+    ],
+    "observedCoreRuntimeDirectories": [
+      "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14"
+    ],
+    "observedCoreLibraryModulePaths": [
+      "C:\\Program Files\\dotnet\\shared\\Microsoft.NETCore.App\\10.0.14\\System.Private.CoreLib.dll"
+    ],
+    "rawEvidence": {
+      "result.json": {
+        "sha256": "2406c567ffc6a3123d536ed702fdc590fae100c2c0ca39842332363a5daac443",
+        "bytes": 25865
+      },
+      "expected.json": {
+        "sha256": "a428cc4515b3695f676559af4f722da4691bd61e0209cdc25524f8bd7fb30cb6",
+        "bytes": 2914
+      },
+      "trace.jsonl": {
+        "sha256": "fce6b3b9f904592d975467b7e2fb6f413740f4b494fed91216a128cca961d1e8",
+        "bytes": 264107
+      },
+      "launcher-result.json": {
+        "sha256": "5016868e4643b9efd14afcd3dffe57b410133a65a4562db6abc9cac3777ffe84",
+        "bytes": 437
+      },
+      "attempt.json": {
+        "sha256": "f384bfa6e84ea2528a693fb0d2bd876f5c5699f996ceacd61f5443fbafcf49c8",
+        "bytes": 29
+      },
+      "launch.json": {
+        "sha256": "97500f7c0e2cc5da6ba3cc075c02790964461584b4eb3f6d42f201314307b13d",
+        "bytes": 1070
+      },
+      "progress/state.json": {
+        "sha256": "ee666746d0fc7d6c10304e9d0a52e58f853f7b4be884985644083e685e871c5f",
+        "bytes": 8454
+      },
+      "logs/candidate-install.txt": {
+        "sha256": "4dc68e2d8023aa126ab06cf57c5653c8ff70bcf8650d37e3ce57b6bbe6eb216f",
+        "bytes": 395
+      },
+      "logs/editor-version.txt": {
+        "sha256": "aff6841c98558e85f0dde480073005e9e8267d1e06817b8165756bbc14ab2ca2",
+        "bytes": 62
+      },
+      "logs/runtime-install.txt": {
+        "sha256": "6ed1a90dc13baf3f43d76ac1303b0b1a868c0d67f15e0edaabbf245ad68c2f4f",
+        "bytes": 422
+      },
+      "logs/sdk-version.txt": {
+        "sha256": "e4e6a678725873a4192c048849cd64d852983991bfcb210a40c3b80cc8fcf2eb",
+        "bytes": 10
+      },
+      "logs/stderr.txt": {
+        "sha256": "dff662ee0f0f5a904fa66dbc4a3120534b05545063512faf675d699f180bcfba",
+        "bytes": 748
+      },
+      "logs/stdout.txt": {
+        "sha256": "482093eecfcf36eab1ed4e8feac70ee8563261db2be6a5ffb209edbdc5cc9ee0",
+        "bytes": 1336
+      },
+      "profile/logs/20261108T165021/window1/exthost/output_logging_20261108T165023/3-C# File Debugging.log": {
+        "sha256": "a11f2a47f4d032b994c66c3842429f49de6cf5a1e637395dd7525cb771898bf3",
+        "bytes": 31005
+      },
+      "profile/logs/20261108T165021/window1/exthost/exthost.log": {
+        "sha256": "4c3c0e446c72a0213ad90a0c1fb54063c92d9b1554a3d41d62e66079ca85b94f",
+        "bytes": 7185
+      },
+      "profile/logs/20261108T165021/window1/exthost/dotnetdev-kr-custom.csharp-with-netcoredbg/C#.log": {
+        "sha256": "99f0bd590a9c16154f08e5cfb9a3cafd29429cc29369d9c0e76658e180071ab2",
+        "bytes": 52238
+      }
+    },
+    "interpretation": "Behavioral lifecycle assertions passed. Stop-time adapter errors remain recorded; this is not an error-free-log or release-qualification claim.",
+    "validatedOutputLogs": {
+      "profile/logs/20261108T165021/window1/exthost/output_logging_20261108T165023/3-C# File Debugging.log": {
+        "sha256": "a11f2a47f4d032b994c66c3842429f49de6cf5a1e637395dd7525cb771898bf3",
+        "bytes": 31005
+      }
+    },
+    "scenario": "build-failure-retry",
+    "failedBuildAttempts": [
+      {
+        "label": "A-compile-failure",
+        "source": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\workspace\\a.cs",
+        "revision": "initial",
+        "nonce": "c872e2fc-aeab-41ea-804f-78dda389f842",
+        "origin": "http://127.0.0.1:53092",
+        "port": 53092,
+        "expectedBuildFailure": true,
+        "commandPending": false,
+        "commandResult": false,
+        "invokedAtMilliseconds": 19475.2943,
+        "returnedAtMilliseconds": 24934.6012,
+        "sourceSaved": true,
+        "capturedSessions": [],
+        "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8bfd973378e7277edcdb38d5\\run-pqxW9j",
+        "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8bfd973378e7277edcdb38d5\\run-pqxW9j\\FileApp.dll",
+        "base": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps",
+        "outputRemovedAtMilliseconds": 24936.1075,
+        "portReusableAtMilliseconds": 24937.5962,
+        "noSession": true,
+        "log": {
+          "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\logs\\20261108T165021\\window1\\exthost\\output_logging_20261108T165023\\3-C# File Debugging.log",
+          "offsetCharacters": 11913,
+          "prefixSha256": "d3ec5207cc419ad8f28979aa2d26898653b86dd149cccdc11626e707ad2922d5",
+          "tailCharacters": 7240,
+          "tailSha256": "5a7e3dc4982b419ae4ca4969f270d2aa5d5a356286ec741e4203c3ae43c2c22e",
+          "buildCommands": [
+            {
+              "args": [
+                "build",
+                "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\workspace\\a.cs",
+                "--configuration",
+                "Debug",
+                "--output",
+                "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8bfd973378e7277edcdb38d5\\run-pqxW9j",
+                "-p:AssemblyName=FileApp",
+                "-p:DebugType=portable",
+                "-p:Optimize=false",
+                "-p:PublishAot=false",
+                "-p:UseSharedCompilation=false",
+                "--disable-build-servers",
+                "--nologo",
+                "-target:Build",
+                "-getProperty:UsingMicrosoftNETSdkWeb,UsingMicrosoftNETSdkRazor,UsingMicrosoftNETSdkWorker,OutputType,TargetFrameworkIdentifier,TargetPlatformIdentifier",
+                "-getItem:FrameworkReference"
+              ],
+              "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8bfd973378e7277edcdb38d5\\run-pqxW9j"
+            }
+          ],
+          "compilerDiagnostics": [
+            "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\workspace\\a.cs(5,11): error CS0103: The name '__missingLifecycleValue' does not exist in the current context [d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\workspace\\a.cs.csproj]",
+            "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\workspace\\a.cs(5,11): error CS0103: The name '__missingLifecycleValue' does not exist in the current context [d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\workspace\\a.cs.csproj]"
+          ],
+          "failedPhaseDiagnostics": [
+            "Phase failed: Building file-based app (4333 ms; total 5306 ms)"
+          ],
+          "cancelledPhaseDiagnostics": [],
+          "buildCompletedPhaseDiagnostics": [],
+          "webPreparationFailedPhaseDiagnostics": [],
+          "webProfileRootDiagnostics": [],
+          "completedPhaseDiagnostics": []
+        }
+      }
+    ],
+    "coalescedRetry": {
+      "label": "A-1",
+      "commandInvocations": 3,
+      "commandResults": [
+        true,
+        true,
+        true
+      ],
+      "sessionId": "4daf3b66-99a0-421b-a85d-3d68ef431cf8",
+      "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8bfd973378e7277edcdb38d5\\run-PC6QIv",
+      "sessionIds": [
+        "4daf3b66-99a0-421b-a85d-3d68ef431cf8"
+      ],
+      "log": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\logs\\20261108T165021\\window1\\exthost\\output_logging_20261108T165023\\3-C# File Debugging.log",
+        "offsetCharacters": 19153,
+        "prefixSha256": "abec1b4e76e53686bcfed56f450574d86dbf5cd9a0878b4100abc1398aa72430",
+        "tailCharacters": 5926,
+        "tailSha256": "45581922fd28acb82f9d1ce41df839657fbc1b9f2348fc871d7f2a04e174bed9",
+        "buildCommands": [
+          {
+            "args": [
+              "build",
+              "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\workspace\\a.cs",
+              "--configuration",
+              "Debug",
+              "--output",
+              "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8bfd973378e7277edcdb38d5\\run-PC6QIv",
+              "-p:AssemblyName=FileApp",
+              "-p:DebugType=portable",
+              "-p:Optimize=false",
+              "-p:PublishAot=false",
+              "-p:UseSharedCompilation=false",
+              "--disable-build-servers",
+              "--nologo",
+              "-target:Build",
+              "-getProperty:UsingMicrosoftNETSdkWeb,UsingMicrosoftNETSdkRazor,UsingMicrosoftNETSdkWorker,OutputType,TargetFrameworkIdentifier,TargetPlatformIdentifier",
+              "-getItem:FrameworkReference"
+            ],
+            "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8bfd973378e7277edcdb38d5\\run-PC6QIv"
+          }
+        ],
+        "compilerDiagnostics": [],
+        "failedPhaseDiagnostics": [],
+        "cancelledPhaseDiagnostics": [],
+        "buildCompletedPhaseDiagnostics": [
+          "Phase completed: Building file-based app (5554 ms; total 6306 ms)"
+        ],
+        "webPreparationFailedPhaseDiagnostics": [],
+        "webProfileRootDiagnostics": [],
+        "completedPhaseDiagnostics": [
+          "Phase completed: Starting netcoredbg (891 ms; total 7201 ms)"
+        ]
+      },
+      "failedOutput": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8bfd973378e7277edcdb38d5\\run-pqxW9j",
+      "freshOutput": true
+    },
+    "successfulCommandControls": [
+      {
+        "label": "A-0",
+        "commandInvocations": 1,
+        "commandResults": [
+          true
+        ],
+        "capturedSessions": [
+          {
+            "sessionId": "822fb168-212f-4889-b2db-78a0dc0ee8dc",
+            "primary": true,
+            "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8bfd973378e7277edcdb38d5\\run-CnnvpB\\FileApp.dll",
+            "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8bfd973378e7277edcdb38d5\\run-CnnvpB",
+            "pid": 69952,
+            "terminated": true,
+            "terminatedAtMilliseconds": 19313.8133
+          }
+        ]
+      },
+      {
+        "label": "B",
+        "commandInvocations": 1,
+        "commandResults": [
+          true
+        ],
+        "capturedSessions": [
+          {
+            "sessionId": "cb59a124-a1c5-4692-850b-d346d59c0b19",
+            "primary": true,
+            "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\e389460c92451484c3c500ab\\run-XIe4PP\\FileApp.dll",
+            "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\e389460c92451484c3c500ab\\run-XIe4PP",
+            "pid": 13876,
+            "terminated": true,
+            "terminatedAtMilliseconds": 42749.644
+          }
+        ]
+      },
+      {
+        "label": "A-1",
+        "commandInvocations": 3,
+        "commandResults": [
+          true,
+          true,
+          true
+        ],
+        "capturedSessions": [
+          {
+            "sessionId": "4daf3b66-99a0-421b-a85d-3d68ef431cf8",
+            "primary": true,
+            "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8bfd973378e7277edcdb38d5\\run-PC6QIv\\FileApp.dll",
+            "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8bfd973378e7277edcdb38d5\\run-PC6QIv",
+            "pid": 99988,
+            "terminated": true,
+            "terminatedAtMilliseconds": 34387.0952
+          }
+        ]
+      },
+      {
+        "label": "A-2",
+        "commandInvocations": 1,
+        "commandResults": [
+          true
+        ],
+        "capturedSessions": [
+          {
+            "sessionId": "5a076a02-2387-4fbd-b6cc-36c1c68b8947",
+            "primary": true,
+            "program": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8bfd973378e7277edcdb38d5\\run-eF4xa6\\FileApp.dll",
+            "output": "d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\c01\\profile\\User\\globalStorage\\dotnetdev-kr-custom.csharp-with-netcoredbg\\file-based-apps\\8bfd973378e7277edcdb38d5\\run-eF4xa6",
+            "pid": 80268,
+            "terminated": true,
+            "terminatedAtMilliseconds": 41789.5484
+          }
+        ]
+      }
+    ]
+  },
+  "compilerRegressionIdentity": {
+    "baseCommit": "2b9b01252f85afd6f554c3d5b149a936845c5a18",
+    "productModulesUnchanged": true,
+    "currentOwnedModules": {
+      "classify.cjs": {
+        "sha256": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+        "bytes": 11396
+      },
+      "entry.cjs": {
+        "sha256": "8cb28056b4f634d1897302f2b97303e140e9c11c233b2f771c32f7845aab44e3",
+        "bytes": 2759
+      },
+      "recovery.cjs": {
+        "sha256": "099f74d6d25c0fad95b0f56e3adaebe43a3f211991b6ef436f92ceed6be199d4",
+        "bytes": 16057
+      },
+      "runtime.cjs": {
+        "sha256": "fd72cad8a4c27ff707dec3c243db2b9cb7cae47fb64ce738a02e14731aebc1d8",
+        "bytes": 35296
+      },
+      "web.cjs": {
+        "sha256": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+        "bytes": 17865
+      }
+    },
+    "completeHarness": {
+      "prepare.py": "081aebb838c4ca54633fc18b2690de67523bab9086e7548a20e64b86a7e0c409",
+      "run.ps1": "cf5d3218d002772422455cc90dfdc57c735cbf8b50c3d72577f882c472871866",
+      "driver.cjs": "8c76ce1ed4411968b253dd7f8a5cd27950a5e8d03dc29c1e79c805283e9d1703",
+      "extension-test.cjs": "9c2379192df150a417120054ad4692575950a9e0c5e7565ac9f0f4f0d97e62c6",
+      "fixtures/web.cs": "4d865a4bfb51e53379d0c73b306ad27ef7c925e192d2de3e9201f7acc4fd2cb6"
+    }
+  },
+  "verification": {
+    "directory": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\tests",
+    "manifest": {
+      "frozenUtc": "2026-11-08T07:49:03.843868Z",
+      "source": [
+        {
+          "path": "scripts/variant/README.md",
+          "sha256": "587795ba946e08b5136cd787f9cecccd203c355fef92a33ad9059b5fb1702364",
+          "size": 7030
+        },
+        {
+          "path": "scripts/variant/discover.py",
+          "sha256": "f6ec3280da861c3035c123fecdb31cadd2bd49e63e6f621fe1511401b1cce2fd",
+          "size": 6356
+        },
+        {
+          "path": "scripts/variant/file-based-apps/classify.cjs",
+          "sha256": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+          "size": 11396
+        },
+        {
+          "path": "scripts/variant/file-based-apps/entry.cjs",
+          "sha256": "8cb28056b4f634d1897302f2b97303e140e9c11c233b2f771c32f7845aab44e3",
+          "size": 2759
+        },
+        {
+          "path": "scripts/variant/file-based-apps/recovery.cjs",
+          "sha256": "099f74d6d25c0fad95b0f56e3adaebe43a3f211991b6ef436f92ceed6be199d4",
+          "size": 16057
+        },
+        {
+          "path": "scripts/variant/file-based-apps/runtime.cjs",
+          "sha256": "fd72cad8a4c27ff707dec3c243db2b9cb7cae47fb64ce738a02e14731aebc1d8",
+          "size": 35296
+        },
+        {
+          "path": "scripts/variant/file-based-apps/snippets/NOTICE.md",
+          "sha256": "96833ce44b134d8367244dd671675fa3e208fe16fea9522b694f38f705772d9e",
+          "size": 1712
+        },
+        {
+          "path": "scripts/variant/file-based-apps/snippets/examples-LICENSE.txt",
+          "sha256": "eb4ae5fdc87dc6f5763a900f96f0c45c12f88a075a65bb0e334f20f9fe15a56e",
+          "size": 1079
+        },
+        {
+          "path": "scripts/variant/file-based-apps/snippets/fba-csharp.json",
+          "sha256": "0d06e525714fb3fdce6617307a83b0484d5a58b8027297f4ef80918601c01ca5",
+          "size": 8195
+        },
+        {
+          "path": "scripts/variant/file-based-apps/test-classify.cjs",
+          "sha256": "2d62f3049ccab8ab9bbd3151485667fa5871c5013313278dc26990b5c734c18d",
+          "size": 10894
+        },
+        {
+          "path": "scripts/variant/file-based-apps/test-entry.cjs",
+          "sha256": "83550e4469728fdd7265f157a1e421ff51c6ef321c93e25d116a8c7e21f1a275",
+          "size": 9409
+        },
+        {
+          "path": "scripts/variant/file-based-apps/test-recovery.cjs",
+          "sha256": "f26a5aa152ccbb0ea2c217e3ecd4d115f9dbe06bed9fa08b1e0e4c9b3e0caa96",
+          "size": 42140
+        },
+        {
+          "path": "scripts/variant/file-based-apps/test-runtime.cjs",
+          "sha256": "3870743a1ef06f185ca023cc9693bb2585e121f8a29564767653963c13e77f0b",
+          "size": 137674
+        },
+        {
+          "path": "scripts/variant/file-based-apps/test-web.cjs",
+          "sha256": "b61a730f1f168e31f83ac1dd17abe59b6dd1a8aca1fe64b3d56eab78761eb24d",
+          "size": 18074
+        },
+        {
+          "path": "scripts/variant/file-based-apps/web.cjs",
+          "sha256": "843591bbdc98940f932a459a8ecee0eecf2a9c9bd2b5e161a768a9c02bcf279b",
+          "size": 17865
+        },
+        {
+          "path": "scripts/variant/lifecycle/active-reload/driver.cjs",
+          "sha256": "cf8339f0c6394e2d789ab371afdc7b1150e5f954b30b7e85bb4813f5418f597e",
+          "size": 504
+        },
+        {
+          "path": "scripts/variant/lifecycle/active-reload/extension-test.cjs",
+          "sha256": "3fa7600ac5e759c25d910d78c532347028c309fd340feb56608ec0f9deb187e2",
+          "size": 15752
+        },
+        {
+          "path": "scripts/variant/lifecycle/active-reload/prepare.py",
+          "sha256": "31317f7878ef7eb37a93f5d8d6e0690e0880feb8b2d7a9f7cf761fce2e98bbda",
+          "size": 2579
+        },
+        {
+          "path": "scripts/variant/lifecycle/active-reload/run.ps1",
+          "sha256": "b9554c4600745de0afe5eb5a7c22574625da54df36233115a7f4f8461e84e5cf",
+          "size": 11070
+        },
+        {
+          "path": "scripts/variant/lifecycle/adapter-loss.ps1",
+          "sha256": "325e961f46d9dd05266ef719155c84ef5e3ce28f837471a0957d45aaa24a3fa2",
+          "size": 11562
+        },
+        {
+          "path": "scripts/variant/lifecycle/command-recovery/extension-test.cjs",
+          "sha256": "b12256bbf6a5661e3f0d03406995864b211c895e497d5a4eeff253e105ffd6d7",
+          "size": 25267
+        },
+        {
+          "path": "scripts/variant/lifecycle/command-recovery/prepare.py",
+          "sha256": "777ca95ba9e48b589904eadded2c087f04636f90b17bbfdc1ac1615d7a32d8de",
+          "size": 1678
+        },
+        {
+          "path": "scripts/variant/lifecycle/command-recovery/run.ps1",
+          "sha256": "2ecf41ca5c1669b9a4fde395b46ac66d97e190853d00aa4aaa74e911c624b273",
+          "size": 11918
+        },
+        {
+          "path": "scripts/variant/lifecycle/driver.cjs",
+          "sha256": "8c76ce1ed4411968b253dd7f8a5cd27950a5e8d03dc29c1e79c805283e9d1703",
+          "size": 189
+        },
+        {
+          "path": "scripts/variant/lifecycle/extension-test.cjs",
+          "sha256": "9c2379192df150a417120054ad4692575950a9e0c5e7565ac9f0f4f0d97e62c6",
+          "size": 171153
+        },
+        {
+          "path": "scripts/variant/lifecycle/fixtures/cancel-build.targets",
+          "sha256": "ff4717c55ab6c466cb17c443037822150c7141f1dc4583851d31e92892d4587c",
+          "size": 2139
+        },
+        {
+          "path": "scripts/variant/lifecycle/fixtures/concurrent-build.targets",
+          "sha256": "47483f01d1a97306b20e80c2e49c5b6f09745f6c68a040dc21cdc548f2e937bd",
+          "size": 3573
+        },
+        {
+          "path": "scripts/variant/lifecycle/fixtures/web.cs",
+          "sha256": "4d865a4bfb51e53379d0c73b306ad27ef7c925e192d2de3e9201f7acc4fd2cb6",
+          "size": 969
+        },
+        {
+          "path": "scripts/variant/lifecycle/interrupted-cleanup/extension-test.cjs",
+          "sha256": "469547819dc7e40684e7bea510c5cb887e61343e3994f54e2c11ded664fc5dc8",
+          "size": 16104
+        },
+        {
+          "path": "scripts/variant/lifecycle/interrupted-cleanup/prepare.py",
+          "sha256": "840797994b602be31bc14a362d88fe6cab27d37a8a346739f9af5a9e394357a3",
+          "size": 1493
+        },
+        {
+          "path": "scripts/variant/lifecycle/interrupted-cleanup/run.ps1",
+          "sha256": "aa0b97218ab6920be1b0066dce6a933a418c20deef6dc630bb104a0ff4a363ad",
+          "size": 10616
+        },
+        {
+          "path": "scripts/variant/lifecycle/interrupted-publication/extension-test.cjs",
+          "sha256": "cfc3552cea9a66ff54d31e1fc1aa55eafabbc01dbfb82e4c03563074eadfee63",
+          "size": 18830
+        },
+        {
+          "path": "scripts/variant/lifecycle/interrupted-publication/prepare.py",
+          "sha256": "c818e260a9b67a94a34d13d7c4c1a2c1ee18736ba79d12f333122deb2e3c9dbd",
+          "size": 1519
+        },
+        {
+          "path": "scripts/variant/lifecycle/interrupted-publication/run.ps1",
+          "sha256": "83874dedbeb88bbaa1bcb56792c527dff0de2d08f12551e4fcbe25fff2509b28",
+          "size": 12523
+        },
+        {
+          "path": "scripts/variant/lifecycle/prepare.py",
+          "sha256": "081aebb838c4ca54633fc18b2690de67523bab9086e7548a20e64b86a7e0c409",
+          "size": 16339
+        },
+        {
+          "path": "scripts/variant/lifecycle/run.ps1",
+          "sha256": "cf5d3218d002772422455cc90dfdc57c735cbf8b50c3d72577f882c472871866",
+          "size": 10492
+        },
+        {
+          "path": "scripts/variant/overlay.py",
+          "sha256": "93103f90b1e2dc8aaa92119c689feb64236cb3ec72ff806b9893fd8eddb7a8e2",
+          "size": 19313
+        },
+        {
+          "path": "scripts/variant/publish.py",
+          "sha256": "bfcb5c15301133948e391084c40706485550f8b5539c02990f61d32775828b13",
+          "size": 9508
+        },
+        {
+          "path": "scripts/variant/resume.py",
+          "sha256": "ee6a30f379d63166efc2150204f57a269f9e0e2b280710879b73b90d53339b5a",
+          "size": 2078
+        },
+        {
+          "path": "scripts/variant/test-factory.cjs",
+          "sha256": "772981f4256d7aa1f53cc085d03ac68b228a992dbc98486d2fb54dd2d5ec9479",
+          "size": 4653
+        },
+        {
+          "path": "scripts/variant/test-packaging.cjs",
+          "sha256": "a6749de5db2d0747d88926b92be7476cb5cc3ed5a017615a532af06bbe31d61e",
+          "size": 4098
+        },
+        {
+          "path": "scripts/variant/test_discovery.py",
+          "sha256": "b377d3dfe6eab5831902ce7efc90af784668721481ae8562a4bcbb764f64b12a",
+          "size": 5800
+        },
+        {
+          "path": "scripts/variant/test_file_app_packaging.py",
+          "sha256": "54a28b543e0ad4ba20eb2eb4272e71032e0216129bc7d17fb0fa5ee3d6fc5100",
+          "size": 3714
+        },
+        {
+          "path": "scripts/variant/test_lifecycle_preparation.py",
+          "sha256": "1d757e0601449bfcb74f052d763285bbd7f4d4248a6b6ce151badf238fffdc20",
+          "size": 5855
+        },
+        {
+          "path": "scripts/variant/test_publication.py",
+          "sha256": "92fee610ef0ce2e16a77e6015fd2c0990976caf9e059812beeec96471e239248",
+          "size": 11381
+        },
+        {
+          "path": "scripts/variant/test_versioning.py",
+          "sha256": "4ad9f50802a03d8cc784911306a34164cb457c9c86307703f635cfcc6012c50c",
+          "size": 2021
+        },
+        {
+          "path": "scripts/variant/verify-vsix.py",
+          "sha256": "b9881de49446cf730fb90668f08a9f6bbb326bd2974b265bf0d96c5b1ccaa7ee",
+          "size": 10494
+        },
+        {
+          "path": "scripts/variant/versioning.py",
+          "sha256": "a18fae3c2f9056924eb8265f92de338a91c2b5b10c297fe7022a9c7e77ccd281",
+          "size": 1977
+        }
+      ],
+      "commit": "2b9b01252f85afd6f554c3d5b149a936845c5a18",
+      "worktree": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\handoff-cancel-2026-11-08\\worktree",
+      "node": {
+        "path": "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "sha256": "f8044a7ac78a0feee5085882d680127526658109d1125e61900872e4c5a8db0b",
+        "size": 81949488
+      },
+      "python": {
+        "path": "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "sha256": "ef9e93f6ef033c190bf3cab9dd9f7206ba431332deee6be7ba8d36a5e54e186c",
+        "size": 107312
+      },
+      "runs": [
+        {
+          "log": "node.log",
+          "argv": [
+            "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+            "--unhandled-rejections=strict",
+            "--test",
+            "scripts/variant/file-based-apps/test-classify.cjs",
+            "scripts/variant/file-based-apps/test-entry.cjs",
+            "scripts/variant/file-based-apps/test-recovery.cjs",
+            "scripts/variant/file-based-apps/test-runtime.cjs",
+            "scripts/variant/file-based-apps/test-web.cjs"
+          ],
+          "result": {
+            "exitCode": 0,
+            "startedUtc": "2026-11-08T07:49:04.970702Z",
+            "completedUtc": "2026-11-08T07:49:13.933309Z",
+            "logSha256": "347ed1592d044c077f35c552229e4edf8ff90aeb9493a1b7be80626d9f2599ae"
+          }
+        },
+        {
+          "log": "python.log",
+          "argv": [
+            "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "scripts/variant",
+            "-p",
+            "test_*.py",
+            "-v"
+          ],
+          "result": {
+            "exitCode": 0,
+            "startedUtc": "2026-11-08T07:49:13.936580Z",
+            "completedUtc": "2026-11-08T07:49:19.769658Z",
+            "logSha256": "f0fb1e17438d7c8ec4c27dd3a0b8619e337bf50fbe38e3eb35a22ebaae60114f"
+          }
+        }
+      ],
+      "commands": {
+        "node": [
+          "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "--unhandled-rejections=strict",
+          "--test",
+          "scripts/variant/file-based-apps/test-classify.cjs",
+          "scripts/variant/file-based-apps/test-entry.cjs",
+          "scripts/variant/file-based-apps/test-recovery.cjs",
+          "scripts/variant/file-based-apps/test-runtime.cjs",
+          "scripts/variant/file-based-apps/test-web.cjs"
+        ],
+        "python": [
+          "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "scripts/variant",
+          "-p",
+          "test_*.py",
+          "-v"
+        ]
+      },
+      "finalSourceVerifiedUtc": "2026-11-08T07:49:19.780308Z"
+    },
+    "sourceCount": 48,
+    "manifestFile": {
+      "sha256": "56e7645393c6aa613c001aae215e636face0fb55fc9fad62222b7fdb21bd259b",
+      "bytes": 11793
+    },
+    "runs": [
+      {
+        "record": {
+          "log": "node.log",
+          "argv": [
+            "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+            "--unhandled-rejections=strict",
+            "--test",
+            "scripts/variant/file-based-apps/test-classify.cjs",
+            "scripts/variant/file-based-apps/test-entry.cjs",
+            "scripts/variant/file-based-apps/test-recovery.cjs",
+            "scripts/variant/file-based-apps/test-runtime.cjs",
+            "scripts/variant/file-based-apps/test-web.cjs"
+          ],
+          "result": {
+            "exitCode": 0,
+            "startedUtc": "2026-11-08T07:49:04.970702Z",
+            "completedUtc": "2026-11-08T07:49:13.933309Z",
+            "logSha256": "347ed1592d044c077f35c552229e4edf8ff90aeb9493a1b7be80626d9f2599ae"
+          }
+        },
+        "counts": {
+          "tests": 228,
+          "pass": 228,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "todo": 0
+        },
+        "rawLog": {
+          "sha256": "347ed1592d044c077f35c552229e4edf8ff90aeb9493a1b7be80626d9f2599ae",
+          "bytes": 22072
+        },
+        "rawResult": {
+          "sha256": "84f828976d97f5962a5bd2a969253da483df7f28368d27a644af44156a583593",
+          "bytes": 205
+        }
+      },
+      {
+        "record": {
+          "log": "python.log",
+          "argv": [
+            "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "scripts/variant",
+            "-p",
+            "test_*.py",
+            "-v"
+          ],
+          "result": {
+            "exitCode": 0,
+            "startedUtc": "2026-11-08T07:49:13.936580Z",
+            "completedUtc": "2026-11-08T07:49:19.769658Z",
+            "logSha256": "f0fb1e17438d7c8ec4c27dd3a0b8619e337bf50fbe38e3eb35a22ebaae60114f"
+          }
+        },
+        "counts": {
+          "tests": 39,
+          "result": "OK"
+        },
+        "rawLog": {
+          "sha256": "f0fb1e17438d7c8ec4c27dd3a0b8619e337bf50fbe38e3eb35a22ebaae60114f",
+          "bytes": 5694
+        },
+        "rawResult": {
+          "sha256": "8bdbc3bcd9ec718d6464b1de2217f7308b28dc301b38833371a774a4b6b36edd",
+          "bytes": 205
+        }
+      }
+    ],
+    "sourceObservation": "All tracked and new unignored scripts/variant pre-run source bytes and hashes are retained; current bytes and historical copies are checked against every entry."
+  },
+  "unexpectedFailures": [],
+  "collectors": {
+    "docs\\research\\handoff-cancel-2026-11-08\\summarize.py": {
+      "sha256": "82a3ca8776e753186cf7dbebd580b5c95e91869cb4ec603ae3716b34d800fbc1",
+      "bytes": 39208
+    },
+    "docs\\research\\concurrent-files-2026-11-08\\summarize.py": {
+      "sha256": "715abf0fbbe7280e769ad8006b70242c566d5837663915d2126a7a3d81ca3d20",
+      "bytes": 40694
+    },
+    "docs\\research\\adapter-loss-2026-11-08\\summarize.py": {
+      "sha256": "601faef4fd784e443e128149dff8a53307184d2ef98b7c4975468044f8b3c13e",
+      "bytes": 33844
+    },
+    "docs\\research\\native-host-failure-2026-11-07\\summarize.py": {
+      "sha256": "57a0fcaa1251775e88ccf086e131ecb7b272c973d6af16b84da13305c677fad8",
+      "bytes": 25260
+    },
+    "docs\\research\\debug-handoff-declined-2026-11-07\\summarize.py": {
+      "sha256": "82ea012762566d2006575b4cdac772742702969457a555c6d78daef52fa354d5",
+      "bytes": 31486
+    },
+    "docs\\research\\build-failure-retry-2026-11-05\\summarize.py": {
+      "sha256": "690f25544a8ec068d5125ae51e31de73e07c72cd59dcd197dba1654c0b52df40",
+      "bytes": 7688
+    },
+    "docs\\research\\web-lifecycle-2026-11-05\\summarize.py": {
+      "sha256": "f6bacf47766121737b2bfd5bd0be7b09744d70a41758d9346a36a320b581b734",
+      "bytes": 11207
+    }
+  }
+}
