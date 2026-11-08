@@ -165,6 +165,25 @@ async function waitFor(predicate, message) {
     assert(predicate(), message);
 }
 
+async function waitForFailedCleanup(f, count = 1) {
+    await waitFor(() => f.calls.logs.filter(line => line.includes('Could not clean file-app output')).length >= count,
+        'The terminal cleanup failure must be diagnosed before retrying it');
+    // No I/O follows this diagnostic. Drain cleanup's final Promise bookkeeping
+    // before a test asks the next command to select a retained failure.
+    await new Promise(resolve => setImmediate(resolve));
+}
+
+async function waitForRemovedOutput(f, directory) {
+    const base = path.join(f.context.globalStorageUri.fsPath, 'file-based-apps');
+    // Follow publication order after observing source absence so a staging-to-ready
+    // move cannot fall between the two queue observations and appear complete.
+    await waitFor(() => !fs.existsSync(directory) && ['terminal-cleanup-staging-v1', 'terminal-cleanup-v1'].every(name => {
+        const queue = path.join(base, name);
+        return !fs.existsSync(queue) || fs.readdirSync(queue).length === 0;
+    }),
+        'The terminal output and its completed receipt must be removed');
+}
+
 function terminalOutputs(f) {
     const queue = path.join(f.context.globalStorageUri.fsPath, 'file-based-apps', 'terminal-cleanup-v1');
     if (!fs.existsSync(queue)) return [];
@@ -346,6 +365,7 @@ async function retainedTerminalOutput(t, { staging = false } = {}) {
     });
     await owner.api.recoveryReady;
     assert.equal(await owner.api.debugActiveFile(), false);
+    await owner.api.dispose();
     const base = path.join(owner.context.globalStorageUri.fsPath, 'file-based-apps');
     const queue = path.join(base, staging ? 'terminal-cleanup-staging-v1' : 'terminal-cleanup-v1');
     const [name] = fs.readdirSync(queue);
@@ -353,8 +373,7 @@ async function retainedTerminalOutput(t, { staging = false } = {}) {
     const output = path.join(entry, 'output');
     assert(fs.existsSync(path.join(output, 'FileApp.dll')));
     assert(fs.existsSync(path.join(entry, 'record.json')));
-    owner.dispose();
-    await waitFor(() => owner.calls.disposals.output, 'The terminal writer must drain before the next owner starts');
+    assert.equal(owner.calls.disposals.output, 1, 'The terminal writer must drain before the next owner starts');
     return { owner, base, entry, output };
 }
 
@@ -474,6 +493,7 @@ test('graceful disposal cancels fresh SDK work while an older cleanup retry reta
         } });
     await f.api.recoveryReady;
     assert.equal(await f.api.debugActiveFile(), false);
+    await waitForFailedCleanup(f);
     const processCount = f.calls.processes.length;
     const saveCount = f.calls.saves;
     const errorCount = f.calls.errors.length;
@@ -1062,6 +1082,7 @@ test('a preparation deadline waits for the build to settle before cleanup and re
     assert(fs.existsSync(path.join(directory, 'FileApp.dll')));
     settleChild();
     assert.equal(await operation, false);
+    await waitForRemovedOutput(f, directory);
     assert(!fs.existsSync(directory));
     assert.match(f.calls.errors[0], /timed out.*Building file-based app.*100 ms/i);
     assert(f.calls.logs.some(line => /Phase timed out: Building file-based app/.test(line)));
@@ -1179,6 +1200,7 @@ test('a preparation deadline aborts a real child and cleanup follows direct-chil
     assert.equal(await operation, false);
     exited();
     const build = f.calls.processes.find(call => call.args[0] === 'build');
+    await waitForRemovedOutput(f, build.args[build.args.indexOf('--output') + 1]);
     assert(!fs.existsSync(build.args[build.args.indexOf('--output') + 1]));
     assert.equal(f.calls.errors.length, 1);
     assert.match(f.calls.errors[0], /timed out.*Building file-based app/i);
@@ -1271,6 +1293,7 @@ test('an invalid HTTP profile root fails after build and permits corrected coale
     const builds = f.calls.processes.filter(call => call.args[0] === 'build');
     assert.equal(builds.length, 1);
     const failedOutput = builds[0].args[builds[0].args.indexOf('--output') + 1];
+    await waitForRemovedOutput(f, failedOutput);
     assert(!fs.existsSync(failedOutput));
     assert.deepEqual(terminalOutputs(f), []);
     assert(f.calls.logs.some(line => line.startsWith('Phase completed: Building file-based app')));
@@ -1318,6 +1341,7 @@ test('cancelling Web preparation releases F5 and cleans its output before a retr
     } });
     assert.equal(await f.api.debugActiveFile(), false);
     const failedBuild = f.calls.processes.find(call => call.args[0] === 'build');
+    await waitForRemovedOutput(f, failedBuild.args[failedBuild.args.indexOf('--output') + 1]);
     assert(!fs.existsSync(failedBuild.args[failedBuild.args.indexOf('--output') + 1]));
     assert.deepEqual(f.calls.errors, []);
     assert.equal(await f.api.debugActiveFile(), true);
@@ -1504,6 +1528,8 @@ test('user build cancellation stays coalesced until child close and permits one 
     assert.deepEqual(removals, []);
     completeChild();
     assert.deepEqual(await Promise.all(requests), [false, false, false]);
+    await waitFor(() => removals.length === 1 && !fs.existsSync(removals[0]) && terminalOutputs(f).length === 0,
+        'The closed cancelled child must eventually release its queued output');
     assert.equal(removals.length, 1);
     assert.notEqual(removals[0], directory, 'The writing child output is retired before its first deletion');
     assert(!fs.existsSync(removals[0]));
@@ -1546,6 +1572,7 @@ test('separate sessions have distinct output directories; only owned output is r
 test('failed debug launch removes its own output and does not reuse stale bytes', async t => {
     const f = fixture(t, { startResult: false });
     assert.equal(await f.api.debugActiveFile(), false);
+    await waitForRemovedOutput(f, f.calls.launches[0].config.__netcoredbgFileAppOutput);
     assert(!fs.existsSync(f.calls.launches[0].config.program));
     assert.equal(f.calls.errors.length, 1);
     assert.match(f.calls.errors[0], /editor did not start the netcoredbg debug session/);
@@ -1644,6 +1671,7 @@ test('an existing output with unavailable journal identity is retained and retri
         removeOutput: async (directory, settings) => { removals.push(directory); await fs.promises.rm(directory, settings); } };
     const f = fixture(t, options);
     assert.equal(await f.api.debugActiveFile(), false);
+    await waitForFailedCleanup(f);
     const retained = f.calls.launches[0].config;
     assert(fs.existsSync(retained.program), 'Unpublishable existing output must remain available for a safe retry');
     assert.deepEqual(removals, [], 'A failed ownership journal must never fall back to deleting the original path');
@@ -1677,6 +1705,7 @@ test('an incomplete tracked publication is retained when its original disappears
         removeOutput: async directory => { removals.push(directory); } };
     const f = fixture(t, options);
     assert.equal(await f.api.debugActiveFile(), false);
+    await waitForFailedCleanup(f);
     assert.equal(removedOriginal, f.calls.launches[0].config.__netcoredbgFileAppOutput);
     assert(!fs.existsSync(removedOriginal));
     const staging = path.join(f.context.globalStorageUri.fsPath, 'file-based-apps', 'terminal-cleanup-staging-v1');
@@ -1731,6 +1760,7 @@ test('failed cleanup is retried by the next command without removing live sessio
     const active = f.calls.launches[0].config;
     options.startResult = false;
     assert.equal(await f.api.debugActiveFile(), false);
+    await waitForFailedCleanup(f);
     const failed = f.calls.launches[1].config;
     const [retired] = terminalOutputs(f);
     assert(fs.existsSync(path.join(retired, 'FileApp.dll')), 'A terminal receipt retains failed output for later recovery');
@@ -1746,6 +1776,280 @@ test('failed cleanup is retried by the next command without removing live sessio
     assert.notEqual(retried.program, failed.program);
     assert.deepEqual(removals, [retired, retired], 'The initial deletion and retry must share the same published output');
     assert.equal(f.calls.errors.length, 1, 'Cleanup must preserve the original launch failure');
+});
+
+test('current terminal cleanup releases a failed build for coalesced dirty retry while disposal waits', { timeout: 5000 }, async t => {
+    let releaseCleanup;
+    const gate = new Promise(resolve => { releaseCleanup = resolve; });
+    let retired;
+    const removals = [];
+    const options = { buildError: new Error('Current compiler failure'), showErrorMessage: () => new Promise(() => {}),
+        removeOutput: async (directory, settings) => {
+            removals.push(directory);
+            if (!retired) { retired = directory; await gate; }
+            await fs.promises.rm(directory, settings);
+        } };
+    const f = fixture(t, options);
+    await f.api.recoveryReady;
+    let returned = false;
+    const failed = Promise.all([f.api.debugActiveFile(), f.api.debugActiveFile(), f.api.debugActiveFile()])
+        .then(result => { returned = true; return result; });
+    try {
+        await waitFor(() => retired, 'The current failed output must enter deletion');
+        const recoveryPasses = f.calls.logs.filter(line => line.startsWith('Terminal output recovery:')).length;
+        await waitFor(() => returned, 'Current terminal deletion must not hold the failed command pending');
+        assert.deepEqual(await failed, [false, false, false]);
+        assert.equal(f.calls.errors.length, 1);
+        assert.match(f.calls.errors[0], /Current compiler failure/);
+        assert.deepEqual(terminalOutputs(f), [retired]);
+        options.buildError = undefined;
+        fs.writeFileSync(f.source, 'Console.WriteLine("corrected current failure");\n');
+        f.document.isDirty = true;
+        assert.deepEqual(await Promise.all([f.api.debugActiveFile(), f.api.debugActiveFile(), f.api.debugActiveFile()]),
+            [true, true, true]);
+        assert.equal(f.calls.saves, 1);
+        assert.equal(f.calls.processes.filter(call => call.args[0] === 'build').length, 2);
+        assert.equal(f.calls.launches.length, 1);
+        const fresh = f.calls.launches[0].config;
+        const firstBuild = f.calls.processes.find(call => call.args[0] === 'build');
+        assert.notEqual(fresh.__netcoredbgFileAppOutput, firstBuild.args[firstBuild.args.indexOf('--output') + 1]);
+        assert(fs.existsSync(fresh.program));
+        assert.deepEqual(removals, [retired], 'A retry cannot duplicate an unsettled current deletion');
+        assert.equal(f.calls.logs.filter(line => line.startsWith('Terminal output recovery:')).length, recoveryPasses);
+        f.terminate(fresh);
+        const disposal = observeDisposal(f);
+        await waitFor(() => !fs.existsSync(fresh.__netcoredbgFileAppOutput) && terminalOutputs(f).length === 1,
+            'Fresh session cleanup must proceed while the failed output stays held');
+        assert.equal(disposal.settled, false);
+        assert.equal(f.calls.disposals.started, 0);
+        assert.equal(f.calls.disposals.terminated, 0);
+        assert.equal(f.calls.disposals.output, 0, 'Actual cleanup keeps its diagnostics and drain ownership');
+        releaseCleanup();
+        await disposal.promise;
+        assert.deepEqual(terminalOutputs(f), []);
+        assert.equal(f.calls.errors.length, 1);
+        assertDisposed(f);
+    } finally {
+        releaseCleanup();
+        await failed;
+        await f.api.dispose();
+    }
+});
+
+test('current terminal cleanup releases cancellation only after child close and retains its deletion drain', { timeout: 5000 }, async t => {
+    let closeChild;
+    let writing = false;
+    let releaseCleanup;
+    const gate = new Promise(resolve => { releaseCleanup = resolve; });
+    let deleting;
+    const f = fixture(t, { removeOutput: async (directory, settings) => {
+        assert.equal(writing, false, 'A writing child must settle before terminal publication or deletion');
+        deleting = directory;
+        await gate;
+        await fs.promises.rm(directory, settings);
+    } });
+    const run = f.dependencies.runDotnet;
+    f.dependencies.runDotnet = async (args, settings) => {
+        const result = await run(args, settings);
+        if (args[0] !== 'build') return result;
+        writing = true;
+        return new Promise((_resolve, reject) => { closeChild = () => {
+            writing = false;
+            reject(Object.assign(new Error('Cancelled child closed'), { name: 'AbortError' }));
+        }; });
+    };
+    const first = f.api.debugActiveFile();
+    let requests;
+    try {
+        await waitFor(() => closeChild, 'The build child must be pending');
+        f.cancel();
+        let returned = false;
+        requests = Promise.all([first, f.api.debugActiveFile(), f.api.debugActiveFile()])
+            .then(result => { returned = true; return result; });
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(returned, false, 'Cancellation still coalesces the writing child until close');
+        assert.equal(deleting, undefined);
+        assert.deepEqual(terminalOutputs(f), []);
+        closeChild();
+        await waitFor(() => deleting, 'Child close must authorize terminal cleanup');
+        await waitFor(() => returned, 'A closed cancelled child must release foreground callers before deletion settles');
+        assert.deepEqual(await requests, [false, false, false]);
+        assert.equal(f.calls.processes.filter(call => call.args[0] === 'build').length, 1);
+        assert.deepEqual(f.calls.launches, []);
+        assert.deepEqual(f.calls.errors, []);
+        const disposal = observeDisposal(f);
+        assert.equal(disposal.settled, false);
+        assert.equal(f.calls.disposals.output, 0);
+        releaseCleanup();
+        await disposal.promise;
+        assert.deepEqual(terminalOutputs(f), []);
+        assertDisposed(f);
+    } finally {
+        closeChild?.();
+        releaseCleanup();
+        await (requests || first);
+        await f.api.dispose();
+    }
+});
+
+for (const rejectStart of [false, true]) {
+    test(`current terminal cleanup releases an editor ${rejectStart ? 'rejection' : 'decline'} without a session`, { timeout: 5000 }, async t => {
+        let releaseCleanup;
+        const gate = new Promise(resolve => { releaseCleanup = resolve; });
+        let retired;
+        let removals = 0;
+        const options = { startResult: false,
+            ...(rejectStart ? { startDebugging: async () => { throw new Error('Current adapter rejection'); } } : {}),
+            removeOutput: async (directory, settings) => {
+                removals++;
+                if (!retired) { retired = directory; await gate; }
+                await fs.promises.rm(directory, settings);
+            } };
+        const f = fixture(t, options);
+        let returned = false;
+        const failed = f.api.debugActiveFile().then(result => { returned = true; return result; });
+        try {
+            await waitFor(() => retired, 'The definitive editor failure must authorize deletion');
+            await waitFor(() => returned, 'Editor failure reporting must not wait for terminal deletion');
+            assert.equal(await failed, false);
+            assert.equal(f.calls.errors.length, 1);
+            assert.match(f.calls.errors[0], rejectStart ? /Current adapter rejection/ : /editor did not start/);
+            options.startDebugging = undefined;
+            options.startResult = true;
+            assert.equal(await f.api.debugActiveFile(), true);
+            assert.equal(f.calls.launches.length, 2);
+            assert.notEqual(f.calls.launches[0].config.program, f.calls.launches[1].config.program);
+            assert(fs.existsSync(f.calls.launches[1].config.program));
+            assert.equal(removals, 1);
+            assert.deepEqual(f.calls.stops, []);
+            const disposal = observeDisposal(f);
+            await waitFor(() => f.calls.stops.length === 1, 'Disposal must Stop only the corrected live session');
+            assert.equal(disposal.settled, false);
+            assert.equal(f.calls.disposals.output, 0);
+            releaseCleanup();
+            await disposal.promise;
+            assert.equal(f.calls.errors.length, 1);
+            assertDisposed(f);
+        } finally {
+            releaseCleanup();
+            await failed;
+            await f.api.dispose();
+        }
+    });
+}
+
+test('current terminal cleanup observes a late quiet rejection and permits recovery without changing live output', { timeout: 5000 }, async t => {
+    let rejectCleanup;
+    const gate = new Promise((_resolve, reject) => { rejectCleanup = reject; });
+    let retired;
+    let cancelFirst = true;
+    let rejected = false;
+    const removals = [];
+    const f = fixture(t, {
+        appendLine: line => { if (line.includes('Current late deletion rejection')) throw new Error('Diagnostic delivery failed'); },
+        webSupport: { BUILD_METADATA_ARGS: [], parseBuildMetadata: () => ({}), prepareWebLaunch: async ({ signal }) => {
+            if (cancelFirst) { cancelFirst = false; f.cancel(); signal.throwIfAborted(); }
+        } },
+        removeOutput: async (directory, settings) => {
+            removals.push(directory);
+            if (!retired) { retired = directory; await gate; }
+            await fs.promises.rm(directory, settings);
+        },
+    });
+    let returned = false;
+    const cancelled = f.api.debugActiveFile().then(result => { returned = true; return result; });
+    try {
+        await waitFor(() => retired, 'The cancelled Web preparation must enter cleanup');
+        await waitFor(() => returned, 'Quiet cancellation must return before its terminal deletion rejects');
+        assert.equal(await cancelled, false);
+        assert.deepEqual(f.calls.errors, []);
+        assert.equal(await f.api.debugActiveFile(), true);
+        const live = f.calls.launches[0].config;
+        assert(fs.existsSync(live.program));
+        rejected = true;
+        rejectCleanup(new Error('Current late deletion rejection'));
+        await waitFor(() => f.calls.logs.some(line => line.includes('Current late deletion rejection')),
+            'The late rejection must remain observed when diagnostic delivery throws');
+        // Cleanup has no more I/O after this diagnostic; let its final bookkeeping settle.
+        await new Promise(resolve => setImmediate(resolve));
+        assert.deepEqual(f.calls.errors, []);
+        assert.deepEqual(terminalOutputs(f), [retired]);
+        assert.equal(await f.api.debugActiveFile(), true);
+        await waitFor(() => !fs.existsSync(path.dirname(retired)), 'A later command must recover the settled failed cleanup');
+        assert.equal(removals.filter(directory => directory === retired).length, 2);
+        assert(fs.existsSync(live.program));
+        assert(fs.existsSync(f.calls.launches[1].config.program));
+        assert.deepEqual(f.calls.errors, []);
+    } finally {
+        if (!rejected) rejectCleanup(new Error('Release current cleanup during test teardown'));
+        await cancelled;
+        await f.api.dispose();
+    }
+});
+
+test('current terminal cleanup retains ownership while receipt publication is blocked', { timeout: 5000 }, async t => {
+    let releasePublication;
+    const gate = new Promise(resolve => { releasePublication = resolve; });
+    let publishing;
+    const activate = activationWithRecoveryIO({ lstat: async (target, settings) => {
+        if (!publishing && settings?.bigint) { publishing = target; await gate; }
+        return fs.promises.lstat(target, settings);
+    } });
+    const options = { activate, buildError: new Error('Failure before publication') };
+    const f = fixture(t, options);
+    await f.api.recoveryReady;
+    let returned = false;
+    const failed = f.api.debugActiveFile().then(result => { returned = true; return result; });
+    try {
+        await waitFor(() => publishing, 'Terminal ownership publication must reach its identity check');
+        await waitFor(() => returned, 'Receipt publication must not hold the original failure pending');
+        assert.equal(await failed, false);
+        assert(fs.existsSync(publishing));
+        assert.deepEqual(terminalOutputs(f), []);
+        options.buildError = undefined;
+        assert.equal(await f.api.debugActiveFile(), true);
+        assert.notEqual(f.calls.launches[0].config.__netcoredbgFileAppOutput, publishing);
+        const disposal = observeDisposal(f);
+        await waitFor(() => f.calls.stops.length === 1, 'The corrected session must receive Stop during disposal');
+        assert.equal(disposal.settled, false);
+        assert.equal(f.calls.disposals.output, 0, 'An unpublished terminal output still owns the cleanup drain');
+        releasePublication();
+        await disposal.promise;
+        assert(!fs.existsSync(publishing));
+        assert.deepEqual(terminalOutputs(f), []);
+        assert.equal(f.calls.errors.length, 1);
+        assertDisposed(f);
+    } finally {
+        releasePublication();
+        await failed;
+        await f.api.dispose();
+    }
+});
+
+test('current terminal cleanup preserves a captured session after an editor decline or rejection', async t => {
+    for (const rejectStart of [false, true]) {
+        let f;
+        const removals = [];
+        const options = { startDebugging: async (_folder, config) => {
+            f.startSession(config);
+            if (rejectStart) throw new Error('API rejected after session start');
+            return false;
+        }, removeOutput: async (directory, settings) => { removals.push(directory); await fs.promises.rm(directory, settings); } };
+        f = fixture(t, options);
+        assert.equal(await f.api.debugActiveFile(), false);
+        const captured = f.calls.launches[0].config;
+        assert(fs.existsSync(captured.program), 'A captured session requires actual termination before cleanup');
+        assert.deepEqual(terminalOutputs(f), []);
+        assert.deepEqual(removals, []);
+        options.startDebugging = undefined;
+        assert.equal(await f.api.debugActiveFile(), true);
+        assert(fs.existsSync(captured.program));
+        f.terminate(captured);
+        await f.api.dispose();
+        assert(!fs.existsSync(captured.__netcoredbgFileAppOutput));
+        assert.equal(f.calls.errors.length, 1);
+        assertDisposed(f);
+    }
 });
 
 test('a blocked older terminal cleanup retry permits coalesced dirty launches and retains drain ownership', { timeout: 5000 }, async t => {
@@ -1765,6 +2069,7 @@ test('a blocked older terminal cleanup retry permits coalesced dirty launches an
     const f = fixture(t, options);
     await f.api.recoveryReady;
     assert.equal(await f.api.debugActiveFile(), false);
+    await waitForFailedCleanup(f);
     assert.deepEqual(terminalOutputs(f), [retired]);
     const originalDll = fs.readFileSync(path.join(retired, 'FileApp.dll'));
     const initialBuilds = f.calls.processes.filter(call => call.args[0] === 'build').length;
@@ -1840,6 +2145,7 @@ test('a late rejected terminal retry stays observed and recoverable without chan
     const f = fixture(t, options);
     await f.api.recoveryReady;
     assert.equal(await f.api.debugActiveFile(), false);
+    await waitForFailedCleanup(f);
     const originalErrors = [...f.calls.errors];
     options.startResult = true;
     let settled = false;
@@ -1928,6 +2234,7 @@ test('cleanup logging failure preserves the original result and failed output ca
     };
     const f = fixture(t, options);
     assert.equal(await f.api.debugActiveFile(), false);
+    await waitForFailedCleanup(f);
     const [retired] = terminalOutputs(f);
     assert(fs.existsSync(path.join(retired, 'FileApp.dll')));
     assert.equal(f.calls.errors.length, 1, 'A failed cleanup log must not replace the launch error');
@@ -1947,6 +2254,7 @@ test('persistent cleanup failures permit fresh launches and retry only one older
     } };
     const f = fixture(t, options);
     assert.equal(await f.api.debugActiveFile(), false);
+    await waitForFailedCleanup(f);
     assert.equal(await f.api.debugActiveFile(), false);
     const failures = () => f.calls.logs.filter(line => line.includes('Could not clean file-app output')).length;
     await waitFor(() => failures() === 3, 'Both current-output failures and the independent older retry must settle');
@@ -1988,6 +2296,7 @@ test('cleanup failure preserves quiet cancellation and the next command recovers
         },
     });
     assert.equal(await f.api.debugActiveFile(), false);
+    await waitForFailedCleanup(f);
     const [failedOutput] = terminalOutputs(f);
     assert(fs.existsSync(path.join(failedOutput, 'FileApp.dll')));
     assert.deepEqual(f.calls.errors, []);
@@ -2011,6 +2320,7 @@ test('a fresh activation recovers a terminal receipt while preserving another ho
     const live = first.calls.launches[0].config;
     options.startResult = false;
     assert.equal(await first.api.debugActiveFile(), false);
+    await waitForFailedCleanup(first);
     const failed = first.calls.launches[1].config;
     const [retired] = terminalOutputs(first);
     assert(fs.existsSync(path.join(retired, 'FileApp.dll')));
@@ -2035,6 +2345,7 @@ test('background recovery does not hold a fresh file command pending', async t =
     const first = fixture(t, { startResult: false, removeOutput: async () => { throw new Error('Locked output'); } });
     await first.api.recoveryReady;
     assert.equal(await first.api.debugActiveFile(), false);
+    await first.api.dispose();
     const [retired] = terminalOutputs(first);
     let release;
     const second = fixture(t, { storage: first.context.globalStorageUri.fsPath, removeOutput: async (directory, settings) => {
@@ -2223,6 +2534,7 @@ test('command recovery chooses a local failed cleanup instead of introducing ano
     const f = fixture(t, options);
     await f.api.recoveryReady;
     assert.equal(await f.api.debugActiveFile(), false);
+    await waitForFailedCleanup(f);
     const [retained] = terminalOutputs(f);
     const completedPasses = f.calls.logs.filter(line => line.startsWith('Terminal output recovery:')).length;
     options.startResult = true;
@@ -2253,6 +2565,7 @@ test('command recovery does not wait for or duplicate a local retry while a glob
     t.after(() => { f.dispose(); release?.(); });
     await waitFor(() => release, 'The initial foreign receipt recovery must be pending');
     assert.equal(await f.api.debugActiveFile(), false);
+    await waitForFailedCleanup(f);
     const local = terminalOutputs(f).find(directory => directory !== previous.output);
     assert(local && fs.existsSync(local));
     localLocked = false;
@@ -2384,6 +2697,7 @@ test('coalesced declined debug starts permit coalesced retry while their notific
     const rejected = f.calls.launches[0].config;
     assert.equal(f.calls.errors.length, 1);
     assert.match(f.calls.errors[0], /The editor did not start the netcoredbg debug session/);
+    await waitForRemovedOutput(f, rejected.__netcoredbgFileAppOutput);
     assert(!fs.existsSync(rejected.program));
     assert.deepEqual(terminalOutputs(f), []);
     options.startResult = true;
@@ -2595,6 +2909,7 @@ test('cancelled launch ignores unrelated session events even when they carry its
 test('an uncancelled start rejection reports the failure and cleans output', async t => {
     const f = fixture(t, { startDebugging: async () => { throw new Error('Adapter start rejected'); } });
     assert.equal(await f.api.debugActiveFile(), false);
+    await waitForRemovedOutput(f, f.calls.launches[0].config.__netcoredbgFileAppOutput);
     assert(!fs.existsSync(f.calls.launches[0].config.program));
     assert.equal(f.calls.errors.length, 1);
     assert.match(f.calls.errors[0], /Adapter start rejected/);
@@ -2627,6 +2942,7 @@ test('a build failure releases the file for retry while its error notification r
 
     assert.equal(await Promise.race([failed, new Promise(resolve => setTimeout(() => resolve('still waiting for notification'), 250))]), false);
     const failedBuild = f.calls.processes.find(call => call.args[0] === 'build');
+    await waitForRemovedOutput(f, failedBuild.args[failedBuild.args.indexOf('--output') + 1]);
     assert(!fs.existsSync(failedBuild.args[failedBuild.args.indexOf('--output') + 1]), 'Failed output must be cleaned before the notification closes');
 
     options.buildError = undefined;
