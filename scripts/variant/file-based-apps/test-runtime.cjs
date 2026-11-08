@@ -456,31 +456,53 @@ test('graceful disposal waits for an in-flight classification and keeps its orig
     assertDisposed(f);
 });
 
-test('graceful disposal after a cleanup retry cannot proceed to saving or building', async t => {
+test('graceful disposal cancels fresh SDK work while an older cleanup retry retains drain ownership', async t => {
     let releaseCleanup;
+    const cleanupGate = new Promise(resolve => { releaseCleanup = resolve; });
+    let releaseSdk;
+    let gateSdk = false;
+    let retrying = false;
     let first = true;
     const f = fixture(t, { dirty: true, buildError: new Error('Compiler failure'),
+        findDotnet: () => gateSdk ? new Promise(resolve => { releaseSdk = resolve; })
+            : { executable: 'dotnet', root: f.root },
         removeOutput: async (directory, settings) => {
             if (first) { first = false; throw Object.assign(new Error('Output is busy'), { code: 'EBUSY' }); }
-            await new Promise(resolve => { releaseCleanup = resolve; });
+            retrying = true;
+            await cleanupGate;
             await fs.promises.rm(directory, settings);
         } });
+    await f.api.recoveryReady;
     assert.equal(await f.api.debugActiveFile(), false);
     const processCount = f.calls.processes.length;
     const saveCount = f.calls.saves;
     const errorCount = f.calls.errors.length;
+    gateSdk = true;
     const operation = f.api.debugActiveFile();
-    await waitFor(() => releaseCleanup, 'The retained terminal output must be retrying cleanup');
-    f.dispose();
-    assert.equal(f.calls.disposals.output, 0, 'Cleanup diagnostics must outlive the disposal request');
-    releaseCleanup();
-    assert.equal(await operation, false);
-    assert.equal(f.calls.saves, saveCount);
-    assert.equal(f.calls.processes.length, processCount);
-    assert.equal(f.calls.errors.length, errorCount);
-    assert.deepEqual(terminalOutputs(f), []);
-    await waitFor(() => f.calls.disposals.output, 'Cleanup and background recovery must both settle');
-    assertDisposed(f);
+    try {
+        await waitFor(() => retrying, 'The retained terminal output must be retrying cleanup');
+        await waitFor(() => releaseSdk, 'Fresh SDK discovery must not wait for an older terminal deletion');
+        assert.equal(f.calls.saves, saveCount + 1, 'The fresh command may save before disposal');
+        const disposal = observeDisposal(f);
+        releaseSdk({ executable: 'dotnet', root: f.root });
+        assert.equal(await operation, false);
+        assert.equal(f.calls.disposals.output, 0, 'The unsettled deletion must retain cleanup diagnostics');
+        assert.equal(disposal.settled, false);
+        assert.equal(f.calls.processes.length, processCount, 'Disposal must prevent downstream SDK processes');
+        assert.equal(f.calls.errors.length, errorCount);
+        assert.deepEqual(f.calls.launches, []);
+        assert.equal(await f.api.debugActiveFile(), false);
+        releaseCleanup();
+        await disposal.promise;
+        assert.deepEqual(terminalOutputs(f), []);
+        assertDisposed(f);
+    } finally {
+        f.dispose();
+        releaseSdk?.({ executable: 'dotnet', root: f.root });
+        releaseCleanup();
+        await operation;
+        await f.api.disposalReady;
+    }
 });
 
 for (const outcomeBeforeEvent of [false, true]) {
@@ -1631,6 +1653,8 @@ test('an existing output with unavailable journal identity is retained and retri
     unavailable = false;
     options.startResult = true;
     assert.equal(await f.api.debugActiveFile(), true);
+    await waitFor(() => removals.length === 1 && !fs.existsSync(retained.__netcoredbgFileAppOutput) && terminalOutputs(f).length === 0,
+        'The independent retry must publish and drain the retained output');
     assert.equal(removals.length, 1, 'The next command retries one retained terminal output');
     assert(!fs.existsSync(retained.__netcoredbgFileAppOutput));
     assert.deepEqual(terminalOutputs(f), []);
@@ -1666,6 +1690,7 @@ test('an incomplete tracked publication is retained when its original disappears
     assert.equal(failures(), 1);
     options.startResult = true;
     assert.equal(await f.api.debugActiveFile(), true);
+    await waitFor(() => failures() === 2, 'The independent retry must report its retained incomplete publication');
     assert.equal(failures(), 2, 'The next command must retain and retry this incomplete owned publication');
     assert(fs.existsSync(marker));
     assert.deepEqual(removals, []);
@@ -1714,12 +1739,138 @@ test('failed cleanup is retried by the next command without removing live sessio
     options.startResult = true;
     assert.equal(await f.api.debugActiveFile(), true);
     const retried = f.calls.launches[2].config;
+    await waitFor(() => !fs.existsSync(retired), 'The older terminal output must drain independently of the new launch');
     assert(!fs.existsSync(retired), 'The next command must retry the failed cleanup');
     assert(fs.existsSync(active.program), 'Recovery must preserve an earlier live session');
     assert(fs.existsSync(retried.program), 'The new session must retain its distinct output');
     assert.notEqual(retried.program, failed.program);
     assert.deepEqual(removals, [retired, retired], 'The initial deletion and retry must share the same published output');
     assert.equal(f.calls.errors.length, 1, 'Cleanup must preserve the original launch failure');
+});
+
+test('a blocked older terminal cleanup retry permits coalesced dirty launches and retains drain ownership', { timeout: 5000 }, async t => {
+    let retired;
+    let releaseCleanup;
+    const cleanupGate = new Promise(resolve => { releaseCleanup = resolve; });
+    const removals = [];
+    const options = { dirty: true, startResult: false, removeOutput: async (directory, settings) => {
+        removals.push(directory);
+        if (!retired) {
+            retired = directory;
+            throw Object.assign(new Error('Initial terminal deletion is busy'), { code: 'EBUSY' });
+        }
+        if (directory === retired) await cleanupGate;
+        await fs.promises.rm(directory, settings);
+    } };
+    const f = fixture(t, options);
+    await f.api.recoveryReady;
+    assert.equal(await f.api.debugActiveFile(), false);
+    assert.deepEqual(terminalOutputs(f), [retired]);
+    const originalDll = fs.readFileSync(path.join(retired, 'FileApp.dll'));
+    const initialBuilds = f.calls.processes.filter(call => call.args[0] === 'build').length;
+    const completedPasses = f.calls.logs.filter(line => line.startsWith('Terminal output recovery:')).length;
+    options.startResult = true;
+    fs.writeFileSync(f.source, 'Console.WriteLine("fresh dirty retry");\n');
+    let settled = false;
+    const commands = Promise.all([f.api.debugActiveFile(), f.api.debugActiveFile(), f.api.debugActiveFile()])
+        .then(value => { settled = true; return value; });
+    try {
+        await waitFor(() => removals.filter(directory => directory === retired).length === 2,
+            'One local retry must enter the held deletion provider');
+        await waitFor(() => settled, 'Older terminal deletion must not hold three fresh same-file callers pending');
+        assert.deepEqual(await commands, [true, true, true]);
+        assert.equal(f.calls.saves, 2, 'Three dirty callers share one new save');
+        assert.equal(f.calls.launches.length, 2, 'Three dirty callers share one new session');
+        assert.equal(f.calls.processes.filter(call => call.args[0] === 'build').length, initialBuilds + 1);
+        const fresh = f.calls.launches[1].config;
+        assert.notEqual(fresh.program, f.calls.launches[0].config.program);
+        assert(fs.existsSync(fresh.program));
+        assert.deepEqual(fs.readFileSync(path.join(retired, 'FileApp.dll')), originalDll);
+        assert.equal(await f.api.debugActiveFile(), true, 'The settled command releases its same-file pending entry');
+        const later = f.calls.launches[2].config;
+        assert.notEqual(later.program, fresh.program);
+        assert(fs.existsSync(fresh.program) && fs.existsSync(later.program));
+        assert.deepEqual(removals, [retired, retired], 'Further commands cannot duplicate the held deletion');
+        assert.equal(f.calls.logs.filter(line => line.startsWith('Terminal output recovery:')).length, completedPasses,
+            'The local retry must not introduce a competing global recovery pass');
+        f.terminate(fresh);
+        f.terminate(later);
+        await waitFor(() => !fs.existsSync(fresh.__netcoredbgFileAppOutput) && !fs.existsSync(later.__netcoredbgFileAppOutput)
+            && terminalOutputs(f).length === 1 && terminalOutputs(f)[0] === retired,
+            'The fresh sessions clean independently while the older deletion stays held');
+        const disposal = observeDisposal(f);
+        assert.equal(disposal.settled, false);
+        assert.equal(f.calls.disposals.output, 0, 'An unsettled older deletion still owns diagnostics and listeners');
+        assert.equal(f.calls.disposals.started, 0);
+        assert.equal(f.calls.disposals.terminated, 0);
+        releaseCleanup();
+        await disposal.promise;
+        assert(!fs.existsSync(retired));
+        assert.deepEqual(terminalOutputs(f), []);
+        assert.equal(removals.filter(directory => directory === retired).length, 2);
+        assert.equal(f.calls.errors.length, 1, 'Background cleanup must preserve the original launch failure');
+        assertDisposed(f);
+    } finally {
+        releaseCleanup();
+        await commands;
+        f.dispose();
+        await f.api.disposalReady;
+    }
+});
+
+test('a late rejected terminal retry stays observed and recoverable without changing fresh launches', { timeout: 5000 }, async t => {
+    let retired;
+    let rejectCleanup;
+    const cleanupGate = new Promise((_resolve, reject) => { rejectCleanup = reject; });
+    let rejected = false;
+    let hold = true;
+    const removals = [];
+    const options = { startResult: false,
+        appendLine: line => { if (line.includes('Late terminal deletion failure')) throw new Error('Diagnostic delivery failed'); },
+        removeOutput: async (directory, settings) => {
+            removals.push(directory);
+            if (!retired) {
+                retired = directory;
+                throw Object.assign(new Error('Initial terminal deletion is busy'), { code: 'EBUSY' });
+            }
+            if (directory === retired && hold) await cleanupGate;
+            await fs.promises.rm(directory, settings);
+        },
+    };
+    const f = fixture(t, options);
+    await f.api.recoveryReady;
+    assert.equal(await f.api.debugActiveFile(), false);
+    const originalErrors = [...f.calls.errors];
+    options.startResult = true;
+    let settled = false;
+    const command = f.api.debugActiveFile().then(value => { settled = true; return value; });
+    try {
+        await waitFor(() => removals.filter(directory => directory === retired).length === 2,
+            'The local retry must wait inside its deletion provider');
+        await waitFor(() => settled, 'A fresh launch must complete before an older retry rejects');
+        assert.equal(await command, true);
+        const fresh = f.calls.launches[1].config;
+        assert(fs.existsSync(fresh.program) && fs.existsSync(path.join(retired, 'FileApp.dll')));
+        rejected = true;
+        rejectCleanup(new Error('Late terminal deletion failure'));
+        await waitFor(() => f.calls.logs.some(line => line.includes('Late terminal deletion failure')),
+            'A late deletion rejection must remain observed even when diagnostic delivery throws');
+        assert.deepEqual(f.calls.errors, originalErrors, 'The late rejection must not replace or add a launch notification');
+        assert.deepEqual(terminalOutputs(f), [retired]);
+        assert(fs.existsSync(fresh.program));
+        hold = false;
+        assert.equal(await f.api.debugActiveFile(), true);
+        await waitFor(() => !fs.existsSync(retired), 'A later command must retry and drain the retained terminal receipt');
+        assert.equal(removals.filter(directory => directory === retired).length, 3);
+        assert.deepEqual(f.calls.errors, originalErrors);
+        assert(fs.existsSync(fresh.program), 'Recovering the older output must preserve the earlier fresh live session');
+        assert(fs.existsSync(f.calls.launches[2].config.program));
+    } finally {
+        if (!rejected) rejectCleanup(new Error('Release held deletion during test cleanup'));
+        await command;
+        f.dispose();
+        await f.api.disposalReady;
+    }
 });
 
 test('overlapping cleanup requests share one deletion and release ownership only after success', async t => {
@@ -1783,6 +1934,7 @@ test('cleanup logging failure preserves the original result and failed output ca
     locked = false;
     options.startResult = true;
     assert.equal(await f.api.debugActiveFile(), true);
+    await waitFor(() => !fs.existsSync(retired), 'The observed retry must recover despite earlier diagnostic failure');
     assert(!fs.existsSync(retired));
     assert(fs.existsSync(f.calls.launches[1].config.program));
 });
@@ -1796,16 +1948,23 @@ test('persistent cleanup failures permit fresh launches and retry only one older
     const f = fixture(t, options);
     assert.equal(await f.api.debugActiveFile(), false);
     assert.equal(await f.api.debugActiveFile(), false);
-    const first = removals[1]; // The second command already retried the first queued output.
-    const second = terminalOutputs(f).find(directory => directory !== first);
-    assert(first && second);
+    const failures = () => f.calls.logs.filter(line => line.includes('Could not clean file-app output')).length;
+    await waitFor(() => failures() === 3, 'Both current-output failures and the independent older retry must settle');
+    await new Promise(resolve => setImmediate(resolve));
+    const retained = terminalOutputs(f);
+    assert.equal(retained.length, 2);
     options.startResult = true;
     const before = removals.length;
     assert.equal(await f.api.debugActiveFile(), true);
+    await waitFor(() => failures() === 4, 'The command must finish exactly one independent older retry');
+    await new Promise(resolve => setImmediate(resolve));
     assert.equal(removals.length, before + 1, 'A command must not sweep the entire failed-output backlog');
-    assert.equal(removals.at(-1), first);
+    const first = removals.at(-1);
+    assert(retained.includes(first));
     assert.equal(await f.api.debugActiveFile(), true);
+    await waitFor(() => failures() === 5, 'The next command must finish one further independent retry');
     assert.equal(removals.length, before + 2);
+    const second = retained.find(directory => directory !== first);
     assert.equal(removals.at(-1), second, 'A locked output must not starve another failed output');
     assert.equal(f.calls.errors.length, 2, 'Recovery failure must not become an additional launch error');
     assert(fs.existsSync(path.join(first, 'FileApp.dll')));
@@ -1834,6 +1993,7 @@ test('cleanup failure preserves quiet cancellation and the next command recovers
     assert.deepEqual(f.calls.errors, []);
     locked = false;
     assert.equal(await f.api.debugActiveFile(), true);
+    await waitFor(() => !fs.existsSync(failedOutput), 'The quiet cancelled output must recover in the independent retry');
     assert(!fs.existsSync(failedOutput));
     assert.deepEqual(f.calls.errors, []);
     assert.equal(f.calls.launches.length, 1);
@@ -2068,6 +2228,7 @@ test('command recovery chooses a local failed cleanup instead of introducing ano
     options.startResult = true;
     locked = false;
     assert.equal(await f.api.debugActiveFile(), true);
+    await waitFor(() => !fs.existsSync(retained), 'The selected local retry must finish without a global pass');
     assert.deepEqual(removals, [retained, retained]);
     assert(!fs.existsSync(retained));
     assert.equal(f.calls.logs.filter(line => line.startsWith('Terminal output recovery:')).length, completedPasses,
@@ -2102,6 +2263,7 @@ test('command recovery does not wait for or duplicate a local retry while a glob
     release();
     await f.api.recoveryReady;
     assert.equal(await f.api.debugActiveFile(), true);
+    await waitFor(() => !fs.existsSync(local), 'After the global pass, one local background retry must drain');
     assert.deepEqual(removals, [previous.output, local, local]);
     assert(!fs.existsSync(local));
 });

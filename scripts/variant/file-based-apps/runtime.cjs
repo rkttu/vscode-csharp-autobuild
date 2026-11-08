@@ -253,10 +253,14 @@ function activate(context, dependencies = {}) {
         // Do not compete with an existing pass or await it in the foreground.
         // Independent session termination still performs its own idempotent cleanup.
         if (recoveryInFlight || cleanupInFlight.size) return;
-        // Select either one same-host retry (which can resume incomplete publication)
-        // or one background recovery pass. Do not add both attempts to a command.
+        // Start either one same-host retry (which can resume incomplete publication)
+        // or one background recovery pass. A fresh command uses a distinct output
+        // while cleanup retains drain/output ownership until actual settlement,
+        // including any late failure. Do not add both attempts to a command.
         const directory = failedCleanups.values().next().value;
-        if (directory !== undefined) await cleanup(directory);
+        if (directory !== undefined) void cleanup(directory).catch(error => {
+            cleanupLog(`Could not retry terminal file-app output ${directory}: ${error?.message || String(error)}`);
+        });
         else void startRecovery();
     }
 
