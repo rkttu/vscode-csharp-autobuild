@@ -1657,6 +1657,83 @@ test('save progress permits another file while a cancelled save retains its capt
     }
 });
 
+test('web preparation cancellation cleans the failed output and permits one corrected retry while another file survives', { timeout: 10000 }, async t => {
+    const options = { web: true };
+    const f = fixture(t, options);
+    const profile = JSON.stringify({ profiles: { Http: { commandName: 'Project', applicationUrl: 'http://localhost:5010' } } });
+    const otherSource = path.join(path.dirname(f.source), 'other.cs');
+    fs.writeFileSync(otherSource, 'Console.WriteLine("independent file");\n');
+    fs.writeFileSync(path.join(path.dirname(otherSource), 'other.run.json'), profile);
+    fs.writeFileSync(path.join(path.dirname(f.source), 'tool.run.json'), profile);
+    f.vscode.window.activeTextEditor = { document: {
+        uri: { scheme: 'file', fsPath: otherSource }, isDirty: false,
+        getText: () => fs.readFileSync(otherSource, 'utf8'),
+    } };
+    assert.equal(await f.api.debugActiveFile(), true);
+    const unrelated = f.calls.launches[0].config;
+    f.vscode.window.activeTextEditor = { document: f.document };
+
+    const reads = [];
+    let gate = true;
+    const paths = new Set([path.join(path.dirname(f.source), 'Properties', 'launchSettings.json'),
+        path.join(path.dirname(f.source), 'tool.run.json')]);
+    const originalRead = fs.promises.readFile;
+    t.mock.method(fs.promises, 'readFile', (filename, settings) => {
+        if (!gate || !paths.has(filename)) return originalRead(filename, settings);
+        return new Promise((resolve, reject) => {
+            let settled = false;
+            const signal = settings?.signal;
+            const finish = (complete, value) => {
+                if (settled) return;
+                settled = true;
+                signal?.removeEventListener('abort', cancelled);
+                complete(value);
+            };
+            const cancelled = () => finish(reject, Object.assign(new Error('Cooperative profile read cancelled'), { name: 'AbortError' }));
+            reads.push({ settings, release: () => finish(resolve, profile) });
+            signal?.addEventListener('abort', cancelled, { once: true });
+            if (signal?.aborted) cancelled();
+        });
+    });
+    const requests = Array.from({ length: 3 }, () => f.api.debugActiveFile());
+    try {
+        await waitFor(() => reads.length === 2, 'The real Web helper must be awaiting both profile reads');
+        const failedBuild = f.calls.processes.find(call => call.args[0] === 'build' && call.args[1] === f.source);
+        const failedOutput = failedBuild.args[failedBuild.args.indexOf('--output') + 1];
+        f.cancel();
+        let returned = false;
+        const results = Promise.all(requests).then(value => { returned = true; return value; });
+        await waitFor(() => returned, 'Cooperative profile read cancellation must release the coalesced file command');
+        assert.deepEqual(await results, [false, false, false]);
+        assert(reads.every(read => read.settings.encoding === 'utf8' && read.settings.signal === reads[0].settings.signal));
+        assert.equal(reads[0].settings.signal.aborted, true);
+        assert.deepEqual(f.calls.errors, []);
+        assert.equal(f.calls.launches.length, 1, 'The cancelled Web preparation must start no new session');
+        assert(f.calls.logs.some(line => /^Phase cancelled: Preparing web launch settings /.test(line)));
+        await waitForRemovedOutput(f, failedOutput);
+        assert(fs.existsSync(unrelated.program));
+        assert.deepEqual(f.calls.stops, [], 'The unrelated file session must remain untouched');
+
+        gate = false;
+        f.document.isDirty = true;
+        options.save = async () => { fs.writeFileSync(f.source, 'Console.WriteLine("corrected file");\n'); f.document.isDirty = false; return true; };
+        assert.deepEqual(await Promise.all(Array.from({ length: 3 }, () => f.api.debugActiveFile())), [true, true, true]);
+        assert.equal(f.calls.saves, 1);
+        assert.equal(f.calls.processes.filter(call => call.args[0] === 'build' && call.args[1] === f.source).length, 2);
+        assert.equal(f.calls.launches.length, 2, 'The corrected callers must share exactly one new session');
+        assert.notEqual(f.calls.launches[1].config.__netcoredbgFileAppOutput, failedOutput);
+        assert(fs.existsSync(unrelated.program));
+        assert.deepEqual(f.calls.stops, []);
+        assert.deepEqual(f.calls.errors, []);
+    } finally {
+        gate = false;
+        f.cancel();
+        for (const read of reads) read.release();
+        await Promise.all(requests);
+        await f.api.dispose();
+    }
+});
+
 test('user build cancellation stays coalesced until child close and permits one dirty concurrent retry', async t => {
     let completeChild;
     let childPending = false;

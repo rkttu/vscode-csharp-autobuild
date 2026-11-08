@@ -139,20 +139,30 @@ function abort(signal) {
 }
 
 function withAbort(promise, signal) {
-    if (!signal) return Promise.resolve(promise);
-    abort(signal);
+    // The provider may cancel reentrantly while returning its Promise/thenable.
+    // Observe that original result even when cancellation has already happened.
+    const observed = Promise.resolve(promise);
+    if (!signal) return observed;
     return new Promise((resolve, reject) => {
-        const cancelled = () => reject(Object.assign(new Error('Web app launch cancelled.'), { name: 'AbortError' }));
+        let settled = false;
+        const finish = (complete, value) => {
+            if (settled) return;
+            settled = true;
+            signal.removeEventListener('abort', cancelled);
+            complete(value);
+        };
+        const cancelled = () => finish(reject, Object.assign(new Error('Web app launch cancelled.'), { name: 'AbortError' }));
+        observed.then(value => finish(resolve, value), error => finish(reject, error));
         signal.addEventListener('abort', cancelled, { once: true });
-        Promise.resolve(promise).then(resolve, reject).finally(() => signal.removeEventListener('abort', cancelled));
+        if (signal.aborted) cancelled();
     });
 }
 
-async function readProfile(source, output) {
+async function readProfile(source, output, signal) {
     const conventional = path.join(path.dirname(source), 'Properties', 'launchSettings.json');
     const adjacent = path.join(path.dirname(source), `${path.basename(source, path.extname(source))}.run.json`);
     const read = async filename => {
-        try { return await fs.readFile(filename, 'utf8'); }
+        try { return await fs.readFile(filename, { encoding: 'utf8', signal }); }
         catch (error) { if (error.code === 'ENOENT') return undefined; throw error; }
     };
     const [conventionalText, adjacentText] = await Promise.all([read(conventional), read(adjacent)]);
@@ -266,7 +276,7 @@ function expandEnvironmentVariables(value, environment) {
 async function prepareWebLaunch({ source, metadata, environment = process.env, signal, runDotnet, vscode, output, onProgress }) {
     if (!metadata?.isWebServer) return undefined;
     abort(signal);
-    const selected = await readProfile(source, output);
+    const selected = await readProfile(source, output, signal);
     abort(signal);
     const env = {};
     let args = [];
