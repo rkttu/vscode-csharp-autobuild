@@ -94,13 +94,13 @@ exports.run = async function run() {
     const expected = JSON.parse(fs.readFileSync(path.join(root, 'expected.json'), 'utf8'));
     assert.equal(expected.schema, 1);
     const scenario = expected.scenario || 'web-lifecycle';
-    assert(['web-lifecycle', 'build-failure-retry', 'native-build-cancel', 'web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry', 'native-host-failure-retry', 'native-adapter-loss', 'concurrent-files'].includes(scenario));
+    assert(['web-lifecycle', 'build-failure-retry', 'native-build-cancel', 'web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry', 'native-host-failure-retry', 'native-adapter-loss', 'concurrent-files', 'native-handoff-cancel'].includes(scenario));
     assert(Number.isInteger(expected.cycles) && expected.cycles >= 2 && expected.cycles <= 10);
     const start = process.hrtime.bigint();
     const result = {
         schema: 1, success: false, expected, editorApiVersion: vscode.version,
         safetyTimeoutMilliseconds: SAFETY_TIMEOUT_MS, checks: [], phases: [], launches: [], cleanup: [], failedBuildAttempts: [],
-        cancelledBuildAttempts: [], failedWebProfileAttempts: [], failedSdkSelectionAttempts: [], failedHandoffAttempts: [], failedNativeHostAttempts: [],
+        cancelledBuildAttempts: [], cancelledHandoffAttempts: [], failedWebProfileAttempts: [], failedSdkSelectionAttempts: [], failedHandoffAttempts: [], failedNativeHostAttempts: [],
         scope: { installedCandidate: true, invocation: 'command-api', physicalF5: false,
             VSCodium: true, platform: `${process.platform}-${process.arch}`, macOS: process.platform === 'darwin',
             qualification: false, localOnly: true, published: false, directWebDebuggee: true,
@@ -112,7 +112,8 @@ exports.run = async function run() {
             injectedEditorRejection: scenario === 'debug-handoff-declined-retry', nativeAdapterFailure: scenario === 'native-adapter-loss',
             actualAdapterProcessKill: scenario === 'native-adapter-loss',
             concurrentSeparateFiles: scenario === 'concurrent-files',
-            actualProgressCancelUi: scenario === 'native-build-cancel', injectedCancellationToken: false },
+            injectedEditorHandoffGate: scenario === 'native-handoff-cancel',
+            actualProgressCancelUi: ['native-build-cancel', 'native-handoff-cancel'].includes(scenario), injectedCancellationToken: false },
     };
     const launches = [];
     const failedBuildAttempts = [];
@@ -121,8 +122,20 @@ exports.run = async function run() {
     const failedHandoffAttempts = [];
     const failedNativeHostAttempts = [];
     const handoffProviders = new Map();
+    const handoffGates = new Map();
+    const cancelledHandoffAttempts = [];
     const cancelledBuildAttempts = [];
     const nativeCancellation = scenario === 'native-build-cancel' ? expected.nativeCancellation : undefined;
+    const handoffCancellation = scenario === 'native-handoff-cancel' ? expected.handoffCancellation : undefined;
+    if (handoffCancellation) {
+        assert.equal(typeof handoffCancellation.nonce, 'string');
+        assert(handoffCancellation.nonce.length > 0);
+        assert.equal(typeof handoffCancellation.windowTitle, 'string');
+        for (const name of ['request', 'receipt']) {
+            assert(path.isAbsolute(handoffCancellation[name]) && within(root, handoffCancellation[name]));
+            assert(!exists(handoffCancellation[name]) && !exists(handoffCancellation[name] + '.tmp'));
+        }
+    } else assert.notEqual(scenario, 'native-handoff-cancel');
     const concurrent = scenario === 'concurrent-files' ? expected.concurrent : undefined;
     const concurrentOperations = [];
     let concurrentStopping = false;
@@ -194,6 +207,8 @@ exports.run = async function run() {
                 expectedSdkSelectionFailure: launch.expectedSdkSelectionFailure,
                 expectedHandoffDeclined: launch.expectedHandoffDeclined,
                 expectedNativeHostFailure: launch.expectedNativeHostFailure,
+                expectedHandoffCancellation: launch.expectedHandoffCancellation,
+                providerPending: launch.providerPending, gateReleased: launch.gateReleased,
                 providerCallCount: launch.providerCalls?.length, providerDisposed: launch.providerDisposed,
                 buildPid: launch.buildPid,
                 stopRequestedAtMilliseconds: launch.stopRequestedAtMilliseconds,
@@ -765,7 +780,7 @@ exports.run = async function run() {
             commandName: 'Project', applicationUrl: launch.origin, launchBrowser: false,
             environmentVariables: { LIFECYCLE_TOKEN: nonce, ASPNETCORE_ENVIRONMENT: 'Development' },
         } } }, null, 2) + '\n');
-        if (['web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry', 'native-host-failure-retry'].includes(scenario)) launch.profileSnapshot = fileSnapshot(source.replace(/\.cs$/i, '.run.json'));
+        if (['web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry', 'native-host-failure-retry', 'native-handoff-cancel'].includes(scenario)) launch.profileSnapshot = fileSnapshot(source.replace(/\.cs$/i, '.run.json'));
         const opened = document || await vscode.workspace.openTextDocument(source);
         await vscode.window.showTextDocument(opened);
         if (concurrent && concurrentStopping) throw new Error('Concurrent fixture cleanup already began; no late command dispatch is permitted');
@@ -789,7 +804,7 @@ exports.run = async function run() {
             state();
         }
         assert.equal(opened.isDirty, false, 'Installed command must save the dirty source before building');
-        if (['web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry', 'native-host-failure-retry'].includes(scenario)) launch.sourceSnapshot = fileSnapshot(source);
+        if (['web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry', 'native-host-failure-retry', 'native-handoff-cancel'].includes(scenario)) launch.sourceSnapshot = fileSnapshot(source);
         await until(() => launch.started, `${label} exact owned session start`);
         assert.equal(launch.capturedSessions.size, 1, 'One launch token must have exactly one captured session');
         assert(exists(launch.program));
@@ -803,6 +818,7 @@ exports.run = async function run() {
         assert(!failedWebProfileAttempts.some(previous => previous.output === launch.output), 'A retry must not reuse Web-profile-failed output');
         assert(!failedHandoffAttempts.some(previous => previous.output === launch.output), 'A retry must not reuse editor-declined output');
         assert(!failedNativeHostAttempts.some(previous => previous.output === launch.output), 'A retry must not reuse native-host-failed output');
+        assert(!cancelledHandoffAttempts.some(previous => previous.output === launch.output), 'A retry must not reuse cancelled handoff output');
         if (inspectBreakpoint) {
             await until(() => launch.dap.some(message => message.event === 'stopped' && message.body?.reason === 'breakpoint'), `${label} source breakpoint`);
             const stopped = launch.dap.find(message => message.event === 'stopped' && message.body?.reason === 'breakpoint');
@@ -1114,6 +1130,279 @@ exports.run = async function run() {
         result.checks.push('Three installed commands share one real build and adapter; the .NET host rejects the per-file roll-forward value, the exact session terminates and output/queues clear while B survives');
         state();
         return attempt;
+    }
+
+    async function nativeHandoffCancellation(source, revision, port, a, b) {
+        let file;
+        await until(() => {
+            file = outputLog();
+            if (!file) return false;
+            const text = fs.readFileSync(file, 'utf8');
+            return buildCommands(text, source).length === 1 && buildCommands(text, b.source).length === 1 &&
+                text.split(/\r?\n/).filter(line => line.startsWith('Phase completed: Starting netcoredbg')).length === 2;
+        }, 'initial A/B output before UI handoff cancellation');
+        const snapshot = logSnapshot(file);
+        const document = await vscode.workspace.openTextDocument(source);
+        assert.equal(document.isDirty, false);
+        assert.equal(document.getText(), fs.readFileSync(source, 'utf8'));
+        await vscode.window.showTextDocument(document);
+        const profile = source.replace(/\.cs$/i, '.run.json');
+        const attempt = { label: 'A-handoff-cancel', source, revision, port, origin: a.origin, nonce: crypto.randomUUID(),
+            expectedHandoffCancellation: true, commandInvocations: 3, dap: [], dapRequests: [], dapTimeline: [], adapterExits: [],
+            adapterCreationCount: 0, editorStartCount: 0, providerCalls: [], providerPending: false, providerActive: true,
+            providerPassthroughCount: 0, providerDisposed: false, providerDisposalCount: 0, providerTokenEvents: [],
+            gateReleased: false, gateSettled: false, testStopRequested: false, sourceSnapshot: fileSnapshot(source) };
+        cancelledHandoffAttempts.push(attempt);
+        ownedAttempts.push(attempt);
+        byToken.set(attempt.nonce, attempt);
+        fs.writeFileSync(profile, JSON.stringify({ profiles: { LifecycleHttp: {
+            commandName: 'Project', applicationUrl: attempt.origin, launchBrowser: false,
+            environmentVariables: { LIFECYCLE_TOKEN: attempt.nonce, ASPNETCORE_ENVIRONMENT: 'Development' },
+        } } }, null, 2) + '\n');
+        attempt.profileSnapshot = fileSnapshot(profile);
+        await stillAlive(b);
+        attempt.bBefore = { sessionId: b.session.id, pid: b.pid, nonce: b.nonce, output: b.output, response: await request(b.origin) };
+        let originalConfig, providerToken, resolveGate;
+        const gatePromise = new Promise(resolve => { resolveGate = resolve; });
+        const tokenSubscriptions = [];
+        const provider = vscode.debug.registerDebugConfigurationProvider('coreclr', {
+            resolveDebugConfigurationWithSubstitutedVariables(_folder, config, token) {
+                if (config?.env?.LIFECYCLE_TOKEN !== attempt.nonce) {
+                    attempt.providerPassthroughCount++;
+                    return config;
+                }
+                if (!attempt.providerActive) return undefined;
+                return observe('handoff-provider-held', () => {
+                    attempt.program = config.program;
+                    attempt.output = config.__netcoredbgFileAppOutput;
+                    assert(within(root, attempt.output) && within(attempt.output, attempt.program));
+                    attempt.base = path.dirname(path.dirname(attempt.output));
+                    assert(samePath(attempt.base, a.base));
+                    assert.notEqual(attempt.output, a.output);
+                    assert(samePath(path.dirname(attempt.program), attempt.output));
+                    assert.equal(path.basename(attempt.program), 'FileApp.dll');
+                    assert.equal(config.type, 'coreclr');
+                    assert.equal(config.request, 'launch');
+                    assert(samePath(config.cwd, path.dirname(source)));
+                    assert(samePath(config.env.DOTNET_ROOT, expected.sdk.root));
+                    assert.equal(config.env.ASPNETCORE_URLS, attempt.origin);
+                    assert.equal(config.serverReadyAction, undefined);
+                    assert.equal(config.checkForDevCert, false);
+                    const outputStat = fs.lstatSync(attempt.output);
+                    assert(outputStat.isDirectory() && !outputStat.isSymbolicLink());
+                    const call = { atMilliseconds: elapsed(start), configuration: JSON.parse(JSON.stringify(config)),
+                        providerTokenCancelled: token?.isCancellationRequested ?? null,
+                        artifacts: ['FileApp.dll', 'FileApp.pdb'].map(name => {
+                            const artifact = path.join(attempt.output, name), stat = fs.lstatSync(artifact);
+                            assert(stat.isFile() && !stat.isSymbolicLink() && stat.size > 0);
+                            return { path: artifact, size: stat.size, sha256: sha256(artifact) };
+                        }) };
+                    attempt.providerCalls.push(call);
+                    assert.equal(attempt.providerCalls.length, 1);
+                    originalConfig = config;
+                    providerToken = token;
+                    if (token) tokenSubscriptions.push(token.onCancellationRequested(() => observe('handoff-provider-token-cancelled', () => {
+                        const event = { atMilliseconds: elapsed(start), gateMode: attempt.gateMode ?? null };
+                        attempt.providerTokenEvents.push(event);
+                        record('handoff-provider-token-cancelled', event);
+                    })));
+                    attempt.providerPending = true;
+                    record('handoff-provider-held', { label: attempt.label, nonce: attempt.nonce, call });
+                    state();
+                    return gatePromise.then(value => {
+                        attempt.providerPending = false;
+                        attempt.providerReturnedAtMilliseconds = elapsed(start);
+                        record('handoff-provider-returned', { label: attempt.label, gateMode: attempt.gateMode,
+                            originalObjectReturned: value === originalConfig, providerTokenCancelled: providerToken?.isCancellationRequested ?? null });
+                        state();
+                        return value;
+                    });
+                });
+            },
+        });
+        const owner = {
+            settle(mode) {
+                if (attempt.gateSettled) return;
+                if (mode === 'valid-original') {
+                    assert(originalConfig);
+                    assert.equal(originalConfig.program, attempt.program);
+                    assert.equal(originalConfig.__netcoredbgFileAppOutput, attempt.output);
+                    assert.deepEqual(JSON.parse(JSON.stringify(originalConfig)), attempt.providerCalls[0].configuration);
+                }
+                attempt.gateSettled = true;
+                attempt.gateMode = mode;
+                attempt.gateSettledAtMilliseconds = elapsed(start);
+                attempt.gateReleased = mode === 'valid-original';
+                attempt.originalObjectReleased = mode === 'valid-original';
+                record('handoff-gate-settled', { label: attempt.label, mode, originalObjectReleased: attempt.originalObjectReleased });
+                resolveGate(mode === 'valid-original' ? originalConfig : undefined);
+            },
+            dispose() {
+                if (!attempt.providerActive) return;
+                if (!attempt.gateSettled) owner.settle('decline-safety');
+                attempt.providerActive = false;
+                try { provider.dispose(); }
+                finally {
+                    for (const subscription of tokenSubscriptions) subscription.dispose();
+                    attempt.providerDisposed = true;
+                    attempt.providerDisposalCount++;
+                    attempt.providerDisposedAtMilliseconds = elapsed(start);
+                    handoffGates.delete(owner);
+                    record('handoff-gate-provider-disposed', { label: attempt.label, count: attempt.providerDisposalCount });
+                    state();
+                }
+            },
+        };
+        handoffGates.set(owner, attempt);
+        subscriptions.push(owner);
+        let completed = false;
+        try {
+            attempt.commandPending = true;
+            attempt.invokedAtMilliseconds = elapsed(start);
+            attempt.commandOperation = Promise.allSettled(Array.from({ length: 3 }, () => vscode.commands.executeCommand(COMMAND)))
+                .finally(() => { attempt.commandPending = false; attempt.returnedAtMilliseconds = elapsed(start); state(); });
+            await until(() => {
+                assert(attempt.commandPending, 'Commands must remain pending at the exact provider gate');
+                return attempt.providerPending;
+            }, 'post-build exact-token debugger provider gate');
+            let tail;
+            await until(() => {
+                tail = logTail(snapshot);
+                return tail.includes('Phase started: Starting netcoredbg');
+            }, 'real completed build/Web preparation before held handoff');
+            const prepared = logEvidence(snapshot, tail, source);
+            assert.equal(prepared.buildCommands.length, 1);
+            assert.equal(prepared.buildCompletedPhaseDiagnostics.length, 1);
+            assert(tail.includes('Phase completed: Preparing web launch settings'));
+            assert(samePath(prepared.buildCommands[0].output, attempt.output));
+            assert.equal(attempt.adapterCreationCount, 0);
+            assert.equal(attempt.editorStartCount, 0);
+            await stillAlive(b);
+            const uiRequest = { schema: 1, nonce: handoffCancellation.nonce, token: attempt.nonce,
+                windowTitle: handoffCancellation.windowTitle, phase: 'Starting netcoredbg', stage: 'provider-held',
+                source, program: attempt.program, output: attempt.output, providerCallCount: attempt.providerCalls.length };
+            const temporary = handoffCancellation.request + '.tmp';
+            fs.writeFileSync(temporary, JSON.stringify(uiRequest, null, 2) + '\n', { flag: 'wx' });
+            fs.renameSync(temporary, handoffCancellation.request);
+            attempt.uiRequestSnapshot = fileSnapshot(handoffCancellation.request);
+            attempt.uiRequestedAtMilliseconds = elapsed(start);
+            record('needs-ui-cancel', uiRequest);
+            const outcomes = await attempt.commandOperation;
+            const rejected = outcomes.find(outcome => outcome.status === 'rejected');
+            if (rejected) throw rejected.reason;
+            attempt.commandResults = outcomes.map(outcome => outcome.value);
+            assert.deepEqual(attempt.commandResults, [false, false, false]);
+            await until(() => exists(handoffCancellation.receipt), 'actual handoff progress Cancel UI receipt');
+            attempt.uiActionSnapshot = fileSnapshot(handoffCancellation.receipt);
+            attempt.uiAction = JSON.parse(Buffer.from(attempt.uiActionSnapshot.base64, 'base64').toString('utf8').replace(/^\uFEFF/, ''));
+            for (const [name, value] of Object.entries({ schema: 1, nonce: handoffCancellation.nonce,
+                automation: '@oai/sky', method: 'click', control: 'progress Cancel', notificationTitle: 'Debug C# file',
+                message: 'Starting netcoredbg', expectedWindowTitle: handoffCancellation.windowTitle })) {
+                assert.equal(attempt.uiAction[name], value);
+            }
+            assert(attempt.uiAction.window?.title?.includes(handoffCancellation.windowTitle));
+            assert(attempt.uiAction.window.app && attempt.uiAction.window.id !== undefined);
+            assert(Number.isFinite(Date.parse(attempt.uiAction.actionStartedUtc)));
+            assert(Date.parse(attempt.uiAction.actionCompletedUtc) >= Date.parse(attempt.uiAction.actionStartedUtc));
+            attempt.uiObservations = ['beforeObservationFile', 'afterObservationFile'].map(name => {
+                const file = attempt.uiAction[name];
+                assert(path.isAbsolute(file) && within(root, file));
+                const stat = fs.statSync(file);
+                assert(stat.isFile() && stat.size > 0);
+                return { path: file, size: stat.size, sha256: sha256(file) };
+            });
+            assert.equal(attempt.providerPending, true);
+            assert.equal(attempt.gateSettled, false);
+            attempt.providerTokenCancelledAfterForeground = providerToken?.isCancellationRequested ?? null;
+            assert.equal(attempt.providerTokenCancelledAfterForeground, false, 'Cancel must target the file-command progress, not debugger initialization');
+            assert.equal(attempt.adapterCreationCount, 0);
+            assert.equal(attempt.editorStartCount, 0);
+            assert.equal(attempt.capturedSessions?.size || 0, 0);
+            await until(() => { tail = logTail(snapshot); return tail.includes('Phase cancelled: Starting netcoredbg'); },
+                'quiet foreground handoff cancellation phase');
+            attempt.log = { ...logEvidence(snapshot, tail, source),
+                handoffCancelledDiagnostics: tail.split(/\r?\n/).filter(line => line.startsWith('Phase cancelled: Starting netcoredbg')) };
+            assert.equal(attempt.log.handoffCancelledDiagnostics.length, 1);
+            assert.equal(attempt.log.buildCommands.length, 1);
+            assert.equal(attempt.log.buildCompletedPhaseDiagnostics.length, 1);
+            assert.equal(attempt.log.webPreparationFailedPhaseDiagnostics.length, 0);
+            assert.equal(attempt.log.failedPhaseDiagnostics.length, 0);
+            assert.equal(attempt.log.cancelledPhaseDiagnostics.length, 0);
+            assert.equal(attempt.log.compilerDiagnostics.length, 0);
+            assert.equal(attempt.log.completedPhaseDiagnostics.length, 0);
+            assert(!tail.includes('Phase failed: Starting netcoredbg') && !tail.includes('Phase timed out:'));
+            assert(!tail.includes('The editor did not start the netcoredbg debug session.'));
+            const heldArtifacts = attempt.providerCalls[0].artifacts.map(artifact => ({ ...artifact,
+                retainedSha256: sha256(artifact.path), retainedSize: fs.statSync(artifact.path).size }));
+            for (const artifact of heldArtifacts) {
+                assert.equal(artifact.retainedSha256, artifact.sha256);
+                assert.equal(artifact.retainedSize, artifact.size);
+            }
+            await stillAlive(b);
+            attempt.heldAfterForeground = { atMilliseconds: elapsed(start), providerPending: true, gateSettled: false,
+                outputExists: exists(attempt.output), artifacts: heldArtifacts, terminalQueuesEmpty: queueEmpty(attempt.base),
+                portBindable: await canBind(port), b: { sessionId: b.session.id, pid: b.pid, nonce: b.nonce,
+                    output: b.output, response: await request(b.origin) } };
+            assert.equal(attempt.heldAfterForeground.outputExists, true);
+            assert.equal(attempt.heldAfterForeground.terminalQueuesEmpty, true);
+            assert.equal(attempt.heldAfterForeground.portBindable, true);
+            assert.deepEqual(attempt.heldAfterForeground.b, attempt.bBefore);
+            record('handoff-cancelled-foreground-output-retained', attempt.heldAfterForeground);
+            owner.settle('valid-original');
+            await until(() => attempt.started && attempt.adapterCreationCount > 0, 'late real cancelled session start');
+            assert.equal(attempt.capturedSessions.size, 1);
+            assert.equal(attempt.editorStartCount, 1);
+            assert.equal(attempt.adapterCreationCount, 1);
+            const requests = command => attempt.dapRequests.filter(item => item.message.type === 'request' && item.message.command === command);
+            await until(() => attempt.dap.some(message => message.type === 'response' && message.command === 'initialize'),
+                'late real adapter initialization transcript');
+            const initialize = requests('initialize');
+            assert.equal(initialize.length, 1);
+            attempt.nativeInitialize = { request: initialize[0], response: attempt.dap.find(message => message.type === 'response' &&
+                message.command === 'initialize' && message.request_seq === initialize[0].message.seq) };
+            assert.equal(attempt.nativeInitialize.response?.success, true);
+            await until(() => attempt.terminated, 'matching late cancelled session termination');
+            await until(() => attempt.adapterExits.length > 0, 'late cancelled native adapter exit');
+            const launches = requests('launch');
+            assert(launches.length <= 1);
+            attempt.launchRequestObserved = launches.length === 1;
+            attempt.nativeLaunchRequest = launches[0] ?? null;
+            if (launches.length) {
+                assert.equal(launches[0].message.arguments.program, attempt.program);
+                assert.equal(launches[0].message.arguments.env.LIFECYCLE_TOKEN, attempt.nonce);
+            }
+            attempt.nativeStopRequests = attempt.dapRequests.filter(item => ['terminate', 'disconnect'].includes(item.message.command));
+            assert(attempt.nativeStopRequests.length > 0, 'The cancelled real session must receive a native stop/teardown request');
+            if (attempt.pid) {
+                await until(() => !pidAlive(attempt.pid), 'captured late cancelled debuggee PID exit');
+                attempt.reportedPidGoneAtMilliseconds = elapsed(start);
+            }
+            attempt.pidReported = !!attempt.pid;
+            await until(() => !exists(attempt.output) && queueEmpty(attempt.base), 'late cancelled owned output and queues cleanup');
+            attempt.outputRemovedAtMilliseconds = elapsed(start);
+            attempt.outputAbsent = !exists(attempt.output);
+            attempt.terminalQueuesEmpty = queueEmpty(attempt.base);
+            attempt.portBindable = await canBind(port);
+            assert(attempt.portBindable);
+            attempt.portReusableAtMilliseconds = elapsed(start);
+            attempt.sourceAfterSnapshot = fileSnapshot(source);
+            attempt.profileAfterSnapshot = fileSnapshot(profile);
+            assert.equal(attempt.sourceAfterSnapshot.sha256, attempt.sourceSnapshot.sha256);
+            assert.equal(attempt.profileAfterSnapshot.sha256, attempt.profileSnapshot.sha256);
+            await stillAlive(b);
+            attempt.bAfter = { sessionId: b.session.id, pid: b.pid, nonce: b.nonce, output: b.output, response: await request(b.origin) };
+            assert.deepEqual(attempt.bAfter, attempt.bBefore);
+            attempt.lateTerminationObservedWithoutTestStop = true;
+            record('native-handoff-cancel-confirmed', { label: attempt.label, commandResults: attempt.commandResults,
+                sessionId: attempt.session.id, pid: attempt.pid, output: attempt.output, nativeStopRequests: attempt.nativeStopRequests });
+            completed = true;
+            result.checks.push('Actual progress Cancel returns three false callers while the editor provider remains held and output/B are preserved; the original released config starts a real late session that terminates without test Stop and releases owned resources');
+            return attempt;
+        } finally {
+            // Failure cleanup owns settling/draining a still-pending editor
+            // start before this provider and exact-session observers disappear.
+            if (completed) owner.dispose();
+        }
     }
 
     async function debugHandoffDeclined(source, revision, port, a, b) {
@@ -1548,6 +1837,23 @@ exports.run = async function run() {
     }
 
     async function failureCleanup() {
+        // Foreground cancellation can already have returned while the editor's
+        // original start is still waiting on our provider. Settle that provider
+        // explicitly; unregistering it cannot settle an existing callback.
+        for (const [owner, attempt] of [...handoffGates]) {
+            const cleanup = { label: attempt.label, pendingHandoffGate: true, validConfigAlreadyReleased: attempt.gateReleased };
+            result.cleanup.push(cleanup);
+            try {
+                if (!attempt.gateSettled) owner.settle('decline-safety');
+                if (attempt.commandOperation) {
+                    const outcomes = await bounded(attempt.commandOperation, 'pending handoff foreground command drain', 15000);
+                    cleanup.commandOutcomes = outcomes.map(outcome => ({ status: outcome.status,
+                        ...(outcome.status === 'fulfilled' ? { value: outcome.value } : { reason: String(outcome.reason) }) }));
+                }
+                if (attempt.output) await waitUntil(() => !exists(attempt.output) || (attempt.capturedSessions?.size || 0) > 0,
+                    'held editor start declines or exposes its exact late session', 15000);
+            } catch (error) { cleanup.gateDrainError = error.stack || String(error); }
+        }
         if (concurrent) {
             concurrentStopping = true;
             // These fresh fixed paths and nonces belong only to this prepared
@@ -1634,6 +1940,10 @@ exports.run = async function run() {
                 result.cleanup.push(cleanup);
                 try {
                     if (session && !owned.terminated) {
+                        if (launch.expectedHandoffCancellation) {
+                            launch.testStopRequested = true;
+                            launch.safetyStopRequestedAtMilliseconds = elapsed(start);
+                        }
                         await bounded(vscode.debug.stopDebugging(session), `failure cleanup exact session ${launch.label}/${session.id}`, 5000);
                         cleanup.exactSessionStopRequested = true;
                     }
@@ -1663,13 +1973,27 @@ exports.run = async function run() {
                 }
             }
         }
+        for (const [owner, attempt] of [...handoffGates]) {
+            const cleanup = { label: attempt.label, handoffGateDisposal: true };
+            result.cleanup.push(cleanup);
+            try {
+                if (attempt.output) await waitUntil(() => !exists(attempt.output) &&
+                    [...(attempt.capturedSessions?.values() || [])].every(captured => captured.terminated),
+                'cancelled handoff background ownership settlement before provider disposal', 15000);
+                cleanup.outputAbsent = !attempt.output || !exists(attempt.output);
+            } catch (error) { cleanup.backgroundStartError = error.stack || String(error); }
+            finally {
+                try { owner.dispose(); cleanup.providerDisposed = attempt.providerDisposed; }
+                catch (error) { cleanup.providerDisposalError = error.stack || String(error); }
+            }
+        }
     }
 
     try {
         subscriptions.push(vscode.debug.onDidStartDebugSession(session => observe('editor-start', () => {
             const launch = ownedLaunch(session);
             if (!launch) return;
-            if (launch.expectedWebProfileFailure || launch.expectedSdkSelectionFailure || launch.expectedHandoffDeclined || launch.expectedNativeHostFailure) launch.editorStartCount++;
+            if (launch.expectedWebProfileFailure || launch.expectedSdkSelectionFailure || launch.expectedHandoffDeclined || launch.expectedNativeHostFailure || launch.expectedHandoffCancellation) launch.editorStartCount++;
             captureSession(session, launch);
             launch.started = true;
             launch.startedAtMilliseconds = elapsed(start);
@@ -1695,13 +2019,14 @@ exports.run = async function run() {
             createDebugAdapterTracker(session) {
                 const launch = ownedLaunch(session);
                 if (!launch) return undefined;
-                if (launch.expectedWebProfileFailure || launch.expectedSdkSelectionFailure || launch.expectedHandoffDeclined || launch.expectedNativeHostFailure) launch.adapterCreationCount++;
+                if (launch.expectedWebProfileFailure || launch.expectedSdkSelectionFailure || launch.expectedHandoffDeclined || launch.expectedNativeHostFailure || launch.expectedHandoffCancellation) launch.adapterCreationCount++;
                 observe('adapter-session', () => captureSession(session, launch));
                 // Keep the tracker even if uniqueness validation failed: it can
                 // still identify the extra owned debuggee for targeted cleanup.
                 return {
                     onWillReceiveMessage(message) { observe('dap-send', () => {
-                        if (launch.expectedNativeHostFailure || adapterLoss) {
+                        if (launch.expectedHandoffCancellation) launch.dapRequests.push({ sessionId: session.id, message, atMilliseconds: elapsed(start) });
+                        else if (launch.expectedNativeHostFailure || adapterLoss) {
                             launch.dapRequests ||= [];
                             launch.dapRequests.push({ sessionId: session.id, message });
                         }
@@ -1709,6 +2034,7 @@ exports.run = async function run() {
                     }); },
                     onDidSendMessage(message) { observe('dap-receive', () => {
                         launch.dap.push(message);
+                        if (launch.expectedHandoffCancellation) launch.dapTimeline.push({ sessionId: session.id, message, atMilliseconds: elapsed(start) });
                         if (message.event === 'process' && message.body?.isLocalProcess === true) {
                             const pid = message.body.systemProcessId;
                             assert(Number.isSafeInteger(pid) && pid > 0, 'Adapter must report a positive local debuggee PID');
@@ -1727,7 +2053,7 @@ exports.run = async function run() {
                     onError(error) { observe('adapter-error', () => record('adapter-error', { label: launch.label, error: String(error) })); },
                     onExit(code, signal) { observe('adapter-exit', () => {
                         const detail = { label: launch.label, sessionId: session.id, code, signal, atMilliseconds: elapsed(start) };
-                        if (launch.expectedNativeHostFailure || adapterLoss) {
+                        if (launch.expectedNativeHostFailure || launch.expectedHandoffCancellation || adapterLoss) {
                             launch.adapterExits ||= [];
                             launch.adapterExits.push(detail);
                         }
@@ -1807,6 +2133,8 @@ exports.run = async function run() {
                                 ? await phase('A injected editor rejection after successful real build while B survives', () => debugHandoffDeclined(aSource, a.revision, aPort, a, b))
                                 : scenario === 'native-host-failure-retry' && cycle === 0
                                     ? await phase('A actual native host startup failure after successful real build while B survives', () => nativeHostFailure(aSource, a.revision, aPort, a, b))
+                                    : scenario === 'native-handoff-cancel' && cycle === 0
+                                        ? await phase('A actual progress Cancel during held editor handoff and late native session cleanup', () => nativeHandoffCancellation(aSource, a.revision, aPort, a, b))
                         : undefined;
             if (cycle + 1 < expected.cycles) {
                 const revision = `retry-${cycle + 1}`;
@@ -1816,6 +2144,12 @@ exports.run = async function run() {
                         assert.equal(failed.providerDisposed, true);
                         assert.equal(failed.providerDisposalCount, 1);
                         assert.equal(sha256(failed.profileSnapshot.path), failed.profileSnapshot.sha256);
+                    }
+                    if (failed?.expectedHandoffCancellation) {
+                        assert.equal(failed.providerDisposed, true);
+                        assert.equal(failed.providerDisposalCount, 1);
+                        assert.equal(failed.providerPending, false);
+                        assert.equal(failed.lateTerminationObservedWithoutTestStop, true);
                     }
                     const current = await vscode.workspace.openTextDocument(aSource);
                     const content = current.getText();
@@ -1914,6 +2248,15 @@ exports.run = async function run() {
                             assert(!a.dap.some(message => message.event === 'output' && message.body?.output?.includes("Invalid value for environment variable 'DOTNET_ROLL_FORWARD'.")));
                             assert.equal(process.env.DOTNET_ROLL_FORWARD ?? null, failed.ambientRollForwardBefore);
                         }
+                        if (failed.expectedHandoffCancellation) {
+                            assert.equal(log.buildCompletedPhaseDiagnostics.length, 1);
+                            assert.equal(log.webPreparationFailedPhaseDiagnostics.length, 0);
+                            assert(!tail.includes('Phase cancelled: Starting netcoredbg') && !tail.includes('Phase failed: Starting netcoredbg'));
+                            assert.equal(failed.providerCalls.length, 1);
+                            assert.notEqual(a.nonce, failed.nonce);
+                            assert.notEqual(a.sourceSnapshot.sha256, failed.sourceSnapshot.sha256);
+                            assert.notEqual(a.profileSnapshot.sha256, failed.profileSnapshot.sha256);
+                        }
                         assert(samePath(log.buildCommands[0].output, a.output), 'Coalesced build output must identify the one captured session');
                         if (failed.expectedSdkSelectionFailure) {
                             assert.equal(sha256(failed.restoredGlobalJsonSnapshot.path), failed.globalJsonSnapshot.sha256);
@@ -1928,12 +2271,14 @@ exports.run = async function run() {
                                 previousOutput: failed.previousOutput, freshOutput: a.output !== failed.previousOutput,
                                 failedAttemptAllocatedOutput: false, globalJsonSnapshot: fileSnapshot(failed.restoredGlobalJsonSnapshot.path),
                             } : { failedOutput: failed.output, freshOutput: a.output !== failed.output }),
-                            ...((failed.expectedWebProfileFailure || failed.expectedSdkSelectionFailure || failed.expectedHandoffDeclined || failed.expectedNativeHostFailure) ? { profileSnapshot: a.profileSnapshot, sourceSnapshot: a.sourceSnapshot } : {}),
+                            ...((failed.expectedWebProfileFailure || failed.expectedSdkSelectionFailure || failed.expectedHandoffDeclined || failed.expectedNativeHostFailure || failed.expectedHandoffCancellation) ? { profileSnapshot: a.profileSnapshot, sourceSnapshot: a.sourceSnapshot } : {}),
                             ...(failed.expectedHandoffDeclined ? { providerDisposedBeforeRetry: failed.providerDisposed,
                                 failedNonce: failed.nonce, nonce: a.nonce, freshToken: a.nonce !== failed.nonce } : {}),
                             ...(failed.expectedNativeHostFailure ? { correctedRollForwardProfile: true,
                                 failedNonce: failed.nonce, nonce: a.nonce, freshToken: a.nonce !== failed.nonce,
-                                nativeLaunchEnvironment: a.session.configuration.env } : {}) };
+                                nativeLaunchEnvironment: a.session.configuration.env } : {}),
+                            ...(failed.expectedHandoffCancellation ? { providerDisposedBeforeRetry: true, failedNonce: failed.nonce,
+                                nonce: a.nonce, freshToken: a.nonce !== failed.nonce } : {}) };
                         if (failed.expectedSdkSelectionFailure) {
                             assert(result.coalescedRetry.freshOutput);
                             assert(!exists(failed.previousOutput));
@@ -1949,6 +2294,8 @@ exports.run = async function run() {
                                         ? 'Injected editor provider disposed and dirty valid revision retries with three callers sharing one saved build/session, fresh token/output and unchanged B'
                                         : failed.expectedNativeHostFailure
                                             ? 'Corrected per-file roll-forward profile and dirty revision retry share one saved real build/session and fresh token/output across three callers while B survives'
+                                            : failed.expectedHandoffCancellation
+                                                ? 'After actual handoff UI Cancel and late native session cleanup, the disposed gate permits one fresh dirty build/session shared by three callers while B survives'
                                 : 'Dirty compiler correction retries with three concurrent commands sharing one build/session and fresh output while B survives');
                         record('coalesced-corrected-retry-confirmed', result.coalescedRetry);
                     }
@@ -2022,6 +2369,10 @@ exports.run = async function run() {
             return { ...evidence, sessionId: session?.id, capturedSessions: capturedSessionState(attempt) };
         });
         result.failedNativeHostAttempts = failedNativeHostAttempts.map(attempt => {
+            const { session, capturedSessions, commandOperation, ...evidence } = attempt;
+            return { ...evidence, sessionId: session?.id, capturedSessions: capturedSessionState(attempt) };
+        });
+        result.cancelledHandoffAttempts = cancelledHandoffAttempts.map(attempt => {
             const { session, capturedSessions, commandOperation, ...evidence } = attempt;
             return { ...evidence, sessionId: session?.id, capturedSessions: capturedSessionState(attempt) };
         });
