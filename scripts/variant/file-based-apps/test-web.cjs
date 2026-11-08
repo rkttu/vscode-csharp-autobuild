@@ -1,7 +1,10 @@
 'use strict';
 
 const assert = require('node:assert/strict');
+const { spawnSync } = require('node:child_process');
+const { getEventListeners } = require('node:events');
 const fs = require('node:fs');
+const profileIO = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
@@ -44,6 +47,40 @@ function fixture(t, options = {}) {
         fs.writeFileSync(filename, typeof profiles === 'string' ? profiles : JSON.stringify({ profiles }));
     };
     return { root, source, calls, input, write, prepare: () => prepareWebLaunch(input) };
+}
+
+// Run through the public module in a strict child so a rejected original prompt
+// fails one parent assertion rather than escaping the test worker's lifecycle.
+async function certificatePromptProbe() {
+    const assert = require('node:assert/strict');
+    const { getEventListeners } = require('node:events');
+    const { prepareWebLaunch } = require(process.argv[1]);
+    const controller = new AbortController();
+    const mode = process.argv[3];
+    const failure = new Error('Original certificate prompt rejected after cancellation');
+    let processes = 0, prompts = 0;
+    const operation = prepareWebLaunch({
+        source: process.argv[2], metadata: { isWebServer: true }, environment: {}, signal: controller.signal,
+        runDotnet: async () => { processes++; return { exitCode: 7 }; },
+        vscode: { window: { showWarningMessage() {
+            prompts++;
+            if (mode === 'thenable') return { get then() {
+                controller.abort();
+                return (_resolve, reject) => setImmediate(() => reject(failure));
+            } };
+            controller.abort();
+            return mode === 'immediate' ? Promise.reject(failure) :
+                new Promise((_resolve, reject) => setImmediate(() => reject(failure)));
+        } } },
+    });
+    await assert.rejects(operation, { name: 'AbortError' });
+    // Flush the original rejection after the cancelled public operation returns.
+    await new Promise(resolve => setImmediate(resolve));
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(prompts, 1);
+    assert.equal(processes, 1, 'Cancellation must not authorize certificate trust');
+    assert.equal(getEventListeners(controller.signal, 'abort').length, 0);
+    process.stdout.write(JSON.stringify({ mode, prompts, processes, cancelled: true }) + '\n');
 }
 
 test('metadata extracts build JSON around banners and unrelated JSON', () => {
@@ -295,18 +332,94 @@ test('certificate refusal and cancellation prevent trust and launch preparation'
     assert.equal(f.calls.processes.length, 1);
 });
 
-test('progress cancellation releases an unanswered certificate modal without later trust', async t => {
+test('web preparation cancellation releases an unanswered certificate modal without later trust', async t => {
     const controller = new AbortController();
     let dismiss;
     const f = fixture(t, { signal: controller.signal, runDotnet: async () => ({ exitCode: 7 }), prompt: () => new Promise(resolve => { dismiss = resolve; }) });
     f.write({ Https: { commandName: 'Project', applicationUrl: 'https://localhost:5011' } });
     const operation = f.prepare();
     while (!dismiss) await new Promise(resolve => setImmediate(resolve));
+    assert.equal(getEventListeners(controller.signal, 'abort').length, 1);
     controller.abort();
     await assert.rejects(operation, { name: 'AbortError' });
+    assert.equal(getEventListeners(controller.signal, 'abort').length, 0, 'Cancel must release the listener while the original modal is still pending');
     dismiss('Trust development certificate');
     await new Promise(resolve => setImmediate(resolve));
     assert.equal(f.calls.processes.length, 1);
+});
+
+test('web preparation cancellation forwards the launch signal to both profile reads', { timeout: 5000 }, async t => {
+    const controller = new AbortController();
+    const f = fixture(t, { signal: controller.signal });
+    const reads = [];
+    const profile = JSON.stringify({ profiles: { Http: { commandName: 'Project', applicationUrl: 'http://localhost:5010' } } });
+    const originalRead = profileIO.readFile;
+    t.mock.method(profileIO, 'readFile', (filename, options) => {
+        if (!path.resolve(filename).startsWith(f.root + path.sep)) return originalRead(filename, options);
+        return new Promise((resolve, reject) => {
+            let settled = false;
+            const index = reads.length;
+            const signal = options?.signal;
+            const finish = (complete, value) => {
+                if (settled) return;
+                settled = true;
+                signal?.removeEventListener('abort', cancelled);
+                complete(value);
+            };
+            const cancelled = () => {
+                if (index === 0) finish(reject, Object.assign(new Error('Cooperative profile read cancelled'), { name: 'AbortError' }));
+            };
+            reads.push({ filename, options, get settled() { return settled; },
+                rejectLate: () => finish(reject, new Error('Original sibling read rejected after cancellation')),
+                release: () => finish(resolve, profile) });
+            signal?.addEventListener('abort', cancelled, { once: true });
+            if (signal?.aborted) cancelled();
+        });
+    });
+    const operation = f.prepare();
+    try {
+        assert.equal(reads.length, 2);
+        assert.deepEqual(reads.map(read => read.options?.encoding), ['utf8', 'utf8']);
+        assert(reads.every(read => read.options.signal === controller.signal), 'Both profile reads must receive the exact launch cancellation signal');
+        controller.abort();
+        await assert.rejects(operation, { name: 'AbortError' });
+        assert.equal(reads[1].settled, false, 'Public cancellation does not prove that every sibling read or OS request settled');
+        reads[1].rejectLate();
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(getEventListeners(controller.signal, 'abort').length, 0);
+        assert.deepEqual(f.calls.processes, []);
+        assert.deepEqual(f.calls.prompts, []);
+    } finally {
+        controller.abort();
+        for (const read of reads) read.release();
+        await operation.catch(() => {});
+    }
+});
+
+for (const mode of ['immediate', 'late', 'thenable']) {
+    test(`web preparation cancellation observes a ${mode} reentrant certificate prompt rejection`, { timeout: 10000 }, t => {
+        const f = fixture(t);
+        f.write({ Https: { commandName: 'Project', applicationUrl: 'https://localhost:5011' } });
+        const child = spawnSync(process.execPath, ['--unhandled-rejections=strict', '-e',
+            '(' + certificatePromptProbe.toString() + ')()', require.resolve('./web.cjs'), f.source, mode], {
+            encoding: 'utf8', timeout: 5000, windowsHide: true,
+        });
+        assert.equal(child.error, undefined, 'The isolated prompt probe must finish within its test safety limit');
+        assert.equal(child.status, 0, `The original ${mode} prompt rejection must remain observed after cancellation.\n${child.stderr}`);
+        assert.deepEqual(JSON.parse(child.stdout), { mode, prompts: 1, processes: 1, cancelled: true });
+    });
+}
+
+test('web preparation cancellation preserves an uncancelled prompt rejection with and without a signal', async t => {
+    const failure = new Error('Original uncancelled certificate prompt failure');
+    for (const signal of [new AbortController().signal, undefined]) {
+        const f = fixture(t, { signal, runDotnet: async () => ({ exitCode: 7 }), prompt: () => Promise.reject(failure) });
+        f.write({ Https: { commandName: 'Project', applicationUrl: 'https://localhost:5011' } });
+        await assert.rejects(f.prepare(), error => error === failure);
+        assert.equal(f.calls.processes.length, 1);
+        assert.equal(f.calls.prompts.length, 1);
+        if (signal) assert.equal(getEventListeners(signal, 'abort').length, 0);
+    }
 });
 
 test('failed trust and failed post-trust validation stop preparation', async t => {
