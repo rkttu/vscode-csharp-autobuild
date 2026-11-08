@@ -320,6 +320,34 @@ test('missing certificate runs trust only after explicit consent, then verifies 
     ]);
 });
 
+for (const [phase, expectedProcesses, expectedPrompts] of [
+    ['Checking HTTPS development certificate', 0, 0],
+    ['Waiting for HTTPS certificate consent', 1, 0],
+    ['Preparing HTTPS development certificate', 1, 1],
+    ['Verifying HTTPS development certificate', 2, 1],
+]) {
+    test(`certificate phases prevent dispatch after progress cancels during ${phase}`, async t => {
+        const controller = new AbortController();
+        const f = fixture(t, {
+            signal: controller.signal,
+            prompt: async (...args) => args[2],
+            // Deliberately ignores the signal: the helper must check before dispatch.
+            runDotnet: async (_args, _settings, calls) => ({ exitCode: calls.processes.length === 1 ? 7 : 0 }),
+        });
+        f.write({ Https: { commandName: 'Project', applicationUrl: 'https://localhost:5011' } });
+        f.input.onProgress = message => {
+            f.calls.progress.push(message);
+            if (message === phase) controller.abort();
+        };
+        await assert.rejects(f.prepare(), { name: 'AbortError' });
+        assert.equal(f.calls.progress.at(-1), phase);
+        assert.equal(f.calls.processes.length, expectedProcesses, 'No certificate process may dispatch after progress cancels');
+        assert.equal(f.calls.prompts.length, expectedPrompts, 'No consent modal may dispatch after progress cancels');
+        assert(f.calls.processes.every(call => call.settings.signal === controller.signal));
+        assert.equal(getEventListeners(controller.signal, 'abort').length, 0);
+    });
+}
+
 test('certificate refusal and cancellation prevent trust and launch preparation', async t => {
     const f = fixture(t, { runDotnet: async () => { throw new Error('certificate not trusted'); } });
     f.write({ Https: { commandName: 'Project', applicationUrl: 'https://localhost:5011' } });

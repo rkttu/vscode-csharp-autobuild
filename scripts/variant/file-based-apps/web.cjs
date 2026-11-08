@@ -222,6 +222,8 @@ async function checkCertificate({ runDotnet, source, signal, vscode, output, onP
     if (await check()) return;
     abort(signal);
     const trust = 'Trust development certificate';
+    onProgress?.('Waiting for HTTPS certificate consent');
+    abort(signal);
     const choice = await withAbort(vscode.window.showWarningMessage('This web app uses HTTPS, but no trusted development certificate was found.', {
         modal: true,
         detail: 'Create or trust the ASP.NET Core development certificate? Your operating system may ask for confirmation.',
@@ -229,8 +231,10 @@ async function checkCertificate({ runDotnet, source, signal, vscode, output, onP
     abort(signal);
     if (choice !== trust) throw Object.assign(new Error('HTTPS certificate setup cancelled.'), { name: 'AbortError' });
     onProgress?.('Preparing HTTPS development certificate');
+    abort(signal);
     const result = await runDotnet(['dev-certs', 'https', '--trust'], { cwd: path.dirname(source), signal });
     if (result && typeof result !== 'string' && result.exitCode) throw new Error(`HTTPS development certificate setup failed (exit ${result.exitCode}).`);
+    onProgress?.('Verifying HTTPS development certificate');
     if (!await check()) throw new Error('HTTPS development certificate is still missing or untrusted after setup.');
 }
 
