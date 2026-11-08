@@ -583,9 +583,10 @@ function activate(context, dependencies = {}) {
                         runDotnet,
                         vscode,
                         output,
-                        onProgress: message => progress.report({ message }),
+                        onProgress: setPhase,
                     });
                     controller.signal.throwIfAborted();
+                    if (phase !== 'Preparing web launch settings') setPhase('Preparing web launch settings');
                     if (webLaunch?.env?.DOTNET_ROOT && comparable(webLaunch.env.DOTNET_ROOT) !== comparable(selected.root)) {
                         throw new Error('The web launch profile DOTNET_ROOT does not identify the selected dotnet installation.');
                     }

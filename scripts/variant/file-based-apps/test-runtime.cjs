@@ -624,6 +624,28 @@ function preparationFixture(t, options = {}) {
         expire: () => { assert(latest, 'A preparation deadline must be armed'); elapsed += 100; latest.callback(); } };
 }
 
+function certificatePhaseFixture(t, options = {}) {
+    const f = preparationFixture(t, { ...options, web: true });
+    const certificate = { processes: [], prompts: 0 };
+    const run = f.dependencies.runDotnet;
+    f.dependencies.runDotnet = async (args, settings) => {
+        if (args[0] !== 'dev-certs') return run(args, settings);
+        f.calls.processes.push({ args, settings });
+        certificate.processes.push({ args, settings });
+        return options.certificateProcess ? options.certificateProcess(args, settings, certificate.processes.length) :
+            { exitCode: certificate.processes.length === 1 ? 7 : 0 };
+    };
+    f.vscode.window.showWarningMessage = (...args) => {
+        certificate.prompts++;
+        return options.certificatePrompt ? options.certificatePrompt(...args) : Promise.resolve('Trust development certificate');
+    };
+    const writeProfile = environmentVariables => fs.writeFileSync(f.source.replace(/\.cs$/, '.run.json'), JSON.stringify({
+        profiles: { Https: { commandName: 'Project', applicationUrl: 'https://localhost:5011', environmentVariables } },
+    }));
+    writeProfile();
+    return { ...f, certificate, writeProfile };
+}
+
 function assertDisposed(f, tracker = 1) {
     assert.deepEqual(f.calls.disposals, { command: 1, started: 1, terminated: 1, tracker, output: 1 });
 }
@@ -1368,6 +1390,132 @@ test('the preparation deadline is disarmed before Web certificate interaction', 
     assert.equal(await f.api.debugActiveFile(), true);
     assert.deepEqual(f.calls.errors, []);
     assert.equal(f.timers.size, 0);
+});
+
+test('certificate phases attribute a held consent cancellation without spending the SDK deadline', { timeout: 5000 }, async t => {
+    const progress = [];
+    let dismiss;
+    const f = certificatePhaseFixture(t, {
+        reportProgress: value => progress.push(value.message),
+        certificateProcess: async () => { f.advance(7); return { exitCode: 7 }; },
+        certificatePrompt: () => new Promise(resolve => { dismiss = resolve; }),
+    });
+    const first = f.api.debugActiveFile();
+    let repeated;
+    try {
+        await waitFor(() => dismiss, 'The certificate consent must be pending');
+        repeated = f.api.debugActiveFile();
+        assert.equal(progress.at(-1), 'Waiting for HTTPS certificate consent');
+        assert.equal(f.timers.size, 0, 'User consent must not consume the SDK preparation deadline');
+        f.advance(500);
+        f.expire(); // Even a queued, disarmed deadline cannot cancel user interaction.
+        assert(!f.certificate.processes[0].settings.signal.aborted);
+        f.cancel();
+        assert.deepEqual(await Promise.all([first, repeated]), [false, false]);
+        assert(f.calls.logs.includes('Phase completed: Checking HTTPS development certificate (7 ms; total 7 ms)'));
+        assert(f.calls.logs.includes('Phase cancelled: Waiting for HTTPS certificate consent (600 ms; total 607 ms)'));
+        assert.deepEqual(f.calls.errors, []);
+        dismiss('Trust development certificate');
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(f.certificate.processes.length, 1, 'A late consent answer must not authorize trust');
+        assert.equal(f.calls.processes.filter(call => call.args[0] === 'build').length, 1);
+        assert.equal(f.calls.launches.length, 0);
+        const build = f.calls.processes.find(call => call.args[0] === 'build');
+        await waitForRemovedOutput(f, build.args[build.args.indexOf('--output') + 1]);
+    } finally {
+        f.cancel(); dismiss?.('Cancel');
+        await Promise.all([first, repeated]);
+        await f.api.dispose();
+    }
+});
+
+test('certificate phases retain a cancelled trust provider and its output until actual settlement', { timeout: 5000 }, async t => {
+    let rejectTrust;
+    const failure = new Error('Original trust provider failed after cancellation');
+    const f = certificatePhaseFixture(t, { certificateProcess: async (_args, _settings, count) => {
+        if (count === 1) return { exitCode: 7 };
+        return new Promise((_resolve, reject) => { rejectTrust = () => reject(failure); });
+    } });
+    let returned = false, disposed = false;
+    const operation = f.api.debugActiveFile().then(result => { returned = true; return result; });
+    let disposal;
+    try {
+        await waitFor(() => rejectTrust, 'The noncooperative trust provider must be pending');
+        const build = f.calls.processes.find(call => call.args[0] === 'build');
+        const directory = build.args[build.args.indexOf('--output') + 1];
+        f.advance(31);
+        f.expire();
+        assert.equal(f.timers.size, 0);
+        f.cancel();
+        disposal = f.api.dispose().then(() => { disposed = true; });
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(returned, false, 'Cancel must not pretend the trust provider settled');
+        assert.equal(disposed, false, 'Disposal must retain the active trust provider');
+        assert(fs.existsSync(path.join(directory, 'FileApp.dll')));
+        assert.equal(f.calls.disposals.output, 0);
+        rejectTrust();
+        assert.equal(await operation, false);
+        await disposal;
+        assert(f.calls.logs.includes('Phase cancelled: Preparing HTTPS development certificate (131 ms; total 131 ms)'));
+        assert(f.calls.logs.some(line => line.includes('Error observed during Preparing HTTPS development certificate after cancellation:') &&
+            line.includes(failure.message)));
+        assert(!f.calls.logs.some(line => line.includes('Phase started: Verifying HTTPS development certificate')));
+        assert.deepEqual(f.calls.errors, []);
+        assert.equal(f.calls.launches.length, 0);
+        assert.equal(f.certificate.processes.length, 2);
+        assert(!fs.existsSync(directory));
+        assertDisposed(f);
+    } finally {
+        rejectTrust?.();
+        await operation;
+        await (disposal || f.api.dispose());
+    }
+});
+
+test('certificate phases attribute failed verification with separate monotonic stage durations', async t => {
+    const f = certificatePhaseFixture(t, {
+        certificatePrompt: async () => { f.advance(13); return 'Trust development certificate'; },
+        certificateProcess: async (_args, _settings, count) => {
+            f.advance([7, 29, 11][count - 1]);
+            if (count === 3) throw new Error('Original certificate verification failure');
+            return { exitCode: count === 1 ? 7 : 0 };
+        },
+    });
+    try {
+        assert.equal(await f.api.debugActiveFile(), false);
+        assert(f.calls.logs.includes('Phase completed: Checking HTTPS development certificate (7 ms; total 7 ms)'));
+        assert(f.calls.logs.includes('Phase completed: Waiting for HTTPS certificate consent (13 ms; total 20 ms)'));
+        assert(f.calls.logs.includes('Phase completed: Preparing HTTPS development certificate (29 ms; total 49 ms)'));
+        assert(f.calls.logs.includes('Phase failed: Verifying HTTPS development certificate (11 ms; total 60 ms)'));
+        assert(f.calls.logs.some(line => line.includes('Original certificate verification failure')));
+        assert.match(f.calls.errors[0], /still missing or untrusted after setup/);
+        assert.equal(f.calls.launches.length, 0);
+        assert.equal(f.timers.size, 0);
+    } finally { await f.api.dispose(); }
+});
+
+test('certificate phases restore Web validation attribution and tolerate diagnostic failures', async t => {
+    for (const invalidRoot of [false, true]) {
+        for (const brokenDiagnostics of [false, true]) {
+            const f = certificatePhaseFixture(t, { appendLine: line => {
+                if (brokenDiagnostics && line.startsWith('Phase ')) throw new Error('Phase output unavailable');
+            } });
+            if (invalidRoot) f.writeProfile({ DOTNET_ROOT: path.join(f.root, 'wrong-dotnet') });
+            try {
+                assert.equal(await f.api.debugActiveFile(), !invalidRoot);
+                assert(f.calls.logs.some(line => line.startsWith('Phase completed: Verifying HTTPS development certificate')));
+                assert.equal(f.timers.size, 0);
+                if (invalidRoot) {
+                    assert.match(f.calls.errors[0], /web launch profile DOTNET_ROOT does not identify the selected dotnet installation/);
+                    assert(f.calls.logs.some(line => line.startsWith('Phase failed: Preparing web launch settings')));
+                    assert.equal(f.calls.launches.length, 0);
+                } else {
+                    assert.deepEqual(f.calls.errors, []);
+                    assert.equal(f.calls.launches.length, 1);
+                }
+            } finally { await f.api.dispose(); }
+        }
+    }
 });
 
 test('the preparation deadline is disarmed before delegating existing project debugging', async t => {
