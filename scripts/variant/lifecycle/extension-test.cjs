@@ -2,6 +2,7 @@
 
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
+const childProcess = require('node:child_process');
 const fs = require('node:fs');
 const net = require('node:net');
 const path = require('node:path');
@@ -93,7 +94,7 @@ exports.run = async function run() {
     const expected = JSON.parse(fs.readFileSync(path.join(root, 'expected.json'), 'utf8'));
     assert.equal(expected.schema, 1);
     const scenario = expected.scenario || 'web-lifecycle';
-    assert(['web-lifecycle', 'build-failure-retry', 'native-build-cancel', 'web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry', 'native-host-failure-retry', 'native-adapter-loss'].includes(scenario));
+    assert(['web-lifecycle', 'build-failure-retry', 'native-build-cancel', 'web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry', 'native-host-failure-retry', 'native-adapter-loss', 'concurrent-files'].includes(scenario));
     assert(Number.isInteger(expected.cycles) && expected.cycles >= 2 && expected.cycles <= 10);
     const start = process.hrtime.bigint();
     const result = {
@@ -110,6 +111,7 @@ exports.run = async function run() {
             actualNativeHostFailure: scenario === 'native-host-failure-retry',
             injectedEditorRejection: scenario === 'debug-handoff-declined-retry', nativeAdapterFailure: scenario === 'native-adapter-loss',
             actualAdapterProcessKill: scenario === 'native-adapter-loss',
+            concurrentSeparateFiles: scenario === 'concurrent-files',
             actualProgressCancelUi: scenario === 'native-build-cancel', injectedCancellationToken: false },
     };
     const launches = [];
@@ -121,6 +123,21 @@ exports.run = async function run() {
     const handoffProviders = new Map();
     const cancelledBuildAttempts = [];
     const nativeCancellation = scenario === 'native-build-cancel' ? expected.nativeCancellation : undefined;
+    const concurrent = scenario === 'concurrent-files' ? expected.concurrent : undefined;
+    const concurrentOperations = [];
+    let concurrentStopping = false;
+    if (concurrent) {
+        assert.equal(concurrent.entries.length, 2);
+        assert(path.isAbsolute(concurrent.target) && within(root, concurrent.target));
+        assert.equal(sha256(concurrent.target), expected.harness['fixtures/concurrent-build.targets']);
+        for (const entry of concurrent.entries) {
+            assert.equal(typeof entry.nonce, 'string');
+            assert(entry.nonce.length > 0);
+            for (const key of ['source', 'marker', 'release']) assert(path.isAbsolute(entry[key]) && within(root, entry[key]));
+            assert(!exists(entry.marker) && !exists(entry.marker + '.tmp') && !exists(entry.release));
+        }
+        assert.notEqual(concurrent.entries[0].nonce, concurrent.entries[1].nonce);
+    } else assert.notEqual(scenario, 'concurrent-files');
     const adapterLoss = scenario === 'native-adapter-loss' ? expected.adapterLoss : undefined;
     if (adapterLoss) {
         assert.equal(typeof adapterLoss.nonce, 'string');
@@ -419,6 +436,179 @@ exports.run = async function run() {
         state();
     }
 
+    function readConcurrentMarker(entry) {
+        const marker = JSON.parse(fs.readFileSync(entry.marker, 'utf8'));
+        assert.equal(marker.schema, 1);
+        assert.equal(marker.nonce, entry.nonce);
+        assert(Number.isSafeInteger(marker.pid) && marker.pid > 0);
+        assert(samePath(marker.source, entry.source));
+        assert(marker.compileInputs.split(';').some(source => samePath(source, entry.source)),
+            'The configured source must be an actual Compile item in this SDK process');
+        assert(samePath(marker.executable, expected.sdk.executable));
+        assert(path.isAbsolute(marker.output) && within(root, marker.output));
+        assert.match(path.basename(path.resolve(marker.output)), /^run-[A-Za-z0-9]{6}$/);
+        assert(Number.isFinite(Date.parse(marker.startUtc)));
+        return marker;
+    }
+
+    async function sdkProcessSnapshot(marker) {
+        const script = `$item = Get-CimInstance Win32_Process -Filter 'ProcessId=${marker.pid}'; ` +
+            `if (!$item) { throw 'SDK process is absent' }; ` +
+            `[ordered]@{ processId=[int]$item.ProcessId; parentProcessId=[int]$item.ParentProcessId; ` +
+            `executablePath=[string]$item.ExecutablePath; commandLine=[string]$item.CommandLine; ` +
+            `creationUtc=$item.CreationDate.ToUniversalTime().ToString('o') } | ConvertTo-Json -Compress`;
+        const powershell = path.join(process.env.SystemRoot, 'System32/WindowsPowerShell/v1.0/powershell.exe');
+        const text = await new Promise((resolve, reject) => childProcess.execFile(powershell,
+            ['-NoLogo', '-NoProfile', '-NonInteractive', '-Command', script],
+            { windowsHide: true, encoding: 'utf8', timeout: 10000 }, (error, stdout) => error ? reject(error) : resolve(stdout)));
+        const identity = JSON.parse(text.replace(/^\uFEFF/, ''));
+        assert.equal(identity.processId, marker.pid);
+        assert(samePath(identity.executablePath, expected.sdk.executable));
+        const command = identity.commandLine.replaceAll('/', '\\').toLowerCase();
+        assert(command.includes(marker.source.replaceAll('/', '\\').toLowerCase()));
+        assert(command.includes(path.resolve(marker.output).replaceAll('/', '\\').toLowerCase()));
+        assert(command.includes('--output'));
+        assert(Math.abs(Date.parse(identity.creationUtc) - Date.parse(marker.startUtc)) <= 1,
+            'The CIM process creation time must match the marker process instance');
+        return identity;
+    }
+
+    function releaseConcurrentBarrier(entry, marker, safetyCleanup = false) {
+        assert.equal(marker.nonce, entry.nonce);
+        assert(samePath(marker.source, entry.source));
+        assert(pidAlive(marker.pid), 'Only the captured live SDK barrier may be released');
+        if (exists(entry.release)) {
+            assert.equal(fs.readFileSync(entry.release, 'utf8').trim(), entry.nonce);
+            return undefined;
+        }
+        const atMilliseconds = elapsed(start);
+        fs.writeFileSync(entry.release, entry.nonce + '\n', { flag: 'wx' });
+        const receipt = { label: entry.label, pid: marker.pid, nonce: entry.nonce,
+            atMilliseconds, safetyCleanup, snapshot: fileSnapshot(entry.release) };
+        record('concurrent-build-barrier-released', receipt);
+        return receipt;
+    }
+
+    async function concurrentFiles(aSource, bSource, aPort, bPort, document) {
+        const evidence = result.concurrent = { entries: concurrent.entries, dispatch: [], releases: [],
+            targetSnapshot: fileSnapshot(concurrent.target), sourceSnapshots: concurrent.entries.map(entry => fileSnapshot(entry.source)) };
+        let logFile;
+        await until(() => { logFile = outputLog(); return !!logFile; }, 'output channel before concurrent commands');
+        assert.equal(buildCommands(fs.readFileSync(logFile, 'utf8'), aSource).length, 0);
+        assert.equal(buildCommands(fs.readFileSync(logFile, 'utf8'), bSource).length, 0);
+        const initialLog = logSnapshot(logFile);
+        function dispatch(entry, port, inspectBreakpoint, opened) {
+            assert(!concurrentStopping);
+            let resolveDispatch, rejectDispatch;
+            const dispatched = new Promise((resolve, reject) => { resolveDispatch = resolve; rejectDispatch = reject; });
+            const item = { label: entry.label, settled: false };
+            concurrentOperations.push(item);
+            item.operation = launchFile(entry.label === 'A' ? 'A-0' : 'B', entry.source, entry.revision, port,
+                inspectBreakpoint, opened, 3, launch => {
+                    item.launch = launch;
+                    const detail = { label: entry.label, source: entry.source, activeSource: vscode.window.activeTextEditor?.document.uri.fsPath,
+                        nonce: launch.nonce, commandInvocations: 3, atMilliseconds: elapsed(start) };
+                    assert(samePath(detail.activeSource, entry.source));
+                    evidence.dispatch.push(detail);
+                    record('concurrent-file-command-dispatched', detail);
+                    resolveDispatch(launch);
+                });
+            // Observe each partial operation immediately, including an A setup
+            // failure before B is dispatched. Keep outcomes for bounded cleanup.
+            item.observed = item.operation.then(value => {
+                item.value = value; item.status = 'fulfilled'; item.settled = true;
+            }, error => {
+                item.error = error; item.status = 'rejected'; item.settled = true; rejectDispatch(error);
+            });
+            return { item, dispatched };
+        }
+        const first = dispatch(concurrent.entries[0], aPort, true, document);
+        await first.dispatched; // Dispatch only; never await A's command results here.
+        const second = dispatch(concurrent.entries[1], bPort, false);
+        await second.dispatched;
+        await until(() => {
+            const failed = concurrentOperations.find(item => item.status === 'rejected');
+            if (failed) throw failed.error;
+            return concurrent.entries.every(entry => exists(entry.marker));
+        }, 'both independent real SDK build barriers');
+        const markers = concurrent.entries.map(readConcurrentMarker);
+        assert.notEqual(markers[0].pid, markers[1].pid);
+        for (let index = 0; index < markers.length; index++) {
+            assert(!markers[index].compileInputs.split(';').some(source => samePath(source, concurrent.entries[1 - index].source)),
+                'A file build must not include the other independently requested source');
+        }
+        const identities = [];
+        for (const marker of markers) identities.push(await sdkProcessSnapshot(marker));
+        let beforeReleaseTail;
+        await until(() => {
+            beforeReleaseTail = logTail(initialLog);
+            return concurrent.entries.every(entry => buildCommands(beforeReleaseTail, entry.source).length === 1);
+        }, 'one logged actual build for each held source');
+        const beforeRelease = evidence.beforeFirstRelease = { atMilliseconds: elapsed(start), markers, identities,
+            markerSnapshots: concurrent.entries.map(entry => fileSnapshot(entry.marker)),
+            pidAlive: markers.map(marker => pidAlive(marker.pid)),
+            commandPending: concurrentOperations.map(item => !!item.launch?.commandPending),
+            operationsSettled: concurrentOperations.map(item => item.settled),
+            releasesAbsent: concurrent.entries.map(entry => !exists(entry.release)),
+            log: { ...initialLog, tailSha256: crypto.createHash('sha256').update(beforeReleaseTail).digest('hex'),
+                tailCharacters: beforeReleaseTail.length,
+                builds: concurrent.entries.map(entry => ({ source: entry.source, commands: buildCommands(beforeReleaseTail, entry.source) })) } };
+        assert.deepEqual(beforeRelease.pidAlive, [true, true]);
+        assert.deepEqual(beforeRelease.commandPending, [true, true]);
+        assert.deepEqual(beforeRelease.operationsSettled, [false, false]);
+        assert.deepEqual(beforeRelease.releasesAbsent, [true, true]);
+        for (let index = 0; index < markers.length; index++) {
+            assert(samePath(beforeRelease.log.builds[index].commands[0].output, markers[index].output));
+        }
+        record('concurrent-builds-held-before-first-release', beforeRelease);
+        for (let index = 0; index < markers.length; index++) {
+            evidence.releases.push(releaseConcurrentBarrier(concurrent.entries[index], markers[index]));
+        }
+        await Promise.all(concurrentOperations.map(item => item.observed));
+        const failed = concurrentOperations.find(item => item.status === 'rejected');
+        if (failed) throw failed.error;
+        const a = first.item.value, b = second.item.value;
+        let tail;
+        await until(() => {
+            tail = logTail(initialLog);
+            return tail.split(/\r?\n/).filter(line => line.startsWith('Phase completed: Starting netcoredbg')).length === 2;
+        }, 'two real concurrent command handoffs');
+        evidence.log = logEvidence(initialLog, tail, aSource);
+        evidence.builds = concurrent.entries.map((entry, index) => {
+            const launch = index === 0 ? a : b;
+            const commands = buildCommands(tail, entry.source);
+            assert.equal(commands.length, 1);
+            assert(samePath(commands[0].output, markers[index].output));
+            assert(samePath(commands[0].output, launch.output));
+            assert.deepEqual(launch.commandResults, [true, true, true]);
+            assert.equal(launch.capturedSessions.size, 1);
+            assert(!pidAlive(markers[index].pid), 'The direct real SDK process must close before native launch readiness');
+            assert.equal(sha256(entry.marker), beforeRelease.markerSnapshots[index].sha256);
+            return { label: entry.label, source: entry.source, commands, sdkPid: markers[index].pid,
+                sdkPidGoneObservedAtMilliseconds: elapsed(start), sessionId: launch.session.id,
+                program: launch.program, output: launch.output, response: launch.response,
+                commandResults: launch.commandResults, capturedSessions: capturedSessionState(launch),
+                configuration: JSON.parse(JSON.stringify(launch.session.configuration)),
+                sourceSnapshot: fileSnapshot(entry.source), profileSnapshot: fileSnapshot(entry.source.replace(/\.cs$/i, '.run.json')),
+                artifacts: ['FileApp.dll', 'FileApp.pdb'].map(name => { const file = path.join(launch.output, name);
+                    return { path: file, size: fs.statSync(file).size, sha256: sha256(file) }; }) };
+        });
+        assert.equal(evidence.log.buildCompletedPhaseDiagnostics.length, 2);
+        assert.equal(evidence.log.completedPhaseDiagnostics.length, 2);
+        assert.equal(evidence.log.failedPhaseDiagnostics.length, 0);
+        assert.equal(evidence.log.cancelledPhaseDiagnostics.length, 0);
+        assert.notEqual(a.output, b.output);
+        assert.notEqual(a.session.id, b.session.id);
+        assert.notEqual(a.pid, b.pid);
+        assert.notEqual(a.nonce, b.nonce);
+        assert.equal(a.response.revision, concurrent.entries[0].revision);
+        assert.equal(b.response.revision, concurrent.entries[1].revision);
+        evidence.completedAtMilliseconds = elapsed(start);
+        record('concurrent-files-confirmed', evidence);
+        result.checks.push('Three A and three B callers capture their own active files, overlap in two verified real SDK barriers, then share one build/session per file with distinct HTTP ownership');
+        return { a, b };
+    }
+
     async function nativeAdapterLoss(a, b) {
         assert(adapterLoss);
         await stillAlive(a);
@@ -565,7 +755,7 @@ exports.run = async function run() {
         return retry;
     }
 
-    async function launchFile(label, source, revision, port, inspectBreakpoint = false, document, commandInvocations = 1) {
+    async function launchFile(label, source, revision, port, inspectBreakpoint = false, document, commandInvocations = 1, onDispatched) {
         const nonce = crypto.randomUUID();
         const launch = { label, source, revision, nonce, port, origin: `http://127.0.0.1:${port}`, dap: [] };
         launches.push(launch);
@@ -578,19 +768,24 @@ exports.run = async function run() {
         if (['web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry', 'native-host-failure-retry'].includes(scenario)) launch.profileSnapshot = fileSnapshot(source.replace(/\.cs$/i, '.run.json'));
         const opened = document || await vscode.workspace.openTextDocument(source);
         await vscode.window.showTextDocument(opened);
+        if (concurrent && concurrentStopping) throw new Error('Concurrent fixture cleanup already began; no late command dispatch is permitted');
         launch.commandPending = true;
         launch.commandInvocations = commandInvocations;
         state();
         try {
             // Observe every concurrent request before handling a rejection so a
             // later owned session can still be captured for failure cleanup.
-            const outcomes = await Promise.allSettled(Array.from({ length: commandInvocations }, () => vscode.commands.executeCommand(COMMAND)));
+            launch.commandOperation = Promise.allSettled(Array.from({ length: commandInvocations }, () => vscode.commands.executeCommand(COMMAND)));
+            launch.dispatchedAtMilliseconds = elapsed(start);
+            if (onDispatched) onDispatched(launch);
+            const outcomes = await launch.commandOperation;
             const rejected = outcomes.find(outcome => outcome.status === 'rejected');
             if (rejected) throw rejected.reason;
             launch.commandResults = outcomes.map(outcome => outcome.value);
             assert.deepEqual(launch.commandResults, Array(commandInvocations).fill(true), `${label} installed commands must start debugging`);
         } finally {
             launch.commandPending = false;
+            launch.returnedAtMilliseconds = elapsed(start);
             state();
         }
         assert.equal(opened.isDirty, false, 'Installed command must save the dirty source before building');
@@ -1353,6 +1548,31 @@ exports.run = async function run() {
     }
 
     async function failureCleanup() {
+        if (concurrent) {
+            concurrentStopping = true;
+            // These fresh fixed paths and nonces belong only to this prepared
+            // fixture. Prepublishing a matching release also covers a task that
+            // reaches its marker after the first failure; no process is killed.
+            for (const entry of concurrent.entries) {
+                const cleanup = { label: entry.label, concurrentBarrierSafetyRelease: true };
+                result.cleanup.push(cleanup);
+                try {
+                    if (exists(entry.marker)) {
+                        cleanup.marker = readConcurrentMarker(entry);
+                        cleanup.pidRespondsToSignalZero = pidAlive(cleanup.marker.pid);
+                    } else cleanup.prepublishedForLateBarrier = true;
+                    if (exists(entry.release)) assert.equal(fs.readFileSync(entry.release, 'utf8').trim(), entry.nonce);
+                    else fs.writeFileSync(entry.release, entry.nonce + '\n', { flag: 'wx' });
+                    cleanup.releaseSnapshot = fileSnapshot(entry.release);
+                } catch (error) { cleanup.releaseError = error.stack || String(error); }
+            }
+            try {
+                await bounded(Promise.all(concurrentOperations.flatMap(item => [item.observed, item.launch?.commandOperation].filter(Boolean))), 'concurrent partial command failure drain', 15000);
+            } catch (error) { result.cleanup.push({ concurrentCommandDrainError: error.stack || String(error) }); }
+            result.concurrentCommandOutcomes = concurrentOperations.map(item => ({ label: item.label, settled: item.settled,
+                status: item.status, ...(item.error ? { error: item.error.stack || String(item.error) } : {}),
+                commandResults: item.launch?.commandResults, sessionId: item.launch?.session?.id }));
+        }
         // phase() can time out before its action settles. Keep the exact-token
         // rejection armed during this bounded drain, then disarm before session cleanup.
         for (const attempt of [...failedHandoffAttempts, ...failedNativeHostAttempts].filter(item => item.commandPending && item.commandOperation)) {
@@ -1559,8 +1779,13 @@ exports.run = async function run() {
         const aPort = await availablePort();
         let bPort;
         do { bPort = await availablePort(); } while (bPort === aPort);
-        let a = await phase('A initial installed-command launch and breakpoint', () => launchFile('A-0', aSource, 'initial', aPort, true, document));
-        const b = await phase('B independent installed-command launch', () => launchFile('B', bSource, 'initial', bPort));
+        let a, b;
+        if (concurrent) ({ a, b } = await phase('A and B concurrent installed commands with independent SDK barriers',
+            () => concurrentFiles(aSource, bSource, aPort, bPort, document)));
+        else {
+            a = await phase('A initial installed-command launch and breakpoint', () => launchFile('A-0', aSource, 'initial', aPort, true, document));
+            b = await phase('B independent installed-command launch', () => launchFile('B', bSource, 'initial', bPort));
+        }
         result.checks.push('Two independent real Web sessions respond with distinct owned nonces and PIDs');
         assert.notEqual(a.pid, b.pid);
         assert.notEqual(a.session.id, b.session.id);
@@ -1596,6 +1821,10 @@ exports.run = async function run() {
                     const content = current.getText();
                     assert(content.includes(`const string revision = "${a.revision}";`));
                     let replacement = content.replace(`const string revision = "${a.revision}";`, `const string revision = "${revision}";`);
+                    if (concurrent && cycle === 0) {
+                        assert(content.includes('#:property LifecycleConcurrentEnabled=true'));
+                        replacement = replacement.replace('#:property LifecycleConcurrentEnabled=true', '#:property LifecycleConcurrentEnabled=false');
+                    }
                     if (failed?.expectedBuildFailure) {
                         assert(content.includes('marker += __missingLifecycleValue;'));
                         replacement = replacement.replace('marker += __missingLifecycleValue;', 'marker += 2;');
@@ -1607,9 +1836,44 @@ exports.run = async function run() {
                     edit.replace(current.uri, new vscode.Range(current.positionAt(0), current.positionAt(content.length)), replacement);
                     assert.equal(await vscode.workspace.applyEdit(edit), true);
                     assert.equal(current.isDirty, true, 'Retry must exercise the installed command\'s source save');
-                    const snapshot = failed ? logSnapshot(failed.log.path) : undefined;
-                    a = await launchFile(`A-${cycle + 1}`, aSource, revision, aPort, false, current, failed ? 3 : 1);
+                    const concurrentRetry = concurrent && cycle === 0;
+                    const snapshot = failed ? logSnapshot(failed.log.path) : concurrentRetry ? logSnapshot(outputLog()) : undefined;
+                    a = await launchFile(`A-${cycle + 1}`, aSource, revision, aPort, false, current, failed || concurrentRetry ? 3 : 1);
                     assert.equal(fs.readFileSync(aSource, 'utf8'), current.getText());
+                    if (concurrentRetry) {
+                        let tail;
+                        await until(() => { tail = logTail(snapshot); return tail.includes('Phase completed: Starting netcoredbg'); },
+                            'three-caller dirty retry after concurrent A Stop');
+                        const log = logEvidence(snapshot, tail, aSource);
+                        assert.equal(log.buildCommands.length, 1);
+                        assert.equal(log.buildCompletedPhaseDiagnostics.length, 1);
+                        assert.equal(log.completedPhaseDiagnostics.length, 1);
+                        assert.equal(log.failedPhaseDiagnostics.length, 0);
+                        assert.equal(log.cancelledPhaseDiagnostics.length, 0);
+                        assert(samePath(log.buildCommands[0].output, a.output));
+                        assert.equal(a.capturedSessions.size, 1);
+                        assert(current.getText().includes('#:property LifecycleConcurrentEnabled=false'));
+                        const initial = result.concurrent.builds[0];
+                        assert.notEqual(a.output, initial.output);
+                        assert.notEqual(a.session.id, initial.sessionId);
+                        assert.notEqual(a.nonce, initial.response.nonce);
+                        assert(!exists(initial.output));
+                        await stillAlive(b);
+                        result.concurrent.retry = { label: a.label, source: a.source, revision, nonce: a.nonce,
+                            pid: a.pid, sessionId: a.session.id, output: a.output, response: a.response,
+                            commandResults: a.commandResults, commandInvocations: a.commandInvocations, log,
+                            sourceSnapshot: fileSnapshot(aSource), profileSnapshot: fileSnapshot(aSource.replace(/\.cs$/i, '.run.json')),
+                            disabledBarrier: true, freshOutput: true, freshSession: true, freshToken: true,
+                            bCheckpoint: { sessionId: b.session.id, pid: b.pid, response: await request(b.origin), output: b.output,
+                                sourceSnapshot: fileSnapshot(b.source), profileSnapshot: fileSnapshot(b.source.replace(/\.cs$/i, '.run.json')) } };
+                        assert.equal(result.concurrent.retry.bCheckpoint.sourceSnapshot.sha256, result.concurrent.builds[1].sourceSnapshot.sha256);
+                        assert.equal(result.concurrent.retry.bCheckpoint.profileSnapshot.sha256, result.concurrent.builds[1].profileSnapshot.sha256);
+                        for (let index = 0; index < concurrent.entries.length; index++) {
+                            assert.equal(sha256(concurrent.entries[index].marker), result.concurrent.beforeFirstRelease.markerSnapshots[index].sha256);
+                        }
+                        record('concurrent-files-dirty-retry-confirmed', result.concurrent.retry);
+                        result.checks.push('After concurrent preparation, exact A Stop preserves B and a dirty A revision with the one-shot barrier disabled retries through one real build/session shared by three callers');
+                    }
                     if (failed) {
                         let tail;
                         await until(() => { tail = logTail(snapshot); return tail.includes('Phase completed: Starting netcoredbg'); },
