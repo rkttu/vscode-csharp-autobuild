@@ -106,6 +106,19 @@ def pe_machine(executable):
         return struct.unpack("<H", read_exact(2))[0]
 
 
+def native_f5_configuration(work, cycles):
+    """Two externally injected keys; never reuse another input's attestation."""
+    if cycles != 2:
+        raise ValueError("The native F5 control requires exactly two cycles, not full qualification")
+    nonce = str(uuid.uuid4())
+    return {"nonce": nonce, "windowTitle": "FBA native F5 " + nonce,
+            "inputs": [{"sequence": sequence,
+                        "request": str(work / f"needs-f5-input-{sequence:02}.json"),
+                        "receipt": str(work / f"f5-input-action-{sequence:02}.json")}
+                       for sequence in (1, 2)],
+            "closed": str(work / "f5-input-closed.json")}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base-vsix", type=Path, required=True)
@@ -118,10 +131,12 @@ def main():
     parser.add_argument("--sdk-version", required=True)
     parser.add_argument("--work-dir", type=Path, required=True)
     parser.add_argument("--cycles", type=int, default=3)
-    parser.add_argument("--scenario", choices=("web-lifecycle", "build-failure-retry", "native-build-cancel", "web-profile-failure-retry", "sdk-selection-failure-retry", "debug-handoff-declined-retry", "native-host-failure-retry", "native-adapter-loss", "concurrent-files", "native-handoff-cancel"), default="web-lifecycle")
+    parser.add_argument("--scenario", choices=("web-lifecycle", "build-failure-retry", "native-build-cancel", "web-profile-failure-retry", "sdk-selection-failure-retry", "debug-handoff-declined-retry", "native-host-failure-retry", "native-adapter-loss", "concurrent-files", "native-handoff-cancel", "native-f5"), default="web-lifecycle")
     args = parser.parse_args()
     if not 2 <= args.cycles <= 10:
         parser.error("Use 2..10 cycles to exercise bounded same-file retry")
+    if args.scenario == "native-f5" and args.cycles != 2:
+        parser.error("The native F5 control requires --cycles 2")
     editor = args.editor.resolve(strict=True)
     editor_cli = args.editor_cli.resolve(strict=True)
     dotnet = args.dotnet.resolve(strict=True)
@@ -210,6 +225,10 @@ def main():
                                 "request": str(work / "needs-ui-cancel.json"),
                                 "receipt": str(work / "ui-cancel-action.json")}
         settings["window.title"] = handoff_cancellation["windowTitle"]
+    native_f5 = native_f5_configuration(work, args.cycles) if args.scenario == "native-f5" else None
+    if native_f5:
+        settings["window.title"] = native_f5["windowTitle"]
+        settings["files.autoSave"] = "off"
     (work / "profile/User/settings.json").write_text(json.dumps(settings, indent=2))
     harness = {name: digest((Path(__file__).parent / name).read_bytes())
                for name in ("prepare.py", "run.ps1", "driver.cjs", "extension-test.cjs", "fixtures/web.cs")}
@@ -236,6 +255,13 @@ def main():
         expected["nativeCancellation"] = native_cancellation
     if handoff_cancellation:
         expected["handoffCancellation"] = handoff_cancellation
+    if native_f5:
+        expected["nativeF5"] = native_f5
+        # Avoid the older ambiguous physicalF5 label: this is native injected
+        # input in a visible window, not an assertion about human hardware.
+        del expected["scope"]["physicalF5"]
+        expected["scope"].update(invocation="native-injected-f5", nativeInjectedF5=True,
+                                 hardwareKeypress=False, noFolderWindow=True)
     if concurrent:
         expected["concurrent"] = concurrent
     if args.scenario == "native-adapter-loss":
