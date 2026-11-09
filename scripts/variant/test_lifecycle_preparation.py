@@ -92,16 +92,26 @@ class LifecyclePreparationTests(unittest.TestCase):
             preparation.fresh_directory(work)
         self.assertEqual(failure.read_text(), 'initial failure')
 
-    def test_native_f5_control_has_two_distinct_input_receipts_in_one_fresh_profile(self):
-        control = preparation.native_f5_configuration(self.root, 2)
-        self.assertIn(control["nonce"], control["windowTitle"])
-        self.assertEqual([item["sequence"] for item in control["inputs"]], [1, 2])
-        paths = [Path(item[key]) for item in control["inputs"] for key in ("request", "receipt")]
-        paths.append(Path(control["closed"]))
-        self.assertEqual(len(set(paths)), 5)
-        self.assertTrue(all(path.parent == self.root and not path.exists() for path in paths))
-        for cycles in (1, 3, 10):
-            with self.subTest(cycles=cycles), self.assertRaisesRegex(ValueError, "exactly two"):
+    def test_native_f5_control_keeps_each_input_and_profile_attestation_separate(self):
+        for cycles in range(2, 11):
+            with self.subTest(cycles=cycles):
+                work = self.root / f"profile-{cycles}"
+                control = preparation.native_f5_configuration(work, cycles)
+                self.assertIn(control["nonce"], control["windowTitle"])
+                self.assertEqual([item["sequence"] for item in control["inputs"]], list(range(1, cycles + 1)))
+                paths = {Path(item[key]) for item in control["inputs"] for key in ("request", "receipt")}
+                paths.add(Path(control["closed"]))
+                self.assertEqual(len(paths), 2 * cycles + 1)
+                self.assertTrue(all(path.parent == work and not path.exists() for path in paths))
+                other = preparation.native_f5_configuration(self.root / f"other-{cycles}", cycles)
+                other_paths = {Path(item[key]) for item in other["inputs"] for key in ("request", "receipt")}
+                other_paths.add(Path(other["closed"]))
+                self.assertTrue(paths.isdisjoint(other_paths))
+                self.assertNotEqual(control["nonce"], other["nonce"])
+
+    def test_native_f5_control_rejects_out_of_range_or_noninteger_counts(self):
+        for cycles in (0, 1, 11, -1, 2.5, True):
+            with self.subTest(cycles=cycles), self.assertRaisesRegex(ValueError, r"2\.\.10"):
                 preparation.native_f5_configuration(self.root, cycles)
 
     def test_pe_machine_reports_truncated_headers_and_reads_native_target(self):

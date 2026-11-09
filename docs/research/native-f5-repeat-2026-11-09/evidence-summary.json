@@ -1,0 +1,1233 @@
+{
+  "schema": 1,
+  "outcome": "two-separately-failed-repeat-series",
+  "allSeriesPassed": false,
+  "baseCommit": "6d438a5b603ca416698d8c6071394e141cb46e5d",
+  "sourceCommit": "1709198d4262dd3b7f58a59d9d01d36e11f5d76f",
+  "plannedProfilesPerSeries": 2,
+  "plannedCyclesPerProfile": 10,
+  "completedTenCycleProfiles": 0,
+  "actualNativeF5InputsAcrossTheseSeries": 0,
+  "firstSeries": {
+    "directory": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09",
+    "outcome": "parameter-binding-failed-before-editor-launch",
+    "success": false,
+    "plan": {
+      "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\series-plan.json",
+      "bytes": 4070,
+      "sha256": "c5d09ead888212c928cd31625b5a03336c259c904fa0314d91eb2a094776e693"
+    },
+    "source": {
+      "commit": "df9899ea4e881fcc4569eb81298833b14338f7d2",
+      "archivedVariantSources": 53,
+      "changedFiles": {
+        "scripts/variant/lifecycle/extension-test.cjs": {
+          "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\worktree\\scripts\\variant\\lifecycle\\extension-test.cjs",
+          "bytes": 193051,
+          "sha256": "6162443673dd90f635b9db4ea983f5fb0d905662a4df0176d957702959d52e87"
+        },
+        "scripts/variant/lifecycle/prepare.py": {
+          "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\worktree\\scripts\\variant\\lifecycle\\prepare.py",
+          "bytes": 17722,
+          "sha256": "bb0aa9385229c7518303f33c33bcd9b76c652bd9ea542302bcd1a263e3d545b4"
+        },
+        "scripts/variant/lifecycle/run.ps1": {
+          "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\worktree\\scripts\\variant\\lifecycle\\run.ps1",
+          "bytes": 11220,
+          "sha256": "fea66c79701c5f7141199a3ad315a3956dddad9ea8e7563ec23953a5a59cb428"
+        },
+        "scripts/variant/test_lifecycle_preparation.py": {
+          "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\worktree\\scripts\\variant\\test_lifecycle_preparation.py",
+          "bytes": 7370,
+          "sha256": "5efda3f9ee7b2a5906a0a812ce4583a6cc9ff50447d4416acdbf11e202af6e46"
+        }
+      },
+      "unchangedProductModules": {
+        "classify.cjs": {
+          "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\worktree\\scripts\\variant\\file-based-apps\\classify.cjs",
+          "bytes": 11396,
+          "sha256": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e"
+        },
+        "entry.cjs": {
+          "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\worktree\\scripts\\variant\\file-based-apps\\entry.cjs",
+          "bytes": 2759,
+          "sha256": "8cb28056b4f634d1897302f2b97303e140e9c11c233b2f771c32f7845aab44e3"
+        },
+        "recovery.cjs": {
+          "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\worktree\\scripts\\variant\\file-based-apps\\recovery.cjs",
+          "bytes": 16057,
+          "sha256": "099f74d6d25c0fad95b0f56e3adaebe43a3f211991b6ef436f92ceed6be199d4"
+        },
+        "runtime.cjs": {
+          "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\worktree\\scripts\\variant\\file-based-apps\\runtime.cjs",
+          "bytes": 51204,
+          "sha256": "d7f0dd838bd83b416e0d0336fa03e417be4aa8ac4bc7e26ea587a9948fdb0a24"
+        },
+        "web.cjs": {
+          "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\worktree\\scripts\\variant\\file-based-apps\\web.cjs",
+          "bytes": 18850,
+          "sha256": "8a9447b2dbb5c0b50e45daf80aec377cae3bcfebeb697dcd109fbca911b58442"
+        }
+      }
+    },
+    "checks": {
+      "runs": [
+        {
+          "name": "javascript-syntax",
+          "exitCode": 0,
+          "log": {
+            "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\checks\\javascript-syntax.log",
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "argv": [
+            "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+            "--check",
+            "scripts/variant/lifecycle/extension-test.cjs"
+          ]
+        },
+        {
+          "name": "python",
+          "exitCode": 0,
+          "log": {
+            "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\checks\\python.log",
+            "bytes": 6096,
+            "sha256": "a60cb52ceca043a0b1ebeebef1e01a09c0bab8d99f1b86b96875abe31c800ee1"
+          },
+          "argv": [
+            "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+            "-B",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "scripts/variant",
+            "-p",
+            "test_*.py",
+            "-v"
+          ]
+        },
+        {
+          "name": "powershell-parse",
+          "exitCode": 0,
+          "log": {
+            "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\checks\\powershell-parse.log",
+            "bytes": 25,
+            "sha256": "a739b5b3fd1b173063e7944b495e7d397c6b2f10c0579fff46f2c9873e235a48"
+          },
+          "argv": [
+            "C:\\Program Files\\PowerShell\\7\\pwsh.EXE",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-Command",
+            "$tokens = $null; $parseErrors = $null; $null = [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $PWD 'scripts/variant/lifecycle/run.ps1'), [ref]$tokens, [ref]$parseErrors); if ($parseErrors.Count) { $parseErrors | Out-String | Write-Output; exit 1 }; Write-Output 'PowerShell parser: PASS'"
+          ]
+        }
+      ],
+      "pythonCases": 41,
+      "productFileAppSuiteRerun": false
+    },
+    "inputs": {
+      "manifest": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\verifier-inputs\\manifest.json",
+        "bytes": 3290,
+        "sha256": "81a1e1311130e0bce9eb701f0f99cf1c507ec58395ee529410b5517b1e203ef5"
+      },
+      "originalExecutionIdentities": {
+        "node": {
+          "path": "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "bytes": 81949488,
+          "sha256": "8e55f00a0aca4c8d71ff6f68aa6285118fad18c29c0482973cc03ee5f0c2a98b"
+        },
+        "python": {
+          "path": "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+          "bytes": 107312,
+          "sha256": "8fc34e1314ae172c7841832ae7c63ce3d59eb7394b3ca317d69c803f93ea5660"
+        },
+        "powershell": {
+          "path": "C:\\Program Files\\PowerShell\\7\\pwsh.EXE",
+          "bytes": 278824,
+          "sha256": "abb215e4d87889c85a18333a310b1dbdae33e78a25e13dc7cf129fbdaea848e0"
+        }
+      },
+      "retainedReadPaths": {
+        "node": {
+          "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\verifier-inputs\\node-8e55f00a0aca4c8d71ff6f68aa6285118fad18c29c0482973cc03ee5f0c2a98b.exe",
+          "bytes": 81949488,
+          "sha256": "8e55f00a0aca4c8d71ff6f68aa6285118fad18c29c0482973cc03ee5f0c2a98b"
+        },
+        "python": {
+          "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\verifier-inputs\\python-8fc34e1314ae172c7841832ae7c63ce3d59eb7394b3ca317d69c803f93ea5660.exe",
+          "bytes": 107312,
+          "sha256": "8fc34e1314ae172c7841832ae7c63ce3d59eb7394b3ca317d69c803f93ea5660"
+        },
+        "powershell": {
+          "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\checks\\pwsh-abb215e4d87889c85a18333a310b1dbdae33e78a25e13dc7cf129fbdaea848e0.exe",
+          "bytes": 278824,
+          "sha256": "abb215e4d87889c85a18333a310b1dbdae33e78a25e13dc7cf129fbdaea848e0"
+        }
+      },
+      "captureTime": "2026-11-09T09:03:21.605021+00:00",
+      "limits": "EXE bytes only; no complete runnable runtime, standard library, OS or effective-token archive."
+    },
+    "run": {
+      "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\native-run-r01-result.json",
+      "bytes": 41835,
+      "sha256": "013176833a3b0e74b1e578287faad9bffcf4d6d07310326e896910fd36983ef3"
+    },
+    "firstFailure": {
+      "schema": 1,
+      "profile": "r01",
+      "stoppedUtc": "2026-11-09T09:04:45.141899+00:00",
+      "reason": "first native profile failed; no replacement profile or second run permitted",
+      "detail": {
+        "exitCode": 1,
+        "consistencyErrors": [],
+        "error": null
+      }
+    },
+    "editorLaunches": 0,
+    "nativeKeyInputs": 0,
+    "secondProfilePrepared": false,
+    "notConsecutiveWithSuccessor": true
+  },
+  "successor": {
+    "outcome": "pre-key-ui-capture-failure-and-harness-safety-timeout",
+    "success": false,
+    "installedAndActivatedIdentity": "passed driver checks",
+    "installedArtifacts": {
+      "candidate": {
+        "packagedFiles": 742,
+        "observedFiles": 760,
+        "installerMetadata": {
+          "installedTimestamp": 1794215389749,
+          "targetPlatform": "undefined",
+          "size": 200498490
+        },
+        "additionalFiles": {
+          ".roslyn/cache/razor.mef.BQv5e2A7QRAGaFOU2mRvFg.cache": {
+            "bytes": 21075,
+            "sha256": "50d117175b76d2d49f24d572574523c29fc113fb67e5a6aa822649e5488007e1"
+          },
+          ".vswebassemblybridge/Microsoft.CodeAnalysis.CSharp.Scripting.dll": {
+            "bytes": 34616,
+            "sha256": "f79a85b1ff5678bbb1e6f21c5c8a3bd94b1cc63ea3a80047867cd4969a8dad92"
+          },
+          ".vswebassemblybridge/Microsoft.CodeAnalysis.CSharp.dll": {
+            "bytes": 7085368,
+            "sha256": "4583e2746a6ba9dec51698a3bf8da58563833b41ad9ab7727dc8441e800adf3d"
+          },
+          ".vswebassemblybridge/Microsoft.CodeAnalysis.Scripting.dll": {
+            "bytes": 137056,
+            "sha256": "3aa40da164bc08b2e5b13e85dd31c2a1a4630566cb3e425a05f3bfd12fee4751"
+          },
+          ".vswebassemblybridge/Microsoft.CodeAnalysis.dll": {
+            "bytes": 3110200,
+            "sha256": "9fd39561a40a1764ef376fea985636bb828d98c4978b63f83217816700771b60"
+          },
+          ".vswebassemblybridge/Microsoft.Diagnostics.BrowserDebugHost.dll": {
+            "bytes": 59704,
+            "sha256": "45f08be1bcb9c9fdb376883cba3a00908ccaf4b9f8814b1e1347fd92d5794bcc"
+          },
+          ".vswebassemblybridge/Microsoft.Diagnostics.BrowserDebugHost.pdb": {
+            "bytes": 28308,
+            "sha256": "78143f5be39ce0459fb56e38b40028779acffca1f679986c62d0356c4185dc4c"
+          },
+          ".vswebassemblybridge/Microsoft.Diagnostics.BrowserDebugHost.runtimeconfig.json": {
+            "bytes": 517,
+            "sha256": "3ace1c3d5779332f817abb86d1ec0ce383f2e9c9b64e081949240aa9570a9387"
+          },
+          ".vswebassemblybridge/Microsoft.Diagnostics.BrowserDebugHost.staticwebassets.endpoints.json": {
+            "bytes": 51,
+            "sha256": "eb6525c892afda953a2560f151f9c5e5bc6e79ef6741d886488ac450262c91e3"
+          },
+          ".vswebassemblybridge/Microsoft.Diagnostics.BrowserDebugProxy.dll": {
+            "bytes": 647992,
+            "sha256": "229c87f0cfb3f49545c8c90c2eff0970e996ea8ce4bc5cf54054850284a73a45"
+          },
+          ".vswebassemblybridge/Microsoft.Diagnostics.BrowserDebugProxy.pdb": {
+            "bytes": 157188,
+            "sha256": "8beb543585259f9d9e1a21e9a8d70372f863bfe4efefff4451729894f00c6bde"
+          },
+          ".vswebassemblybridge/Microsoft.FileFormats.dll": {
+            "bytes": 116064,
+            "sha256": "d6476880b33b73144a7977f14fbf1ccb294c8f2567d1669bf36d2a66887746b5"
+          },
+          ".vswebassemblybridge/Microsoft.NET.WebAssembly.Webcil.dll": {
+            "bytes": 41272,
+            "sha256": "8023a5e871d4f8094c9ecde3b52538be8d57efdc1cf9775dc6f9842b0bb50b74"
+          },
+          ".vswebassemblybridge/Microsoft.SymbolStore.dll": {
+            "bytes": 70968,
+            "sha256": "f23fefc9249021ac2a96756771d5ce2d11e997dfdbc9594c24ed175ca9f9652a"
+          },
+          ".vswebassemblybridge/Newtonsoft.Json.dll": {
+            "bytes": 705424,
+            "sha256": "0ab8749d2d98604fc0fbab2fd08a7839f8d67005d323e9936d15aec082ea0c63"
+          },
+          ".vswebassemblybridge/System.Collections.Immutable.dll": {
+            "bytes": 251664,
+            "sha256": "3f5c371654eb19ced7a4a7329163b7dbda35bb49e29ab20588a528aac2a363ce"
+          },
+          ".vswebassemblybridge/System.Reflection.Metadata.dll": {
+            "bytes": 504080,
+            "sha256": "ea85da8898cdb8dc32ed996edaffca63c30c38de9515f0a4d29bd7585bb9d38c"
+          },
+          ".vswebassemblybridge/install.Lock": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        }
+      },
+      "dependency": {
+        "packagedFiles": 26,
+        "observedFiles": 26,
+        "installerMetadata": {
+          "id": "1aab81a1-b3d9-4aef-976b-577d5d90fe3f",
+          "publisherDisplayName": "Microsoft",
+          "publisherId": "d05e23de-3974-4ff0-8d47-23ee77830092",
+          "isPreReleaseVersion": false,
+          "installedTimestamp": 1794215387498,
+          "targetPlatform": "undefined",
+          "size": 5838069
+        },
+        "additionalFiles": {}
+      }
+    },
+    "phases": [
+      {
+        "label": "verify installed local candidate",
+        "startedAtMilliseconds": 2.3993,
+        "outcome": "passed",
+        "elapsedMilliseconds": 14125.4722
+      },
+      {
+        "label": "native F5 setup-only keybinding logging",
+        "startedAtMilliseconds": 14128.9116,
+        "outcome": "passed",
+        "elapsedMilliseconds": 88.7117
+      },
+      {
+        "label": "native F5 input 1 breakpoint and HTTP revision",
+        "startedAtMilliseconds": 14220.6225,
+        "outcome": "failed",
+        "error": "Error: Safety timeout: native F5 input 1 breakpoint and HTTP revision\n\tat Timeout.<anonymous> (d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\driver\\extension-test.cjs:42:45)\n\tat listOnTimeout (node:internal/timers:685:17)\n\tat process.processTimers (node:internal/timers:618:7)",
+        "elapsedMilliseconds": 90005.29
+      }
+    ],
+    "firstFailure": {
+      "atMilliseconds": 104226.3781,
+      "error": "Error: Safety timeout: native F5 input 1 breakpoint and HTTP revision\n\tat Timeout.<anonymous> (d:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\driver\\extension-test.cjs:42:45)\n\tat listOnTimeout (node:internal/timers:685:17)\n\tat process.processTimers (node:internal/timers:618:7)"
+    },
+    "elapsedMilliseconds": 104242.4784,
+    "readinessRequests": 1,
+    "nativeKeyInputs": 0,
+    "nativeReceipts": 0,
+    "targetCommandRoutes": 0,
+    "targetBuilds": 0,
+    "ownedSessions": 0,
+    "DAPBreakpointOrEvaluation": false,
+    "HTTPResponse": false,
+    "successfulResourceCleanup": false,
+    "cleanupAsRecorded": [
+      {
+        "label": "F5-1"
+      }
+    ],
+    "fixtureShutdownAsRecorded": [],
+    "operatorReport": {
+      "schema": 1,
+      "recordedUtc": "2026-11-09T09:11:25.723Z",
+      "profile": "r01",
+      "sequence": 1,
+      "stage": "pre-key screenshot observation",
+      "requestedWindowTitle": "FBA native F5 c8dc553d-ed9f-4dad-bbd7-b5e955297f49",
+      "windowLastSelected": {
+        "app": "process:C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\VSCodium.exe",
+        "id": 5510634,
+        "title": "[Extension Development Host] FBA native F5 c8dc553d-ed9f-4dad-bbd7-b5e955297f49"
+      },
+      "error": "IGraphicsCaptureItemInterop.CreateForMonitor failed: Could not capture the given monitor. (0x80070057)",
+      "captureAttempts": 2,
+      "recovery": "Cleared stale state, refreshed sky.list_windows, selected exactly one returned test window and retried get_window_state once",
+      "nativeKeyCalls": 0,
+      "targetCommandApiFallback": false,
+      "uiInputStopped": true,
+      "actor": "root operator report; not an independent screenshot",
+      "imagePayloadRetained": false
+    },
+    "inputClosed": {
+      "schema": 1,
+      "nonce": "c8dc553d-ed9f-4dad-bbd7-b5e955297f49",
+      "reason": "first failure; do not inject another key",
+      "closedAtUtc": "2026-11-09T09:11:38.491Z"
+    },
+    "seriesStop": {
+      "schema": 1,
+      "profile": "r01",
+      "stoppedUtc": "2026-11-09T09:11:41.607327+00:00",
+      "reason": "first native profile failed; no replacement profile or second run permitted",
+      "detail": {
+        "exitCode": 1,
+        "consistencyErrors": [],
+        "error": null
+      }
+    },
+    "secondProfilePrepared": false,
+    "languageService": {
+      "NU1100Lines": 9,
+      "projectLoadErrorToastRetained": true,
+      "qualified": false
+    }
+  },
+  "source": {
+    "commit": "1709198d4262dd3b7f58a59d9d01d36e11f5d76f",
+    "archivedVariantSources": 53,
+    "changedFiles": {
+      "scripts/variant/lifecycle/extension-test.cjs": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\worktree\\scripts\\variant\\lifecycle\\extension-test.cjs",
+        "bytes": 193051,
+        "sha256": "6162443673dd90f635b9db4ea983f5fb0d905662a4df0176d957702959d52e87"
+      },
+      "scripts/variant/lifecycle/prepare.py": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\worktree\\scripts\\variant\\lifecycle\\prepare.py",
+        "bytes": 17722,
+        "sha256": "bb0aa9385229c7518303f33c33bcd9b76c652bd9ea542302bcd1a263e3d545b4"
+      },
+      "scripts/variant/lifecycle/run.ps1": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\worktree\\scripts\\variant\\lifecycle\\run.ps1",
+        "bytes": 11221,
+        "sha256": "2f405271340e38121fbc2dfc76343dd1e17b7a9b5c74570c8a32bac3396ab5b3"
+      },
+      "scripts/variant/test_lifecycle_preparation.py": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\worktree\\scripts\\variant\\test_lifecycle_preparation.py",
+        "bytes": 7370,
+        "sha256": "5efda3f9ee7b2a5906a0a812ce4583a6cc9ff50447d4416acdbf11e202af6e46"
+      }
+    },
+    "unchangedProductModules": {
+      "classify.cjs": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\worktree\\scripts\\variant\\file-based-apps\\classify.cjs",
+        "bytes": 11396,
+        "sha256": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e"
+      },
+      "entry.cjs": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\worktree\\scripts\\variant\\file-based-apps\\entry.cjs",
+        "bytes": 2759,
+        "sha256": "8cb28056b4f634d1897302f2b97303e140e9c11c233b2f771c32f7845aab44e3"
+      },
+      "recovery.cjs": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\worktree\\scripts\\variant\\file-based-apps\\recovery.cjs",
+        "bytes": 16057,
+        "sha256": "099f74d6d25c0fad95b0f56e3adaebe43a3f211991b6ef436f92ceed6be199d4"
+      },
+      "runtime.cjs": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\worktree\\scripts\\variant\\file-based-apps\\runtime.cjs",
+        "bytes": 51204,
+        "sha256": "d7f0dd838bd83b416e0d0336fa03e417be4aa8ac4bc7e26ea587a9948fdb0a24"
+      },
+      "web.cjs": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\worktree\\scripts\\variant\\file-based-apps\\web.cjs",
+        "bytes": 18850,
+        "sha256": "8a9447b2dbb5c0b50e45daf80aec377cae3bcfebeb697dcd109fbca911b58442"
+      }
+    }
+  },
+  "checks": {
+    "runs": [
+      {
+        "name": "javascript-syntax",
+        "exitCode": 0,
+        "log": {
+          "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\checks\\javascript-syntax.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "argv": [
+          "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+          "--check",
+          "scripts/variant/lifecycle/extension-test.cjs"
+        ]
+      },
+      {
+        "name": "python",
+        "exitCode": 0,
+        "log": {
+          "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\checks\\python.log",
+          "bytes": 6096,
+          "sha256": "9eeab46a4865aa2232c0fb875ebd0ad254a007e7cd425b2ad226796e7a717738"
+        },
+        "argv": [
+          "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+          "-B",
+          "-m",
+          "unittest",
+          "discover",
+          "-s",
+          "scripts/variant",
+          "-p",
+          "test_*.py",
+          "-v"
+        ]
+      },
+      {
+        "name": "powershell-parse",
+        "exitCode": 0,
+        "log": {
+          "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\checks\\powershell-parse.log",
+          "bytes": 25,
+          "sha256": "a739b5b3fd1b173063e7944b495e7d397c6b2f10c0579fff46f2c9873e235a48"
+        },
+        "argv": [
+          "C:\\Program Files\\PowerShell\\7\\pwsh.EXE",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$tokens = $null; $parseErrors = $null; $null = [System.Management.Automation.Language.Parser]::ParseFile((Join-Path $PWD 'scripts/variant/lifecycle/run.ps1'), [ref]$tokens, [ref]$parseErrors); if ($parseErrors.Count) { $parseErrors | Out-String | Write-Output; exit 1 }; Write-Output 'PowerShell parser: PASS'"
+        ]
+      },
+      {
+        "name": "powershell-parameter-binding",
+        "exitCode": 0,
+        "log": {
+          "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\checks\\powershell-parameter-binding.log",
+          "bytes": 103,
+          "sha256": "2e3b73f12dc7c57fbe9aba048d288a0d75489b179d538e9a9a6c36878946c9a5"
+        },
+        "argv": [
+          "C:\\Program Files\\PowerShell\\7\\pwsh.EXE",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$probe = Join-Path $PWD '__native_f5_binding_probe_missing__'; if (Test-Path -LiteralPath $probe) { throw 'Expected missing probe directory' }; try { & './scripts/variant/lifecycle/run.ps1' -WorkDir $probe -DeadlineSeconds 2400 -ShowWindow; throw 'Unexpected runner completion' } catch { if ($_.FullyQualifiedErrorId -notlike 'PathNotFound,*ResolvePathCommand') { throw }; Write-Output 'PowerShell 2400-second parameter binding: PASS; stopped at missing WorkDir before installation or GUI' }"
+        ]
+      }
+    ],
+    "pythonCases": 41,
+    "productFileAppSuiteRerun": false
+  },
+  "successorCandidate": {
+    "baseVsixSha256": "0d239dff83d3120786ff3596a046fd0866b045f1d883c86fb83c64a7d808d0c5",
+    "sourceCommit": "1709198d4262dd3b7f58a59d9d01d36e11f5d76f",
+    "target": "win32-arm64",
+    "ownedModules": {
+      "entry.cjs": "8cb28056b4f634d1897302f2b97303e140e9c11c233b2f771c32f7845aab44e3",
+      "runtime.cjs": "d7f0dd838bd83b416e0d0336fa03e417be4aa8ac4bc7e26ea587a9948fdb0a24",
+      "classify.cjs": "e14fe6da86914c518b78cfe9f35f91467d80cc20109d33207517b1d582be9e8e",
+      "web.cjs": "8a9447b2dbb5c0b50e45daf80aec377cae3bcfebeb697dcd109fbca911b58442",
+      "recovery.cjs": "099f74d6d25c0fad95b0f56e3adaebe43a3f211991b6ef436f92ceed6be199d4"
+    },
+    "buildId": "2cb6b527ce49c7d2dfe2353a1f75e250a262f0daebd60757642a352f769df2e9",
+    "sha256": "01814ff59101ded61c093ba6f9b3783f98ff12bdb411d878327d9f093072f92e",
+    "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\local-lifecycle.vsix",
+    "version": "11.7.18004",
+    "localOnly": true,
+    "published": false,
+    "unchangedEntries": 736,
+    "unchangedPayloadDigest": "5b655a847a8d304972570006e1ecd7f4ac1cc01f855055bf3c35640237e2cdf1"
+  },
+  "preflightEditor": {
+    "executable": "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\VSCodium.exe",
+    "cli": "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\bin\\codium.cmd",
+    "version": "1.143.17232",
+    "commit": "c072cf642cbbadabefa22f39c58cc902a8b7427f",
+    "sha256": "61b273b2c0196d7cee4ba84f7412ccc74975f0fcefd3579e69a7b373f79027cd",
+    "machine": "arm64"
+  },
+  "preflightSDK": {
+    "executable": "C:\\Program Files\\dotnet\\dotnet.exe",
+    "root": "C:\\Program Files\\dotnet",
+    "version": "10.0.403",
+    "sha256": "8f9714d921c3fa1425611e3f79940715b74a18e2b21a5171bbd58e3775ff8315"
+  },
+  "successorInputs": {
+    "manifest": {
+      "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\verifier-inputs\\manifest.json",
+      "bytes": 3298,
+      "sha256": "774344fbf6680bb7c85b9dc9e137263190b354a0542e33258c99a58acc61b49f"
+    },
+    "originalExecutionIdentities": {
+      "node": {
+        "path": "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "bytes": 81949488,
+        "sha256": "8e55f00a0aca4c8d71ff6f68aa6285118fad18c29c0482973cc03ee5f0c2a98b"
+      },
+      "python": {
+        "path": "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+        "bytes": 107312,
+        "sha256": "8fc34e1314ae172c7841832ae7c63ce3d59eb7394b3ca317d69c803f93ea5660"
+      },
+      "powershell": {
+        "path": "C:\\Program Files\\PowerShell\\7\\pwsh.EXE",
+        "bytes": 278824,
+        "sha256": "abb215e4d87889c85a18333a310b1dbdae33e78a25e13dc7cf129fbdaea848e0"
+      }
+    },
+    "retainedReadPaths": {
+      "node": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\verifier-inputs\\node-8e55f00a0aca4c8d71ff6f68aa6285118fad18c29c0482973cc03ee5f0c2a98b.exe",
+        "bytes": 81949488,
+        "sha256": "8e55f00a0aca4c8d71ff6f68aa6285118fad18c29c0482973cc03ee5f0c2a98b"
+      },
+      "python": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\verifier-inputs\\python-8fc34e1314ae172c7841832ae7c63ce3d59eb7394b3ca317d69c803f93ea5660.exe",
+        "bytes": 107312,
+        "sha256": "8fc34e1314ae172c7841832ae7c63ce3d59eb7394b3ca317d69c803f93ea5660"
+      },
+      "powershell": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\checks\\pwsh-abb215e4d87889c85a18333a310b1dbdae33e78a25e13dc7cf129fbdaea848e0.exe",
+        "bytes": 278824,
+        "sha256": "abb215e4d87889c85a18333a310b1dbdae33e78a25e13dc7cf129fbdaea848e0"
+      }
+    },
+    "captureTime": "2026-11-09T09:08:24.572300+00:00",
+    "limits": "EXE bytes only; no complete runnable runtime, standard library, OS or effective-token archive."
+  },
+  "priorMixedReference": {
+    "directory": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-2026-11-09",
+    "frozenReferences": {
+      "worktree/docs/research/native-f5-2026-11-09/README.md": {
+        "bytes": 12408,
+        "sha256": "827c4ef8c6c7493a966d602a4de0a04f0da10a424dc45a8bc85cb6424dc755d8"
+      },
+      "worktree/docs/research/native-f5-2026-11-09/verify.py": {
+        "bytes": 36986,
+        "sha256": "6bf8b847726e95164125cf29df586e735af651d6f042de31bfcb365140fa72e8"
+      },
+      "worktree/docs/research/native-f5-2026-11-09/evidence-summary.json": {
+        "bytes": 69648,
+        "sha256": "20dda91cce8a112467d46b7a827765d31a7d6053d066da63177c243a6a5dd705"
+      },
+      "native-run-result.json": {
+        "bytes": 37818,
+        "sha256": "009e16fe8d44ad99b353f3821e44147f7bca55a8bff26e55497354053363c973"
+      },
+      "native-run-n02-result.json": {
+        "bytes": 37915,
+        "sha256": "71479ba027e3c98886cebb408658e2f9edcbc73a6a5239ce94d6a68cc21430de"
+      },
+      "native-run-n03-result.json": {
+        "bytes": 37913,
+        "sha256": "3c7a57a7e0dfd217e9e56d32aa21ed5dc872a9ee63d638d684cb0fda2305adf2"
+      },
+      "n02/result.json": {
+        "bytes": 41365,
+        "sha256": "9b6edd09617236151138ca960cc21d18b83ae73776387d2f3c9402c2a6250d81"
+      },
+      "n03/result.json": {
+        "bytes": 96672,
+        "sha256": "02aac824766ac7c4686731226c74fcf5e0721bcabb87720446fa08f1b8f8bab6"
+      }
+    },
+    "n01": "startup FAIL retained",
+    "n02": "late-input harness FAIL retained",
+    "n03": "two-input scoped PASS retained",
+    "historicalCollectorExecuted": false,
+    "historicalAllInputsRevalidatedHere": false,
+    "notConsecutiveWithRepeatSeries": true
+  },
+  "architecture": {
+    "planProcessEnvironment": {
+      "platform": "Windows-11-10.0.26300-SP0",
+      "machine": "AMD64",
+      "version": "10.0.26300"
+    },
+    "beforeFirstSeriesReadback": {
+      "observedUtc": "2026-11-09T09:02:46.3414104Z",
+      "processArchitecture": "Arm64",
+      "osArchitecture": "Arm64",
+      "os": null,
+      "processors": [],
+      "scope": "Architecture readback before any check or editor attempt; Python platform.machine describes its process environment, not a native-OS assertion"
+    },
+    "afterSuccessorReadback": {
+      "observedUtc": "2026-11-09T09:13:16.4440637Z",
+      "processArchitecture": "Arm64",
+      "osArchitecture": "Arm64",
+      "osDescription": "Microsoft Windows 10.0.26300",
+      "parameterProbePath": "D:/Projects/vscode-csharp-autobuild/validation-artifacts/native-f5-repeat-2026-11-09-b/worktree/__native_f5_binding_probe_missing__",
+      "parameterProbeExistsAfterChecksAndAttempt": false,
+      "limits": "Readback after completed failed attempt; no CIM query, UI action, test or helper was rerun. Python platform.machine in the plan is a separate process-environment observation."
+    },
+    "nativeEditorPEMachine": "0xaa64"
+  },
+  "scope": {
+    "repeatedNativeF5Qualified": false,
+    "AC7Completed": false,
+    "policyAC146Approved": false,
+    "macOS": false,
+    "menu": false,
+    "LSPQualified": false,
+    "issue45Resolved": false,
+    "fullMatrix": false,
+    "published": false
+  },
+  "limits": "No F5 key was injected in either repeat series. The first failed before editor launch; the successor failed after readiness and two operator-reported capture errors. No product timeout, F5 defect, actual session cleanup or 2x10 success is inferred. Historical n01/n02 remain failures and n03 remains a separate two-input observation. Retained EXE bytes do not reconstruct the execution environment or effective security token.",
+  "verifiedInputCount": 1138,
+  "verifiedInputInventorySha256": "dbf04ed99d61209b64b83fcf1baaac349de3b8d8757ce78a9d510609deec222b",
+  "retainedRecordAndLogBindings": {
+    "C:\\Program Files\\dotnet\\dotnet.exe": {
+      "bytes": 145704,
+      "sha256": "8f9714d921c3fa1425611e3f79940715b74a18e2b21a5171bbd58e3775ff8315"
+    },
+    "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\VSCodium.exe": {
+      "bytes": 222487040,
+      "sha256": "61b273b2c0196d7cee4ba84f7412ccc74975f0fcefd3579e69a7b373f79027cd"
+    },
+    "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\bin\\codium.cmd": {
+      "bytes": 182,
+      "sha256": "4c3dfde28c15b699f720abaf0fac249ff3895e47c1396ced3b59c9997c71f604"
+    },
+    "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\resources\\app\\out\\mainImpl.js": {
+      "bytes": 1326190,
+      "sha256": "9ac99204945c5b3fff2baf2260230a66329c4c3faeb4634f3b1b23b639a476fa"
+    },
+    "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\resources\\app\\out\\vs\\workbench\\api\\node\\extensionHostProcess.js": {
+      "bytes": 2273372,
+      "sha256": "ad8fbac184bee8bf1e027c95f0b72130c1c6eaed9ff732d7097c1a4f4eb097c2"
+    },
+    "C:\\Users\\rkttu\\AppData\\Local\\Programs\\VSCodium\\resources\\app\\out\\vs\\workbench\\workbench.desktop.main.js": {
+      "bytes": 21102889,
+      "sha256": "8d84032a329de378286c48b1524a126eb080b96b45ef5cf300c62f85884a1fd5"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\fba-web-snippets-release-2026-11-03\\readback-11.7.18004\\csharp-with-netcoredbg-win32-arm64-11.7.18004.vsix": {
+      "bytes": 75326795,
+      "sha256": "0d239dff83d3120786ff3596a046fd0866b045f1d883c86fb83c64a7d808d0c5"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-2026-11-09\\n02\\result.json": {
+      "bytes": 41365,
+      "sha256": "9b6edd09617236151138ca960cc21d18b83ae73776387d2f3c9402c2a6250d81"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-2026-11-09\\n03\\result.json": {
+      "bytes": 96672,
+      "sha256": "02aac824766ac7c4686731226c74fcf5e0721bcabb87720446fa08f1b8f8bab6"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-2026-11-09\\native-run-n02-result.json": {
+      "bytes": 37915,
+      "sha256": "71479ba027e3c98886cebb408658e2f9edcbc73a6a5239ce94d6a68cc21430de"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-2026-11-09\\native-run-n03-result.json": {
+      "bytes": 37913,
+      "sha256": "3c7a57a7e0dfd217e9e56d32aa21ed5dc872a9ee63d638d684cb0fda2305adf2"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-2026-11-09\\native-run-result.json": {
+      "bytes": 37818,
+      "sha256": "009e16fe8d44ad99b353f3821e44147f7bca55a8bff26e55497354053363c973"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-2026-11-09\\worktree\\docs\\research\\native-f5-2026-11-09\\README.md": {
+      "bytes": 12408,
+      "sha256": "827c4ef8c6c7493a966d602a4de0a04f0da10a424dc45a8bc85cb6424dc755d8"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-2026-11-09\\worktree\\docs\\research\\native-f5-2026-11-09\\evidence-summary.json": {
+      "bytes": 69648,
+      "sha256": "20dda91cce8a112467d46b7a827765d31a7d6053d066da63177c243a6a5dd705"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-2026-11-09\\worktree\\docs\\research\\native-f5-2026-11-09\\verify.py": {
+      "bytes": 36986,
+      "sha256": "6bf8b847726e95164125cf29df586e735af651d6f042de31bfcb365140fa72e8"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\capture-verifier-inputs.py": {
+      "bytes": 1813,
+      "sha256": "99faf8eb8f1e017acd1e229cc995f26294ff6541771fd69b88cda889592736ed"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\checks\\before.json": {
+      "bytes": 20050,
+      "sha256": "a21aa3e47c959bb981668167cec8ab8fbdf8eb2f408b55bdcf4f5ea2826fda77"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\checks\\javascript-syntax-result.json": {
+      "bytes": 2474,
+      "sha256": "d75d0d1aad4cacb436a2def6473e3d4874c97014d2e056d9d74bff2e4f448c41"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\checks\\javascript-syntax.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\checks\\powershell-parameter-binding-result.json": {
+      "bytes": 2946,
+      "sha256": "e2e60a0c69a7d56578ca03219af28a4cba533074ddfd0ccc4d4c884a84689024"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\checks\\powershell-parameter-binding.log": {
+      "bytes": 103,
+      "sha256": "2e3b73f12dc7c57fbe9aba048d288a0d75489b179d538e9a9a6c36878946c9a5"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\checks\\powershell-parse-result.json": {
+      "bytes": 2739,
+      "sha256": "2c217e52b0729f5c05cb146377ede828ef707093b1b74760757159bd5c3fe095"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\checks\\powershell-parse.log": {
+      "bytes": 25,
+      "sha256": "a739b5b3fd1b173063e7944b495e7d397c6b2f10c0579fff46f2c9873e235a48"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\checks\\pwsh-abb215e4d87889c85a18333a310b1dbdae33e78a25e13dc7cf129fbdaea848e0.exe": {
+      "bytes": 278824,
+      "sha256": "abb215e4d87889c85a18333a310b1dbdae33e78a25e13dc7cf129fbdaea848e0"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\checks\\python-result.json": {
+      "bytes": 2509,
+      "sha256": "17ca706c6668b5fc3e35efa3838bbc5d03fe4c9c2ea17c517806ce079ecb709f"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\checks\\python.log": {
+      "bytes": 6096,
+      "sha256": "9eeab46a4865aa2232c0fb875ebd0ad254a007e7cd425b2ad226796e7a717738"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\checks\\record.json": {
+      "bytes": 51119,
+      "sha256": "4865041015fbd47d8f945427e3d7647e50b98feb0b21019da2ae4895083d2d42"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\checks\\run-harness-checks.py": {
+      "bytes": 4820,
+      "sha256": "718cd736c7d13904e5eeac5e03d73d1c8c0437b4875711a65a89d1e859916182"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\environment-and-probe-readback.json": {
+      "bytes": 578,
+      "sha256": "6998d2c2186756099a2e3826f71a1ba718456c23625a1d33280f119e309cdc08"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\native-key-producer-source.js": {
+      "bytes": 3121,
+      "sha256": "d150eaa4499fdda39f6ae6f3c9e8aa8dd656c7e088a09411a66ee869f2429d33"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\native-request-observer-source.js": {
+      "bytes": 1685,
+      "sha256": "f91cddebdb46c3e30756ae1b28a96aeb8f247330a214845940fc6b9c856a805d"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\native-run-r01-before.json": {
+      "bytes": 21542,
+      "sha256": "eb709d846303411b9907bf33cf9ca1e5438669e4695a3859eba154179cd7679b"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\native-run-r01-result.json": {
+      "bytes": 43091,
+      "sha256": "bdd055a2c3fe7490c1157461d84c9c107643df4a50143898466e69e8475cb086"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\native-run-r01.log": {
+      "bytes": 403,
+      "sha256": "e6b8078723b5378bc5d85138e3faf973172760a43d7bd0d415d20026837b4886"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\observation-recorder-source.js": {
+      "bytes": 546,
+      "sha256": "2d8707e414584e7f2f63617189269955d3b11a35bf415c268455019af523c595"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\operator-observation-failure.json": {
+      "bytes": 927,
+      "sha256": "91514e7c367f4c5299edade407ad15f1db379a2a972612946726481384cdec1c"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\preparation-r01-before.json": {
+      "bytes": 23741,
+      "sha256": "929cc9d09ee6a47f951d835cdc5356b3d60da03a8eb9be33383a702921736361"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\preparation-r01.json": {
+      "bytes": 47440,
+      "sha256": "115d0aa410ce1141a367ba9bfe6af2342cf996e4a156a572d769d97fc5da7889"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\preparation-r01.log": {
+      "bytes": 278,
+      "sha256": "90df2c6c22208e9ee3a692fdb300a784eeed55d9b6bef7c97ba3e3126791ef56"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\prepare-repeat.py": {
+      "bytes": 9683,
+      "sha256": "8f69330c323c49539cfe9c90eea04b3e997adef6cb8eca72521cff5d2754f78c"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\producer-prepared-before-launch.json": {
+      "bytes": 316,
+      "sha256": "04377a4b964f43d7bb0e074cf3abaed6d53da04dcb78515c3278687be042ed26"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\appdata\\NuGet\\NuGet.Config": {
+      "bytes": 75,
+      "sha256": "d240b9affa63e3d05d49f0463bc05947ed2ff1d6c97159e1a4ce73fec946d5ef"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\attempt.json": {
+      "bytes": 29,
+      "sha256": "f384bfa6e84ea2528a693fb0d2bd876f5c5699f996ceacd61f5443fbafcf49c8"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\driver\\driver.cjs": {
+      "bytes": 189,
+      "sha256": "8c76ce1ed4411968b253dd7f8a5cd27950a5e8d03dc29c1e79c805283e9d1703"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\driver\\extension-test.cjs": {
+      "bytes": 193051,
+      "sha256": "6162443673dd90f635b9db4ea983f5fb0d905662a4df0176d957702959d52e87"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\expected.json": {
+      "bytes": 6583,
+      "sha256": "1653346ed0d245e8db635f30411c07d1c25b7466540ed1d04b8c5ac946b2911a"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\f5-input-closed.json": {
+      "bytes": 170,
+      "sha256": "a3299a4d49e0d470b0576fe4c9c198d4c6c49613369d8b847b659f13aff5a774"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\launch.json": {
+      "bytes": 1149,
+      "sha256": "d369820c1b388db63121ce147e382cf8eeff2fbcf3db36fc524882be59b71490"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\launcher-result.json": {
+      "bytes": 583,
+      "sha256": "89c813b15efaa2226b7857a432aebbc0c37ee5baef81a3730f8aa4979f37afea"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\local-lifecycle.vsix": {
+      "bytes": 73342222,
+      "sha256": "01814ff59101ded61c093ba6f9b3783f98ff12bdb411d878327d9f093072f92e"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\logs\\candidate-install.txt": {
+      "bytes": 396,
+      "sha256": "50a12a09771a6549ab0152001cd1ed1f80c0ff54f7bc5617c492ff4b041a5f8a"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\logs\\editor-version.txt": {
+      "bytes": 62,
+      "sha256": "aff6841c98558e85f0dde480073005e9e8267d1e06817b8165756bbc14ab2ca2"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\logs\\runtime-install.txt": {
+      "bytes": 422,
+      "sha256": "825ad27349b2fb064f205bac01c4242762837a919489151d66597cabcf04dfed"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\logs\\sdk-version.txt": {
+      "bytes": 10,
+      "sha256": "e4e6a678725873a4192c048849cd64d852983991bfcb210a40c3b80cc8fcf2eb"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\logs\\stderr.txt": {
+      "bytes": 1070,
+      "sha256": "04131d11b4c9b8ea70347a084d715b92aeadbd46686af99cc42768575fedbd63"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\logs\\stdout.txt": {
+      "bytes": 141427,
+      "sha256": "f9134663c439610c768e73a21eab16e47389950b31503988a17c099c41f60c11"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\needs-f5-input-01.json": {
+      "bytes": 2974,
+      "sha256": "bf2096e24a675091a3ca5e2d2454ec89a3505751680614dcc0e78f6c0e6e11f7"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\User\\settings.json": {
+      "bytes": 486,
+      "sha256": "07bcc77cc5ef566f95394728cdab4ed71dc4ec25575ef5d4e6176dbb84b0db24"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180947\\cli.log": {
+      "bytes": 7528,
+      "sha256": "f38313849bf31a0cb420d7eec2cddad7c5270e262156306364b868cb2664bb33"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\editSessions.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\main.log": {
+      "bytes": 34905,
+      "sha256": "c7738e47e9355f02484d57964168f3c27f73f159e462a2f2aff8e92632109aba"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\mcpGateway.log": {
+      "bytes": 64,
+      "sha256": "d2ad3385fb569e50b17b15cad814e910538c054adf633b71635a663cf0c7e7d4"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\network-shared.log": {
+      "bytes": 1389,
+      "sha256": "6f67367b8c8b751e2ad3211a49626f47e68e2b1b7d43db2de2bdfb120e576cb0"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\remoteTunnelService.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\sharedprocess.log": {
+      "bytes": 22414,
+      "sha256": "49fe806dc4b7b824924afc9b3f56f897bbd0558320251ff081363c52a961cafe"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\terminal.log": {
+      "bytes": 138,
+      "sha256": "7e0fdd25334d2421a5517424094f7f37ef953c873d0973fc8f3783164b974677"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\userDataSync.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\exthost\\dotnetdev-kr-custom.csharp-with-netcoredbg\\C# LSP Trace Logs.log": {
+      "bytes": 220803,
+      "sha256": "1744fd1fbf1c349fe5a495eab80b896c9b7639718b5d8e73725f191748439be7"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\exthost\\dotnetdev-kr-custom.csharp-with-netcoredbg\\C#.log": {
+      "bytes": 113580,
+      "sha256": "140c1f30c0d4860c5a112c78fc63b4902d9bc3994ecdcf555a77508381375131"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\exthost\\extHostTelemetry.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\exthost\\exthost.log": {
+      "bytes": 1582993,
+      "sha256": "6de5b805c3614251ec9935de55bffa3dec34a1c4d82ef267f2c341733b8fe362"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\exthost\\ms-dotnettools.vscode-dotnet-runtime\\DotNetAcquisition-ms-dotnettools.vscode-dotnet-runtime-1794215392461.txt": {
+      "bytes": 32970,
+      "sha256": "92d9db30d2fc29f103b9d6763cc9c1ce7c908b09633e2f0b7e37e7127c0be976"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\exthost\\output_logging_20261109T180952\\1-.NET Install Tool.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\exthost\\output_logging_20261109T180952\\2-VsWebAssemblyBridge.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\exthost\\output_logging_20261109T180952\\3-C# File Debugging.log": {
+      "bytes": 60,
+      "sha256": "2c243cf08ad6fc1d7c8eeee7d8c8304452bce39327882883f1ebbe7aff992278"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\exthost\\output_logging_20261109T180952\\4-.NET Test Log.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\exthost\\vscode.git\\Git.log": {
+      "bytes": 146713,
+      "sha256": "16512aa122f0b93a390bd88988d7297a33727b0c760b8b0afe89be1f823a4993"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\exthost\\vscode.github-authentication\\GitHub Authentication.log": {
+      "bytes": 1302,
+      "sha256": "90b815c358a07a51f09e2bf6fe527638736bc3b4f03cc8e7a5bdb79de837763a"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\exthost\\vscode.github\\GitHub.log": {
+      "bytes": 407,
+      "sha256": "84107f37a3b0f61508d6fe253ed53b08cd053d7764e987d6c7bf2c69c9e84066"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\exthost\\vscode.json-language-features\\JSON Language Server.log": {
+      "bytes": 1621,
+      "sha256": "886bc62198f42865756535711064535a3d1d556d4b3f5b04fb6e2abecbc7a7ee"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\fileWatcher.log": {
+      "bytes": 204825,
+      "sha256": "71fb788f55c9b58470bb5cc9753a6b482de99d44a90958c480c637b322eec2e9"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\mcpServer.copilot.null.microsoft_learn.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\network.log": {
+      "bytes": 552,
+      "sha256": "ed7f0b1ff8fbcd903cc56e04da25f4942beb16d14716f0b86a1a9a6285b3b48d"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\notebook.rendering.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\output_20261109T180951\\tasks.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\renderer.log": {
+      "bytes": 198053,
+      "sha256": "912173b571d0d356e925cef4172e4c8519a1c962918ead8fe88cb458d84c8e39"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\textModelChanges.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\profile\\logs\\20261109T180950\\window1\\views.log": {
+      "bytes": 1703,
+      "sha256": "da1217708972e069cd5cc16c9bea0435c98a711f8d7198f67eb88c82467bfb81"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\result.json": {
+      "bytes": 22403,
+      "sha256": "a3c52289af6b489787de2688a528bca36ad5f9c943a5ada36f7973e1feafbd67"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\trace.jsonl": {
+      "bytes": 5044,
+      "sha256": "784dd8e40d629601173e7914c7c0b940348c5683570d2fe8faaa3da482738c0c"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\ui\\observation-recorder-source.js": {
+      "bytes": 546,
+      "sha256": "2d8707e414584e7f2f63617189269955d3b11a35bf415c268455019af523c595"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\workspace\\NuGet.Config": {
+      "bytes": 75,
+      "sha256": "d240b9affa63e3d05d49f0463bc05947ed2ff1d6c97159e1a4ce73fec946d5ef"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\workspace\\a.cs": {
+      "bytes": 969,
+      "sha256": "4d865a4bfb51e53379d0c73b306ad27ef7c925e192d2de3e9201f7acc4fd2cb6"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\r01\\workspace\\a.run.json": {
+      "bytes": 320,
+      "sha256": "663e68bf28e416881e04c096f3fb9f27e96491a34588b7c5c0930dd44cb00fcd"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\repeat_common.py": {
+      "bytes": 5918,
+      "sha256": "7789952a8b09e5ddab241f1453069dd3a6d29af3ec50cd4d13ce1c0c24a6b75c"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\run-harness-checks.py": {
+      "bytes": 4820,
+      "sha256": "718cd736c7d13904e5eeac5e03d73d1c8c0437b4875711a65a89d1e859916182"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\run-repeat.py": {
+      "bytes": 4606,
+      "sha256": "5bcded05bee50880efb1e4fc78fdb847f7cdb6a73003f1a199225a6db5782dc0"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\series-plan.json": {
+      "bytes": 5127,
+      "sha256": "e7a94973ca02438c9b9e0cac914b6539b45698ae562ff4ab52f3f9bb3b93520f"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\series-stop.json": {
+      "bytes": 266,
+      "sha256": "ba9c0ec2648e7b4c1ef6d0ea6706982a8dd22931ee0ab1bed5b8b03784e3b5f5"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\verifier-inputs\\manifest.json": {
+      "bytes": 3298,
+      "sha256": "774344fbf6680bb7c85b9dc9e137263190b354a0542e33258c99a58acc61b49f"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\verifier-inputs\\node-8e55f00a0aca4c8d71ff6f68aa6285118fad18c29c0482973cc03ee5f0c2a98b.exe": {
+      "bytes": 81949488,
+      "sha256": "8e55f00a0aca4c8d71ff6f68aa6285118fad18c29c0482973cc03ee5f0c2a98b"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\verifier-inputs\\python-8fc34e1314ae172c7841832ae7c63ce3d59eb7394b3ca317d69c803f93ea5660.exe": {
+      "bytes": 107312,
+      "sha256": "8fc34e1314ae172c7841832ae7c63ce3d59eb7394b3ca317d69c803f93ea5660"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09-b\\write-series-plan.py": {
+      "bytes": 4279,
+      "sha256": "38d28d95d1c242a9632353c4bbd804fa9d6f377c9bc6e903bed8ef118c04ad05"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\capture-verifier-inputs.py": {
+      "bytes": 1813,
+      "sha256": "99faf8eb8f1e017acd1e229cc995f26294ff6541771fd69b88cda889592736ed"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\checks\\before.json": {
+      "bytes": 19932,
+      "sha256": "da364175369e495835c36afba23d7c40cd9f781e057fd441d2f0b2cea2cedc5a"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\checks\\javascript-syntax-result.json": {
+      "bytes": 2466,
+      "sha256": "e11787c6e11ff78782d03303ff2c8c3d5e3348239375b747e55da3ba06c7592a"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\checks\\javascript-syntax.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\checks\\powershell-parse-result.json": {
+      "bytes": 2731,
+      "sha256": "355d553a4373b006a7e88e2f0c66b399e92a4bf47277ba315884f65c0e308537"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\checks\\powershell-parse.log": {
+      "bytes": 25,
+      "sha256": "a739b5b3fd1b173063e7944b495e7d397c6b2f10c0579fff46f2c9873e235a48"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\checks\\pwsh-abb215e4d87889c85a18333a310b1dbdae33e78a25e13dc7cf129fbdaea848e0.exe": {
+      "bytes": 278824,
+      "sha256": "abb215e4d87889c85a18333a310b1dbdae33e78a25e13dc7cf129fbdaea848e0"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\checks\\python-result.json": {
+      "bytes": 2501,
+      "sha256": "d0a303dea118e4c935c59b81e81a3dafaaf254b4e44adfb791940475dd6bbdf5"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\checks\\python.log": {
+      "bytes": 6096,
+      "sha256": "a60cb52ceca043a0b1ebeebef1e01a09c0bab8d99f1b86b96875abe31c800ee1"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\checks\\record.json": {
+      "bytes": 47676,
+      "sha256": "d27a4ffb42877b4c05762cbda212f29ece25b43c40e94b9bcabf7daf839de66d"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\checks\\run-harness-checks.py": {
+      "bytes": 4217,
+      "sha256": "3f50f45dd8bc1449c30ac793c8bebf748863528d7850ded37066d9d2c05281af"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\native-key-producer-source.js": {
+      "bytes": 3121,
+      "sha256": "d150eaa4499fdda39f6ae6f3c9e8aa8dd656c7e088a09411a66ee869f2429d33"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\native-request-observer-source.js": {
+      "bytes": 1685,
+      "sha256": "f91cddebdb46c3e30756ae1b28a96aeb8f247330a214845940fc6b9c856a805d"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\native-run-r01-before.json": {
+      "bytes": 21416,
+      "sha256": "e0c3f7ad6f2ece26d332b378b8c4c0f4f28ef1d0cf72e81ee5150ef0afaae15d"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\native-run-r01-result.json": {
+      "bytes": 41835,
+      "sha256": "013176833a3b0e74b1e578287faad9bffcf4d6d07310326e896910fd36983ef3"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\native-run-r01.log": {
+      "bytes": 257,
+      "sha256": "a8a1f27f07e7cbf80d70ac710e988009d291ac9c1b28a0b9b5d98209308962f3"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\observation-recorder-source.js": {
+      "bytes": 546,
+      "sha256": "2d8707e414584e7f2f63617189269955d3b11a35bf415c268455019af523c595"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\preparation-r01-before.json": {
+      "bytes": 23617,
+      "sha256": "973d6198427a25cc8036a032788f234b72268b42d776fb898451ea01b9cb92f5"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\preparation-r01.json": {
+      "bytes": 47194,
+      "sha256": "c6c644e5c9fd5b6043c2f54f7e799517ff23d69d5e2628557e63ef0fbb124a8d"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\preparation-r01.log": {
+      "bytes": 276,
+      "sha256": "32103200d206859b82ab699122d0327d2bd66fa843b7b83040433155184cd9bd"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\prepare-repeat.py": {
+      "bytes": 9683,
+      "sha256": "8f69330c323c49539cfe9c90eea04b3e997adef6cb8eca72521cff5d2754f78c"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\producer-prepared-before-launch.json": {
+      "bytes": 319,
+      "sha256": "802f757ba73ef0db3e0d290fc44793e3126be69b4d740f42a795234f3a7b3056"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\r01\\driver\\driver.cjs": {
+      "bytes": 189,
+      "sha256": "8c76ce1ed4411968b253dd7f8a5cd27950a5e8d03dc29c1e79c805283e9d1703"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\r01\\driver\\extension-test.cjs": {
+      "bytes": 193051,
+      "sha256": "6162443673dd90f635b9db4ea983f5fb0d905662a4df0176d957702959d52e87"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\r01\\expected.json": {
+      "bytes": 6539,
+      "sha256": "6674daddb1da1877bcccaab6c7109070ddb2bc878c62ae440d8ac4dbcf8c89ca"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\r01\\local-lifecycle.vsix": {
+      "bytes": 73342222,
+      "sha256": "d2efbbd83e29c67bbd5c1b30b628feec067d2930ac68f8006e80842fc6394363"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\repeat_common.py": {
+      "bytes": 5918,
+      "sha256": "7789952a8b09e5ddab241f1453069dd3a6d29af3ec50cd4d13ce1c0c24a6b75c"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\run-harness-checks.py": {
+      "bytes": 4217,
+      "sha256": "3f50f45dd8bc1449c30ac793c8bebf748863528d7850ded37066d9d2c05281af"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\run-repeat.py": {
+      "bytes": 4606,
+      "sha256": "5bcded05bee50880efb1e4fc78fdb847f7cdb6a73003f1a199225a6db5782dc0"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\series-plan.json": {
+      "bytes": 4070,
+      "sha256": "c5d09ead888212c928cd31625b5a03336c259c904fa0314d91eb2a094776e693"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\series-stop.json": {
+      "bytes": 266,
+      "sha256": "ff87876ae403d311504b27936176b31bbf4453578c1119db1571c1749a188dd9"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\system-architecture-readback.json": {
+      "bytes": 314,
+      "sha256": "da40bbd386180eaade1d00e6d1f9bebc9f7e6403f0e3b220a351398df84e1d44"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\verifier-inputs\\manifest.json": {
+      "bytes": 3290,
+      "sha256": "81a1e1311130e0bce9eb701f0f99cf1c507ec58395ee529410b5517b1e203ef5"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\verifier-inputs\\node-8e55f00a0aca4c8d71ff6f68aa6285118fad18c29c0482973cc03ee5f0c2a98b.exe": {
+      "bytes": 81949488,
+      "sha256": "8e55f00a0aca4c8d71ff6f68aa6285118fad18c29c0482973cc03ee5f0c2a98b"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\verifier-inputs\\python-8fc34e1314ae172c7841832ae7c63ce3d59eb7394b3ca317d69c803f93ea5660.exe": {
+      "bytes": 107312,
+      "sha256": "8fc34e1314ae172c7841832ae7c63ce3d59eb7394b3ca317d69c803f93ea5660"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\native-f5-repeat-2026-11-09\\write-series-plan.py": {
+      "bytes": 3642,
+      "sha256": "6630d158af2f0518487406075fd9feb68cea77a9b36d1e4df8ff2b72c75fcc34"
+    },
+    "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\web-lifecycle-2026-11-05\\resources\\ms-dotnettools.vscode-dotnet-runtime-3.2.0.vsix": {
+      "bytes": 1457925,
+      "sha256": "a4cff5409f66e3827ee2c6a727ae59382290a182a653ca0f9ac97c63536ee541"
+    }
+  }
+}

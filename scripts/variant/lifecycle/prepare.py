@@ -107,15 +107,15 @@ def pe_machine(executable):
 
 
 def native_f5_configuration(work, cycles):
-    """Two externally injected keys; never reuse another input's attestation."""
-    if cycles != 2:
-        raise ValueError("The native F5 control requires exactly two cycles, not full qualification")
+    """Bounded externally injected keys with a separate attestation per input."""
+    if type(cycles) is not int or not 2 <= cycles <= 10:
+        raise ValueError("The native F5 control requires 2..10 integer cycles")
     nonce = str(uuid.uuid4())
     return {"nonce": nonce, "windowTitle": "FBA native F5 " + nonce,
             "inputs": [{"sequence": sequence,
                         "request": str(work / f"needs-f5-input-{sequence:02}.json"),
                         "receipt": str(work / f"f5-input-action-{sequence:02}.json")}
-                       for sequence in (1, 2)],
+                       for sequence in range(1, cycles + 1)],
             "closed": str(work / "f5-input-closed.json")}
 
 
@@ -135,8 +135,6 @@ def main():
     args = parser.parse_args()
     if not 2 <= args.cycles <= 10:
         parser.error("Use 2..10 cycles to exercise bounded same-file retry")
-    if args.scenario == "native-f5" and args.cycles != 2:
-        parser.error("The native F5 control requires --cycles 2")
     editor = args.editor.resolve(strict=True)
     editor_cli = args.editor_cli.resolve(strict=True)
     dotnet = args.dotnet.resolve(strict=True)
