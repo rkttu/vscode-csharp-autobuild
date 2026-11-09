@@ -127,6 +127,8 @@ exports.run = async function run() {
     const cancelledHandoffAttempts = [];
     const cancelledBuildAttempts = [];
     const nativeF5 = scenario === 'native-f5' ? expected.nativeF5 : undefined;
+    const nativeF5Input = nativeF5 ? require('./native-f5-input.cjs') : undefined;
+    const nativeF5Policy = nativeF5 ? nativeF5Input.inputPolicy(Object.hasOwn(nativeF5, 'inputMode') ? nativeF5.inputMode : 'native-injected') : undefined;
     let nativeF5Closed = false;
     let nativeF5Operation;
     const nativeF5LateStops = [];
@@ -138,10 +140,13 @@ exports.run = async function run() {
         assert.equal(new Set(files).size, 2 * expected.cycles + 1);
         for (const file of files) assert(path.isAbsolute(file) && within(root, file) && !exists(file) && !exists(file + '.tmp'));
         delete result.scope.physicalF5;
-        Object.assign(result.scope, { invocation: 'native-injected-f5', nativeInjectedF5: true,
-            hardwareKeypress: false, noFolderWindow: true, trustUiExercised: false,
+        const manual = nativeF5Policy.mode === 'manual-native';
+        Object.assign(result.scope, { invocation: manual ? 'manual-native-f5' : 'native-injected-f5',
+            nativeInjectedF5: !manual, humanKeypressAttestationRequired: manual, hardwareInputIndependentlyVerified: false,
+            noFolderWindow: true, trustUiExercised: false,
             setupCommand: 'workbench.action.toggleKeybindingsLog', targetCommandApiLaunch: false });
-        result.nativeF5 = { inputs: [], inputReceiptsAreAttestations: true,
+        if (!manual) result.scope.hardwareKeypress = false;
+        result.nativeF5 = { inputMode: nativeF5Policy.mode, inputs: [], inputReceiptsAreAttestations: true,
             actualKeyEvidenceRequiredSeparately: true, setupCommands: [], postStartApiActions: [] };
     } else assert.notEqual(scenario, 'native-f5');
     const nativeCancellation = scenario === 'native-build-cancel' ? expected.nativeCancellation : undefined;
@@ -857,17 +862,19 @@ exports.run = async function run() {
             editorWindowFocused: vscode.window.state.focused, activeSource: vscode.window.activeTextEditor.document.uri.fsPath,
             noFolderWindow: true, workspaceFolders: [], activeDebugSessionId: null, isDirty: document.isDirty, diskBefore,
             bufferBefore: { bytes: buffer.length, sha256: bufferSha256 },
-            action: 'press-key', key: 'F5', mechanism: 'native-injected',
+            action: 'press-key', key: 'F5', inputMode: nativeF5Policy.mode, mechanism: nativeF5Policy.mechanism,
             requestedAtUtc: new Date().toISOString(),
             expiresAtUtc: new Date(Date.now() + SAFETY_TIMEOUT_MS).toISOString(),
             receipt: input.receipt, closed: nativeF5.closed,
-            instructions: 'Observe the exact visible window and C# editor focus; check closed/firstFailure before input. Send one native F5. Only then publish the matching receipt. Never use a command API launch fallback.' };
+            instructions: nativeF5Policy.mode === 'manual-native'
+                ? 'A human must observe the exact visible title and C# editor focus, check closed/firstFailure, then personally press exactly one F5. Only that human may record the matching attestation with the staged native-f5-input.cjs helper before expiry. The helper does not press keys. Never use automation or a command API launch fallback.'
+                : 'Observe the exact visible window and C# editor focus; check closed/firstFailure before input. Send one native F5. Only then publish the matching receipt. Never use a command API launch fallback.' };
         const detail = { sequence: input.sequence, label: launch.label, request,
             rendererBefore, outputBefore, profileSnapshot: launch.profileSnapshot };
         result.nativeF5.inputs.push(detail);
         state();
         // All exact-token session/DAP observers and the breakpoint are already
-        // armed. External root CUA supplies the key; this function never invokes
+        // armed. The frozen external input mechanism supplies the key; this function never invokes
         // COMMAND and cannot observe a command-return boolean from native input.
         assert(!exists(input.request), 'Never replace an earlier native input request');
         fs.writeFileSync(input.request + '.tmp', JSON.stringify(request, null, 2) + '\n', { flag: 'wx' });
@@ -877,23 +884,24 @@ exports.run = async function run() {
         await until(() => { requireNativeF5Open(); return exists(input.receipt); }, `${launch.label} native key action receipt`);
         requireNativeF5Open();
         const receipt = JSON.parse(fs.readFileSync(input.receipt, 'utf8').replace(/^\uFEFF/, ''));
-        assert.equal(receipt.schema, 1);
-        for (const key of ['nonce', 'sequence', 'launchToken', 'windowTitle', 'action', 'key', 'mechanism']) {
-            assert.equal(receipt[key], request[key], `Native F5 receipt ${key}`);
-        }
-        assert.equal(receipt.requestSha256, detail.requestSnapshot.sha256);
-        assert.equal(receipt.tool, 'sky.press_key');
-        assert.equal(receipt.editorFocusedBeforeInput, true, 'Native input needs separately observed editor focus');
-        assert.equal(typeof receipt.observedWindowTitle, 'string');
-        assert(receipt.observedWindowTitle.includes(nativeF5.windowTitle), 'Retain the actual OS title including the unique expected token');
-        assert(['string', 'number'].includes(typeof receipt.windowId) && String(receipt.windowId).length > 0);
-        assert(Number.isFinite(Date.parse(receipt.inputAtUtc)) && Date.parse(receipt.inputAtUtc) >= Date.parse(request.requestedAtUtc));
-        assert(Date.parse(receipt.inputAtUtc) <= Date.parse(request.expiresAtUtc), 'Native input must occur before its request expires');
-        assert(Date.parse(receipt.inputAtUtc) <= Date.now() + 1000);
+        nativeF5Input.validateReceipt({ mode: nativeF5Policy.mode, request, receipt,
+            requestSha256: detail.requestSnapshot.sha256, now: Date.now() });
         for (const key of ['observationPath', 'inputRecordPath']) {
             assert(path.isAbsolute(receipt[key]) && within(root, receipt[key]) && exists(receipt[key]), `Retain original native input evidence: ${key}`);
+            if (nativeF5Policy.mode === 'manual-native') {
+                const entry = fs.lstatSync(receipt[key]);
+                assert(entry.isFile() && !entry.isSymbolicLink() && within(fs.realpathSync(root), fs.realpathSync(receipt[key])),
+                    'Manual attestation evidence must be a regular file contained in the isolated profile');
+            }
+        }
+        if (nativeF5Policy.mode === 'manual-native') {
+            assert(!samePath(receipt.observationPath, receipt.inputRecordPath), 'Manual observation and action records must be distinct');
         }
         detail.receipt = receipt;
+        detail.inputEvidence = { inputMode: nativeF5Policy.mode,
+            actorType: nativeF5Policy.mode === 'manual-native' ? 'human-attestation' : 'automation-tool-attestation',
+            timestampKind: nativeF5Policy.mode === 'manual-native' ? 'helper-attestation-time-only' : 'producer-attested-key-time',
+            hardwareInputIndependentlyVerified: false };
         detail.receiptSnapshot = fileSnapshot(input.receipt);
         detail.observationSnapshot = fileSnapshot(receipt.observationPath);
         detail.inputRecordSnapshot = fileSnapshot(receipt.inputRecordPath);
@@ -2379,7 +2387,7 @@ exports.run = async function run() {
             assert.equal(new Set(launches.map(launch => launch.session.id)).size, expected.cycles, 'Every native input needs a distinct session');
             assert.equal(document.isDirty, false);
             closeNativeF5(`${expected.cycles}-cycle control completed`);
-            result.checks.push(`One no-folder profile: ${expected.cycles} external native injected F5 inputs, dirty save/revision repeats, exact per-session Stop and PID/port/output cleanup; not full qualification or hardware keyboard input`);
+            result.checks.push(`One no-folder profile: ${expected.cycles} ${nativeF5Policy.label} inputs, dirty save/revision repeats, exact per-session Stop and PID/port/output cleanup; not full qualification or independent hardware-input verification`);
             if (eventError) throw eventError;
             result.success = true;
             return;
