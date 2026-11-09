@@ -1,11 +1,14 @@
 """Check local lifecycle candidate isolation and payload preservation."""
 import hashlib
 import importlib.util
+import contextlib
+import io
 import json
 from pathlib import Path
 import tempfile
 import struct
 import unittest
+from unittest import mock
 import warnings
 import zipfile
 
@@ -97,6 +100,7 @@ class LifecyclePreparationTests(unittest.TestCase):
             with self.subTest(cycles=cycles):
                 work = self.root / f"profile-{cycles}"
                 control = preparation.native_f5_configuration(work, cycles)
+                self.assertEqual(control["inputMode"], "native-injected")
                 self.assertIn(control["nonce"], control["windowTitle"])
                 self.assertEqual([item["sequence"] for item in control["inputs"]], list(range(1, cycles + 1)))
                 paths = {Path(item[key]) for item in control["inputs"] for key in ("request", "receipt")}
@@ -113,6 +117,62 @@ class LifecyclePreparationTests(unittest.TestCase):
         for cycles in (0, 1, 11, -1, 2.5, True):
             with self.subTest(cycles=cycles), self.assertRaisesRegex(ValueError, r"2\.\.10"):
                 preparation.native_f5_configuration(self.root, cycles)
+
+    def test_native_f5_input_mode_is_frozen_with_the_staged_shared_validator(self):
+        editor = self.root / "editor/VSCodium.exe"
+        editor.parent.mkdir()
+        editor.write_bytes(b"MZ" + bytes(0x3C - 2) + struct.pack("<I", 0x40) + b"PE\0\0" + struct.pack("<H", 0xAA64))
+        app = editor.parent / "resources/app"
+        app.mkdir(parents=True)
+        (app / "product.json").write_text(json.dumps({"applicationName": "codium", "commit": "f" * 40}))
+        (app / "package.json").write_text(json.dumps({"version": "1.0.0"}))
+        cli, dotnet = self.root / "codium.cmd", self.root / "dotnet.exe"
+        cli.write_text("synthetic CLI; never executed")
+        dotnet.write_text("synthetic SDK; never executed")
+        runtime = self.root / "runtime.vsix"
+        with zipfile.ZipFile(runtime, "w") as archive:
+            archive.writestr("extension/package.json", json.dumps({"publisher": "ms-dotnettools", "name": "vscode-dotnet-runtime", "version": "3.2.0"}))
+        base = self.base()
+        for mode in ("native-injected", "manual-native"):
+            with self.subTest(mode=mode):
+                work = self.root / mode
+                argv = ["prepare.py", "--base-vsix", str(base), "--base-sha256", hashlib.sha256(base.read_bytes()).hexdigest(),
+                        "--runtime-vsix", str(runtime), "--runtime-sha256", hashlib.sha256(runtime.read_bytes()).hexdigest(),
+                        "--editor", str(editor), "--editor-cli", str(cli), "--dotnet", str(dotnet), "--sdk-version", "10.0.403",
+                        "--scenario", "native-f5", "--cycles", "2", "--work-dir", str(work)]
+                if mode == "manual-native":
+                    argv += ["--native-f5-input", mode]
+                with mock.patch("sys.argv", argv), mock.patch.object(preparation.subprocess, "check_output", return_value="f" * 40) as git, contextlib.redirect_stdout(io.StringIO()):
+                    preparation.main()
+                git.assert_called_once_with(["git", "rev-parse", "HEAD"], cwd=preparation.REPO, text=True)
+                expected = json.loads((work / "expected.json").read_text())
+                self.assertEqual(expected["nativeF5"]["inputMode"], mode)
+                staged = (work / "driver/native-f5-input.cjs").read_bytes()
+                self.assertEqual(staged, (Path(preparation.__file__).parent / "native-f5-input.cjs").read_bytes())
+                self.assertEqual(hashlib.sha256(staged).hexdigest(), expected["harness"]["native-f5-input.cjs"])
+                manual = mode == "manual-native"
+                self.assertEqual(expected["scope"]["humanKeypressAttestationRequired"], manual)
+                self.assertEqual(expected["scope"]["nativeInjectedF5"], not manual)
+                self.assertFalse(expected["scope"]["hardwareInputIndependentlyVerified"])
+                self.assertFalse(expected["scope"]["qualification"])
+                self.assertEqual("hardwareKeypress" in expected["scope"], not manual)
+                self.assertFalse((work / "attempt.json").exists())
+
+    def test_native_f5_rejects_unknown_input_mechanisms(self):
+        for mode in ("", "manual", "sky.press_key", None, True):
+            with self.subTest(mode=mode), self.assertRaisesRegex(ValueError, "input mode"):
+                preparation.native_f5_configuration(self.root, 2, mode)
+
+    def test_native_input_option_is_rejected_for_other_scenarios_before_files_are_read(self):
+        for mode in ("manual-native", "native-injected"):
+            argv = ["prepare.py", "--base-vsix", "missing", "--base-sha256", "0" * 64, "--runtime-vsix", "missing",
+                    "--runtime-sha256", "0" * 64, "--editor", "missing", "--editor-cli", "missing", "--dotnet", "missing",
+                    "--sdk-version", "10.0.403", "--work-dir", "missing", "--native-f5-input", mode]
+            error = io.StringIO()
+            with self.subTest(mode=mode), mock.patch("sys.argv", argv), contextlib.redirect_stderr(error), self.assertRaises(SystemExit) as caught:
+                preparation.main()
+            self.assertEqual(caught.exception.code, 2)
+            self.assertIn("only valid with --scenario native-f5", error.getvalue())
 
     def test_pe_machine_reports_truncated_headers_and_reads_native_target(self):
         executable = self.root / "editor.exe"

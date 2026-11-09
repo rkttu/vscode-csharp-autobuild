@@ -106,12 +106,14 @@ def pe_machine(executable):
         return struct.unpack("<H", read_exact(2))[0]
 
 
-def native_f5_configuration(work, cycles):
-    """Bounded externally injected keys with a separate attestation per input."""
+def native_f5_configuration(work, cycles, input_mode="native-injected"):
+    """Freeze one native input mechanism and separate attestations per input."""
     if type(cycles) is not int or not 2 <= cycles <= 10:
         raise ValueError("The native F5 control requires 2..10 integer cycles")
+    if input_mode not in ("native-injected", "manual-native"):
+        raise ValueError("Unknown native F5 input mode")
     nonce = str(uuid.uuid4())
-    return {"nonce": nonce, "windowTitle": "FBA native F5 " + nonce,
+    return {"nonce": nonce, "windowTitle": "FBA native F5 " + nonce, "inputMode": input_mode,
             "inputs": [{"sequence": sequence,
                         "request": str(work / f"needs-f5-input-{sequence:02}.json"),
                         "receipt": str(work / f"f5-input-action-{sequence:02}.json")}
@@ -131,10 +133,14 @@ def main():
     parser.add_argument("--sdk-version", required=True)
     parser.add_argument("--work-dir", type=Path, required=True)
     parser.add_argument("--cycles", type=int, default=3)
+    parser.add_argument("--native-f5-input", choices=("native-injected", "manual-native"),
+                        help="Freeze the input mechanism for a new native-f5 profile (default: native-injected)")
     parser.add_argument("--scenario", choices=("web-lifecycle", "build-failure-retry", "native-build-cancel", "web-profile-failure-retry", "sdk-selection-failure-retry", "debug-handoff-declined-retry", "native-host-failure-retry", "native-adapter-loss", "concurrent-files", "native-handoff-cancel", "native-f5"), default="web-lifecycle")
     args = parser.parse_args()
     if not 2 <= args.cycles <= 10:
         parser.error("Use 2..10 cycles to exercise bounded same-file retry")
+    if args.native_f5_input is not None and args.scenario != "native-f5":
+        parser.error("--native-f5-input is only valid with --scenario native-f5")
     editor = args.editor.resolve(strict=True)
     editor_cli = args.editor_cli.resolve(strict=True)
     dotnet = args.dotnet.resolve(strict=True)
@@ -162,6 +168,8 @@ def main():
         (work / directory).mkdir(parents=True, exist_ok=True)
     for name in ("driver.cjs", "extension-test.cjs"):
         (work / "driver" / name).write_bytes((Path(__file__).parent / name).read_bytes())
+    if args.scenario == "native-f5":
+        (work / "driver/native-f5-input.cjs").write_bytes((Path(__file__).parent / "native-f5-input.cjs").read_bytes())
     if args.scenario == "native-adapter-loss":
         (work / "driver/adapter-loss.ps1").write_bytes((Path(__file__).parent / "adapter-loss.ps1").read_bytes())
     (work / "driver/package.json").write_text(json.dumps({"publisher": "local-lifecycle-test", "name": "web-lifecycle-driver",
@@ -223,13 +231,15 @@ def main():
                                 "request": str(work / "needs-ui-cancel.json"),
                                 "receipt": str(work / "ui-cancel-action.json")}
         settings["window.title"] = handoff_cancellation["windowTitle"]
-    native_f5 = native_f5_configuration(work, args.cycles) if args.scenario == "native-f5" else None
+    native_f5 = native_f5_configuration(work, args.cycles, args.native_f5_input or "native-injected") if args.scenario == "native-f5" else None
     if native_f5:
         settings["window.title"] = native_f5["windowTitle"]
         settings["files.autoSave"] = "off"
     (work / "profile/User/settings.json").write_text(json.dumps(settings, indent=2))
     harness = {name: digest((Path(__file__).parent / name).read_bytes())
                for name in ("prepare.py", "run.ps1", "driver.cjs", "extension-test.cjs", "fixtures/web.cs")}
+    if native_f5:
+        harness["native-f5-input.cjs"] = digest((Path(__file__).parent / "native-f5-input.cjs").read_bytes())
     if native_cancellation:
         harness["fixtures/cancel-build.targets"] = digest(target.read_bytes())
         harness["prepared/a.cs"] = digest((work / "workspace/a.cs").read_bytes())
@@ -255,11 +265,13 @@ def main():
         expected["handoffCancellation"] = handoff_cancellation
     if native_f5:
         expected["nativeF5"] = native_f5
-        # Avoid the older ambiguous physicalF5 label: this is native injected
-        # input in a visible window, not an assertion about human hardware.
         del expected["scope"]["physicalF5"]
-        expected["scope"].update(invocation="native-injected-f5", nativeInjectedF5=True,
-                                 hardwareKeypress=False, noFolderWindow=True)
+        manual = native_f5["inputMode"] == "manual-native"
+        expected["scope"].update(invocation="manual-native-f5" if manual else "native-injected-f5",
+                                 nativeInjectedF5=not manual, noFolderWindow=True,
+                                 humanKeypressAttestationRequired=manual, hardwareInputIndependentlyVerified=False)
+        if not manual:
+            expected["scope"]["hardwareKeypress"] = False
     if concurrent:
         expected["concurrent"] = concurrent
     if args.scenario == "native-adapter-loss":

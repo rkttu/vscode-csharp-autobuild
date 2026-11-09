@@ -10,6 +10,10 @@ if ($expected.schema -ne 1 -or !$expected.candidate.localOnly -or $expected.cand
 if ($expected.scenario -eq 'native-f5' -and (!$ShowWindow -or !$expected.nativeF5 -or $expected.cycles -lt 2 -or $expected.cycles -gt 10)) {
     throw 'The 2..10-cycle native F5 control requires its prepared handshake and -ShowWindow'
 }
+$nativeInputMode = if ($expected.nativeF5 -and $null -ne $expected.nativeF5.PSObject.Properties['inputMode']) { $expected.nativeF5.inputMode } else { 'native-injected' }
+if ($expected.scenario -eq 'native-f5' -and $nativeInputMode -notin @('native-injected', 'manual-native')) {
+    throw 'Unknown prepared native F5 input mechanism; do not switch mechanisms during a profile'
+}
 foreach ($marker in @('attempt.json', 'launch.json', 'launcher-result.json')) {
     if (Test-Path -LiteralPath (Join-Path $work $marker)) { throw 'This profile has already been attempted; use a fresh work directory and retain its first result' }
 }
@@ -23,6 +27,9 @@ Assert-Hash $expected.dependency.path $expected.dependency.sha256
 Assert-Hash $PSCommandPath $expected.harness.'run.ps1'
 foreach ($driverFile in @('driver.cjs', 'extension-test.cjs')) {
     Assert-Hash (Join-Path $work ('driver/' + $driverFile)) $expected.harness.$driverFile
+}
+if ($expected.scenario -eq 'native-f5') {
+    Assert-Hash (Join-Path $work 'driver/native-f5-input.cjs') $expected.harness.'native-f5-input.cjs'
 }
 foreach ($fixture in @('a.cs', 'b.cs')) {
     $preparedKey = 'prepared/' + $fixture
@@ -72,7 +79,8 @@ $launcher = @{ schema = 1; success = $false; work = $work; candidateSha256 = $ex
     visibleWindowRequested = [bool]$ShowWindow;
     scope = 'normally installed local candidate and dependency; isolated VSCodium command API control, not qualification' }
 if ($expected.scenario -eq 'native-f5') {
-    $launcher.scope = "normally installed local candidate; one no-folder profile, $($expected.cycles) native injected F5 HTTP Web launches; not hardware input or full qualification"
+    $launcher.scope = "normally installed local candidate; one no-folder profile, $($expected.cycles) $nativeInputMode F5 HTTP Web launches; not independent hardware-input verification or full qualification"
+    $launcher.nativeInputMode = $nativeInputMode
 }
 $process = $null
 
