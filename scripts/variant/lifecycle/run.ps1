@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory = $true)][string]$WorkDir,
-    [ValidateRange(60, 900)][int]$DeadlineSeconds = 300,
+    [ValidateRange(60, 3600)][int]$DeadlineSeconds = 300,
     [switch]$ShowWindow
 )
 $ErrorActionPreference = 'Stop'
