@@ -92,6 +92,18 @@ class LifecyclePreparationTests(unittest.TestCase):
             preparation.fresh_directory(work)
         self.assertEqual(failure.read_text(), 'initial failure')
 
+    def test_native_f5_control_has_two_distinct_input_receipts_in_one_fresh_profile(self):
+        control = preparation.native_f5_configuration(self.root, 2)
+        self.assertIn(control["nonce"], control["windowTitle"])
+        self.assertEqual([item["sequence"] for item in control["inputs"]], [1, 2])
+        paths = [Path(item[key]) for item in control["inputs"] for key in ("request", "receipt")]
+        paths.append(Path(control["closed"]))
+        self.assertEqual(len(set(paths)), 5)
+        self.assertTrue(all(path.parent == self.root and not path.exists() for path in paths))
+        for cycles in (1, 3, 10):
+            with self.subTest(cycles=cycles), self.assertRaisesRegex(ValueError, "exactly two"):
+                preparation.native_f5_configuration(self.root, cycles)
+
     def test_pe_machine_reports_truncated_headers_and_reads_native_target(self):
         executable = self.root / "editor.exe"
         header = b"MZ" + bytes(0x3C - 2) + struct.pack("<I", 0x40)

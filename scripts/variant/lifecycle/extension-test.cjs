@@ -95,7 +95,7 @@ exports.run = async function run() {
     const expected = JSON.parse(fs.readFileSync(path.join(root, 'expected.json'), 'utf8'));
     assert.equal(expected.schema, 1);
     const scenario = expected.scenario || 'web-lifecycle';
-    assert(['web-lifecycle', 'build-failure-retry', 'native-build-cancel', 'web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry', 'native-host-failure-retry', 'native-adapter-loss', 'concurrent-files', 'native-handoff-cancel'].includes(scenario));
+    assert(['web-lifecycle', 'build-failure-retry', 'native-build-cancel', 'web-profile-failure-retry', 'sdk-selection-failure-retry', 'debug-handoff-declined-retry', 'native-host-failure-retry', 'native-adapter-loss', 'concurrent-files', 'native-handoff-cancel', 'native-f5'].includes(scenario));
     assert(Number.isInteger(expected.cycles) && expected.cycles >= 2 && expected.cycles <= 10);
     const start = process.hrtime.bigint();
     const result = {
@@ -126,6 +126,25 @@ exports.run = async function run() {
     const handoffGates = new Map();
     const cancelledHandoffAttempts = [];
     const cancelledBuildAttempts = [];
+    const nativeF5 = scenario === 'native-f5' ? expected.nativeF5 : undefined;
+    let nativeF5Closed = false;
+    let nativeF5Operation;
+    const nativeF5LateStops = [];
+    if (nativeF5) {
+        assert.equal(expected.cycles, 2);
+        assert.equal(typeof nativeF5.nonce, 'string');
+        assert(nativeF5.nonce.length > 0 && nativeF5.windowTitle.includes(nativeF5.nonce));
+        assert.deepEqual(nativeF5.inputs.map(input => input.sequence), [1, 2]);
+        const files = [nativeF5.closed, ...nativeF5.inputs.flatMap(input => [input.request, input.receipt])];
+        assert.equal(new Set(files).size, 5);
+        for (const file of files) assert(path.isAbsolute(file) && within(root, file) && !exists(file) && !exists(file + '.tmp'));
+        delete result.scope.physicalF5;
+        Object.assign(result.scope, { invocation: 'native-injected-f5', nativeInjectedF5: true,
+            hardwareKeypress: false, noFolderWindow: true, trustUiExercised: false,
+            setupCommand: 'workbench.action.toggleKeybindingsLog', targetCommandApiLaunch: false });
+        result.nativeF5 = { inputs: [], inputReceiptsAreAttestations: true,
+            actualKeyEvidenceRequiredSeparately: true, setupCommands: [], postStartApiActions: [] };
+    } else assert.notEqual(scenario, 'native-f5');
     const nativeCancellation = scenario === 'native-build-cancel' ? expected.nativeCancellation : undefined;
     const handoffCancellation = scenario === 'native-handoff-cancel' ? expected.handoffCancellation : undefined;
     if (handoffCancellation) {
@@ -191,6 +210,18 @@ exports.run = async function run() {
 
     function record(event, detail) {
         fs.appendFileSync(traceFile, JSON.stringify({ atMilliseconds: elapsed(start), event, detail }) + '\n');
+    }
+
+    function closeNativeF5(reason) {
+        if (!nativeF5 || nativeF5Closed) return;
+        nativeF5Closed = true;
+        const detail = { schema: 1, nonce: nativeF5.nonce, reason, closedAtUtc: new Date().toISOString() };
+        fs.writeFileSync(nativeF5.closed, JSON.stringify(detail, null, 2) + '\n', { flag: 'wx' });
+        record('f5-input-closed', detail);
+    }
+
+    function requireNativeF5Open() {
+        assert(!nativeF5Closed && !result.firstFailure, 'Native F5 input closed after completion or first failure');
     }
 
     function state() {
@@ -769,6 +800,165 @@ exports.run = async function run() {
             configuration: JSON.parse(JSON.stringify(retry.session.configuration)) };
         result.checks.push('Exact installed A adapter process loss is observed separately from debuggee/session/output release; B survives and three dirty retry callers share one new real session');
         return retry;
+    }
+
+    function rendererLog() {
+        const matches = [];
+        function visit(directory) {
+            if (!exists(directory)) return;
+            for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+                const file = path.join(directory, entry.name);
+                if (entry.isDirectory()) visit(file);
+                else if (entry.isFile() && entry.name === 'renderer.log') matches.push(file);
+            }
+        }
+        visit(path.join(root, 'profile/logs'));
+        assert(matches.length <= 1, 'Native F5 requires exactly one isolated renderer log');
+        return matches[0];
+    }
+
+    async function launchFromNativeF5(input, source, revision, port, document) {
+        requireNativeF5Open();
+        assert.equal(vscode.workspace.workspaceFolders?.length || 0, 0, 'Native F5 control must have no workspace folder');
+        assert.equal(vscode.workspace.workspaceFile, undefined);
+        assert.equal(vscode.debug.activeDebugSession, undefined, 'F5 must start a new session, not Continue an active one');
+        assert.equal(document.isDirty, input.sequence === 2);
+        const nonce = crypto.randomUUID();
+        const launch = { label: `F5-${input.sequence}`, source, revision, nonce, port,
+            origin: `http://127.0.0.1:${port}`, dap: [] };
+        launches.push(launch);
+        ownedAttempts.push(launch);
+        byToken.set(nonce, launch);
+        fs.writeFileSync(source.replace(/\.cs$/i, '.run.json'), JSON.stringify({ profiles: { LifecycleHttp: {
+            commandName: 'Project', applicationUrl: launch.origin, launchBrowser: false,
+            environmentVariables: { LIFECYCLE_TOKEN: nonce, ASPNETCORE_ENVIRONMENT: 'Development' },
+        } } }, null, 2) + '\n');
+        launch.profileSnapshot = fileSnapshot(source.replace(/\.cs$/i, '.run.json'));
+        await vscode.window.showTextDocument(document);
+        requireNativeF5Open();
+        assert(samePath(vscode.window.activeTextEditor.document.uri.fsPath, source));
+        assert.equal(document.languageId, 'csharp');
+        const line = document.getText().split(/\r?\n/).findIndex(value => value.trim() === 'marker += 2;');
+        assert(line >= 0);
+        const breakpoint = new vscode.SourceBreakpoint(new vscode.Location(document.uri, new vscode.Position(line, 0)));
+        breakpoints.push(breakpoint);
+        vscode.debug.addBreakpoints([breakpoint]);
+        let renderer;
+        await until(() => { requireNativeF5Open(); return (renderer = rendererLog()); }, 'native F5 renderer trace created');
+        const rendererBefore = logSnapshot(renderer);
+        const priorOutput = outputLog();
+        const outputBefore = priorOutput ? logSnapshot(priorOutput) : undefined;
+        const buffer = Buffer.from(document.getText(), 'utf8');
+        const diskBefore = fileSnapshot(source);
+        const bufferSha256 = crypto.createHash('sha256').update(buffer).digest('hex');
+        assert.equal(diskBefore.sha256 === bufferSha256, input.sequence === 1,
+            'First input must be saved; second input must have a distinct unsaved buffer');
+        const request = { schema: 1, nonce: nativeF5.nonce, sequence: input.sequence, launchToken: nonce,
+            windowTitle: nativeF5.windowTitle, source, languageId: document.languageId,
+            editorWindowFocused: vscode.window.state.focused, activeSource: vscode.window.activeTextEditor.document.uri.fsPath,
+            noFolderWindow: true, workspaceFolders: [], activeDebugSessionId: null, isDirty: document.isDirty, diskBefore,
+            bufferBefore: { bytes: buffer.length, sha256: bufferSha256 },
+            action: 'press-key', key: 'F5', mechanism: 'native-injected',
+            requestedAtUtc: new Date().toISOString(),
+            expiresAtUtc: new Date(Date.now() + SAFETY_TIMEOUT_MS).toISOString(),
+            receipt: input.receipt, closed: nativeF5.closed,
+            instructions: 'Observe the exact visible window and C# editor focus; check closed/firstFailure before input. Send one native F5. Only then publish the matching receipt. Never use a command API launch fallback.' };
+        const detail = { sequence: input.sequence, label: launch.label, request,
+            rendererBefore, outputBefore, profileSnapshot: launch.profileSnapshot };
+        result.nativeF5.inputs.push(detail);
+        state();
+        // All exact-token session/DAP observers and the breakpoint are already
+        // armed. External root CUA supplies the key; this function never invokes
+        // COMMAND and cannot observe a command-return boolean from native input.
+        assert(!exists(input.request), 'Never replace an earlier native input request');
+        fs.writeFileSync(input.request + '.tmp', JSON.stringify(request, null, 2) + '\n', { flag: 'wx' });
+        fs.renameSync(input.request + '.tmp', input.request);
+        detail.requestSnapshot = fileSnapshot(input.request);
+        record('needs-f5-input', { ...request, requestPath: input.request, requestSha256: detail.requestSnapshot.sha256 });
+        await until(() => { requireNativeF5Open(); return exists(input.receipt); }, `${launch.label} native key action receipt`);
+        requireNativeF5Open();
+        const receipt = JSON.parse(fs.readFileSync(input.receipt, 'utf8').replace(/^\uFEFF/, ''));
+        assert.equal(receipt.schema, 1);
+        for (const key of ['nonce', 'sequence', 'launchToken', 'windowTitle', 'action', 'key', 'mechanism']) {
+            assert.equal(receipt[key], request[key], `Native F5 receipt ${key}`);
+        }
+        assert.equal(receipt.requestSha256, detail.requestSnapshot.sha256);
+        assert.equal(receipt.tool, 'sky.press_key');
+        assert.equal(receipt.editorFocusedBeforeInput, true, 'Native input needs separately observed editor focus');
+        assert.equal(typeof receipt.observedWindowTitle, 'string');
+        assert(receipt.observedWindowTitle.includes(nativeF5.windowTitle), 'Retain the actual OS title including the unique expected token');
+        assert(['string', 'number'].includes(typeof receipt.windowId) && String(receipt.windowId).length > 0);
+        assert(Number.isFinite(Date.parse(receipt.inputAtUtc)) && Date.parse(receipt.inputAtUtc) >= Date.parse(request.requestedAtUtc));
+        assert(Date.parse(receipt.inputAtUtc) <= Date.parse(request.expiresAtUtc), 'Native input must occur before its request expires');
+        assert(Date.parse(receipt.inputAtUtc) <= Date.now() + 1000);
+        for (const key of ['observationPath', 'inputRecordPath']) {
+            assert(path.isAbsolute(receipt[key]) && within(root, receipt[key]) && exists(receipt[key]), `Retain original native input evidence: ${key}`);
+        }
+        detail.receipt = receipt;
+        detail.receiptSnapshot = fileSnapshot(input.receipt);
+        detail.observationSnapshot = fileSnapshot(receipt.observationPath);
+        detail.inputRecordSnapshot = fileSnapshot(receipt.inputRecordPath);
+        record('native-f5-receipt-observed', detail.receiptSnapshot);
+        await until(() => { requireNativeF5Open(); return launch.started; }, `${launch.label} exact owned session start`);
+        assert.equal(launch.capturedSessions.size, 1);
+        assert.equal(launch.session.configuration.env.ASPNETCORE_URLS, launch.origin);
+        assert.equal(launch.session.configuration.serverReadyAction, undefined);
+        assert.equal(launch.session.configuration.checkForDevCert, false);
+        assert(exists(launch.program) && exists(launch.output));
+        assert(!launches.some(previous => previous !== launch && previous.output === launch.output));
+        await until(() => {
+            requireNativeF5Open();
+            return launch.dap.some(message => message.event === 'stopped' && message.body?.reason === 'breakpoint');
+        }, `${launch.label} source breakpoint`);
+        const stopped = launch.dap.find(message => message.event === 'stopped' && message.body?.reason === 'breakpoint');
+        const frames = (await launch.session.customRequest('stackTrace', { threadId: stopped.body.threadId })).stackFrames;
+        requireNativeF5Open();
+        assert(samePath(frames[0].source.path, source));
+        assert.equal(frames[0].line, line + 1);
+        const evaluated = await launch.session.customRequest('evaluate', { frameId: frames[0].id, expression: 'marker', context: 'watch' });
+        requireNativeF5Open();
+        assert.equal(evaluated.result, '40');
+        detail.breakpoint = { source: frames[0].source.path, line: frames[0].line, expression: 'marker', result: evaluated.result };
+        assert.equal(document.isDirty, false, 'F5 must save the dirty buffer before its build');
+        assert.equal(sha256(source), bufferSha256);
+        assert.equal(fs.readFileSync(source, 'utf8'), document.getText());
+        detail.diskAfter = fileSnapshot(source);
+        if (input.sequence === 2) {
+            assert(detail.savedEvents?.length > 0, 'Dirty F5 repeat must observe a source save event');
+            assert.notEqual(detail.diskAfter.sha256, diskBefore.sha256);
+        }
+        let outputTail, rendererTail;
+        await until(() => {
+            requireNativeF5Open();
+            const file = outputLog();
+            if (!file) return false;
+            outputTail = outputBefore ? logTail(outputBefore) : fs.readFileSync(file, 'utf8');
+            rendererTail = logTail(rendererBefore);
+            return outputTail.includes('Phase completed: Starting netcoredbg') &&
+                /KeybindingService#dispatch\s+F5\s+\[ Will dispatch command netcoredbg\.debugActiveFile \]/.test(rendererTail);
+        }, `${launch.label} actual F5 dispatch and file-debug output flush`);
+        const f5Dispatches = rendererTail.split(/\r?\n/).filter(value => /KeybindingService#dispatch\s+F5\s/.test(value));
+        const targetCommands = rendererTail.split(/\r?\n/).filter(value => /CommandService#executeCommand\s+netcoredbg\.debugActiveFile\s*$/.test(value));
+        assert.equal(f5Dispatches.length, 1, 'One external F5 must have one resolver dispatch');
+        assert.equal(targetCommands.length, 1, 'One native F5 must route to one owned command');
+        const builds = buildCommands(outputTail, source);
+        assert.equal(builds.length, 1);
+        assert(samePath(builds[0].output, launch.output));
+        assert.equal(outputTail.split(/\r?\n/).filter(value => value.startsWith('Phase completed: Starting netcoredbg')).length, 1);
+        detail.route = { ...rendererBefore, tailCharacters: rendererTail.length,
+            tailSha256: crypto.createHash('sha256').update(rendererTail).digest('hex'), f5Dispatches, targetCommands };
+        detail.builds = builds;
+        detail.configuration = JSON.parse(JSON.stringify(launch.session.configuration));
+        vscode.debug.removeBreakpoints([breakpoint]);
+        breakpoints.splice(breakpoints.indexOf(breakpoint), 1);
+        result.nativeF5.postStartApiActions.push({ action: 'DAP continue', sessionId: launch.session.id, sequence: input.sequence });
+        await launch.session.customRequest('continue', { threadId: stopped.body.threadId });
+        requireNativeF5Open();
+        await ready(launch);
+        requireNativeF5Open();
+        detail.response = launch.response;
+        result.checks.push(`${launch.label}: external native F5 dispatch starts one saved real build, exact breakpoint/evaluation and owned HTTP revision`);
+        return launch;
     }
 
     async function launchFile(label, source, revision, port, inspectBreakpoint = false, document, commandInvocations = 1, onDispatched) {
@@ -1995,15 +2185,36 @@ exports.run = async function run() {
     }
 
     try {
+        if (nativeF5) subscriptions.push(vscode.workspace.onDidSaveTextDocument(document => observe('native-f5-source-save', () => {
+            const detail = result.nativeF5.inputs.at(-1);
+            if (!detail || !samePath(document.uri.fsPath, detail.request.source)) return;
+            detail.savedEvents ||= [];
+            const saved = { atMilliseconds: elapsed(start), source: document.uri.fsPath, disk: fileSnapshot(document.uri.fsPath) };
+            detail.savedEvents.push(saved);
+            record('native-f5-source-save', saved);
+        })));
         subscriptions.push(vscode.debug.onDidStartDebugSession(session => observe('editor-start', () => {
             const launch = ownedLaunch(session);
-            if (!launch) return;
+            if (!launch) {
+                if (nativeF5) throw new Error(`Unexpected non-owned session during native F5 control: ${session.id}`);
+                return;
+            }
             if (launch.expectedWebProfileFailure || launch.expectedSdkSelectionFailure || launch.expectedHandoffDeclined || launch.expectedNativeHostFailure || launch.expectedHandoffCancellation) launch.editorStartCount++;
             captureSession(session, launch);
             launch.started = true;
             launch.startedAtMilliseconds = elapsed(start);
             record('editor-start', { label: launch.label, sessionId: session.id, configuration: session.configuration });
             state();
+            if (nativeF5Closed) {
+                // A first failure closes external input, but an already injected
+                // key can still expose a late exact session. Observe and request
+                // only that handle's Stop; do not infer global terminal state.
+                const stop = Promise.resolve().then(() => vscode.debug.stopDebugging(session)).then(
+                    () => record('native-f5-late-exact-stop-acknowledged', { sessionId: session.id }),
+                    error => record('native-f5-late-exact-stop-error', { sessionId: session.id, error: String(error) }));
+                nativeF5LateStops.push(stop);
+                stop.catch(() => {});
+            }
         })));
         subscriptions.push(vscode.debug.onDidTerminateDebugSession(session => observe('editor-terminate', () => {
             const launch = ownedLaunch(session);
@@ -2094,10 +2305,82 @@ exports.run = async function run() {
             }
             result.installedExtension = { path: extension.extensionPath, version: metadata.version,
                 displayName: metadata.displayName, metadata: metadata.__metadata, build: metadata.netcoredbgBuild };
+            if (nativeF5) {
+                const bindings = metadata.contributes.keybindings.filter(binding => binding.command === COMMAND);
+                assert.equal(bindings.length, 1);
+                assert.equal(bindings[0].key, 'f5');
+                assert.equal(bindings[0].when, 'editorTextFocus && editorLangId == csharp && !inDebugMode');
+                result.nativeF5.installedBinding = bindings[0];
+            }
             await extension.activate();
             assert((await vscode.commands.getCommands(true)).includes(COMMAND));
             result.checks.push('Normally installed local candidate activates with exact owned module hashes and isolated loaded path');
         });
+
+        if (nativeF5) {
+            const source = path.join(root, 'workspace/a.cs');
+            const document = await vscode.workspace.openTextDocument(source);
+            assert.equal(vscode.workspace.workspaceFolders?.length || 0, 0);
+            assert.equal(vscode.workspace.workspaceFile, undefined);
+            assert.equal(vscode.workspace.getConfiguration('files', document.uri).get('autoSave'), 'off');
+            await phase('native F5 setup-only keybinding logging', async () => {
+                requireNativeF5Open();
+                result.nativeF5.setupCommands.push({ command: 'workbench.action.toggleKeybindingsLog', purpose: 'input diagnostics only; not a debugger launch' });
+                await vscode.commands.executeCommand('workbench.action.toggleKeybindingsLog');
+                requireNativeF5Open();
+                // The troubleshooting command can open Output; restore the C#
+                // editor before publishing any input request. Root CUA must
+                // still observe/click the real editor focus before its key.
+                await vscode.window.showTextDocument(document);
+                requireNativeF5Open();
+            });
+            const port = await availablePort();
+            let previous;
+            for (const input of nativeF5.inputs) {
+                requireNativeF5Open();
+                const revision = input.sequence === 1 ? 'initial' : 'retry-f5-2';
+                if (input.sequence === 2) await phase('native F5 dirty repeat preparation after exact cleanup', async () => {
+                    requireNativeF5Open();
+                    assert(previous.terminated && !pidAlive(previous.pid) && !exists(previous.output) && queueEmpty(previous.base));
+                    assert.equal(await canBind(port), true);
+                    requireNativeF5Open();
+                    const content = document.getText();
+                    assert(content.includes('const string revision = "initial";'));
+                    const replacement = content.replace('const string revision = "initial";', 'const string revision = "retry-f5-2";');
+                    const edit = new vscode.WorkspaceEdit();
+                    edit.replace(document.uri, new vscode.Range(document.positionAt(0), document.positionAt(content.length)), replacement);
+                    assert.equal(await vscode.workspace.applyEdit(edit), true);
+                    requireNativeF5Open();
+                    assert.equal(document.isDirty, true);
+                });
+                const launch = await phase(`native F5 input ${input.sequence} breakpoint and HTTP revision`, () => {
+                    requireNativeF5Open();
+                    nativeF5Operation = launchFromNativeF5(input, source, revision, port, document);
+                    return nativeF5Operation;
+                });
+                nativeF5Operation = undefined;
+                if (previous) {
+                    assert.notEqual(launch.session.id, previous.session.id);
+                    assert.notEqual(launch.nonce, previous.nonce);
+                    assert.notEqual(launch.output, previous.output);
+                }
+                await phase(`native F5 input ${input.sequence} exact API Stop and actual cleanup`, async () => {
+                    requireNativeF5Open();
+                    result.nativeF5.postStartApiActions.push({ action: 'vscode.debug.stopDebugging', sessionId: launch.session.id, sequence: input.sequence });
+                    await stop(launch);
+                    requireNativeF5Open();
+                });
+                previous = launch;
+            }
+            assert.equal(launches.length, 2);
+            assert(result.nativeF5.inputs.every(input => input.route && input.response));
+            assert.equal(document.isDirty, false);
+            closeNativeF5('two-cycle control completed');
+            result.checks.push('One no-folder profile: two external native injected F5 inputs, dirty save/revision repeat, exact per-session Stop and PID/port/output cleanup; not full qualification or hardware keyboard input');
+            if (eventError) throw eventError;
+            result.success = true;
+            return;
+        }
 
         const aSource = path.join(root, 'workspace/a.cs');
         const bSource = path.join(root, 'workspace/b.cs');
@@ -2313,9 +2596,24 @@ exports.run = async function run() {
         result.success = true;
     } catch (error) {
         result.firstFailure ||= { atMilliseconds: elapsed(start), error: error.stack || String(error) };
+        if (nativeF5) {
+            try { closeNativeF5('first failure; do not inject another key'); }
+            catch (closeError) { result.nativeF5.closeError = String(closeError); }
+        }
         record('first-failure', result.firstFailure);
         state();
+        if (nativeF5Operation) {
+            // phase's timeout does not cancel its action. Closing the input gate
+            // makes all subsequent polls/continuations fail before another key
+            // request, edit or Continue. A stuck editor API remains uncertainty.
+            try { await bounded(Promise.allSettled([nativeF5Operation]), 'native F5 failed observer continuation drain', 5000); }
+            catch (drainError) { result.nativeF5.observerDrainError = String(drainError); }
+        }
         await failureCleanup();
+        if (nativeF5LateStops.length) {
+            try { await bounded(Promise.allSettled(nativeF5LateStops), 'native F5 late exact Stop acknowledgements', 5000); }
+            catch (stopError) { result.nativeF5.lateStopDrainError = String(stopError); }
+        }
         throw error;
     } finally {
         vscode.debug.removeBreakpoints(breakpoints);

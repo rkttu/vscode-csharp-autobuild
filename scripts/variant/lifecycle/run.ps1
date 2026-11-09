@@ -7,6 +7,9 @@ $ErrorActionPreference = 'Stop'
 $work = (Resolve-Path -LiteralPath $WorkDir).Path
 $expected = Get-Content -LiteralPath (Join-Path $work 'expected.json') -Raw | ConvertFrom-Json
 if ($expected.schema -ne 1 -or !$expected.candidate.localOnly -or $expected.candidate.published) { throw 'Expected a local lifecycle preparation' }
+if ($expected.scenario -eq 'native-f5' -and (!$ShowWindow -or !$expected.nativeF5 -or $expected.cycles -ne 2)) {
+    throw 'The two-cycle native F5 control requires its prepared handshake and -ShowWindow'
+}
 foreach ($marker in @('attempt.json', 'launch.json', 'launcher-result.json')) {
     if (Test-Path -LiteralPath (Join-Path $work $marker)) { throw 'This profile has already been attempted; use a fresh work directory and retain its first result' }
 }
@@ -68,6 +71,9 @@ $logs = Join-Path $work 'logs'
 $launcher = @{ schema = 1; success = $false; work = $work; candidateSha256 = $expected.candidate.sha256;
     visibleWindowRequested = [bool]$ShowWindow;
     scope = 'normally installed local candidate and dependency; isolated VSCodium command API control, not qualification' }
+if ($expected.scenario -eq 'native-f5') {
+    $launcher.scope = 'normally installed local candidate; one no-folder profile, two native injected F5 HTTP Web launches; not hardware input or full qualification'
+}
 $process = $null
 
 function Request-OwnedFixtureShutdown {
@@ -125,8 +131,11 @@ try {
     $arguments = @('--locale', 'en', '--user-data-dir', (& $quoted $editorProfile), '--extensions-dir', (& $quoted $extensions),
         '--extensionDevelopmentPath', (& $quoted (Join-Path $work 'driver')),
         '--extensionTestsPath', (& $quoted (Join-Path $work 'driver/extension-test.cjs')),
-        '--skip-welcome', '--skip-release-notes', '--disable-gpu', '--disable-workspace-trust', '--no-sandbox',
-        (& $quoted (Join-Path $work 'workspace')))
+        '--skip-welcome', '--skip-release-notes', '--disable-gpu', '--disable-workspace-trust', '--no-sandbox')
+    if ($expected.scenario -eq 'native-f5') {
+        # A file argument opens an editor without making its directory a workspace.
+        $arguments += @('--log', 'trace', '--new-window', (& $quoted (Join-Path $work 'workspace/a.cs')))
+    } else { $arguments += (& $quoted (Join-Path $work 'workspace')) }
     # Explicit opt-in is needed when an operator will exercise native UI input.
     $windowStyle = if ($ShowWindow) { 'Normal' } else { 'Hidden' }
     $process = Start-Process -FilePath $expected.editor.executable -ArgumentList $arguments -WindowStyle $windowStyle -PassThru `
