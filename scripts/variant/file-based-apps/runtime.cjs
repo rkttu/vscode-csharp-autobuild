@@ -126,6 +126,7 @@ function activate(context, dependencies = {}) {
     const now = dependencies.now || (() => performance.now());
     const preparationTimeoutMs = dependencies.preparationTimeoutMs ?? 5 * 60 * 1000;
     const handoffTimeoutMs = dependencies.handoffTimeoutMs ?? 5 * 60 * 1000;
+    const saveTimeoutMs = dependencies.saveTimeoutMs ?? 5 * 60 * 1000;
     const scheduleTimeout = dependencies.scheduleTimeout || setTimeout;
     const cancelTimeout = dependencies.clearTimeout || clearTimeout;
     const storage = (context.globalStorageUri || context.storageUri)?.fsPath;
@@ -469,6 +470,9 @@ function activate(context, dependencies = {}) {
                 let handoffActive = false;
                 let handoffBegan;
                 let handoffTimer;
+                let saveActive = false;
+                let saveBegan;
+                let saveTimer;
                 const expire = () => {
                     if (!preparationActive || controller.signal.aborted) return;
                     const error = new Error(`Preparation timed out during ${phase || 'SDK discovery'} after ${Math.round(now() - preparationBegan)} ms (limit ${preparationTimeoutMs} ms). Check project evaluation, SDK and restore output before retrying`);
@@ -481,9 +485,16 @@ function activate(context, dependencies = {}) {
                     error.name = 'TimeoutError';
                     controller.abort(error);
                 };
+                const expireSave = () => {
+                    if (!saveActive || controller.signal.aborted) return;
+                    const error = new Error(`Editor save timed out during Saving C# file after ${Math.round(now() - saveBegan)} ms (limit ${saveTimeoutMs} ms). The underlying editor save may still finish and remains observed. This file cannot start another save or build until it settles`);
+                    error.name = 'TimeoutError';
+                    controller.abort(error);
+                };
                 const checkpoint = () => {
                     if (preparationActive && now() - preparationBegan >= preparationTimeoutMs) expire();
                     if (handoffActive && now() - handoffBegan >= handoffTimeoutMs) expireHandoff();
+                    if (saveActive && now() - saveBegan >= saveTimeoutMs) expireSave();
                     controller.signal.throwIfAborted();
                 };
                 const stopPreparation = () => {
@@ -498,6 +509,13 @@ function activate(context, dependencies = {}) {
                     if (handoffTimer !== undefined) {
                         cancelTimeout(handoffTimer);
                         handoffTimer = undefined;
+                    }
+                };
+                const stopSave = () => {
+                    saveActive = false;
+                    if (saveTimer !== undefined) {
+                        cancelTimeout(saveTimer);
+                        saveTimer = undefined;
                     }
                 };
                 const phaseLog = message => {
@@ -526,6 +544,7 @@ function activate(context, dependencies = {}) {
                         foregroundAbort?.name === 'AbortError' ? 'cancelled' : 'failed';
                     stopPreparation();
                     stopHandoff();
+                    stopSave();
                     logPhase(outcome);
                     phaseLog(launchOwnsOutput ?
                         `Foreground ${outcome} during ${phase}; uncertain debugger starts remain tracked and their output is retained until safely terminal. A distinct retry can start after this foreground workflow drains, while an earlier request is still pending.` :
@@ -544,6 +563,7 @@ function activate(context, dependencies = {}) {
                     progressActive = false;
                     stopPreparation();
                     stopHandoff();
+                    stopSave();
                     controller.signal.removeEventListener('abort', abortForeground);
                     if (cancel) disposeResource(cancel);
                 };
@@ -555,12 +575,17 @@ function activate(context, dependencies = {}) {
                     checkpoint();
                     const sourceUri = document.uri;
                     if (document.isDirty) {
+                        saveBegan = now();
+                        saveActive = true;
+                        saveTimer = scheduleTimeout(expireSave, saveTimeoutMs);
                         setPhase('Saving C# file');
                         // The editor save API has no cancellation token. Keep this exact
                         // save coalesced and observed until settlement; Cancel stops its
                         // continuation without pretending the editor finished saving.
+                        checkpoint();
                         const saved = await document.save();
                         checkpoint();
+                        stopSave();
                         if (!saved) { outcome = 'not saved'; return false; }
                     }
                     const text = document.getText();
@@ -710,6 +735,7 @@ function activate(context, dependencies = {}) {
                   } finally {
                     stopPreparation();
                     stopHandoff();
+                    stopSave();
                     logPhase(foregroundAbort ? `drained after ${outcome}` : outcome);
                   }
                 }).then(value => {

@@ -118,6 +118,7 @@ function fixture(t, options = {}) {
         ...(options.now ? { now: options.now } : {}),
         ...(options.preparationTimeoutMs !== undefined ? { preparationTimeoutMs: options.preparationTimeoutMs } : {}),
         ...(options.handoffTimeoutMs !== undefined ? { handoffTimeoutMs: options.handoffTimeoutMs } : {}),
+        ...(options.saveTimeoutMs !== undefined ? { saveTimeoutMs: options.saveTimeoutMs } : {}),
         ...(options.scheduleTimeout ? { scheduleTimeout: options.scheduleTimeout, clearTimeout: options.clearTimeout } : {}),
         findDotnet: options.findDotnet || (async () => ({ executable: path.join(root, 'dotnet', 'dotnet.exe'), root: path.join(root, 'dotnet') })),
         classifyFile: async input => {
@@ -617,14 +618,19 @@ async function retainedTerminalOutput(t, { staging = false } = {}) {
 
 function preparationFixture(t, options = {}) {
     let elapsed = 0;
-    let latest;
+    let latestPreparation;
     const timers = new Set();
     const f = fixture(t, { ...options, preparationTimeoutMs: 100, now: () => elapsed,
-        scheduleTimeout: callback => { latest = { callback }; timers.add(latest); return latest; },
+        scheduleTimeout: (callback, delay) => {
+            const timer = { callback, delay };
+            if (delay === 100) latestPreparation = timer;
+            timers.add(timer);
+            return timer;
+        },
         clearTimeout: timer => timers.delete(timer),
     });
     return { ...f, advance: ms => { elapsed += ms; }, timers,
-        expire: () => { assert(latest, 'A preparation deadline must be armed'); elapsed += 100; latest.callback(); } };
+        expire: () => { assert(latestPreparation, 'A preparation deadline must be armed'); elapsed += 100; latestPreparation.callback(); } };
 }
 
 function certificatePhaseFixture(t, options = {}) {
@@ -1855,7 +1861,7 @@ test('concurrent dirty-file commands share a cancelled save and permit a correct
     assert.equal(f.calls.classifications.length, 0);
     assert.equal(f.calls.processes.length, 0);
     assert.deepEqual(progress, [{ message: 'Saving C# file' }], 'The shared save must report the cancellable save phase');
-    assert.equal(f.timers.size, 0, 'The preparation timer must remain unarmed during save');
+    assert.deepEqual([...f.timers].map(timer => timer.delay), [300000], 'Only the separate save budget may run before SDK preparation');
     completeSave(false);
     assert.deepEqual(await Promise.all(requests), [false, false, false]);
     assert.deepEqual(f.calls.errors, []);
@@ -1984,7 +1990,7 @@ test('save progress excludes save time from preparation while retaining total ph
     try {
         await waitFor(() => completeSave, 'The save must precede SDK preparation');
         assert.deepEqual(progress, ['Saving C# file']);
-        assert.equal(f.timers.size, 0, 'The SDK preparation budget must not be armed during an editor-owned save');
+        assert.deepEqual([...f.timers].map(timer => timer.delay), [300000], 'The save budget is separate from the unarmed SDK preparation budget');
         f.advance(1000);
         completeSave(true);
         await waitFor(() => completeClassification, 'The successful save must receive a fresh preparation budget');
@@ -3782,6 +3788,10 @@ test('foreground diagnostics keep certificate cancellation quiet and reject late
 
 function foregroundDrainFixture(t, options = {}, certificate = false) {
     const f = certificate ? certificatePhaseFixture(t, options) : preparationFixture(t, options);
+    return observeForeground(f);
+}
+
+function observeForeground(f) {
     const state = { windows: [], registrations: 0, lateReports: 0 };
     const withProgress = f.vscode.window.withProgress;
     f.vscode.window.withProgress = async (settings, callback) => {
@@ -4502,9 +4512,10 @@ test('handoff deadline excludes save, Web interaction and already dispatched sel
         try {
             await waitFor(() => releaseStage, 'The excluded stage must be held');
             assert.equal(f.handoffTimers.length, 0);
-            assert.equal(f.timers.size, 0);
-            f.advance(600000);
-            for (const timer of f.scheduled) timer.callback();
+            assert.equal([...f.timers].filter(timer => timer.delay === f.limit).length, 0, 'No handoff budget applies to the excluded stage');
+            assert.equal(f.timers.size, stage === 'save' ? 1 : 0, 'An editor save may have its own independent budget');
+            f.advance(101); // Beyond handoff's limit, within the independent save budget.
+            for (const timer of [...f.timers].filter(candidate => candidate.due <= 101)) timer.callback();
             f.cancel();
             if (stage === 'project') releaseStage(true);
             else assert.equal(await awaitForegroundResult(operation), false);
@@ -4544,5 +4555,350 @@ test('handoff deadline prepares foreign launch arguments before ownership transf
             f.terminate(f.calls.launches[0].config);
         } finally { await f.api.dispose(); }
         assertDisposed(f);
+    }
+});
+
+function saveDeadlineFixture(t, options = {}) {
+    let elapsed = 0;
+    const timers = new Set(), scheduled = [];
+    const limit = options.defaultBudget ? 300000 : 100;
+    const f = observeForeground(fixture(t, { ...options, preparationTimeoutMs: 1000, handoffTimeoutMs: 2000,
+        ...(options.defaultBudget ? {} : { saveTimeoutMs: limit }),
+        now: () => elapsed,
+        scheduleTimeout: (callback, delay) => {
+            const timer = { callback, delay, due: elapsed + delay };
+            timers.add(timer); scheduled.push(timer); return timer;
+        },
+        clearTimeout: timer => timers.delete(timer),
+    }));
+    return { ...f, timers, scheduled, limit, advance: ms => { elapsed += ms; },
+        get saveTimers() { return scheduled.filter(timer => timer.delay === limit); },
+        runDue(ms) {
+            elapsed += ms;
+            for (const timer of [...timers].filter(candidate => candidate.due <= elapsed)) {
+                if (timers.has(timer)) timer.callback();
+            }
+        },
+    };
+}
+
+test('save deadline returns a held timeout without competing saves and permits another file then a corrected coalesced retry', { timeout: 5000 }, async t => {
+    let completeSave, completeRetry, originalSettled = false;
+    let saveProvider = () => new Promise(resolve => { completeSave = () => {
+        if (originalSettled) return;
+        originalSettled = true;
+        fs.writeFileSync(f.source, 'Console.WriteLine("late original save");\n');
+        f.document.isDirty = false;
+        resolve(true);
+    }; });
+    const f = saveDeadlineFixture(t, { dirty: true, save: () => saveProvider() });
+    const first = f.api.debugActiveFile();
+    let retries;
+    try {
+        await waitFor(() => completeSave, 'The editor save must be held');
+        f.runDue(100);
+        assert.equal(await awaitForegroundResult(first), false);
+        const oldTimer = f.saveTimers[0];
+        assert.equal(oldTimer.delay, 100);
+        assert.equal(f.foreground.windows[0].closed, true);
+        assert.equal(f.foreground.registrations, 0);
+        assert.equal(f.timers.size, 0);
+        assert.equal(f.calls.disposals.output, 0);
+        assert.equal(f.calls.errors.length, 1);
+        assert.match(f.calls.errors[0], /Editor save timed out during Saving C# file after 100 ms \(limit 100 ms\)/);
+        assert.deepEqual(await Promise.all(Array.from({ length: 3 }, () => f.api.debugActiveFile())), [false, false, false]);
+        assert.equal(f.calls.saves, 1);
+        assert.equal(f.foreground.windows.length, 1);
+        assert.deepEqual(f.calls.classifications, []);
+        assert.deepEqual(f.calls.processes, []);
+
+        const other = path.join(path.dirname(f.source), 'independent-save-timeout.cs');
+        const otherText = 'Console.WriteLine("other source");\n';
+        fs.writeFileSync(other, otherText);
+        f.vscode.window.activeTextEditor = { document: { uri: { scheme: 'file', fsPath: other }, isDirty: false, getText: () => otherText } };
+        assert.equal(await f.api.debugActiveFile(), true);
+        const otherConfig = f.calls.launches[0].config;
+        f.advance(17);
+        completeSave();
+        await waitForForegroundDrain(f);
+        assert.equal(fs.readFileSync(f.source, 'utf8'), 'Console.WriteLine("late original save");\n', 'The original editor save can still finish its write');
+        assert.equal(f.calls.classifications.length, 1, 'A late save must not start SDK work for the timed-out source');
+        assert.equal(f.calls.classifications[0].filePath, other);
+        assert.equal(f.calls.stops.length, 0);
+        assert(fs.existsSync(otherConfig.program));
+        assert(f.calls.logs.includes('Phase drained after timed out: Saving C# file (117 ms; total 117 ms)'));
+
+        f.vscode.window.activeTextEditor = { document: f.document };
+        f.document.isDirty = true;
+        saveProvider = () => new Promise(resolve => { completeRetry = () => {
+            fs.writeFileSync(f.source, 'Console.WriteLine("corrected save");\n');
+            f.document.isDirty = false;
+            resolve(true);
+        }; });
+        let returned = false;
+        retries = Promise.all(Array.from({ length: 3 }, () => f.api.debugActiveFile())).then(value => { returned = true; return value; });
+        await waitFor(() => completeRetry, 'The corrected save must start only after the original settles');
+        oldTimer.callback();
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(returned, false, 'A stale old timer cannot abort the fresh held save');
+        assert.equal(f.calls.saves, 2);
+        completeRetry();
+        assert.deepEqual(await retries, [true, true, true]);
+        assert.equal(f.calls.launches.length, 2);
+        assert.equal(f.calls.processes.filter(call => call.args[0] === 'build').length, 2, 'Other-file and corrected-file builds each run once');
+        assert.equal(f.calls.errors.length, 1);
+        assert.equal(f.foreground.lateReports, 0);
+        assert.notEqual(f.calls.launches[1].config.program, otherConfig.program);
+    } finally {
+        const disposal = f.api.dispose();
+        completeSave?.(); completeRetry?.();
+        await first; await retries;
+        await disposal;
+    }
+    assertDisposed(f);
+});
+
+for (const rejected of [false, true]) {
+    test(`save deadline retains source and disposal through a late ${rejected ? 'rejection' : 'false reply'} without duplicate notifications`, { timeout: 5000 }, async t => {
+        let settleSave;
+        const failure = new Error('Original save rejection after timeout');
+        const f = saveDeadlineFixture(t, { dirty: true, save: () => new Promise((resolve, reject) => {
+            settleSave = () => rejected ? reject(failure) : resolve(false);
+        }) });
+        const operation = f.api.debugActiveFile();
+        let disposal;
+        try {
+            await waitFor(() => settleSave, 'The original save result must be held');
+            f.runDue(100);
+            assert.equal(await awaitForegroundResult(operation), false);
+            assert.equal(await f.api.debugActiveFile(), false);
+            assert.equal(f.calls.saves, 1);
+            disposal = observeDisposal(f);
+            await new Promise(resolve => setImmediate(resolve));
+            assert.equal(disposal.settled, false);
+            assert.equal(f.calls.disposals.output, 0);
+            f.advance(7);
+            settleSave();
+            await disposal.promise;
+            assert.equal(f.calls.errors.length, 1);
+            assert.match(f.calls.errors[0], /Editor save timed out/);
+            if (rejected) assert(f.calls.logs.some(line => line.includes(failure.message)));
+            assert.deepEqual(f.calls.classifications, []);
+            assert.deepEqual(f.calls.processes, []);
+            assert.deepEqual(f.calls.launches, []);
+            assert.equal(f.foreground.lateReports, 0);
+            assertDisposed(f);
+        } finally { settleSave?.(); await operation; await (disposal?.promise || f.api.dispose()); }
+    });
+}
+
+for (const saved of [true, false]) {
+    test(`save deadline rejects an over-budget ${saved} reply without waiting for its timer callback`, async t => {
+        const f = saveDeadlineFixture(t, { dirty: true, save: () => { f.advance(101); return saved; } });
+        try {
+            assert.equal(await f.api.debugActiveFile(), false);
+            await f.api.dispose();
+            assert.equal(f.calls.saves, 1);
+            assert.equal(f.calls.errors.length, 1);
+            assert.match(f.calls.errors[0], /Editor save timed out.*101 ms \(limit 100 ms\)/);
+            assert.deepEqual(f.calls.classifications, []);
+            assert.deepEqual(f.calls.processes, []);
+            assert.deepEqual(f.calls.launches, []);
+            assert.equal(f.timers.size, 0);
+            assertDisposed(f);
+        } finally { await f.api.dispose(); }
+    });
+}
+
+test('save deadline uses a separate default and ends at accepted replies while preserving original save errors', async t => {
+    for (const mode of ['default-success', 'not-saved', 'rejection']) {
+        const failure = new Error('Original save error without a delivered timeout');
+        const f = saveDeadlineFixture(t, { dirty: true, defaultBudget: mode === 'default-success', save: () => {
+            if (mode === 'rejection') { f.advance(101); throw failure; }
+            return mode !== 'not-saved';
+        } });
+        if (mode === 'default-success') {
+            const getText = f.document.getText;
+            f.document.getText = () => {
+                f.advance(600000);
+                f.saveTimers[0].callback();
+                return getText();
+            };
+        }
+        try {
+            assert.equal(await f.api.debugActiveFile(), mode === 'default-success');
+            assert.equal(f.saveTimers.length, 1);
+            assert.equal(f.saveTimers[0].delay, mode === 'default-success' ? 300000 : 100);
+            f.saveTimers[0].callback();
+            assert.equal(f.timers.size, 0);
+            if (mode === 'default-success') {
+                assert.deepEqual(f.calls.errors, []);
+                assert.equal(f.calls.launches.length, 1);
+                assert.equal(f.scheduled.find(timer => timer.delay === 1000).due, 601000, 'SDK preparation starts after accepted save and later text retrieval');
+                f.terminate(f.calls.launches[0].config);
+            } else {
+                assert.equal(f.calls.errors.length, mode === 'rejection' ? 1 : 0);
+                if (mode === 'rejection') assert.match(f.calls.errors[0], /Original save error without a delivered timeout/);
+                else assert(f.calls.logs.some(line => line.startsWith('Phase not saved: Saving C# file')));
+                assert.deepEqual(f.calls.processes, []);
+                assert.deepEqual(f.calls.launches, []);
+            }
+        } finally { await f.api.dispose(); }
+        assertDisposed(f);
+    }
+});
+
+test('save deadline leaves SDK preparation a fresh independent budget after a timely save', { timeout: 5000 }, async t => {
+    let completeClassification;
+    const f = saveDeadlineFixture(t, { dirty: true, save: () => { f.advance(99); return true; },
+        classify: () => new Promise(resolve => { completeClassification = resolve; }) });
+    const operation = f.api.debugActiveFile();
+    try {
+        await waitFor(() => completeClassification, 'SDK classification must follow the accepted save');
+        assert.equal(f.scheduled.find(timer => timer.delay === 1000).due, 1099);
+        assert.deepEqual([...f.timers].map(timer => timer.delay), [1000]);
+        f.runDue(100);
+        f.saveTimers[0]?.callback();
+        assert.deepEqual(f.calls.errors, []);
+        assert.deepEqual([...f.timers].map(timer => timer.delay), [1000]);
+        completeClassification({ kind: 'file', reason: 'accepted after independent save budget' });
+        assert.equal(await operation, true);
+        assert.equal(f.calls.launches.length, 1);
+        f.terminate(f.calls.launches[0].config);
+    } finally { completeClassification?.({ kind: 'file', reason: 'test release' }); await operation; await f.api.dispose(); }
+    assertDisposed(f);
+});
+
+test('save deadline preserves cancellation or timeout ahead of stale callbacks and later progress-provider errors', { timeout: 5000 }, async t => {
+    for (const mode of ['cancel', 'timeout']) {
+        let rejectSave;
+        const f = saveDeadlineFixture(t, { dirty: true, save: () => new Promise((_resolve, reject) => { rejectSave = reject; }) });
+        const withProgress = f.vscode.window.withProgress;
+        f.vscode.window.withProgress = async (...args) => {
+            try { return await withProgress(...args); }
+            catch { throw new Error('Later save progress provider error'); }
+        };
+        const operation = f.api.debugActiveFile();
+        let disposal;
+        try {
+            await waitFor(() => rejectSave, 'The save must remain held before choosing its outcome');
+            if (mode === 'cancel') f.cancel();
+            else f.runDue(100);
+            assert.equal(await awaitForegroundResult(operation), false);
+            f.runDue(100); f.cancel();
+            assert.equal(f.calls.errors.length, mode === 'cancel' ? 0 : 1);
+            if (mode === 'timeout') assert.match(f.calls.errors[0], /Editor save timed out/);
+            disposal = observeDisposal(f);
+            await new Promise(resolve => setImmediate(resolve));
+            assert.equal(disposal.settled, false);
+            rejectSave(new Error('Original save rejection after first outcome'));
+            await disposal.promise;
+            assert.equal(f.calls.errors.length, mode === 'cancel' ? 0 : 1);
+            assert(f.calls.logs.some(line => line.includes('Original save rejection after first outcome')));
+            assert.deepEqual(f.calls.processes, []);
+            assert.deepEqual(f.calls.launches, []);
+            assertDisposed(f);
+        } finally { rejectSave?.(new Error('Test released save')); await operation; await (disposal?.promise || f.api.dispose()); }
+    }
+});
+
+test('save deadline checks cancellation and elapsed phase progress before dispatching the editor save', async t => {
+    for (const mode of ['pre-cancelled', 'progress-cancel', 'progress-overshoot']) {
+        let f;
+        f = saveDeadlineFixture(t, { dirty: true, cancellationRequested: mode === 'pre-cancelled', reportProgress: value => {
+            if (value.message !== 'Saving C# file') return;
+            if (mode === 'progress-cancel') f.cancel();
+            if (mode === 'progress-overshoot') f.advance(101);
+        } });
+        try {
+            assert.equal(await f.api.debugActiveFile(), false);
+            await f.api.dispose();
+            assert.equal(f.calls.saves, 0);
+            assert.deepEqual(f.calls.classifications, []);
+            assert.deepEqual(f.calls.processes, []);
+            assert.equal(f.calls.errors.length, mode === 'progress-overshoot' ? 1 : 0);
+            if (mode === 'progress-overshoot') assert.match(f.calls.errors[0], /Editor save timed out/);
+            assert.equal(f.timers.size, 0);
+            assert.equal(f.foreground.registrations, 0);
+            assertDisposed(f);
+        } finally { await f.api.dispose(); }
+    }
+});
+
+test('save deadline disposal disarms the timer but waits for the actual save and observes its reentrant rejected result', { timeout: 5000 }, async t => {
+    for (const reentrant of [false, true]) {
+        let settleSave, f;
+        f = saveDeadlineFixture(t, { dirty: true, save: () => {
+            if (reentrant) return { then(_resolve, reject) {
+                f.api.dispose();
+                reject(new Error('Original reentrant save thenable rejection'));
+            } };
+            return new Promise(resolve => { settleSave = resolve; });
+        } });
+        const operation = f.api.debugActiveFile();
+        let disposal;
+        try {
+            if (!reentrant) {
+                await waitFor(() => settleSave, 'The original save must still be pending at disposal');
+                disposal = observeDisposal(f);
+            }
+            assert.equal(await awaitForegroundResult(operation), false);
+            f.runDue(100);
+            assert.equal(f.timers.size, 0);
+            assert.deepEqual(f.calls.errors, []);
+            if (!reentrant) {
+                assert.equal(disposal.settled, false);
+                assert.equal(f.calls.disposals.output, 0);
+                settleSave(true);
+            }
+            await (disposal?.promise || f.api.dispose());
+            if (reentrant) assert(f.calls.logs.some(line => line.includes('Original reentrant save thenable rejection')));
+            assert.deepEqual(f.calls.processes, []);
+            assert.deepEqual(f.calls.launches, []);
+            assert.equal(f.foreground.lateReports, 0);
+            assertDisposed(f);
+        } finally { settleSave?.(false); await operation; await (disposal?.promise || f.api.dispose()); }
+    }
+});
+
+test('save deadline applies only to dirty saves and does not extend into SDK, Web, handoff or selected-project waits', { timeout: 5000 }, async t => {
+    for (const stage of ['clean', 'SDK', 'Web settings', 'certificate consent', 'OS trust', 'handoff', 'project']) {
+        let releaseStage;
+        const held = () => new Promise(resolve => { releaseStage = resolve; });
+        const f = saveDeadlineFixture(t, {
+            dirty: stage !== 'clean', save: async () => true,
+            ...(stage === 'SDK' ? { classify: held } : {}),
+            ...(stage === 'project' ? { kind: 'project' } : {}),
+            ...(stage === 'handoff' ? { startDebugging: held } : {}),
+            ...(['Web settings', 'certificate consent', 'OS trust'].includes(stage) ? { webSupport: {
+                BUILD_METADATA_ARGS: [], parseBuildMetadata: () => ({ isWebServer: true }),
+                prepareWebLaunch: ({ onProgress }) => { onProgress(stage); return held(); },
+            } } : {}),
+        });
+        if (stage === 'project') f.vscode.commands.executeCommand = held;
+        const operation = f.api.debugActiveFile();
+        try {
+            if (stage === 'clean') {
+                assert.equal(await operation, true);
+                assert.equal(f.calls.saves, 0);
+                assert.equal(f.saveTimers.length, 0);
+                f.terminate(f.calls.launches[0].config);
+            } else {
+                await waitFor(() => releaseStage, 'The later stage must be held after accepted save');
+                assert.equal(f.calls.saves, 1);
+                assert.equal([...f.timers].some(timer => timer.delay === f.limit), false);
+                f.advance(101); f.saveTimers[0]?.callback();
+                assert.deepEqual(f.calls.errors, []);
+                f.cancel();
+                if (stage === 'project') releaseStage(true);
+                else assert.equal(await awaitForegroundResult(operation), false);
+                releaseStage(stage === 'project' ? true : stage === 'SDK' ? { kind: 'file', reason: 'test release' } : false);
+                assert.equal(await operation, stage === 'project');
+            }
+            await f.api.dispose();
+            assert.deepEqual(f.calls.errors, []);
+            assert.equal(f.foreground.lateReports, 0);
+            assertDisposed(f);
+        } finally { releaseStage?.(false); await operation; await f.api.dispose(); }
     }
 });
