@@ -53,7 +53,7 @@ The [stability contract](stability-contract.md) permits an explicit manual check
 
    The unchanged **90-second input/observation phase** includes the human observation, keypress, receipt publication and ensuing driver assertions. The request expiry does not pause the enclosing phase, which starts before request publication and can close first. Prepare the terminal in advance; do not extend or pause timers or change assertions to accommodate an operator delay.
 
-3. **Launch the prepared profile visibly once.** Use the frozen launcher and its normal installation path. For example, the optional 2,400-second whole-run safety cap is within the existing 60..3,600-second range; the default remains 300 seconds.
+3. **Launch the prepared profile visibly once.** Use the frozen launcher and its normal installation path. For example, the optional 2,400-second editor-process lifetime cap is within the existing 60..3,600-second range; the default remains 300 seconds.
 
    ```powershell
    & $powershell -NoLogo -NoProfile -File `
@@ -61,7 +61,7 @@ The [stability contract](stability-contract.md) permits an explicit manual check
        -WorkDir $work -DeadlineSeconds 2400 -ShowWindow
    ```
 
-   This outer cap is a test safety ceiling, not a calibrated product deadline. It neither extends a 90-second phase nor guarantees that every phase can consume its full allowance. Do not change launcher security flags, clear caches, reload/reinstall, or switch input modes to obtain a pass after failure.
+   This outer cap starts after the editor is launched and does not bound pre-editor installation/setup or uncooperative OS I/O. It is a test safety ceiling, not a calibrated product deadline. It neither extends a 90-second phase nor guarantees that every phase can consume its full allowance. Do not change launcher security flags, clear caches, reload/reinstall, or switch input modes to obtain a pass after failure.
 
 4. **For each published request, observe, press once, then attest.** Wait for `needs-f5-input-01.json` and the matching armed state in `progress/state.json`. Compare the current request's nonce, sequence, launch token, source and window title with the prepared profile. Before input, check that `f5-input-closed.json` is absent, `progress/state.json` has no `firstFailure`, and the request is still live. If the state is closed, expired, uncertain or failed, stop without sending input or publishing a receipt.
 
