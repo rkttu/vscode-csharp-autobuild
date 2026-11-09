@@ -1,0 +1,223 @@
+{
+  "schema": 1,
+  "scope": "Controlled editor acceptance/event diagnostics; no native session-delivery qualification.",
+  "baseCommit": "b2549b9c4eb7f12b1272468021d2de9ab761ae09",
+  "sourceCommit": "97ed767b789fe9bcd1e88889fa4ec18cd0cfe496",
+  "sourcesVerified": 54,
+  "changedFiles": {
+    "docs/file-based-apps.md": {
+      "bytes": 26100,
+      "sha256": "115328017d0ff2a7ad3d6136ea07f76715e76e6a5d9c7d1e8d0e70eb86898da5"
+    },
+    "scripts/variant/file-based-apps/runtime.cjs": {
+      "bytes": 51204,
+      "sha256": "d7f0dd838bd83b416e0d0336fa03e417be4aa8ac4bc7e26ea587a9948fdb0a24"
+    },
+    "scripts/variant/file-based-apps/test-runtime.cjs": {
+      "bytes": 302752,
+      "sha256": "5bc66ad00b4002f8c2bf09e79171f562caa8a729d74fc7e08053c5567c2b40a4"
+    }
+  },
+  "verifierManifest": {
+    "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\unconfirmed-session-2026-11-09\\verifier-inputs\\manifest.json",
+    "bytes": 3230,
+    "sha256": "ed5f4e0d930b6262207bebb54e34cec17f5c81028fbd4613236c0f7351b80f97"
+  },
+  "verifierExecutables": {
+    "node": {
+      "originalPath": "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+      "retainedPath": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\unconfirmed-session-2026-11-09\\verifier-inputs\\node-8e55f00a0aca4c8d71ff6f68aa6285118fad18c29c0482973cc03ee5f0c2a98b.exe",
+      "bytes": 81949488,
+      "sha256": "8e55f00a0aca4c8d71ff6f68aa6285118fad18c29c0482973cc03ee5f0c2a98b"
+    },
+    "python": {
+      "originalPath": "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\python\\python.exe",
+      "retainedPath": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\unconfirmed-session-2026-11-09\\verifier-inputs\\python-8fc34e1314ae172c7841832ae7c63ce3d59eb7394b3ca317d69c803f93ea5660.exe",
+      "bytes": 107312,
+      "sha256": "8fc34e1314ae172c7841832ae7c63ce3d59eb7394b3ca317d69c803f93ea5660"
+    }
+  },
+  "inputLimits": "Original argv identities are recorded; replay reads retained EXE bytes, not current cache EXEs. No complete Python environment is retained.",
+  "checks": [
+    {
+      "record": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\unconfirmed-session-2026-11-09\\checks\\initial-contrast\\record.json",
+        "bytes": 29981,
+        "sha256": "73f4c28f0a0ea7f28d5babad5b9cb2cb7255e9621481837269eae3f9f193f61c"
+      },
+      "runner": {
+        "bytes": 6136,
+        "sha256": "f285007020102911c2cfc1551750f226e12b2c45ff09bc3adb2ec34d3d4458e0"
+      },
+      "archivedSourcesVerified": 54,
+      "runs": [
+        {
+          "variant": "baseline",
+          "argv": [
+            "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+            "--unhandled-rejections=strict",
+            "--test",
+            "--test-reporter=tap",
+            "--test-name-pattern",
+            "^unconfirmed launch diagnostics",
+            "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\unconfirmed-session-2026-11-09\\checks\\initial-contrast\\baseline\\test-runtime.cjs"
+          ],
+          "startedUtc": "2026-11-09T05:08:32.776740+00:00",
+          "completedUtc": "2026-11-09T05:08:34.381896+00:00",
+          "exitCode": 1,
+          "counts": {
+            "tests": 6,
+            "suites": 0,
+            "pass": 1,
+            "fail": 5,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "log": {
+            "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\unconfirmed-session-2026-11-09\\checks\\initial-contrast\\baseline.log",
+            "bytes": 5606,
+            "sha256": "b3ad48f47821fb7a3defba812800780018da7b1490ad575e047fffd6a3053077"
+          },
+          "selected": [
+            {
+              "name": "unconfirmed launch diagnostics preserve an accepted result and independent retry while retaining unobserved output",
+              "passed": false,
+              "diagnosticSha256": "7e2301a895d5d21257a78966f7eda24ac5fdff91e3e798243d3c1201bead3b73",
+              "diagnostic": "  ---\n  duration_ms: 46.9637\n  type: 'test'\n  location: 'D:\\\\Projects\\\\vscode-csharp-autobuild\\\\validation-artifacts\\\\unconfirmed-session-2026-11-09\\\\checks\\\\initial-contrast\\\\baseline\\\\test-runtime.cjs:5241:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly equal:\n    \n    0 !== 1\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 1\n  actual: 0\n  operator: 'strictEqual'\n  stack: |-\n    TestContext.<anonymous> (D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\unconfirmed-session-2026-11-09\\checks\\initial-contrast\\baseline\\test-runtime.cjs:5249:16)\n    async Test.run (node:internal/test_runner/test:1409:7)\n    async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3)\n  ...\n"
+            },
+            {
+              "name": "unconfirmed launch diagnostics confirm only the exact late session once and ignore duplicate or unrelated events",
+              "passed": false,
+              "diagnosticSha256": "1ac0b4db322560dd292a39f3f347c1edcc1fa89fac653d1875be45cf355f7fac",
+              "diagnostic": "  ---\n  duration_ms: 28.0374\n  type: 'test'\n  location: 'D:\\\\Projects\\\\vscode-csharp-autobuild\\\\validation-artifacts\\\\unconfirmed-session-2026-11-09\\\\checks\\\\initial-contrast\\\\baseline\\\\test-runtime.cjs:5273:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly equal:\n    \n    0 !== 1\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 1\n  actual: 0\n  operator: 'strictEqual'\n  stack: |-\n    TestContext.<anonymous> (D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\unconfirmed-session-2026-11-09\\checks\\initial-contrast\\baseline\\test-runtime.cjs:5286:16)\n    async Test.run (node:internal/test_runner/test:1409:7)\n    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)\n  ...\n"
+            },
+            {
+              "name": "unconfirmed launch diagnostics keep a cancelled late acceptance false and quiet while stopping only its later exact session",
+              "passed": false,
+              "diagnosticSha256": "7583e17d26eccd57de2039809153bac55b626416450a04f0620de4665d7b26d2",
+              "diagnostic": "  ---\n  duration_ms: 1025.9307\n  type: 'test'\n  location: 'D:\\\\Projects\\\\vscode-csharp-autobuild\\\\validation-artifacts\\\\unconfirmed-session-2026-11-09\\\\checks\\\\initial-contrast\\\\baseline\\\\test-runtime.cjs:5301:1'\n  failureType: 'testCodeFailure'\n  error: 'Late editor acceptance must remain distinguishable from an observed start'\n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: true\n  actual: false\n  operator: '=='\n  stack: |-\n    waitFor (D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\unconfirmed-session-2026-11-09\\checks\\initial-contrast\\baseline\\test-runtime.cjs:170:5)\n    async TestContext.<anonymous> (D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\unconfirmed-session-2026-11-09\\checks\\initial-contrast\\baseline\\test-runtime.cjs:5311:9)\n    async Test.run (node:internal/test_runner/test:1409:7)\n    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)\n  ...\n"
+            },
+            {
+              "name": "unconfirmed launch diagnostics identify pending accepted and captured disposal ownership without early cleanup",
+              "passed": false,
+              "diagnosticSha256": "277cce368c8bd57386e89e3e2b021bdb82db8f4c9525e9e9f5a19c05ea498639",
+              "diagnostic": "  ---\n  duration_ms: 31.7058\n  type: 'test'\n  location: 'D:\\\\Projects\\\\vscode-csharp-autobuild\\\\validation-artifacts\\\\unconfirmed-session-2026-11-09\\\\checks\\\\initial-contrast\\\\baseline\\\\test-runtime.cjs:5334:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Repeated disposal must not repeat the ownership diagnosis\n    \n    0 !== 1\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 1\n  actual: 0\n  operator: 'strictEqual'\n  stack: |-\n    TestContext.<anonymous> (D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\unconfirmed-session-2026-11-09\\checks\\initial-contrast\\baseline\\test-runtime.cjs:5349:20)\n    async Test.run (node:internal/test_runner/test:1409:7)\n    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)\n  ...\n"
+            },
+            {
+              "name": "unconfirmed launch diagnostics stay absent when exact events already arrived or the API declined or rejected",
+              "passed": true
+            },
+            {
+              "name": "unconfirmed launch diagnostics contain throwing sinks and reentrant disposal after updating ownership state",
+              "passed": false,
+              "diagnosticSha256": "57e812307fa27777bd893e85356a5444e1d48363182a76853153b0648b636f64",
+              "diagnostic": "  ---\n  duration_ms: 25.2581\n  type: 'test'\n  location: 'D:\\\\Projects\\\\vscode-csharp-autobuild\\\\validation-artifacts\\\\unconfirmed-session-2026-11-09\\\\checks\\\\initial-contrast\\\\baseline\\\\test-runtime.cjs:5394:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly equal:\n    \n    0 !== 1\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 1\n  actual: 0\n  operator: 'strictEqual'\n  stack: |-\n    TestContext.<anonymous> (D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\unconfirmed-session-2026-11-09\\checks\\initial-contrast\\baseline\\test-runtime.cjs:5432:24)\n    async Test.run (node:internal/test_runner/test:1409:7)\n    async Test.processPendingSubtests (node:internal/test_runner/test:974:7)\n  ...\n"
+            }
+          ]
+        },
+        {
+          "variant": "changed",
+          "argv": [
+            "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+            "--unhandled-rejections=strict",
+            "--test",
+            "--test-reporter=tap",
+            "--test-name-pattern",
+            "^unconfirmed launch diagnostics",
+            "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\unconfirmed-session-2026-11-09\\checks\\initial-contrast\\changed\\test-runtime.cjs"
+          ],
+          "startedUtc": "2026-11-09T05:08:36.415509+00:00",
+          "completedUtc": "2026-11-09T05:08:37.164633+00:00",
+          "exitCode": 0,
+          "counts": {
+            "tests": 6,
+            "suites": 0,
+            "pass": 6,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "log": {
+            "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\unconfirmed-session-2026-11-09\\checks\\initial-contrast\\changed.log",
+            "bytes": 1886,
+            "sha256": "f6c778d35c6b97ac72bc032adda444b66b2da69fd0c9c9e5ac1ce7dc3d1f402a"
+          },
+          "selected": [
+            {
+              "name": "unconfirmed launch diagnostics preserve an accepted result and independent retry while retaining unobserved output",
+              "passed": true
+            },
+            {
+              "name": "unconfirmed launch diagnostics confirm only the exact late session once and ignore duplicate or unrelated events",
+              "passed": true
+            },
+            {
+              "name": "unconfirmed launch diagnostics keep a cancelled late acceptance false and quiet while stopping only its later exact session",
+              "passed": true
+            },
+            {
+              "name": "unconfirmed launch diagnostics identify pending accepted and captured disposal ownership without early cleanup",
+              "passed": true
+            },
+            {
+              "name": "unconfirmed launch diagnostics stay absent when exact events already arrived or the API declined or rejected",
+              "passed": true
+            },
+            {
+              "name": "unconfirmed launch diagnostics contain throwing sinks and reentrant disposal after updating ownership state",
+              "passed": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "record": {
+        "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\unconfirmed-session-2026-11-09\\checks\\initial-full\\record.json",
+        "bytes": 24598,
+        "sha256": "71a6d9bd33a392d73598453492180e8165daaa33e4b7c492e63ab6f254716118"
+      },
+      "runner": {
+        "bytes": 6136,
+        "sha256": "f285007020102911c2cfc1551750f226e12b2c45ff09bc3adb2ec34d3d4458e0"
+      },
+      "archivedSourcesVerified": 54,
+      "runs": [
+        {
+          "variant": "full",
+          "argv": [
+            "C:\\Users\\rkttu\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe",
+            "--unhandled-rejections=strict",
+            "--test",
+            "--test-reporter=tap",
+            "scripts/variant/file-based-apps/test-classify.cjs",
+            "scripts/variant/file-based-apps/test-entry.cjs",
+            "scripts/variant/file-based-apps/test-recovery.cjs",
+            "scripts/variant/file-based-apps/test-runtime.cjs",
+            "scripts/variant/file-based-apps/test-web.cjs"
+          ],
+          "startedUtc": "2026-11-09T05:08:51.386254+00:00",
+          "completedUtc": "2026-11-09T05:09:01.990052+00:00",
+          "exitCode": 0,
+          "counts": {
+            "tests": 321,
+            "suites": 0,
+            "pass": 321,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "log": {
+            "path": "D:\\Projects\\vscode-csharp-autobuild\\validation-artifacts\\unconfirmed-session-2026-11-09\\checks\\initial-full\\full.log",
+            "bytes": 77929,
+            "sha256": "9cea8be67579197d7b85f8e24b31a8d0fba1dbfd27678577abd67d8b8e076795"
+          },
+          "selected": []
+        }
+      ]
+    }
+  ]
+}
