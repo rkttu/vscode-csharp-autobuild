@@ -2,6 +2,7 @@
 
 // Synthetic receipt/handshake tests only. No native input or editor is used.
 const assert = require('node:assert/strict');
+const { spawnSync } = require('node:child_process');
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const os = require('node:os');
@@ -213,6 +214,54 @@ test('helper publishes complete JSON without replacement and preserves separate 
     noResult(f);
 });
 
+test('default real clock produces a numeric current attestation without a clock override', t => {
+    const f = fixture(t);
+    const preparedAt = Date.now();
+    f.request.requestedAtUtc = iso(preparedAt - 1000);
+    f.request.expiresAtUtc = iso(preparedAt + 89000);
+    write(f.input.request, f.request);
+    const before = Date.now();
+    const outcome = recordManualInput(f.options);
+    const after = Date.now();
+    assert.equal(outcome.receiptPublished, true);
+    const receipt = JSON.parse(fs.readFileSync(f.input.receipt, 'utf8'));
+    const attestedAt = Date.parse(receipt.attestedAtUtc);
+    assert(Number.isFinite(attestedAt) && before <= attestedAt && attestedAt <= after);
+    validateReceipt({ mode: 'manual-native', request: f.request, receipt, requestSha256: receipt.requestSha256 });
+    assert.equal(receipt.nativeExecutionVerified, false);
+    assert.equal(Object.hasOwn(receipt, 'inputAtUtc'), false);
+    noResult(f);
+});
+
+test('staged helper CLI records a current synthetic declaration through its normal real-clock route', t => {
+    const f = fixture(t);
+    const driver = path.join(f.root, 'driver');
+    fs.mkdirSync(driver);
+    const helper = path.join(driver, 'native-f5-input.cjs');
+    fs.copyFileSync(require.resolve('./native-f5-input.cjs'), helper);
+    const preparedAt = Date.now();
+    f.request.requestedAtUtc = iso(preparedAt - 1000);
+    f.request.expiresAtUtc = iso(preparedAt + 89000);
+    write(f.input.request, f.request);
+    const before = Date.now();
+    const child = spawnSync(process.execPath, [helper, '--work-dir', f.root, '--sequence', '1',
+        '--observer', f.options.observer, '--observed-window-title', f.options.observedWindowTitle,
+        '--note', f.options.note, '--confirm-human-f5'], { encoding: 'utf8', timeout: 10000, windowsHide: true });
+    const after = Date.now();
+    assert.equal(child.error, undefined);
+    assert.equal(child.status, 0, child.stderr);
+    assert.equal(child.stderr, '');
+    assert.deepEqual(JSON.parse(child.stdout), { receiptPublished: true, receipt: f.input.receipt, nativeExecutionVerified: false });
+    const receipt = JSON.parse(fs.readFileSync(f.input.receipt, 'utf8'));
+    const attestedAt = Date.parse(receipt.attestedAtUtc);
+    assert(Number.isFinite(attestedAt) && before <= attestedAt && attestedAt <= after);
+    assert.equal(receipt.producer.path, helper);
+    assert.equal(receipt.nativeExecutionVerified, false);
+    assert.equal(receipt.hardwareKeypressIndependentlyVerified, false);
+    assert.equal(Object.hasOwn(receipt, 'inputAtUtc'), false);
+    noResult(f);
+});
+
 test('no confirmation, actual title, focus note or observer means no writes', t => {
     const f = fixture(t);
     for (const [key, value] of [['confirmHumanF5', false], ['observedWindowTitle', undefined], ['note', ' '], ['observer', ' ']]) {
@@ -278,6 +327,61 @@ test('prepared path escape cannot redirect the helper to result files or outside
         noResult(f);
         assert.equal(fs.existsSync(path.join(f.temporary, 'foreign.json')), false);
     });
+});
+
+test('missing/../ receipt alias cannot bypass a canonical existing receipt or create originals', t => {
+    const f = fixture(t);
+    const canonicalReceipt = f.outputs[3];
+    const sentinel = Buffer.from('canonical original receipt must remain unchanged\n');
+    fs.writeFileSync(canonicalReceipt, sentinel, { flag: 'wx' });
+    // Literal concatenation is intentional: path.join would erase this alias.
+    const alias = f.root + '/missing/../f5-input-action-01.json';
+    f.expected.nativeF5.inputs[0].receipt = alias;
+    f.request.receipt = alias;
+    write(f.expectedPath, f.expected);
+    write(f.input.request, f.request);
+    assert.throws(() => recordManualInput(f.options, NOW), /path aliases/);
+    assert.deepEqual(fs.readFileSync(canonicalReceipt), sentinel);
+    for (const file of f.outputs.slice(0, 3)) assert.equal(fs.existsSync(file), false, file);
+    noResult(f);
+});
+
+test('missing/../ receipt alias without existing evidence is rejected before partial writes', t => {
+    const f = fixture(t);
+    const alias = f.root + path.sep + 'missing' + path.sep + '..' + path.sep + 'f5-input-action-01.json';
+    f.expected.nativeF5.inputs[0].receipt = alias;
+    f.request.receipt = alias;
+    write(f.expectedPath, f.expected);
+    write(f.input.request, f.request);
+    assert.throws(() => recordManualInput(f.options, NOW), /path aliases/);
+    noOutputs(f);
+    noResult(f);
+});
+
+test('missing/../ closed metadata cannot bypass a canonical closed marker', t => {
+    const f = fixture(t);
+    const canonicalClosed = path.join(f.root, 'f5-input-closed.json');
+    const sentinel = Buffer.from('canonical first-failure closure marker\n');
+    fs.writeFileSync(canonicalClosed, sentinel, { flag: 'wx' });
+    // All receipt/request filenames remain canonical: only closure is aliased.
+    const alias = f.root + '/missing/../f5-input-closed.json';
+    f.expected.nativeF5.closed = alias;
+    f.request.closed = alias;
+    write(f.expectedPath, f.expected);
+    write(f.input.request, f.request);
+    assert.throws(() => recordManualInput(f.options, NOW), /path aliases/);
+    assert.deepEqual(fs.readFileSync(canonicalClosed), sentinel);
+    noOutputs(f);
+    noResult(f);
+});
+
+test('request path aliases are rejected consistently even when prepared paths are canonical', t => {
+    const f = fixture(t);
+    f.request.receipt = f.root + '/missing/../f5-input-action-01.json';
+    write(f.input.request, f.request);
+    assert.throws(() => recordManualInput(f.options, NOW), /path aliases/);
+    noOutputs(f);
+    noResult(f);
 });
 
 test('real-parent checks reject a junction or symlink in source paths', t => {

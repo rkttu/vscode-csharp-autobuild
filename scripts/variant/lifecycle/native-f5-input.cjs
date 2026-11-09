@@ -147,8 +147,21 @@ function readJson(root, filename, direct = false) {
 }
 
 function absent(root, filename) {
-    safePath(root, filename, { direct: true, exists: false });
-    assert(!fs.existsSync(filename), 'Never overwrite existing manual input evidence');
+    const resolved = safePath(root, filename, { direct: true, exists: false });
+    assert(!fs.existsSync(resolved), 'Never overwrite existing manual input evidence');
+    return resolved;
+}
+
+function preparedEvidencePath(root, filename, basename, label) {
+    const canonical = path.join(root, basename);
+    assert(samePath(filename, canonical), `Unexpected ${label} path`);
+    // Reject lexical aliases before touching any evidence. In particular,
+    // missing/../file may normalize to file while OS calls on the original
+    // spelling fail because missing does not exist. Both Windows separators
+    // are checked; all actual I/O below uses the fixed canonical basename.
+    assert(!filename.split(/[\\/]/).some(part => part === '.' || part === '..'),
+        `${label} must not contain . or .. path aliases`);
+    return canonical;
 }
 
 function recordManualInput({ workDir, sequence, observer, observedWindowTitle, note, confirmHumanF5 }, optionalNow) {
@@ -186,21 +199,27 @@ function recordManualInput({ workDir, sequence, observer, observedWindowTitle, n
     nonblank(native.nonce, 'Prepared native input nonce');
     nonblank(native.windowTitle, 'Prepared native window title');
     assert(native.windowTitle.includes(native.nonce));
-    assert(samePath(native.closed, path.join(root, 'f5-input-closed.json')), 'Unexpected native input closure path');
-    native.inputs.forEach((input, index) => {
+    const closedPath = preparedEvidencePath(root, native.closed, 'f5-input-closed.json', 'native input closure');
+    const inputs = native.inputs.map((input, index) => {
         assert.equal(input.sequence, index + 1);
         const suffix = String(input.sequence).padStart(2, '0');
-        assert(samePath(input.request, path.join(root, `needs-f5-input-${suffix}.json`)), 'Unexpected input request path');
-        assert(samePath(input.receipt, path.join(root, `f5-input-action-${suffix}.json`)), 'Unexpected input receipt path');
+        return { sequence: input.sequence,
+            request: preparedEvidencePath(root, input.request, `needs-f5-input-${suffix}.json`, 'input request'),
+            receipt: preparedEvidencePath(root, input.receipt, `f5-input-action-${suffix}.json`, 'input receipt') };
     });
-    const input = native.inputs[sequence - 1];
+    const input = inputs[sequence - 1];
     assert(input, 'Input sequence is outside this prepared profile');
-    const requestSnapshot = readJson(root, input.request, true);
+    const requestPath = input.request;
+    const receiptPath = input.receipt;
+    const requestSnapshot = readJson(root, requestPath, true);
     const request = requestSnapshot.value;
     assert.equal(request.nonce, native.nonce);
     assert.equal(request.sequence, sequence);
     assert.equal(request.windowTitle, native.windowTitle);
-    assert(samePath(request.receipt, input.receipt) && samePath(request.closed, native.closed), 'Request evidence paths differ from preparation');
+    assert(samePath(request.receipt, receiptPath) && samePath(request.closed, closedPath), 'Request evidence paths differ from preparation');
+    const suffix = String(sequence).padStart(2, '0');
+    preparedEvidencePath(root, request.receipt, `f5-input-action-${suffix}.json`, 'request receipt');
+    preparedEvidencePath(root, request.closed, 'f5-input-closed.json', 'request closure');
     const source = safePath(root, path.join(root, 'workspace/a.cs'));
     assert(samePath(request.source, source) && samePath(request.activeSource, source), 'Manual request must name the captured isolated C# source');
     assert.equal(request.languageId, 'csharp');
@@ -208,13 +227,12 @@ function recordManualInput({ workDir, sequence, observer, observedWindowTitle, n
     assert.deepEqual(request.workspaceFolders, []);
     assert.equal(request.activeDebugSessionId, null);
     assert.equal(request.isDirty, sequence > 1);
-    const suffix = String(sequence).padStart(2, '0');
     const observationPath = path.join(root, `manual-observation-${suffix}.json`);
     const inputRecordPath = path.join(root, `manual-action-${suffix}.json`);
-    const stagedPath = input.receipt + '.tmp';
+    const stagedPath = receiptPath + '.tmp';
 
     function openRequest(now) {
-        absent(root, native.closed);
+        absent(root, closedPath);
         const state = readJson(root, path.join(root, 'progress/state.json')).value;
         assert(samePath(state.root, root), 'Progress belongs to a different profile');
         assert(state.firstFailure == null, 'First failure closes manual input');
@@ -228,7 +246,7 @@ function recordManualInput({ workDir, sequence, observer, observedWindowTitle, n
 
     const attestedAt = clock();
     openRequest(attestedAt);
-    for (const file of [input.receipt, stagedPath, observationPath, inputRecordPath]) absent(root, file);
+    for (const file of [receiptPath, stagedPath, observationPath, inputRecordPath]) absent(root, file);
     const producer = { path: __filename, sha256: producerSha256, version: PRODUCER_VERSION };
     const common = Object.fromEntries(SHARED_KEYS.map(key => [key, request[key]]));
     const declaration = { schema: 1, ...common, inputMode: 'manual-native', requestSha256: requestSnapshot.sha256,
@@ -256,9 +274,9 @@ function recordManualInput({ workDir, sequence, observer, observedWindowTitle, n
     for (const [file, bytes] of records) assert(readJson(root, file, true).bytes.equals(bytes), 'Original manual evidence changed before publication');
     openRequest(publicationTime);
     validateReceipt({ mode: 'manual-native', request, receipt, requestSha256: requestSnapshot.sha256, now: publicationTime });
-    absent(root, input.receipt);
-    fs.linkSync(stagedPath, input.receipt);
-    return { receiptPublished: true, receipt: input.receipt, nativeExecutionVerified: false };
+    absent(root, receiptPath);
+    fs.linkSync(stagedPath, receiptPath);
+    return { receiptPublished: true, receipt: receiptPath, nativeExecutionVerified: false };
 }
 
 module.exports = { inputPolicy, validateReceipt, recordManualInput };
