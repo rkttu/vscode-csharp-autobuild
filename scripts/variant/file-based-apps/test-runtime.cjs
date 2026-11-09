@@ -119,6 +119,7 @@ function fixture(t, options = {}) {
         ...(options.preparationTimeoutMs !== undefined ? { preparationTimeoutMs: options.preparationTimeoutMs } : {}),
         ...(options.handoffTimeoutMs !== undefined ? { handoffTimeoutMs: options.handoffTimeoutMs } : {}),
         ...(options.saveTimeoutMs !== undefined ? { saveTimeoutMs: options.saveTimeoutMs } : {}),
+        ...(options.webPreparationTimeoutMs !== undefined ? { webPreparationTimeoutMs: options.webPreparationTimeoutMs } : {}),
         ...(options.scheduleTimeout ? { scheduleTimeout: options.scheduleTimeout, clearTimeout: options.clearTimeout } : {}),
         findDotnet: options.findDotnet || (async () => ({ executable: path.join(root, 'dotnet', 'dotnet.exe'), root: path.join(root, 'dotnet') })),
         classifyFile: async input => {
@@ -1391,7 +1392,7 @@ test('the preparation deadline is disarmed before Web certificate interaction', 
     const f = preparationFixture(t, { webSupport: {
         BUILD_METADATA_ARGS: [], parseBuildMetadata: () => ({ isWebServer: true }),
         prepareWebLaunch: async ({ signal }) => {
-            assert.equal(f.timers.size, 0);
+            assert.deepEqual([...f.timers].map(timer => timer.delay), [300000], 'Only the independent Web budget applies here');
             f.expire(); // A previously queued timer must not time out user interaction.
             assert(!signal.aborted);
         },
@@ -4500,7 +4501,8 @@ test('handoff deadline excludes save, Web interaction and already dispatched sel
             ...(stage === 'project' ? { kind: 'project' } : {}),
             ...(['Web settings', 'certificate consent', 'OS trust'].includes(stage) ? { webSupport: {
                 BUILD_METADATA_ARGS: [], parseBuildMetadata: () => ({ isWebServer: true }),
-                prepareWebLaunch: ({ onProgress }) => {
+                prepareWebLaunch: ({ onProgress, onNonInteractive }) => {
+                    if (stage === 'certificate consent' || stage === 'OS trust') onNonInteractive?.(false);
                     onProgress(stage === 'certificate consent' ? 'Waiting for HTTPS certificate consent' :
                         stage === 'OS trust' ? 'Preparing HTTPS development certificate' : 'Preparing web launch settings');
                     return held();
@@ -4513,7 +4515,7 @@ test('handoff deadline excludes save, Web interaction and already dispatched sel
             await waitFor(() => releaseStage, 'The excluded stage must be held');
             assert.equal(f.handoffTimers.length, 0);
             assert.equal([...f.timers].filter(timer => timer.delay === f.limit).length, 0, 'No handoff budget applies to the excluded stage');
-            assert.equal(f.timers.size, stage === 'save' ? 1 : 0, 'An editor save may have its own independent budget');
+            assert.equal(f.timers.size, stage === 'save' || stage === 'Web settings' ? 1 : 0, 'Save and noninteractive Web settings may have independent budgets');
             f.advance(101); // Beyond handoff's limit, within the independent save budget.
             for (const timer of [...f.timers].filter(candidate => candidate.due <= 101)) timer.callback();
             f.cancel();
@@ -4901,4 +4903,333 @@ test('save deadline applies only to dirty saves and does not extend into SDK, We
             assertDisposed(f);
         } finally { releaseStage?.(false); await operation; await f.api.dispose(); }
     }
+});
+
+function webDeadlineFixture(t, options = {}) {
+    let elapsed = 0;
+    const timers = new Set(), scheduled = [];
+    const limit = options.defaultBudget ? 300000 : 100;
+    const f = observeForeground(fixture(t, { ...options, web: options.web !== false,
+        preparationTimeoutMs: 1000, handoffTimeoutMs: 2000, saveTimeoutMs: 3000,
+        ...(options.defaultBudget ? {} : { webPreparationTimeoutMs: limit }),
+        now: () => elapsed,
+        scheduleTimeout: (callback, delay) => {
+            const timer = { callback, delay, due: elapsed + delay };
+            timers.add(timer); scheduled.push(timer); return timer;
+        }, clearTimeout: timer => timers.delete(timer),
+    }));
+    const certificate = { processes: [], prompts: 0 };
+    const run = f.dependencies.runDotnet;
+    f.dependencies.runDotnet = async (args, settings) => {
+        if (args[0] !== 'dev-certs') return run(args, settings);
+        f.calls.processes.push({ args, settings }); certificate.processes.push({ args, settings });
+        return options.certificateProcess ? options.certificateProcess(args, settings, certificate.processes.length) : { exitCode: 0 };
+    };
+    f.vscode.window.showWarningMessage = (...args) => {
+        certificate.prompts++;
+        return options.certificatePrompt ? options.certificatePrompt(...args) : Promise.resolve('Trust development certificate');
+    };
+    if (!options.noProfile) fs.writeFileSync(f.source.replace(/\.cs$/, '.run.json'), JSON.stringify({ profiles: {
+        Local: { commandName: 'Project', applicationUrl: options.https ? 'https://localhost:5011' : 'http://localhost:5010' },
+    } }));
+    return { ...f, certificate, timers, scheduled, limit, advance: ms => { elapsed += ms; },
+        get webTimers() { return scheduled.filter(timer => timer.delay !== 1000 && timer.delay !== 2000 && timer.delay !== 3000); },
+        runDue(ms) {
+            elapsed += ms;
+            for (const timer of [...timers].filter(candidate => candidate.due <= elapsed)) if (timers.has(timer)) timer.callback();
+        },
+    };
+}
+
+test('web preparation deadline returns a held timeout while retaining output and source until provider settlement and corrected retry', { timeout: 5000 }, async t => {
+    let rejectWeb, transition, first = true;
+    const support = require('./web.cjs');
+    const f = webDeadlineFixture(t, { webSupport: { ...support, prepareWebLaunch: input => {
+        if (input.source === f.source && first) {
+            first = false; transition = input.onNonInteractive;
+            return new Promise((_resolve, reject) => { rejectWeb = reject; });
+        }
+        return support.prepareWebLaunch(input);
+    } } });
+    const operation = f.api.debugActiveFile();
+    try {
+        await waitFor(() => rejectWeb, 'The Web provider must be held');
+        const build = f.calls.processes.find(call => call.args[0] === 'build');
+        const directory = build.args[build.args.indexOf('--output') + 1];
+        f.runDue(100);
+        assert.equal(await awaitForegroundResult(operation), false);
+        const oldTimer = f.webTimers[0];
+        assert.equal(f.calls.errors.length, 1);
+        assert.match(f.calls.errors[0], /Web preparation timed out.*100 ms of noninteractive work/);
+        assert(fs.existsSync(path.join(directory, 'FileApp.dll')));
+        assert.deepEqual(await Promise.all([f.api.debugActiveFile(), f.api.debugActiveFile()]), [false, false]);
+        assert.equal(f.calls.processes.filter(call => call.args[0] === 'build').length, 1);
+        const other = path.join(path.dirname(f.source), 'other-web.cs');
+        fs.writeFileSync(other, 'Console.WriteLine("other");\n');
+        f.vscode.window.activeTextEditor = { document: { uri: { scheme: 'file', fsPath: other }, isDirty: false,
+            getText: () => fs.readFileSync(other, 'utf8') } };
+        // Explicit HTTP avoids synthesizing an HTTPS profile for this independent source.
+        fs.writeFileSync(other.replace(/\.cs$/, '.run.json'), JSON.stringify({ profiles: { Http: { commandName: 'Project', applicationUrl: 'http://localhost:5010' } } }));
+        assert.equal(await f.api.debugActiveFile(), true);
+        const otherConfig = f.calls.launches[0].config;
+        rejectWeb(new Error('Original late Web provider failure'));
+        await waitForForegroundDrain(f);
+        await waitForRemovedOutput(f, directory);
+        assert(f.calls.logs.some(line => line.includes('Original late Web provider failure')));
+        assert(fs.existsSync(otherConfig.program));
+        assert.equal(f.calls.stops.length, 0);
+        f.vscode.window.activeTextEditor = { document: f.document };
+        assert.deepEqual(await Promise.all([f.api.debugActiveFile(), f.api.debugActiveFile(), f.api.debugActiveFile()]), [true, true, true]);
+        oldTimer.callback(); transition(true); transition(false);
+        assert.equal(f.calls.errors.length, 1);
+        assert.equal(f.calls.launches.length, 2);
+        assert.equal(f.timers.size, 0);
+        assert.equal(f.foreground.lateReports, 0);
+    } finally { const disposal = f.api.dispose(); rejectWeb?.(new Error('Test released Web')); await operation; await disposal; }
+    assertDisposed(f);
+});
+
+test('web preparation deadline accumulates check and verification while excluding consent and trust and ignoring an earlier epoch', { timeout: 5000 }, async t => {
+    let dismiss, finishTrust, rejectVerification;
+    const f = webDeadlineFixture(t, { https: true,
+        certificatePrompt: () => new Promise(resolve => { dismiss = resolve; }),
+        certificateProcess: (_args, _settings, count) => {
+            if (count === 1) { f.advance(30); return { exitCode: 7 }; }
+            if (count === 2) return new Promise(resolve => { finishTrust = () => resolve({ exitCode: 0 }); });
+            return new Promise((_resolve, reject) => { rejectVerification = reject; });
+        },
+    });
+    const operation = f.api.debugActiveFile();
+    let disposal;
+    try {
+        await waitFor(() => dismiss, 'Consent must pause the active budget');
+        const oldTimer = f.webTimers[0];
+        assert.equal(f.timers.size, 0);
+        f.runDue(1000); oldTimer?.callback();
+        assert.deepEqual(f.calls.errors, []);
+        dismiss('Trust development certificate');
+        await waitFor(() => finishTrust, 'OS trust must remain in the same paused interval');
+        assert.equal(f.timers.size, 0);
+        f.runDue(1000); oldTimer?.callback();
+        finishTrust();
+        await waitFor(() => rejectVerification, 'Verification must resume only the remaining budget');
+        const resumed = [...f.timers];
+        f.advance(10); oldTimer?.callback();
+        assert.deepEqual(f.calls.errors, [], 'A cleared pre-pause callback cannot expire the resumed budget');
+        f.runDue(60);
+        assert.equal(await awaitForegroundResult(operation), false);
+        assert.deepEqual(resumed.map(timer => timer.delay), [70]);
+        assert.match(f.calls.errors[0], /Verifying HTTPS development certificate after 100 ms of noninteractive work \(limit 100 ms\)/);
+        assert(f.calls.logs.some(line => /Phase timed out: Verifying HTTPS development certificate \(70 ms; total 2100 ms\)/.test(line)));
+        disposal = observeDisposal(f);
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(disposal.settled, false);
+        assert.equal(f.calls.disposals.output, 0);
+        rejectVerification(new Error('Late verification provider result'));
+        await disposal.promise;
+        assert.equal(f.certificate.processes.length, 3);
+        assert.equal(f.certificate.prompts, 1);
+        assert.equal(f.calls.errors.length, 1);
+        assert.deepEqual(f.calls.launches, []);
+        assert.equal(f.foreground.lateReports, 0);
+        assertDisposed(f);
+    } finally { dismiss?.('Cancel'); finishTrust?.(); rejectVerification?.(new Error('Test released verification')); await operation; await (disposal?.promise || f.api.dispose()); }
+});
+
+test('web preparation deadline checks consumed time before pausing so an overdue certificate check cannot open consent', async t => {
+    let f;
+    f = webDeadlineFixture(t, { https: true, certificateProcess: () => { throw new Error('Untrusted certificate'); },
+        appendLine: line => { if (line.startsWith('HTTPS development certificate needs attention:')) f.advance(101); } });
+    try {
+        assert.equal(await f.api.debugActiveFile(), false);
+        await f.api.dispose();
+        assert.match(f.calls.errors[0], /Web preparation timed out/);
+        assert.equal(f.certificate.processes.length, 1);
+        assert.equal(f.certificate.prompts, 0);
+        assert.deepEqual(f.calls.launches, []);
+        assertDisposed(f);
+    } finally { await f.api.dispose(); }
+});
+
+test('web preparation deadline checks normal replies then closes before bookkeeping and preserves original fatal errors', async t => {
+    for (const mode of ['overdue', 'rejection', 'default-success', 'non-Web']) {
+        const support = require('./web.cjs');
+        let f, preparing = 0;
+        f = webDeadlineFixture(t, { defaultBudget: mode === 'default-success', https: mode === 'default-success', web: mode !== 'non-Web',
+            reportProgress: value => {
+                if (value.message === 'Preparing web launch settings' && ++preparing === 2 && mode === 'default-success') {
+                    f.advance(600000); f.webTimers[0]?.callback();
+                }
+            },
+            ...(['overdue', 'rejection'].includes(mode) ? { webSupport: { ...support, prepareWebLaunch: () => {
+                f.advance(101);
+                if (mode === 'rejection') throw new Error('Original fatal Web provider error');
+                return undefined;
+            } } } : {}),
+        });
+        try {
+            assert.equal(await f.api.debugActiveFile(), mode === 'default-success' || mode === 'non-Web');
+            if (mode === 'overdue') assert.match(f.calls.errors[0], /Web preparation timed out/);
+            if (mode === 'rejection') assert.match(f.calls.errors[0], /Original fatal Web provider error/);
+            if (mode === 'default-success') {
+                assert.equal(f.webTimers[0].delay, 300000);
+                assert.deepEqual(f.calls.errors, []);
+            }
+            if (mode === 'non-Web') assert.equal(f.webTimers.length, 0);
+            assert.equal(f.timers.size, 0);
+        } finally { await f.api.dispose(); }
+        assertDisposed(f);
+    }
+});
+
+test('web preparation deadline leaves held OS trust exempt and preserves cancellation disposal and original trust errors', { timeout: 5000 }, async t => {
+    for (const cancel of [false, true]) {
+        let rejectTrust;
+        const f = webDeadlineFixture(t, { https: true, certificateProcess: (_args, _settings, count) => count === 1 ? { exitCode: 7 } :
+            new Promise((_resolve, reject) => { rejectTrust = reject; }) });
+        const operation = f.api.debugActiveFile();
+        let disposal;
+        try {
+            await waitFor(() => rejectTrust, 'Trust must be pending with the Web budget paused');
+            assert.equal(f.timers.size, 0);
+            f.runDue(600000); f.webTimers[0]?.callback();
+            assert.deepEqual(f.calls.errors, []);
+            if (cancel) {
+                f.cancel();
+                assert.equal(await awaitForegroundResult(operation), false);
+                disposal = observeDisposal(f);
+                await new Promise(resolve => setImmediate(resolve));
+                assert.equal(disposal.settled, false);
+            }
+            rejectTrust(new Error('Original trust operation failure'));
+            assert.equal(await operation, false);
+            await (disposal?.promise || f.api.dispose());
+            assert.equal(f.calls.errors.length, cancel ? 0 : 1);
+            if (!cancel) assert.match(f.calls.errors[0], /Original trust operation failure/);
+            assert.equal(f.certificate.processes.length, 2);
+            assert.equal(f.timers.size, 0);
+            assert.deepEqual(f.calls.launches, []);
+            assertDisposed(f);
+        } finally { rejectTrust?.(new Error('Test released trust')); await operation; await (disposal?.promise || f.api.dispose()); }
+    }
+});
+
+test('web preparation deadline keeps duplicate transitions idempotent and rearms early callbacks for remaining time', { timeout: 5000 }, async t => {
+    let finishWeb, transition;
+    const support = require('./web.cjs');
+    const f = webDeadlineFixture(t, { webSupport: { ...support, prepareWebLaunch: ({ onNonInteractive }) => {
+        transition = onNonInteractive;
+        f.advance(20.2); transition(false); transition(false);
+        f.advance(2000); transition(true); f.advance(10.1); transition(true);
+        return new Promise(resolve => { finishWeb = resolve; });
+    } } });
+    const operation = f.api.debugActiveFile();
+    try {
+        await waitFor(() => finishWeb, 'The resumed provider must remain held');
+        const resumed = f.webTimers.at(-1);
+        resumed?.callback();
+        const rearmed = f.webTimers.at(-1);
+        f.webTimers[0]?.callback();
+        assert.deepEqual(f.calls.errors, []);
+        f.runDue(70);
+        assert.equal(await awaitForegroundResult(operation), false);
+        assert.equal(resumed?.delay, 80);
+        assert.equal(rearmed?.delay, 70, 'An early callback must rearm ceil(remaining), without resetting consumed work');
+        const count = f.scheduled.length;
+        transition(true); transition(false);
+        assert.equal(f.scheduled.length, count, 'Closed budgets cannot be reopened by late callbacks');
+        finishWeb(undefined);
+        await f.api.dispose();
+        assert.equal(f.calls.errors.length, 1);
+        assert.deepEqual(f.calls.launches, []);
+        assertDisposed(f);
+    } finally { f.cancel(); finishWeb?.(undefined); await operation; await f.api.dispose(); }
+});
+
+test('web preparation deadline retains a cancelled port reservation until its close callback settles', { timeout: 5000 }, async t => {
+    let listening = false, releaseClose;
+    const net = require('node:net');
+    t.mock.method(net, 'createServer', () => ({ once() { return this; }, listen() { listening = true; },
+        close(callback) { if (callback) releaseClose = callback; }, address() { return { port: 5010 }; } }));
+    const f = webDeadlineFixture(t, { noProfile: true });
+    const operation = f.api.debugActiveFile();
+    let disposal;
+    try {
+        await waitFor(() => listening, 'The controlled port reservation must remain pending');
+        f.runDue(100);
+        assert.equal(await awaitForegroundResult(operation), false);
+        await waitFor(() => releaseClose, 'The helper must observe actual port-close completion');
+        disposal = observeDisposal(f);
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(disposal.settled, false);
+        assert.equal(f.calls.disposals.output, 0);
+        releaseClose();
+        await disposal.promise;
+        assert.equal(f.calls.errors.length, 1);
+        assert.equal(f.certificate.processes.length, 0);
+        assert.deepEqual(f.calls.launches, []);
+        assertDisposed(f);
+    } finally {
+        f.cancel();
+        if (listening && !releaseClose) await waitFor(() => releaseClose, 'Cancellation must reach the controlled close barrier');
+        releaseClose?.(); await operation; await (disposal?.promise || f.api.dispose());
+    }
+});
+
+test('web preparation deadline preserves the first outcome through later UI errors while an owned provider drains', { timeout: 5000 }, async t => {
+    for (const cancel of [false, true]) {
+        let rejectWeb;
+        const support = require('./web.cjs');
+        const f = webDeadlineFixture(t, { webSupport: { ...support, prepareWebLaunch: () => new Promise((_resolve, reject) => { rejectWeb = reject; }) } });
+        const progress = f.vscode.window.withProgress;
+        f.vscode.window.withProgress = async (...args) => {
+            try { return await progress(...args); } catch { throw new Error('Late Web progress-provider failure'); }
+        };
+        const operation = f.api.debugActiveFile();
+        let disposal;
+        try {
+            await waitFor(() => rejectWeb, 'The Web provider must remain held');
+            if (cancel) f.cancel(); else f.runDue(100);
+            assert.equal(await awaitForegroundResult(operation), false);
+            disposal = observeDisposal(f);
+            assert.equal(disposal.settled, false);
+            rejectWeb(new Error('Original late owned Web error'));
+            await disposal.promise;
+            assert.equal(f.calls.errors.length, cancel ? 0 : 1);
+            if (!cancel) assert.match(f.calls.errors[0], /Web preparation timed out/);
+            assert(f.calls.logs.some(line => line.includes('Original late owned Web error')));
+            assert.deepEqual(f.calls.launches, []);
+            assertDisposed(f);
+        } finally { rejectWeb?.(new Error('Test released Web')); await operation; await (disposal?.promise || f.api.dispose()); }
+    }
+});
+
+test('web preparation deadline retains a Web workflow when both input reads ignore cancellation until they settle', { timeout: 5000 }, async t => {
+    const io = require('node:fs/promises');
+    const original = io.readFile;
+    const f = webDeadlineFixture(t);
+    const reads = [];
+    t.mock.method(io, 'readFile', (filename, options) => {
+        if (!path.resolve(filename).startsWith(path.dirname(f.source) + path.sep)) return original(filename, options);
+        return new Promise(resolve => reads.push({ options, release: () => resolve('{"profiles":{"Http":{"commandName":"Project","applicationUrl":"http://localhost:5010"}}}') }));
+    });
+    const operation = f.api.debugActiveFile();
+    let disposal;
+    try {
+        await waitFor(() => reads.length === 2, 'Both profile reads must be held');
+        f.runDue(100);
+        assert.equal(await awaitForegroundResult(operation), false);
+        assert.equal(await f.api.debugActiveFile(), false);
+        assert(reads.every(read => read.options.signal.aborted));
+        disposal = observeDisposal(f);
+        reads[0].release();
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(disposal.settled, false, 'With neither read failed, the logical Web provider still awaits its sibling');
+        reads[1].release();
+        await disposal.promise;
+        assert.equal(f.calls.errors.length, 1);
+        assert.deepEqual(f.calls.launches, []);
+        assert.equal(f.certificate.processes.length, 0);
+        assertDisposed(f);
+    } finally { f.cancel(); for (const read of reads) read.release(); await operation; await (disposal?.promise || f.api.dispose()); }
 });

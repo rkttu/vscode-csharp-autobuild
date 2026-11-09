@@ -209,7 +209,7 @@ async function freePorts(signal) {
     }
 }
 
-async function checkCertificate({ runDotnet, source, signal, vscode, output, onProgress }) {
+async function checkCertificate({ runDotnet, source, signal, vscode, output, onProgress, onNonInteractive }) {
     const check = async () => {
         abort(signal);
         try {
@@ -226,6 +226,8 @@ async function checkCertificate({ runDotnet, source, signal, vscode, output, onP
     if (await check()) return;
     abort(signal);
     const trust = 'Trust development certificate';
+    onNonInteractive?.(false);
+    abort(signal);
     onProgress?.('Waiting for HTTPS certificate consent');
     abort(signal);
     const choice = await withAbort(vscode.window.showWarningMessage('This web app uses HTTPS, but no trusted development certificate was found.', {
@@ -238,6 +240,9 @@ async function checkCertificate({ runDotnet, source, signal, vscode, output, onP
     abort(signal);
     const result = await runDotnet(['dev-certs', 'https', '--trust'], { cwd: path.dirname(source), signal });
     if (result && typeof result !== 'string' && result.exitCode) throw new Error(`HTTPS development certificate setup failed (exit ${result.exitCode}).`);
+    abort(signal);
+    onNonInteractive?.(true);
+    abort(signal);
     onProgress?.('Verifying HTTPS development certificate');
     if (!await check()) throw new Error('HTTPS development certificate is still missing or untrusted after setup.');
 }
@@ -281,7 +286,7 @@ function expandEnvironmentVariables(value, environment) {
     });
 }
 
-async function prepareWebLaunch({ source, metadata, environment = process.env, signal, runDotnet, vscode, output, onProgress }) {
+async function prepareWebLaunch({ source, metadata, environment = process.env, signal, runDotnet, vscode, output, onProgress, onNonInteractive }) {
     if (!metadata?.isWebServer) return undefined;
     abort(signal);
     const selected = await readProfile(source, output, signal);
@@ -327,7 +332,7 @@ async function prepareWebLaunch({ source, metadata, environment = process.env, s
     const urls = endpoints.URLS || '';
     // Explicit URLS overrides HTTP_PORTS/HTTPS_PORTS in the generic web host.
     const requiresHttps = urls ? urls.split(';').some(url => /^https:\/\//i.test(url.trim())) : hasPorts(endpoints.HTTPS_PORTS);
-    if (requiresHttps) await checkCertificate({ runDotnet, source, signal, vscode, output, onProgress });
+    if (requiresHttps) await checkCertificate({ runDotnet, source, signal, vscode, output, onProgress, onNonInteractive });
     abort(signal);
     let serverReadyAction;
     if (launchBrowser) {

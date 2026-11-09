@@ -127,6 +127,7 @@ function activate(context, dependencies = {}) {
     const preparationTimeoutMs = dependencies.preparationTimeoutMs ?? 5 * 60 * 1000;
     const handoffTimeoutMs = dependencies.handoffTimeoutMs ?? 5 * 60 * 1000;
     const saveTimeoutMs = dependencies.saveTimeoutMs ?? 5 * 60 * 1000;
+    const webPreparationTimeoutMs = dependencies.webPreparationTimeoutMs ?? 5 * 60 * 1000;
     const scheduleTimeout = dependencies.scheduleTimeout || setTimeout;
     const cancelTimeout = dependencies.clearTimeout || clearTimeout;
     const storage = (context.globalStorageUri || context.storageUri)?.fsPath;
@@ -473,6 +474,61 @@ function activate(context, dependencies = {}) {
                 let saveActive = false;
                 let saveBegan;
                 let saveTimer;
+                let webOpen = false;
+                let webRunning = false;
+                let webSpent = 0;
+                let webSegmentBegan;
+                let webTimer;
+                let webEpoch = 0;
+                const webElapsed = () => webSpent + (webRunning ? now() - webSegmentBegan : 0);
+                const expireWeb = elapsed => {
+                    if (!webOpen || !webRunning || controller.signal.aborted) return;
+                    const error = new Error(`Web preparation timed out during ${phase} after ${Math.round(elapsed)} ms of noninteractive work (limit ${webPreparationTimeoutMs} ms). Certificate consent and trust are excluded from this budget. Unfinished owned work remains observed; retry this file after its workflow drains`);
+                    error.name = 'TimeoutError';
+                    controller.abort(error);
+                };
+                const clearWebTimer = () => {
+                    webEpoch++;
+                    if (webTimer !== undefined) {
+                        cancelTimeout(webTimer);
+                        webTimer = undefined;
+                    }
+                };
+                const stopWeb = () => {
+                    webOpen = false;
+                    webRunning = false;
+                    clearWebTimer();
+                };
+                const armWebTimer = () => {
+                    clearWebTimer();
+                    const epoch = webEpoch;
+                    webTimer = scheduleTimeout(() => {
+                        if (!webOpen || !webRunning || epoch !== webEpoch || controller.signal.aborted) return;
+                        const elapsed = webElapsed();
+                        if (elapsed >= webPreparationTimeoutMs) expireWeb(elapsed);
+                        else armWebTimer(); // An early callback must not shorten the active-time budget.
+                    }, Math.max(0, Math.ceil(webPreparationTimeoutMs - webElapsed())));
+                };
+                const setWebNonInteractive = active => {
+                    if (!webOpen) return; // Late helper callbacks cannot reopen a completed foreground budget.
+                    controller.signal.throwIfAborted();
+                    if (active === webRunning) { checkpoint(); return; }
+                    const sampled = now();
+                    if (!active) {
+                        const elapsed = webSpent + sampled - webSegmentBegan;
+                        if (elapsed >= webPreparationTimeoutMs) {
+                            expireWeb(elapsed);
+                            controller.signal.throwIfAborted();
+                        }
+                        webSpent = elapsed;
+                        webRunning = false;
+                        clearWebTimer();
+                    } else {
+                        webRunning = true;
+                        webSegmentBegan = sampled;
+                        armWebTimer();
+                    }
+                };
                 const expire = () => {
                     if (!preparationActive || controller.signal.aborted) return;
                     const error = new Error(`Preparation timed out during ${phase || 'SDK discovery'} after ${Math.round(now() - preparationBegan)} ms (limit ${preparationTimeoutMs} ms). Check project evaluation, SDK and restore output before retrying`);
@@ -495,6 +551,10 @@ function activate(context, dependencies = {}) {
                     if (preparationActive && now() - preparationBegan >= preparationTimeoutMs) expire();
                     if (handoffActive && now() - handoffBegan >= handoffTimeoutMs) expireHandoff();
                     if (saveActive && now() - saveBegan >= saveTimeoutMs) expireSave();
+                    if (webOpen && webRunning) {
+                        const elapsed = webElapsed();
+                        if (elapsed >= webPreparationTimeoutMs) expireWeb(elapsed);
+                    }
                     controller.signal.throwIfAborted();
                 };
                 const stopPreparation = () => {
@@ -545,6 +605,7 @@ function activate(context, dependencies = {}) {
                     stopPreparation();
                     stopHandoff();
                     stopSave();
+                    stopWeb();
                     logPhase(outcome);
                     phaseLog(launchOwnsOutput ?
                         `Foreground ${outcome} during ${phase}; uncertain debugger starts remain tracked and their output is retained until safely terminal. A distinct retry can start after this foreground workflow drains, while an earlier request is still pending.` :
@@ -564,6 +625,7 @@ function activate(context, dependencies = {}) {
                     stopPreparation();
                     stopHandoff();
                     stopSave();
+                    stopWeb();
                     controller.signal.removeEventListener('abort', abortForeground);
                     if (cancel) disposeResource(cancel);
                 };
@@ -676,17 +738,27 @@ function activate(context, dependencies = {}) {
                     // Certificate consent, OS trust and editor-owned launches do not use this deadline.
                     stopPreparation();
                     setPhase('Preparing web launch settings');
+                    const metadata = webSupport.parseBuildMetadata(stdout(buildResult));
+                    if (metadata?.isWebServer) {
+                        webOpen = true;
+                        webRunning = true;
+                        webSegmentBegan = now();
+                        armWebTimer();
+                    }
+                    checkpoint();
                     const webLaunch = await webSupport.prepareWebLaunch({
                         source,
-                        metadata: webSupport.parseBuildMetadata(stdout(buildResult)),
+                        metadata,
                         environment,
                         signal: controller.signal,
                         runDotnet,
                         vscode,
                         output,
                         onProgress: setPhase,
+                        onNonInteractive: setWebNonInteractive,
                     });
-                    controller.signal.throwIfAborted();
+                    checkpoint();
+                    stopWeb();
                     if (phase !== 'Preparing web launch settings') setPhase('Preparing web launch settings');
                     if (webLaunch?.env?.DOTNET_ROOT && comparable(webLaunch.env.DOTNET_ROOT) !== comparable(selected.root)) {
                         throw new Error('The web launch profile DOTNET_ROOT does not identify the selected dotnet installation.');
@@ -736,6 +808,7 @@ function activate(context, dependencies = {}) {
                     stopPreparation();
                     stopHandoff();
                     stopSave();
+                    stopWeb();
                     logPhase(foregroundAbort ? `drained after ${outcome}` : outcome);
                   }
                 }).then(value => {

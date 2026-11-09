@@ -548,3 +548,94 @@ test('foreground diagnostics preserve certificate consent and business errors wi
     assert.deepEqual(f.calls.processes, []);
     assert.deepEqual(f.calls.prompts, []);
 });
+
+test('web preparation deadline explicitly brackets consent and trust before verification without using progress labels as policy', async t => {
+    const f = fixture(t, { prompt: async (...args) => args[2], runDotnet: async (_args, _settings, calls) => ({ exitCode: calls.processes.length === 1 ? 7 : 0 }) });
+    f.write({ Https: { commandName: 'Project', applicationUrl: 'https://localhost:5011' } });
+    const transitions = [];
+    f.input.onNonInteractive = active => transitions.push({ active, processes: f.calls.processes.length, prompts: f.calls.prompts.length });
+    assert.equal((await f.prepare()).requiresHttps, true);
+    assert.deepEqual(transitions, [
+        { active: false, processes: 1, prompts: 0 },
+        { active: true, processes: 2, prompts: 1 },
+    ]);
+    assert.deepEqual(f.calls.progress, ['Checking HTTPS development certificate', 'Waiting for HTTPS certificate consent',
+        'Preparing HTTPS development certificate', 'Verifying HTTPS development certificate']);
+    const http = fixture(t);
+    http.write({ Http: { commandName: 'Project', applicationUrl: 'http://localhost:5010' } });
+    const unused = [];
+    http.input.onNonInteractive = value => unused.push(value);
+    await http.prepare();
+    http.input.metadata.isWebServer = false;
+    await http.prepare();
+    assert.deepEqual(unused, []);
+});
+
+test('web preparation deadline transition cancellation and failures prevent the following consent or verification dispatch', async t => {
+    for (const target of [false, true]) for (const cancel of [false, true]) {
+        const controller = new AbortController(), failure = new Error('Original Web transition callback error');
+        const f = fixture(t, { signal: controller.signal, prompt: async (...args) => args[2],
+            runDotnet: async (_args, _settings, calls) => ({ exitCode: calls.processes.length === 1 ? 7 : 0 }) });
+        f.write({ Https: { commandName: 'Project', applicationUrl: 'https://localhost:5011' } });
+        f.input.onNonInteractive = active => {
+            if (active !== target) return;
+            if (cancel) controller.abort(); else throw failure;
+        };
+        await assert.rejects(f.prepare(), error => cancel ? error.name === 'AbortError' : error === failure);
+        assert.equal(f.calls.processes.length, target ? 2 : 1);
+        assert.equal(f.calls.prompts.length, target ? 1 : 0);
+        assert.equal(getEventListeners(controller.signal, 'abort').length, 0);
+    }
+});
+
+test('web preparation deadline never resumes a cancelled consent interval after a late Trust answer or prompt rejection', async t => {
+    for (const rejectLate of [false, true]) {
+        const controller = new AbortController();
+        let dismiss;
+        const f = fixture(t, { signal: controller.signal, runDotnet: async () => ({ exitCode: 7 }),
+            prompt: () => new Promise((resolve, reject) => { dismiss = () => rejectLate ? reject(new Error('Original late prompt failure')) : resolve('Trust development certificate'); }) });
+        f.write({ Https: { commandName: 'Project', applicationUrl: 'https://localhost:5011' } });
+        const transitions = [];
+        f.input.onNonInteractive = value => transitions.push(value);
+        const operation = f.prepare();
+        try {
+            while (!dismiss) await new Promise(resolve => setImmediate(resolve));
+            controller.abort();
+            await assert.rejects(operation, { name: 'AbortError' });
+            dismiss();
+            await new Promise(resolve => setImmediate(resolve));
+            assert.deepEqual(transitions, [false]);
+            assert.equal(f.calls.processes.length, 1);
+            assert.equal(f.calls.prompts.length, 1);
+            assert.equal(getEventListeners(controller.signal, 'abort').length, 0);
+        } finally { controller.abort(); dismiss?.(); await operation.catch(() => {}); }
+    }
+});
+
+test('web preparation deadline preserves early input-read failure while observing a pure sibling read after logical completion', async t => {
+    const controller = new AbortController();
+    const f = fixture(t, { signal: controller.signal });
+    const original = profileIO.readFile, reads = [], transitions = [];
+    t.mock.method(profileIO, 'readFile', (filename, options) => {
+        if (!path.resolve(filename).startsWith(f.root + path.sep)) return original(filename, options);
+        return new Promise((_resolve, reject) => {
+            const index = reads.length;
+            const cancelled = () => { options.signal.removeEventListener('abort', cancelled); if (index === 0) reject(Object.assign(new Error('First read cancelled'), { name: 'AbortError' })); };
+            reads.push({ rejectLate: () => reject(new Error('Original late pure-input read rejection')) });
+            options.signal.addEventListener('abort', cancelled, { once: true });
+        });
+    });
+    f.input.onNonInteractive = value => transitions.push(value);
+    const operation = f.prepare();
+    try {
+        assert.equal(reads.length, 2);
+        controller.abort();
+        await assert.rejects(operation, { name: 'AbortError' });
+        assert.deepEqual(f.calls.processes, []);
+        assert.deepEqual(f.calls.prompts, []);
+        assert.deepEqual(transitions, []);
+        reads[1].rejectLate();
+        await new Promise(resolve => setImmediate(resolve));
+        assert.deepEqual(f.calls.progress, []);
+    } finally { controller.abort(); for (const read of reads) read.rejectLate(); await operation.catch(() => {}); }
+});
