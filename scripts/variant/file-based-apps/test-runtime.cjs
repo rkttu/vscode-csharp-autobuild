@@ -5233,3 +5233,211 @@ test('web preparation deadline retains a Web workflow when both input reads igno
         assertDisposed(f);
     } finally { f.cancel(); for (const read of reads) read.release(); await operation; await (disposal?.promise || f.api.dispose()); }
 });
+
+const unconfirmedLaunchLines = f => f.calls.logs.filter(line => line.startsWith('Editor accepted C# launch; awaiting exact owned session start event;'));
+const confirmedLaunchLines = f => f.calls.logs.filter(line => line.startsWith('Confirmed exact owned C# session start:'));
+const retainedLaunchLines = f => f.calls.logs.filter(line => line.startsWith('Retained C# launch during disposal:'));
+
+test('unconfirmed launch diagnostics preserve an accepted result and independent retry while retaining unobserved output', async t => {
+    const f = fixture(t, { startDebugging: (_folder, config) => {
+        if (f.calls.launches.length > 1) f.startSession(config);
+        return true;
+    } });
+    try {
+        assert.equal(await f.api.debugActiveFile(), true, 'Editor acceptance remains the command result');
+        const old = f.calls.launches[0].config;
+        assert.equal(unconfirmedLaunchLines(f).length, 1);
+        assert(unconfirmedLaunchLines(f)[0].includes(old.program));
+        assert(unconfirmedLaunchLines(f)[0].includes(old.__netcoredbgFileAppOutput));
+        assert(fs.existsSync(old.program));
+        assert.deepEqual(f.calls.stops, [], 'An absent session handle cannot be stopped');
+        assert.deepEqual(f.calls.errors, []);
+        assert.deepEqual(await Promise.all([f.api.debugActiveFile(), f.api.debugActiveFile()]), [true, true]);
+        const current = f.calls.launches[1].config;
+        assert.equal(f.calls.launches.length, 2, 'Concurrent retry callers share one fresh editor start');
+        assert.notEqual(old.program, current.program);
+        assert.equal(unconfirmedLaunchLines(f).length, 1, 'A retry whose exact event already arrived is confirmed normally');
+        f.terminate(old);
+        await waitForRemovedOutput(f, old.__netcoredbgFileAppOutput);
+        assert(fs.existsSync(current.program), 'The earlier terminal event cannot remove retry output');
+        assert.deepEqual(f.calls.stops, []);
+        f.terminate(current);
+    } finally {
+        const disposal = f.api.dispose();
+        for (const launch of f.calls.launches) f.terminate(launch.config);
+        await disposal;
+    }
+    assertDisposed(f);
+});
+
+test('unconfirmed launch diagnostics confirm only the exact late session once and ignore duplicate or unrelated events', async t => {
+    const f = fixture(t, { startDebugging: async () => true });
+    try {
+        assert.equal(await f.api.debugActiveFile(), true);
+        const config = f.calls.launches[0].config;
+        const fake = { id: 'unrelated', type: 'coreclr', name: 'unrelated', configuration: config };
+        f.emitStart({ ...fake, type: 'other' });
+        f.emitStart({ ...fake, configuration: { ...config, program: path.join(f.root, 'other.dll') } });
+        f.emitStart({ ...fake, configuration: { ...config, __netcoredbgFileAppOutput: f.root } });
+        assert.equal(confirmedLaunchLines(f).length, 0);
+        const exact = f.startSession(config);
+        f.emitStart(exact);
+        f.emitStart({ ...exact, id: 'another-session-id' });
+        assert.equal(unconfirmedLaunchLines(f).length, 1);
+        assert.equal(confirmedLaunchLines(f).length, 1);
+        assert(confirmedLaunchLines(f)[0].includes(exact.id));
+        assert(confirmedLaunchLines(f)[0].includes('startRequest=accepted'));
+        assert.deepEqual(f.calls.stops, [], 'A late confirmed accepted session retains normal user control');
+        assert.deepEqual(f.calls.errors, []);
+        f.terminate(config);
+    } finally {
+        const disposal = f.api.dispose();
+        for (const launch of f.calls.launches) f.terminate(launch.config);
+        await disposal;
+    }
+    assertDisposed(f);
+});
+
+test('unconfirmed launch diagnostics keep a cancelled late acceptance false and quiet while stopping only its later exact session', { timeout: 5000 }, async t => {
+    let resolveStart;
+    const f = fixture(t, { startDebugging: () => new Promise(resolve => { resolveStart = resolve; }), stopDebugging: async () => {} });
+    const operation = f.api.debugActiveFile();
+    try {
+        await waitFor(() => resolveStart, 'The editor API must be pending before cancellation');
+        const config = f.calls.launches[0].config;
+        f.cancel();
+        assert.equal(await awaitForegroundResult(operation), false);
+        resolveStart(true);
+        await waitFor(() => unconfirmedLaunchLines(f).length === 1, 'Late editor acceptance must remain distinguishable from an observed start');
+        assert(unconfirmedLaunchLines(f)[0].includes('cancelled=true'));
+        assert(fs.existsSync(config.program));
+        assert.deepEqual(f.calls.stops, []);
+        const exact = f.startSession(config);
+        await waitFor(() => f.calls.stops.length === 1, 'The existing cancelled-session path must stop the exact late session');
+        f.emitStart(exact);
+        assert.equal(f.calls.stops.length, 1);
+        assert.equal(f.calls.stops[0], exact);
+        assert.equal(confirmedLaunchLines(f).length, 1);
+        assert(fs.existsSync(config.program), 'Stop acknowledgement is not termination');
+        assert.deepEqual(f.calls.errors, []);
+        f.terminate(config);
+        await waitForRemovedOutput(f, config.__netcoredbgFileAppOutput);
+    } finally {
+        const disposal = f.api.dispose();
+        resolveStart?.(false);
+        for (const launch of f.calls.launches) f.terminate(launch.config);
+        await operation; await disposal;
+    }
+    assertDisposed(f);
+});
+
+test('unconfirmed launch diagnostics identify pending accepted and captured disposal ownership without early cleanup', { timeout: 5000 }, async t => {
+    for (const state of ['pending', 'accepted', 'captured']) {
+        let resolveStart;
+        const f = fixture(t, { ...(state === 'pending' ? { startDebugging: () => new Promise(resolve => { resolveStart = resolve; }) } :
+            state === 'accepted' ? { startDebugging: async () => true } : {}), stopDebugging: async () => {} });
+        const operation = f.api.debugActiveFile();
+        let disposal;
+        try {
+            if (state === 'pending') await waitFor(() => resolveStart, 'The pending API must have an owned launch record');
+            else assert.equal(await operation, true);
+            const config = f.calls.launches[0].config;
+            disposal = observeDisposal(f);
+            assert.equal(f.api.dispose(), disposal.promise);
+            assert.equal(await awaitForegroundResult(operation), state !== 'pending');
+            await new Promise(resolve => setImmediate(resolve));
+            assert.equal(retainedLaunchLines(f).length, 1, 'Repeated disposal must not repeat the ownership diagnosis');
+            const line = retainedLaunchLines(f)[0];
+            assert(line.includes(`startRequest=${state === 'pending' ? 'pending' : 'accepted'}`));
+            assert(line.includes(`session=${state === 'captured' ? f.session(config).id : 'not observed'}`));
+            assert(line.includes(config.__netcoredbgFileAppOutput));
+            assert.equal(disposal.settled, false);
+            assert.equal(f.calls.disposals.output, 0);
+            assert(fs.existsSync(config.program));
+            assert.deepEqual(terminalOutputs(f), []);
+            assert.equal(f.calls.stops.length, state === 'captured' ? 1 : 0);
+            assert.deepEqual(f.calls.errors, []);
+            if (state === 'pending') resolveStart(false);
+            else f.terminate(config);
+            await disposal.promise;
+            assert(!fs.existsSync(config.__netcoredbgFileAppOutput));
+            assertDisposed(f);
+        } finally {
+            const drain = disposal?.promise || f.api.dispose();
+            resolveStart?.(false);
+            for (const launch of f.calls.launches) f.terminate(launch.config);
+            await operation; await drain;
+        }
+    }
+});
+
+test('unconfirmed launch diagnostics stay absent when exact events already arrived or the API declined or rejected', async t => {
+    for (const state of ['started', 'terminated', 'declined', 'rejected']) {
+        let f;
+        f = fixture(t, { ...(state === 'terminated' ? { startDebugging: (_folder, config) => { f.terminate(config); return true; } } : {}),
+            ...(state === 'declined' ? { startResult: false } : {}),
+            ...(state === 'rejected' ? { startDebugging: () => { throw new Error('Original start rejection'); } } : {}),
+        });
+        try {
+            assert.equal(await f.api.debugActiveFile(), state === 'started' || state === 'terminated');
+            assert.equal(unconfirmedLaunchLines(f).length, 0);
+            assert.equal(confirmedLaunchLines(f).length, 0);
+            if (state === 'started') f.terminate(f.calls.launches[0].config);
+            await f.api.dispose();
+            assert.equal(retainedLaunchLines(f).length, 0);
+            assert.equal(f.calls.errors.length, state === 'declined' || state === 'rejected' ? 1 : 0);
+            assertDisposed(f);
+        } finally { await f.api.dispose(); }
+    }
+});
+
+test('unconfirmed launch diagnostics contain throwing sinks and reentrant disposal after updating ownership state', { timeout: 5000 }, async t => {
+    for (const mode of ['accepted-throw', 'accepted-dispose', 'confirmed-throw', 'confirmed-dispose', 'confirmed-terminate', 'dispose-throw', 'dispose-reenter']) {
+        let f, attempts = 0, reentered;
+        const prefix = mode.startsWith('accepted') ? 'Editor accepted C# launch;' : mode.startsWith('confirmed') ? 'Confirmed exact owned C# session start:' : 'Retained C# launch during disposal:';
+        f = fixture(t, { startDebugging: async () => true, appendLine: line => {
+            if (!line.startsWith(prefix)) return;
+            attempts++;
+            if (mode.endsWith('-dispose') || mode === 'dispose-reenter') reentered = f.api.dispose();
+            if (mode === 'confirmed-terminate') f.terminate(f.calls.launches[0].config);
+            throw new Error('Injected unconfirmed-launch diagnostic failure');
+        } });
+        let config;
+        try {
+            assert.equal(await f.api.debugActiveFile(), mode !== 'accepted-dispose');
+            config = f.calls.launches[0].config;
+            if (mode.startsWith('dispose')) {
+                const disposal = observeDisposal(f);
+                assert.equal(attempts, 1);
+                if (mode === 'dispose-reenter') assert.equal(reentered, disposal.promise);
+                assert.equal(disposal.settled, false);
+                assert.equal(f.calls.stops.length, 0);
+                assert(fs.existsSync(config.program));
+                assert(retainedLaunchLines(f)[0].includes('startRequest=accepted'));
+                f.terminate(config);
+                await disposal.promise;
+            } else {
+                f.startSession(config);
+                if (mode.endsWith('-dispose')) {
+                    await reentered;
+                    assert.equal(f.calls.stops.length, 1);
+                    assert.equal(f.calls.stops[0], f.session(config));
+                    if (mode === 'accepted-dispose') assert(retainedLaunchLines(f)[0].includes('startRequest=accepted'));
+                    else assert(retainedLaunchLines(f)[0].includes(`session=${f.session(config).id}`));
+                } else {
+                    assert.deepEqual(f.calls.stops, []);
+                    f.terminate(config);
+                    await f.api.dispose();
+                }
+                assert.equal(attempts, 1);
+                assert.equal(confirmedLaunchLines(f).length, 1);
+            }
+            assert.deepEqual(f.calls.errors, []);
+            assertDisposed(f);
+        } finally {
+            const drain = f.api.dispose();
+            if (config) f.terminate(config);
+            await drain;
+        }
+    }
+});

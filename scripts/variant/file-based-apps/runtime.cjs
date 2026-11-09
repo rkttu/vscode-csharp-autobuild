@@ -383,6 +383,10 @@ function activate(context, dependencies = {}) {
         const launch = launches.get(session.configuration?.__netcoredbgFileAppOutput);
         if (!launch || launch.terminal || !matchesLaunch(session, launch)) return;
         launch.session = session;
+        if (launch.unconfirmedNoted && !launch.confirmationNoted) {
+            launch.confirmationNoted = true;
+            cleanupLog(`Confirmed exact owned C# session start: ${session.id}; startRequest=${launch.startState}; output=${launch.directory}`);
+        }
         if (launch.cancelled) void stopCancelledSession(launch);
     });
     const terminated = vscode.debug.onDidTerminateDebugSession(session => {
@@ -392,7 +396,8 @@ function activate(context, dependencies = {}) {
 
     async function startFileDebugging(folder, config, signal, checkpoint) {
         const launch = { directory: config.__netcoredbgFileAppOutput, program: config.program,
-            cancelled: false, terminal: false, session: undefined, stopPromise: undefined, configuredSessions: new Set() };
+            cancelled: false, terminal: false, session: undefined, stopPromise: undefined, configuredSessions: new Set(),
+            startState: 'pending', unconfirmedNoted: false, confirmationNoted: false };
         launches.set(launch.directory, launch);
         pendingStarts.add(launch);
         let abort;
@@ -409,10 +414,16 @@ function activate(context, dependencies = {}) {
             checkpoint();
             return vscode.debug.startDebugging(folder, config);
         }).then(started => {
+            launch.startState = started ? 'accepted' : 'declined';
+            if (started && !launch.session && !launch.terminal && !launch.unconfirmedNoted) {
+                launch.unconfirmedNoted = true;
+                cleanupLog(`Editor accepted C# launch; awaiting exact owned session start event; output retained: ${launch.directory}; program=${launch.program}; cancelled=${launch.cancelled}`);
+            }
             if (!started && !launch.session) finishLaunch(launch);
             signal.throwIfAborted();
             return started;
         }, error => {
+            launch.startState = 'rejected';
             if (!launch.session) finishLaunch(launch);
             signal.throwIfAborted();
             throw error;
@@ -913,6 +924,7 @@ function activate(context, dependencies = {}) {
             for (const controller of controllers) controller.abort();
             for (const launch of launches.values()) {
                 launch.cancelled = true;
+                cleanupLog(`Retained C# launch during disposal: startRequest=${launch.startState}; session=${launch.session?.id || 'not observed'}; output=${launch.directory}. Pending start results or exact termination remain required; output is preserved.`);
                 void stopCancelledSession(launch);
             }
             releaseDisposedResources();
