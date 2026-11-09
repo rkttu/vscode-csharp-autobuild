@@ -131,12 +131,11 @@ exports.run = async function run() {
     let nativeF5Operation;
     const nativeF5LateStops = [];
     if (nativeF5) {
-        assert.equal(expected.cycles, 2);
         assert.equal(typeof nativeF5.nonce, 'string');
         assert(nativeF5.nonce.length > 0 && nativeF5.windowTitle.includes(nativeF5.nonce));
-        assert.deepEqual(nativeF5.inputs.map(input => input.sequence), [1, 2]);
+        assert.deepEqual(nativeF5.inputs.map(input => input.sequence), Array.from({ length: expected.cycles }, (_, index) => index + 1));
         const files = [nativeF5.closed, ...nativeF5.inputs.flatMap(input => [input.request, input.receipt])];
-        assert.equal(new Set(files).size, 5);
+        assert.equal(new Set(files).size, 2 * expected.cycles + 1);
         for (const file of files) assert(path.isAbsolute(file) && within(root, file) && !exists(file) && !exists(file + '.tmp'));
         delete result.scope.physicalF5;
         Object.assign(result.scope, { invocation: 'native-injected-f5', nativeInjectedF5: true,
@@ -822,7 +821,7 @@ exports.run = async function run() {
         assert.equal(vscode.workspace.workspaceFolders?.length || 0, 0, 'Native F5 control must have no workspace folder');
         assert.equal(vscode.workspace.workspaceFile, undefined);
         assert.equal(vscode.debug.activeDebugSession, undefined, 'F5 must start a new session, not Continue an active one');
-        assert.equal(document.isDirty, input.sequence === 2);
+        assert.equal(document.isDirty, input.sequence > 1);
         const nonce = crypto.randomUUID();
         const launch = { label: `F5-${input.sequence}`, source, revision, nonce, port,
             origin: `http://127.0.0.1:${port}`, dap: [] };
@@ -852,7 +851,7 @@ exports.run = async function run() {
         const diskBefore = fileSnapshot(source);
         const bufferSha256 = crypto.createHash('sha256').update(buffer).digest('hex');
         assert.equal(diskBefore.sha256 === bufferSha256, input.sequence === 1,
-            'First input must be saved; second input must have a distinct unsaved buffer');
+            'First input must be saved; every later input must have a distinct unsaved buffer');
         const request = { schema: 1, nonce: nativeF5.nonce, sequence: input.sequence, launchToken: nonce,
             windowTitle: nativeF5.windowTitle, source, languageId: document.languageId,
             editorWindowFocused: vscode.window.state.focused, activeSource: vscode.window.activeTextEditor.document.uri.fsPath,
@@ -923,7 +922,7 @@ exports.run = async function run() {
         assert.equal(sha256(source), bufferSha256);
         assert.equal(fs.readFileSync(source, 'utf8'), document.getText());
         detail.diskAfter = fileSnapshot(source);
-        if (input.sequence === 2) {
+        if (input.sequence > 1) {
             assert(detail.savedEvents?.length > 0, 'Dirty F5 repeat must observe a source save event');
             assert.notEqual(detail.diskAfter.sha256, diskBefore.sha256);
         }
@@ -2338,15 +2337,16 @@ exports.run = async function run() {
             let previous;
             for (const input of nativeF5.inputs) {
                 requireNativeF5Open();
-                const revision = input.sequence === 1 ? 'initial' : 'retry-f5-2';
-                if (input.sequence === 2) await phase('native F5 dirty repeat preparation after exact cleanup', async () => {
+                const revision = input.sequence === 1 ? 'initial' : `retry-f5-${input.sequence}`;
+                if (input.sequence > 1) await phase(`native F5 input ${input.sequence} dirty repeat preparation after exact cleanup`, async () => {
                     requireNativeF5Open();
                     assert(previous.terminated && !pidAlive(previous.pid) && !exists(previous.output) && queueEmpty(previous.base));
                     assert.equal(await canBind(port), true);
                     requireNativeF5Open();
                     const content = document.getText();
-                    assert(content.includes('const string revision = "initial";'));
-                    const replacement = content.replace('const string revision = "initial";', 'const string revision = "retry-f5-2";');
+                    const priorRevision = `const string revision = "${previous.revision}";`;
+                    assert.equal(content.split(priorRevision).length, 2, 'The previous revision must occur exactly once');
+                    const replacement = content.replace(priorRevision, `const string revision = "${revision}";`);
                     const edit = new vscode.WorkspaceEdit();
                     edit.replace(document.uri, new vscode.Range(document.positionAt(0), document.positionAt(content.length)), replacement);
                     assert.equal(await vscode.workspace.applyEdit(edit), true);
@@ -2372,11 +2372,14 @@ exports.run = async function run() {
                 });
                 previous = launch;
             }
-            assert.equal(launches.length, 2);
-            assert(result.nativeF5.inputs.every(input => input.route && input.response));
+            assert.equal(launches.length, expected.cycles);
+            assert.equal(result.nativeF5.inputs.length, expected.cycles);
+            assert(result.nativeF5.inputs.every(input => input.route && input.response && input.receipt));
+            for (const key of ['nonce', 'output']) assert.equal(new Set(launches.map(launch => launch[key])).size, expected.cycles, `Every native input needs a distinct ${key}`);
+            assert.equal(new Set(launches.map(launch => launch.session.id)).size, expected.cycles, 'Every native input needs a distinct session');
             assert.equal(document.isDirty, false);
-            closeNativeF5('two-cycle control completed');
-            result.checks.push('One no-folder profile: two external native injected F5 inputs, dirty save/revision repeat, exact per-session Stop and PID/port/output cleanup; not full qualification or hardware keyboard input');
+            closeNativeF5(`${expected.cycles}-cycle control completed`);
+            result.checks.push(`One no-folder profile: ${expected.cycles} external native injected F5 inputs, dirty save/revision repeats, exact per-session Stop and PID/port/output cleanup; not full qualification or hardware keyboard input`);
             if (eventError) throw eventError;
             result.success = true;
             return;

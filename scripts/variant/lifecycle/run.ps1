@@ -7,8 +7,8 @@ $ErrorActionPreference = 'Stop'
 $work = (Resolve-Path -LiteralPath $WorkDir).Path
 $expected = Get-Content -LiteralPath (Join-Path $work 'expected.json') -Raw | ConvertFrom-Json
 if ($expected.schema -ne 1 -or !$expected.candidate.localOnly -or $expected.candidate.published) { throw 'Expected a local lifecycle preparation' }
-if ($expected.scenario -eq 'native-f5' -and (!$ShowWindow -or !$expected.nativeF5 -or $expected.cycles -ne 2)) {
-    throw 'The two-cycle native F5 control requires its prepared handshake and -ShowWindow'
+if ($expected.scenario -eq 'native-f5' -and (!$ShowWindow -or !$expected.nativeF5 -or $expected.cycles -lt 2 -or $expected.cycles -gt 10)) {
+    throw 'The 2..10-cycle native F5 control requires its prepared handshake and -ShowWindow'
 }
 foreach ($marker in @('attempt.json', 'launch.json', 'launcher-result.json')) {
     if (Test-Path -LiteralPath (Join-Path $work $marker)) { throw 'This profile has already been attempted; use a fresh work directory and retain its first result' }
@@ -72,7 +72,7 @@ $launcher = @{ schema = 1; success = $false; work = $work; candidateSha256 = $ex
     visibleWindowRequested = [bool]$ShowWindow;
     scope = 'normally installed local candidate and dependency; isolated VSCodium command API control, not qualification' }
 if ($expected.scenario -eq 'native-f5') {
-    $launcher.scope = 'normally installed local candidate; one no-folder profile, two native injected F5 HTTP Web launches; not hardware input or full qualification'
+    $launcher.scope = "normally installed local candidate; one no-folder profile, $($expected.cycles) native injected F5 HTTP Web launches; not hardware input or full qualification"
 }
 $process = $null
 
