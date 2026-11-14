@@ -53,7 +53,7 @@ The [stability contract](stability-contract.md) permits an explicit manual check
 
    The unchanged **90-second input/observation phase** includes the human observation, keypress, receipt publication and ensuing driver assertions. The request expiry does not pause the enclosing phase, which starts before request publication and can close first. Prepare the terminal in advance; do not extend or pause timers or change assertions to accommodate an operator delay.
 
-3. **Launch the prepared profile visibly once.** Use the frozen launcher and its normal installation path. For example, the optional 2,400-second whole-run safety cap is within the existing 60..3,600-second range; the default remains 300 seconds.
+3. **Launch the prepared profile visibly once.** Use the frozen launcher and its normal installation path. For example, the optional 2,400-second editor-process lifetime cap is within the existing 60..3,600-second range; the default remains 300 seconds.
 
    ```powershell
    & $powershell -NoLogo -NoProfile -File `
@@ -61,7 +61,7 @@ The [stability contract](stability-contract.md) permits an explicit manual check
        -WorkDir $work -DeadlineSeconds 2400 -ShowWindow
    ```
 
-   This outer cap is a test safety ceiling, not a calibrated product deadline. It neither extends a 90-second phase nor guarantees that every phase can consume its full allowance. Do not change launcher security flags, clear caches, reload/reinstall, or switch input modes to obtain a pass after failure.
+   This outer cap starts after the editor is launched and does not bound pre-editor installation/setup or uncooperative OS I/O. It is a test safety ceiling, not a calibrated product deadline. It neither extends a 90-second phase nor guarantees that every phase can consume its full allowance. Do not change launcher security flags, clear caches, reload/reinstall, or switch input modes to obtain a pass after failure.
 
 4. **For each published request, observe, press once, then attest.** Wait for `needs-f5-input-01.json` and the matching armed state in `progress/state.json`. Compare the current request's nonce, sequence, launch token, source and window title with the prepared profile. Before input, check that `f5-input-closed.json` is absent, `progress/state.json` has no `firstFailure`, and the request is still live. If the state is closed, expired, uncertain or failed, stop without sending input or publishing a receipt.
 
@@ -77,6 +77,6 @@ The [stability contract](stability-contract.md) permits an explicit manual check
 
    Stop the series at the first failed preparation, launch, observation, helper publication or driver assertion. Missing readiness, an expired phase, an uncertain/double keypress or a helper refusal is not permission to press again. Preserve the complete work directory, original logs/trace, request/receipt/partial files, elapsed times and first-failure records, together with the human's actual account. Do not prepare a second profile after that failure, restart a consecutive count, rerun the same work directory or hide the failure behind a later success. Any investigated future series needs a separate prospective plan and new directory.
 
-The full contract still requires **two independently created profiles with ten consecutive cycles each**, the same target candidate ZIP and pins within the planned series, and the first-failure protocol. The two-input example does not satisfy that plan. This change supplies neither a qualifying two-profile runner nor candidate-ZIP reuse across independent preparations; invoking the preparer twice builds candidates and does not by itself prove the required same-ZIP reuse. That orchestration and its evidence must be provided separately before a qualification claim.
+The full contract still requires **two independently created profiles with ten consecutive cycles each**, the same target candidate ZIP and pins within the planned series, and the first-failure protocol. The two-input example does not satisfy that plan. Use the separate [native F5 series workflow](f5-series-validation.md) to build one candidate, copy its exact bytes to independent profiles and gate the second preparation on complete first-profile evidence. Invoking this single-profile preparer twice without the pinned reuse option does not prove same-ZIP reuse. The series tooling is prospective infrastructure; actual recorded execution and the remaining qualification gates are still required.
 
 Actual AC7 completion, policy decisions for AC1/4/6, native macOS, menu parity, rapid duplicate F5, active-session Continue/keybinding precedence, LSP/context health, HTTPS, calibration, [#45](https://github.com/rkttu/vscode-csharp-autobuild/issues/45) and release qualification remain open. A future successful manual control would establish only its explicitly recorded target, fixture, inputs and assertions; it would not close [#18](https://github.com/rkttu/vscode-csharp-autobuild/issues/18) or qualify the full matrix.
