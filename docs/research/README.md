@@ -24,6 +24,8 @@ The existing production workflow and `dotnetdev-kr-custom.csharp` publication po
 
 ## Subsequent investigations
 
+- [Issue 18 progress review and post-62 work plan](2026-11-11-issue-18-post-pr62-plan.md) (November 11, 2026): reviewed draft #62, focused synthetic regression results, scoped native-evidence history, and ordered actual-series, acceptance-policy, Pause-diagnosis and qualification work. Documentation only; no new native run or acceptance approval.
+
 - [Web bootstrap and FBA snippets release](2026-11-03-file-based-web-snippets-release.md) (November 3, 2026): completed `11.7.18004` publication, 29 successful CI jobs, actual installed-package checks, launch profiles, browser readiness, development HTTPS, 21 snippets, and README installation-guidance cleanup.
 
 - [Web file-based app bootstrap](2026-11-03-file-based-web-bootstrap.md) (November 3, 2026): evaluated SDK identity, launch profiles, browser readiness, development HTTPS certificates, and a wrapper-level implementation path.
