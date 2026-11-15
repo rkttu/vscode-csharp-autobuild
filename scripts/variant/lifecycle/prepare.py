@@ -1,85 +1,17 @@
 """Prepare a local-only installed-editor lifecycle candidate and fresh profile."""
 import argparse
-import copy
-import hashlib
 import json
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 import struct
 import subprocess
 import sys
 import uuid
-import xml.etree.ElementTree as ET
 import zipfile
 
 REPO = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(REPO / "scripts/variant"))
-from overlay import FILE_APP_MODULES
-
-EXTENSION_ID = "dotnetdev-kr-custom.csharp-with-netcoredbg"
-DISPLAY_NAME = "C# (netcoredbg) LOCAL WEB LIFECYCLE TEST"
-
-
-def digest(data):
-    return hashlib.sha256(data).hexdigest()
-
-
-def build_candidate(base, modules, target, source_commit, output, expected_sha):
-    """Replace only owned modules and local-only metadata; verify all other bytes."""
-    if digest(base.read_bytes()) != expected_sha.lower():
-        raise ValueError("Base VSIX SHA-256 differs from the pinned input")
-    with zipfile.ZipFile(base) as archive:
-        names = archive.namelist()
-        if len(names) != len(set(names)):
-            raise ValueError("Duplicate ZIP entries")
-        # ZipInfo.filename normalizes backslashes on Windows; validate the
-        # original central-directory spelling before trusting normalized names.
-        for info in archive.infolist():
-            name = info.orig_filename
-            parts = PurePosixPath(name)
-            if parts.is_absolute() or ".." in parts.parts or "\\" in name or ":" in name:
-                raise ValueError("Unsafe ZIP entry")
-        package = json.loads(archive.read("extension/package.json"))
-        if package.get("netcoredbgBuild", {}).get("target") != target:
-            raise ValueError("Base VSIX target differs from the selected native target")
-        if f"{package.get('publisher')}.{package.get('name')}" != EXTENSION_ID:
-            raise ValueError("Unexpected extension ID")
-        if package.get("main") != "./.netcoredbg/entry.cjs":
-            raise ValueError("Base VSIX must already contain the owned entry wrapper")
-        owned = {name: (modules / name).read_bytes() for name in FILE_APP_MODULES}
-        identity = {"baseVsixSha256": expected_sha.lower(), "sourceCommit": source_commit,
-                    "target": target, "ownedModules": {name: digest(data) for name, data in owned.items()}}
-        build_id = digest(json.dumps(identity, sort_keys=True, separators=(",", ":")).encode())
-        package["displayName"] = DISPLAY_NAME
-        package["netcoredbgBuild"].update(localCandidate=True, lifecycleBuildId=build_id,
-                                           lifecycleSourceCommit=source_commit)
-        replacements = {f"extension/.netcoredbg/{name}": data for name, data in owned.items()}
-        replacements["extension/package.json"] = (json.dumps(package, indent=2) + "\n").encode()
-        manifest = ET.fromstring(archive.read("extension.vsixmanifest"))
-        for element in manifest.iter():
-            if element.tag.rsplit("}", 1)[-1] == "DisplayName":
-                element.text = DISPLAY_NAME
-        replacements["extension.vsixmanifest"] = ET.tostring(manifest, encoding="utf-8", xml_declaration=True)
-        allowed = set(replacements)
-        output.parent.mkdir(parents=True, exist_ok=True)
-        with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as candidate:
-            for info in archive.infolist():
-                candidate.writestr(copy.copy(info), replacements.pop(info.filename, archive.read(info.filename)))
-            for name, data in replacements.items():
-                candidate.writestr(name, data)
-        with zipfile.ZipFile(output) as candidate:
-            if set(candidate.namelist()) != set(names) | allowed:
-                raise ValueError("Candidate contains unexpected entries")
-            immutable = {}
-            for name in names:
-                if name not in allowed:
-                    original = archive.read(name)
-                    if candidate.read(name) != original:
-                        raise ValueError("Non-owned payload changed: " + name)
-                    immutable[name] = digest(original)
-        return {**identity, "buildId": build_id, "sha256": digest(output.read_bytes()),
-                "path": str(output), "version": package["version"], "localOnly": True,
-                "published": False, "unchangedEntries": len(immutable),
-                "unchangedPayloadDigest": digest(json.dumps(immutable, sort_keys=True).encode())}
+from lifecycle.candidate import (DISPLAY_NAME, EXTENSION_ID, FILE_APP_MODULES, build_candidate,
+                                 copy_candidate_manifest, digest, load_candidate_manifest)
 
 
 def fresh_directory(directory):
@@ -132,6 +64,9 @@ def main():
     parser.add_argument("--dotnet", type=Path, required=True)
     parser.add_argument("--sdk-version", required=True)
     parser.add_argument("--work-dir", type=Path, required=True)
+    parser.add_argument("--candidate-manifest", type=Path,
+                        help="Reuse a pinned series candidate for a fresh native-f5 profile")
+    parser.add_argument("--candidate-manifest-sha256")
     parser.add_argument("--cycles", type=int, default=3)
     parser.add_argument("--native-f5-input", choices=("native-injected", "manual-native"),
                         help="Freeze the input mechanism for a new native-f5 profile (default: native-injected)")
@@ -141,6 +76,10 @@ def main():
         parser.error("Use 2..10 cycles to exercise bounded same-file retry")
     if args.native_f5_input is not None and args.scenario != "native-f5":
         parser.error("--native-f5-input is only valid with --scenario native-f5")
+    if (args.candidate_manifest is None) != (args.candidate_manifest_sha256 is None):
+        parser.error("--candidate-manifest and --candidate-manifest-sha256 are required together")
+    if args.candidate_manifest is not None and args.scenario != "native-f5":
+        parser.error("--candidate-manifest is only valid with --scenario native-f5")
     editor = args.editor.resolve(strict=True)
     editor_cli = args.editor_cli.resolve(strict=True)
     dotnet = args.dotnet.resolve(strict=True)
@@ -159,10 +98,19 @@ def main():
     if product.get("applicationName") != "codium":
         parser.error("Use VSCodium for this baseline control")
     work = args.work_dir.resolve()
-    fresh_directory(work)
     source_commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=REPO, text=True).strip()
-    candidate = build_candidate(args.base_vsix.resolve(strict=True), REPO / "scripts/variant/file-based-apps",
-                                "win32-arm64", source_commit, work / "local-lifecycle.vsix", args.base_sha256)
+    base = args.base_vsix.resolve(strict=True)
+    modules = REPO / "scripts/variant/file-based-apps"
+    validated = (load_candidate_manifest(args.candidate_manifest, args.candidate_manifest_sha256,
+                                        base, modules, "win32-arm64", source_commit, args.base_sha256)
+                 if args.candidate_manifest is not None else None)
+    fresh_directory(work)
+    candidate_reuse = None
+    if validated is not None:
+        candidate, candidate_reuse = copy_candidate_manifest(validated, work / "local-lifecycle.vsix")
+    else:
+        candidate = build_candidate(base, modules, "win32-arm64", source_commit,
+                                    work / "local-lifecycle.vsix", args.base_sha256)
     for directory in ("profile/User", "extensions", "workspace", "driver", "appdata/NuGet", "localappdata",
                       "dotnet-home", "nuget-packages", "nuget-cache", "tmp", "logs"):
         (work / directory).mkdir(parents=True, exist_ok=True)
@@ -237,7 +185,7 @@ def main():
         settings["files.autoSave"] = "off"
     (work / "profile/User/settings.json").write_text(json.dumps(settings, indent=2))
     harness = {name: digest((Path(__file__).parent / name).read_bytes())
-               for name in ("prepare.py", "run.ps1", "driver.cjs", "extension-test.cjs", "fixtures/web.cs")}
+               for name in ("prepare.py", "candidate.py", "run.ps1", "driver.cjs", "extension-test.cjs", "fixtures/web.cs")}
     if native_f5:
         harness["native-f5-input.cjs"] = digest((Path(__file__).parent / "native-f5-input.cjs").read_bytes())
     if native_cancellation:
@@ -259,6 +207,8 @@ def main():
                 "dependency": {"path": str(runtime), "sha256": args.runtime_sha256.lower(), "version": "3.2.0"},
                 "scope": {"localOnly": True, "published": False, "qualification": False, "physicalF5": False,
                           "macOS": False, "invocation": "command-api", "freshProfiles": 1}}
+    if candidate_reuse is not None:
+        expected["candidateReuse"] = candidate_reuse
     if native_cancellation:
         expected["nativeCancellation"] = native_cancellation
     if handoff_cancellation:

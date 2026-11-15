@@ -219,12 +219,22 @@ exports.run = async function run() {
     function closeNativeF5(reason) {
         if (!nativeF5 || nativeF5Closed) return;
         nativeF5Closed = true;
+        if (exists(nativeF5.closed)) {
+            // A series controller can close input while this observer waits.
+            // Preserve that original marker; its presence is a conservative
+            // stop condition, not permission to overwrite or trust its text.
+            record('f5-input-closed-observed', { path: nativeF5.closed, reason });
+            return;
+        }
         const detail = { schema: 1, nonce: nativeF5.nonce, reason, closedAtUtc: new Date().toISOString() };
         fs.writeFileSync(nativeF5.closed, JSON.stringify(detail, null, 2) + '\n', { flag: 'wx' });
         record('f5-input-closed', detail);
     }
 
     function requireNativeF5Open() {
+        if (nativeF5 && !nativeF5Closed && exists(nativeF5.closed)) {
+            closeNativeF5('external closure marker observed');
+        }
         assert(!nativeF5Closed && !result.firstFailure, 'Native F5 input closed after completion or first failure');
     }
 
@@ -483,6 +493,19 @@ exports.run = async function run() {
         launch.portReusableAtMilliseconds = elapsed(start);
         await until(() => !exists(launch.output) && queueEmpty(launch.base), `${launch.label} owned output and terminal queues cleanup`);
         launch.outputRemovedAtMilliseconds = elapsed(start);
+        if (nativeF5) {
+            // These are the separate successful observations above, not an
+            // atomic guarantee that OS resources remain absent indefinitely.
+            launch.cleanupObservation = {
+                base: launch.base, sessionId: launch.session.id, pid: launch.pid,
+                port: launch.port, output: launch.output,
+                sessionTerminated: true, pidExited: true, portReusable: true,
+                outputAbsent: true, terminalQueuesEmpty: true,
+                observedAtMilliseconds: { termination: launch.terminatedAtMilliseconds,
+                    pid: launch.pidGoneAtMilliseconds, port: launch.portReusableAtMilliseconds,
+                    outputAndQueues: launch.outputRemovedAtMilliseconds },
+            };
+        }
         record('owned-resources-released', { label: launch.label, pid: launch.pid, port: launch.port, output: launch.output });
         state();
     }
@@ -934,11 +957,12 @@ exports.run = async function run() {
             assert(detail.savedEvents?.length > 0, 'Dirty F5 repeat must observe a source save event');
             assert.notEqual(detail.diskAfter.sha256, diskBefore.sha256);
         }
-        let outputTail, rendererTail;
+        let outputTail, rendererTail, nativeOutputFile;
         await until(() => {
             requireNativeF5Open();
             const file = outputLog();
             if (!file) return false;
+            nativeOutputFile = file;
             outputTail = outputBefore ? logTail(outputBefore) : fs.readFileSync(file, 'utf8');
             rendererTail = logTail(rendererBefore);
             return outputTail.includes('Phase completed: Starting netcoredbg') &&
@@ -955,6 +979,10 @@ exports.run = async function run() {
         detail.route = { ...rendererBefore, tailCharacters: rendererTail.length,
             tailSha256: crypto.createHash('sha256').update(rendererTail).digest('hex'), f5Dispatches, targetCommands };
         detail.builds = builds;
+        detail.outputEvidence = logEvidence(outputBefore || {
+            path: nativeOutputFile, offsetCharacters: 0,
+            prefixSha256: crypto.createHash('sha256').update('').digest('hex'),
+        }, outputTail, source);
         detail.configuration = JSON.parse(JSON.stringify(launch.session.configuration));
         vscode.debug.removeBreakpoints([breakpoint]);
         breakpoints.splice(breakpoints.indexOf(breakpoint), 1);
@@ -2637,7 +2665,7 @@ exports.run = async function run() {
             commandPending: launch.commandPending,
             commandInvocations: launch.commandInvocations, commandResults: launch.commandResults,
             profileSnapshot: launch.profileSnapshot, sourceSnapshot: launch.sourceSnapshot,
-            dap: adapterLoss ? launch.dap : undefined, dapRequests: launch.dapRequests, adapterExits: launch.adapterExits,
+            dap: adapterLoss || nativeF5 ? launch.dap : undefined, dapRequests: launch.dapRequests, adapterExits: launch.adapterExits,
             capturedSessions: capturedSessionState(launch),
             startedAtMilliseconds: launch.startedAtMilliseconds,
             stopRequestedAtMilliseconds: launch.stopRequestedAtMilliseconds,
@@ -2646,6 +2674,7 @@ exports.run = async function run() {
             pidGoneAtMilliseconds: launch.pidGoneAtMilliseconds,
             portReusableAtMilliseconds: launch.portReusableAtMilliseconds,
             outputRemovedAtMilliseconds: launch.outputRemovedAtMilliseconds,
+            ...(nativeF5 ? { base: launch.base, cleanupObservation: launch.cleanupObservation } : {}),
         }));
         result.failedBuildAttempts = failedBuildAttempts.map(attempt => ({
             label: attempt.label, source: attempt.source, revision: attempt.revision, nonce: attempt.nonce,
