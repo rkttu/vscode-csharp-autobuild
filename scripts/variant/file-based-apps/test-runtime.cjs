@@ -1591,9 +1591,11 @@ test('a preparation deadline aborts a real child and cleanup follows direct-chil
     const operation = f.api.debugActiveFile();
     t.after(async () => { f.context.subscriptions.at(-1).dispose(); await operation; });
     assert.equal(await operation, false);
-    exited();
     const build = f.calls.processes.find(call => call.args[0] === 'build');
+    // The foreground deadline settles before the aborted child drains. The
+    // removeOutput hook above still verifies termination before any deletion.
     await waitForRemovedOutput(f, build.args[build.args.indexOf('--output') + 1]);
+    exited();
     assert(!fs.existsSync(build.args[build.args.indexOf('--output') + 1]));
     assert.equal(f.calls.errors.length, 1);
     assert.match(f.calls.errors[0], /timed out.*Building file-based app/i);
